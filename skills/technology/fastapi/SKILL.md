@@ -70,7 +70,7 @@ Stop and record the gap (see Section 13).
 4. Dependencies declared in `requirements.txt`: `fastapi`, `uvicorn[standard]`, `pydantic`,
    `python-decouple`, `sqlalchemy`, `alembic`, and a PostgreSQL driver.
 5. `specs.md` has been read for the entity or endpoint being implemented.
-6. Authentication and session work follows the validated decision in `specs.md`, section 7.
+6. Authentication and session work follows the validated decision in `specs.md`, Section 7 ("Regras de identificação e sessão").
 
 ## 7. Procedure
 
