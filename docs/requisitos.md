@@ -74,8 +74,9 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 ### Módulo 1 — Identificação e acesso
 
 - **[RF01] Cadastro enxuto:** o sistema deve permitir cadastro solicitando apenas nome,
-  e-mail com domínio `@aluno.unb.br` e senha. A posse do endereço deve ser confirmada por
-  link enviado por e-mail. Não devem ser solicitados matrícula, CPF ou histórico acadêmico.
+  e-mail com domínio `@aluno.unb.br` e senha. A conta é criada antes da confirmação do
+  endereço, mas somente pode registrar avaliações depois da confirmação por link, conforme
+  RF14. Não devem ser solicitados matrícula, CPF ou histórico acadêmico.
 - **[RF02] Sessão autenticada:** o sistema deve autenticar o usuário e manter, no servidor,
   uma sessão identificada no navegador por cookie seguro. A sessão deve expirar após sete
   dias consecutivos de inatividade e ser invalidada no logout.
