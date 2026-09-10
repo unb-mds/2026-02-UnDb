@@ -74,9 +74,12 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 ### Módulo 1 — Identificação e acesso
 
 - **[RF01] Cadastro enxuto:** o sistema deve permitir cadastro solicitando apenas nome,
-  e-mail e senha. Não devem ser solicitados matrícula, CPF ou histórico acadêmico.
-- **[RF02] Sessão autenticada:** o sistema deve autenticar o usuário e manter sessão válida
-  para as operações que exigem identificação.
+  e-mail com domínio `@aluno.unb.br` e senha. A conta é criada antes da confirmação do
+  endereço, mas somente pode registrar avaliações depois da confirmação por link, conforme
+  RF14. Não devem ser solicitados matrícula, CPF ou histórico acadêmico.
+- **[RF02] Sessão autenticada:** o sistema deve autenticar o usuário e manter, no servidor,
+  uma sessão identificada no navegador por cookie seguro. A sessão deve expirar após sete
+  dias consecutivos de inatividade e ser invalidada no logout.
 - **[RF03] Bloqueio de avaliação duplicada:** o sistema deve impedir que o mesmo usuário
   avalie o mesmo professor na mesma disciplina mais de uma vez.
 - **[RF04] Consulta sem cadastro:** o sistema deve permitir consulta livre a todos os
@@ -111,9 +114,9 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 
 ### Módulo 5 — Registro de avaliação
 
-- **[RF14] Registro estruturado:** o sistema deve permitir que um estudante autenticado
-  registre avaliação de um professor em uma disciplina através dos cinco critérios da
-  seção 6, sem campo de texto livre.
+- **[RF14] Registro estruturado:** o sistema deve permitir que um estudante autenticado e
+  com e-mail confirmado registre avaliação de um professor em uma disciplina através dos
+  cinco critérios da seção 6, sem campo de texto livre.
 - **[RF15] Agregação por natureza do critério:** o sistema deve agregar cada critério
   conforme sua natureza, sem misturar regras de fato e de opinião (seção 6).
 
@@ -226,11 +229,32 @@ se o caso de módulo livre (RF07) está sendo atendido.
 
 ---
 
-## 11. Decisões pendentes
+## 11. Decisões de acesso e pendências
+
+### Identificação, cadastro e sessão — validada para a Release 1
+
+O grupo validou em reunião presencial de 09/09/2026, nas mesas do UAC, o seguinte modelo:
+
+- a consulta de avaliações é pública e não exige conta;
+- o registro de avaliações exige conta com e-mail confirmado;
+- o cadastro solicita somente nome, e-mail `@aluno.unb.br` e senha;
+- a posse do endereço é confirmada por link enviado ao e-mail cadastrado;
+- somente quem mantém acesso ao domínio aceito pode concluir o cadastro; ex-alunos sem esse
+  acesso e outros vínculos institucionais não são contemplados na Release 1;
+- a sessão é mantida no servidor e identificada por valor aleatório em cookie `HttpOnly`,
+  `SameSite=Lax` e `Secure` em produção;
+- a sessão expira após sete dias consecutivos de inatividade; atividade válida renova esse
+  prazo, e o logout invalida a sessão no servidor e remove o cookie do navegador;
+- matrícula, CPF e histórico acadêmico não são coletados.
+
+A reunião foi convocada no grupo de WhatsApp da equipe. Participaram Nicolas, Vinicius,
+Gabriel, Tiago e Warlley; Yasmin não participou. A decisão vale para a Release 1 e será
+reavaliada na validação geral da release, permitindo correções para a Release 2.
+
+### Demais decisões pendentes
 
 | Decisão | Bloqueia | Responsável |
 |---|---|---|
-| Identificação do aluno — modelo de cadastro e sessão | RF01–RF03, e por consequência RF14 | Time + professora |
 | Modelo de execução do SQLAlchemy (síncrono ou assíncrono) | RF14–RF16, RNF05 | Time |
 | Estratégia de deploy do frontend Next.js (SSR vs export estático) | Todos os RF de interface | Time |
 | Valor de N (métrica de cobertura) e mínimo do RNF02 | Apenas métrica e exibição | PO |

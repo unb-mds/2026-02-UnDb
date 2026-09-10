@@ -35,7 +35,7 @@ O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanham
 
 ### Releases
 
-- **Release 1:** _(data a definir)_
+- **Release 1:** 28/09/2026
 - **Release 2 (final):** 25/11/2026
 
 ## Como rodar o projeto localmente

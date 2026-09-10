@@ -53,7 +53,7 @@ Ordinalidade para desempate de moda: `DIFICIL > MEDIO > FACIL` e `BOM > MEDIO > 
 |---|---|---|
 | `id` | UUID | PK |
 | `nome` | VARCHAR(100) | obrigatório |
-| `email` | VARCHAR(150) | UNIQUE, obrigatório, domínio institucional da UnB |
+| `email` | VARCHAR(150) | UNIQUE, obrigatório, domínio `@aluno.unb.br` |
 | `password_hash` | VARCHAR(255) | hash forte |
 | `email_confirmado` | BOOLEAN | default `false` |
 | `created_at` | TIMESTAMPTZ | default now |
@@ -171,6 +171,21 @@ suficientes, independentemente da chave escolhida.
 4. Validar que `qualidade_material` é `null` quando `disponibiliza_material` é `false`.
 5. Nenhum campo de texto livre é aceito no Release 1. Se um chegar na requisição, rejeitar.
 
+### Regras de identificação e sessão
+
+1. Consultas públicas não exigem conta nem sessão.
+2. O cadastro aceita apenas e-mail com domínio `@aluno.unb.br` e envia um link de
+   confirmação para comprovar a posse do endereço.
+3. Uma conta com `email_confirmado = false` não pode registrar avaliação. As consultas
+   permanecem públicas e não dependem da autenticação dessa conta.
+4. A sessão fica armazenada no servidor e é identificada no navegador por valor aleatório
+   em cookie `HttpOnly`, `SameSite=Lax` e `Secure` em produção.
+5. A sessão expira após sete dias consecutivos de inatividade. Cada atividade autenticada
+   válida renova o prazo por mais sete dias.
+6. O logout invalida a sessão no servidor e remove o cookie do navegador.
+7. Ex-alunos sem acesso ao domínio aceito e outros vínculos institucionais não são
+   contemplados pelo cadastro da Release 1.
+
 ---
 
 ## 8. Contrato de API
@@ -183,6 +198,7 @@ modelo SQLAlchemy diretamente.
 | `POST` | `/auth/cadastro` | não | Cria usuário, dispara e-mail de confirmação |
 | `GET` | `/auth/confirmar/{token}` | não | Confirma e-mail |
 | `POST` | `/auth/login` | não | Autentica |
+| `POST` | `/auth/logout` | sim | Invalida a sessão atual e remove seu cookie |
 | `GET` | `/professores/busca?nome=` | não | Busca por nome parcial |
 | `GET` | `/disciplinas/busca?termo=` | não | Busca por nome ou código |
 | `GET` | `/professores/{id}/disciplinas/{disciplina_id}` | não | Agregado de um professor numa disciplina |
@@ -219,11 +235,9 @@ Não implementar nem inventar valor para os itens abaixo.
 
 | Item | Situação |
 |---|---|
-| Domínio de e-mail institucional da UnB | A confirmar junto à universidade |
 | Provedor de envio de e-mail e ambiente de desenvolvimento | Não decidido |
-| Formato de sessão (token, expiração) | Não decidido |
+| Validade do link de confirmação de e-mail | Não decidido |
 | Viabilidade do scraping do SIGAA (páginas em JSF com ViewState) | A verificar antes de estimar a importação |
-| Ex-aluno sem acesso ao e-mail institucional | Caso de borda não decidido |
 | Estratégia de povoamento inicial da base | Não decidido |
 
 ---

@@ -2,7 +2,7 @@
 name: fastapi
 description: Set up, structure, and extend the project's FastAPI backend service — project layout, routers, Pydantic schemas, settings, domain logic, repositories, and database access. Use whenever creating the initial FastAPI project structure, adding a new endpoint/router, defining a request/response schema, configuring environment-based settings, writing aggregation logic, or wiring the database session layer.
 metadata:
-  project-version: "0.2.0"
+  project-version: "0.3.0"
   project-status: "proposed"
   project-category: "technology"
   project-scope: "backend"
@@ -70,6 +70,7 @@ Stop and record the gap (see Section 13).
 4. Dependencies declared in `requirements.txt`: `fastapi`, `uvicorn[standard]`, `pydantic`,
    `python-decouple`, `sqlalchemy`, `alembic`, and a PostgreSQL driver.
 5. `specs.md` has been read for the entity or endpoint being implemented.
+6. Authentication and session work follows the validated decision in `specs.md`, Section 7 ("Regras de identificação e sessão").
 
 ## 7. Procedure
 
@@ -254,12 +255,13 @@ If a migration conflicts, do not edit an applied migration. Create a new one.
 - **Sync or async SQLAlchemy.** ADR 01 chose SQLAlchemy but did not specify the execution
   model. This affects the driver (`psycopg` vs `asyncpg`), session handling, and every
   repository signature. Decide before writing the first repository.
-- Session/token format for authentication (see `specs.md`, section 10).
 - Whether the SIGAA scraper requires browser automation, which would add a structural
   dependency to the backend image.
 
 ## 16. Change history
 
+- `0.3.0` — authentication session decision synchronized with `specs.md`: server-side
+  sessions are no longer a pending decision in this skill. Remains `proposed`.
 - `0.2.0` — ORM changed from the proposed Tortoise ORM to SQLAlchemy + Alembic (ADR 01);
   structure extended with `domain/`, `repositories/` and `scrapers/`; constraints aligned
   with `specs.md`. Remains `proposed`.
