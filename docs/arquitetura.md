@@ -3,8 +3,8 @@
 Sistema de avaliação de professores e disciplinas da UnB.
 Requisitos em [`requisitos.md`](requisitos.md).
 
-> **Estado:** as decisões deste documento são **proposta do PO**, fundamentadas em
-> requisitos já validados. Passam a valer como decisão do projeto após validação do time.
+> **Estado:** cada ADR informa seu próprio estado. O ADR 03 foi validado pelo grupo para a
+> Release 1; os demais permanecem como **proposta do PO** até validação específica do time.
 
 ---
 
@@ -222,13 +222,19 @@ problema para a Epic de Docker, existe a alternativa de usar exportação estát
 
 ### ADR 03 — Identificação por e-mail institucional confirmado
 
+**Estado.** Validada pelo grupo para a Release 1 em reunião presencial de 09/09/2026. A
+decisão será reavaliada na validação geral da release e poderá ser refinada para a Release 2.
+
 **Contexto.** O RF03 exige impedir avaliação duplicada, o que requer identificar o avaliador.
 O sistema expõe publicamente avaliações sobre pessoas identificáveis pelo nome, o que torna
 a origem das avaliações uma questão de credibilidade e não apenas de integridade de dados.
 
-**Decisão.** Cadastro com nome, e-mail e senha, restrito a e-mail de domínio institucional da
-UnB, com confirmação por link antes de a conta poder avaliar. Nenhum dado acadêmico é
-armazenado.
+**Decisão.** Cadastro com nome, e-mail e senha, restrito ao domínio `@aluno.unb.br`, com
+confirmação por link antes de a conta poder avaliar. A consulta permanece pública. A sessão
+é armazenada no servidor e identificada por valor aleatório em cookie `HttpOnly`,
+`SameSite=Lax` e `Secure` em produção. Ela expira após sete dias consecutivos de inatividade;
+atividade válida renova esse prazo, e o logout invalida a sessão no servidor e remove o
+cookie. Nenhum dado acadêmico é armazenado.
 
 **Justificativa.** Cadastro com e-mail livre resolveria a duplicata, mas permitiria que
 qualquer pessoa fora da universidade avaliasse professores da UnB — inclusive de forma
@@ -236,11 +242,15 @@ coordenada. A restrição de domínio responde diretamente à preocupação leva
 exposição de professores, sem exigir matrícula ou histórico, preservando o RNF01.
 
 **Consequência.** Exige infraestrutura de envio de e-mail e token de confirmação com
-expiração, incluindo em ambiente de desenvolvimento. Casos de borda a definir: ex-aluno sem
-acesso ao e-mail institucional e usuário com vínculo não discente.
+expiração, incluindo em ambiente de desenvolvimento, além de armazenamento persistente das
+sessões no backend. Ex-alunos sem acesso ao domínio aceito e outros vínculos institucionais
+não conseguem concluir o cadastro na Release 1.
 
-**Pendência.** O domínio de e-mail institucional em vigor deve ser confirmado junto à
-universidade antes da implementação.
+**Pendência.** O provedor de envio e a validade do link de confirmação ainda precisam ser
+definidos antes da implementação desse fluxo.
+
+**Evidência.** Reunião presencial de 09/09/2026 nas mesas do UAC, convocada pelo grupo de
+WhatsApp. Participaram Nicolas, Vinicius, Gabriel, Tiago e Warlley; Yasmin não participou.
 
 ---
 
