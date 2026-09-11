@@ -129,6 +129,7 @@ importação precisa cobrir todos eles (RF17).
 | `qualidade_material` | ENUM (`RUIM`, `MEDIO`, `BOM`) (NULL se `disponibiliza_material=false`) | Fato + opinião |
 | `recomenda` | BOOLEAN | Opinião |
 | `created_at` | TIMESTAMPTZ | |
+| `updated_at` | TIMESTAMPTZ | Atualizado em substituição |
 
 **Constraint:** `UNIQUE(usuario_id, professor_id, disciplina_id)` — implementa o RF03 no
 banco, e não apenas na aplicação.
@@ -184,8 +185,10 @@ back que motivou a saída do Django.
 A proposta anterior do projeto era Tortoise ORM, escolhida por semelhança sintática com o
 ORM do Django.
 
-**Decisão.** Adotar SQLAlchemy como ORM e Alembic para migrações. Substitui a proposta de
-Tortoise ORM.
+**Decisão.** Adotar SQLAlchemy síncrono como ORM, `psycopg2` como driver PostgreSQL e
+Alembic para migrações. A conexão usa
+`postgresql+psycopg2://usuario:senha@host:porta/banco`. A decisão foi aprovada durante a
+revisão do PR #55 em 11/09/2026 e substitui a proposta de Tortoise ORM.
 
 **Justificativa.** O Alembic é a ferramenta madura de migração no ecossistema; o equivalente
 no Tortoise (Aerich) tem adoção e maturidade menores, e migração é justamente o ponto que o

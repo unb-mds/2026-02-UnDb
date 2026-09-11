@@ -62,5 +62,5 @@ Estas valem para qualquer implementação e não devem ser contornadas sem alter
 - Engenharia de requisitos concluída: pesquisa com usuários, personas, requisitos numerados e ADRs.
 - Skills `docker` e `fastapi`: status `proposed`.
 - Skill `requirements`: status `proposed`.
-- Decisão pendente: SQLAlchemy síncrono ou assíncrono (impacta driver e assinatura de repositories; ver `skills/technology/fastapi/SKILL.md`, seção 15).
-- Decisões ainda pendentes: domínio de e-mail institucional, provedor de envio de e-mail, formato de sessão, viabilidade técnica do scraping do SIGAA (páginas em JSF) e estratégia de povoamento inicial da base. Ver `docs/requisitos.md`, seção 11.
+- Persistência definida: SQLAlchemy síncrono, Alembic, PostgreSQL e driver `psycopg2` (ver `skills/technology/fastapi/SKILL.md`, seção 15).
+- Decisões ainda pendentes: estratégia de deploy do frontend Next.js, valor de N e mínimo da métrica de cobertura, viabilidade técnica do scraping do SIGAA e estratégia de povoamento inicial da base. Ver `docs/requisitos.md`, seção 11, e `specs.md`, seção 10.

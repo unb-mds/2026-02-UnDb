@@ -17,14 +17,16 @@ origem é decisão em aberto. Não invente o valor; pare e registre a lacuna.
 | Camada | Tecnologia |
 |---|---|
 | Backend | Python 3.12, FastAPI, Uvicorn |
-| ORM | SQLAlchemy |
+| ORM | SQLAlchemy síncrono |
 | Migrações | Alembic |
-| Banco | PostgreSQL |
+| Banco | PostgreSQL via `psycopg2` |
 | Frontend | Next.js |
 | Container | Docker Compose |
 | Configuração | `python-decouple`, lida via `app/core/config.py` |
 
 Segredos nunca em código. Nenhuma alteração de schema fora de migração Alembic.
+`DATABASE_URL` segue o formato
+`postgresql+psycopg2://usuario:senha@host:porta/banco`.
 
 ---
 

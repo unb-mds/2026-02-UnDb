@@ -20,7 +20,7 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 ## Tecnologias
 
 - **Backend:** Python 3.12 + FastAPI + Uvicorn
-- **Banco de dados:** PostgreSQL via Docker Compose SQLAlchemy + Alembic
+- **Banco de dados:** PostgreSQL via Docker Compose + SQLAlchemy + Alembic
 - **Frontend:** Next.js
 - **Integração:** dados extraídos do SIGAA
 - **CI/CD:** GitHub Actions
@@ -40,6 +40,10 @@ O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanham
 
 ## Como rodar o projeto localmente
 
+**Pré-requisito:** mantenha uma instância PostgreSQL em execução e crie nela o usuário e o
+banco informados em `DATABASE_URL`. Este repositório ainda não provisiona o PostgreSQL via
+Docker Compose; essa configuração é acompanhada pela [Issue #35](../../issues/35).
+
 ```bash
 # clonar o repositório
 git clone https://github.com/unb-mds/G7-2026-2.git
@@ -55,13 +59,19 @@ pip install -r backend/requirements.txt
 # configurar variáveis de ambiente
 cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backend\.env
 # edite backend/.env e preencha os valores (o .env real nunca é commitado)
+# DATABASE_URL=postgresql+psycopg2://usuario:senha@localhost:5432/g7
 
-# rodar o servidor de desenvolvimento
+# aplicar as migrações e rodar o servidor de desenvolvimento
+# (o PostgreSQL configurado em DATABASE_URL já deve estar acessível)
 cd backend
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
 A API sobe em `http://127.0.0.1:8000` e a documentação interativa fica em `http://127.0.0.1:8000/docs`.
+
+A decisão de persistência e as restrições do modelo estão registradas em
+[`sprints/sprint02/banco-de-dados.md`](sprints/sprint02/banco-de-dados.md).
 
 ## Fluxo de contribuição
 
