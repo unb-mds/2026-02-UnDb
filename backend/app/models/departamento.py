@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
+
 from app.db.session import Base
+
 
 class Departamento(Base):
     __tablename__ = "departamento"
@@ -11,3 +13,7 @@ class Departamento(Base):
 
     professores = relationship("Professor", back_populates="departamento")
     disciplinas = relationship("Disciplina", back_populates="departamento")
+
+    __table_args__ = (
+        UniqueConstraint("sigla", name="uq_departamento_sigla"),
+    )

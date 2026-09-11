@@ -4,4 +4,3 @@ pydantic
 python-decouple
 sqlalchemy
 psycopg2-binary
-alembic

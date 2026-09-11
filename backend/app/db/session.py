@@ -1,9 +1,7 @@
-from decouple import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Lê o valor de DATABASE_URL de dentro do seu arquivo .env local
-DATABASE_URL = config("DATABASE_URL")
+from app.core.config import DATABASE_URL
 
 engine = create_engine(DATABASE_URL)
 

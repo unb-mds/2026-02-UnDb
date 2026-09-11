@@ -2,7 +2,7 @@
 name: fastapi
 description: Set up, structure, and extend the project's FastAPI backend service — project layout, routers, Pydantic schemas, settings, and database access. Use whenever creating the initial FastAPI project structure, adding a new endpoint/router, defining a request/response schema, configuring environment-based settings, or wiring the database session layer.
 metadata:
-  project-version: "0.1.0"
+  project-version: "0.2.0"
   project-status: "proposed"
   project-category: "technology"
   project-scope: "backend"
@@ -53,14 +53,14 @@ Do not use it to:
 3. whether the endpoint needs database access;
 4. expected request and response fields.
 
-If the database layer is not yet confirmed, scaffold the endpoint without wiring it and mark that explicitly (see Section 13).
+Database-backed work must use the SQLAlchemy session layer defined in Step 4.
 
 ## 6. Pre-conditions
 
 1. Python 3.12 + venv already set up.
 2. All prior Django-specific files removed via a dedicated migration branch (e.g. `chore/migrate-to-fastapi`), preserving Git history.
 3. `.env` file exists with required settings and is listed in `.gitignore` (project-wide convention, already `Defined`).
-4. Dependencies declared in `requirements.txt`: `fastapi`, `uvicorn[standard]`, `pydantic`, `python-decouple`.
+4. Dependencies declared in `requirements.txt`: `fastapi`, `uvicorn[standard]`, `pydantic`, `python-decouple`, `sqlalchemy`, and `psycopg2-binary`.
 
 ## 7. Procedure
 
@@ -106,12 +106,18 @@ from decouple import config
 
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
-DATABASE_URL = config("DATABASE_URL", default=None)
+DATABASE_URL = config("DATABASE_URL")
 ```
 
-### Step 4 — Database layer (`app/db/`) — Proposed
+### Step 4 — Database layer (`app/db/`) — Defined
 
-Use **Tortoise ORM** rather than SQLAlchemy: its syntax (`fields.CharField`, `fields.ForeignKeyField`) closely mirrors Django's ORM, lowering the learning curve for a team already familiar with it. This choice needs team sign-off before the skill can move from `proposed` to `defined`.
+Use synchronous **SQLAlchemy** models and sessions with PostgreSQL. The team approved this choice during the review of PR #55 on 2026-09-11. Read the required `DATABASE_URL` through `app/core/config.py`; do not load the same setting independently in the session module.
+
+Use this URL format with the approved `psycopg2` driver:
+
+```text
+postgresql+psycopg2://usuario:senha@host:porta/banco
+```
 
 ### Step 5 — Models (`app/models/`)
 
@@ -138,14 +144,14 @@ uvicorn app.main:app --reload
 
 ## 8. Expected output
 
-A running FastAPI app exposing `/health`, a Swagger UI at `/docs`, settings loaded from `.env`, and (once the database decision is approved) a working database session layer.
+A running FastAPI app exposing `/health`, a Swagger UI at `/docs`, settings loaded from `.env`, and a working SQLAlchemy database session layer.
 
 ## 9. Constraints
 
 Never:
 
 - hardcode secrets in code — always read via `app/core/config.py`;
-- return SQLAlchemy/Tortoise model instances directly from an endpoint — always map to a Pydantic schema;
+- return SQLAlchemy model instances directly from an endpoint — always map to a Pydantic schema;
 - put business logic directly inside a router function — delegate to `app/services/`.
 
 ## 10. Human approval
@@ -153,7 +159,6 @@ Never:
 Required to:
 
 - make this skill `Defined`;
-- confirm the ORM choice (Tortoise ORM, proposed above);
 - confirm the `backend/` + `frontend/` top-level folder split;
 - change the project structure conventions team-wide.
 
@@ -172,11 +177,9 @@ Required to:
 
 ## 13. Handling uncertainty and failures
 
-If the ORM/database decision is not yet approved:
-
-1. scaffold routers and schemas without database wiring;
-2. leave `app/db/` empty with a `# Pending Decision` comment;
-3. state clearly that the human decision needed is: ORM choice + `DATABASE_URL` format.
+If database initialization fails, verify that `DATABASE_URL` is present and uses
+the documented SQLAlchemy PostgreSQL format. Report the exact exception rather
+than substituting another ORM, driver, or URL format.
 
 If `uvicorn` fails to start, report the exact traceback rather than guessing — most failures at this stage are a missing environment variable or an import error from an incomplete router.
 
@@ -186,11 +189,17 @@ If `uvicorn` fails to start, report the exact traceback rather than guessing —
 - [x] `name` and `description` present, description states purpose and trigger context;
 - [x] project-specific metadata under `metadata`;
 - [x] does not duplicate rules owned by another skill (Docker entrypoint referenced, not repeated);
-- [x] pending decisions stated explicitly (Section 15);
+- [x] defined and pending decisions stated explicitly (Section 15);
 - [x] approval boundaries stated (Section 10).
 
-## 15. Open decisions (Pending Decision)
+## 15. Decision status
 
-- ORM/database library (Tortoise ORM proposed, needs team sign-off).
+### Defined
+
+- ORM/database library: synchronous SQLAlchemy with PostgreSQL and `psycopg2`.
+- `DATABASE_URL` format: `postgresql+psycopg2://usuario:senha@host:porta/banco`.
+
+### Pending Decision
+
 - `backend/` + `frontend/` top-level folder split (proposed, needs team sign-off).
 - Naming convention: domain entities proposed in Portuguese (matching the existing data model), technical scaffolding (routers, schemas) in English (matching FastAPI/Python ecosystem convention).
