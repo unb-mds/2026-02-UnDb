@@ -8,6 +8,8 @@ from app.models.enums import Dificuldade, QualidadeMaterial
 
 
 class AvaliacaoBase(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     professor_id: UUID
     disciplina_id: UUID
     didatica: int = Field(ge=1, le=5)
