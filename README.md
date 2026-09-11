@@ -59,6 +59,13 @@ cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backe
 # rodar o servidor de desenvolvimento
 cd backend
 uvicorn app.main:app --reload
+### ⚙️ Configuração das Variáveis de Ambiente (Backend)
+
+Antes de iniciar o backend, configure o arquivo de variáveis de ambiente:
+
+1. Copie o arquivo de exemplo para criar o seu `.env`:
+   ```bash
+   cp backend/.env.example backend/.env
 ```
 
 A API sobe em `http://127.0.0.1:8000` e a documentação interativa fica em `http://127.0.0.1:8000/docs`.
