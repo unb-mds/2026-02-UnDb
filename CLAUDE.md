@@ -43,7 +43,8 @@ Não transforme uma skill de `proposed` para `defined` sem aprovação humana ex
 ## Convenções gerais
 
 - Segredos nunca são commitados: variáveis sensíveis ficam em `.env` (fora do Git), lidas via `python-decouple`.
-- Fluxo de Git: GitHub Flow — sempre branch de feature + Pull Request, nunca push direto na `main`.
+- Fluxo de Git: Gitflow conforme `CONTRIBUTING.md`; `main` contém releases,
+  `develop` integra a próxima release e toda integração ocorre por Pull Request.
 - Nomenclatura: entidades de domínio em português (`Avaliacao`, `Usuario`, `Professor`, `Disciplina`, `Turma`), estrutura técnica (routers, schemas, etc.) em inglês.
 - Lógica de negócio nunca dentro da função do router. Regras de agregação ficam em `app/domain/`, sem dependência de banco.
 
