@@ -44,6 +44,9 @@ O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanham
 banco informados em `DATABASE_URL`. Este repositório ainda não provisiona o PostgreSQL via
 Docker Compose; essa configuração é acompanhada pela [Issue #35](../../issues/35).
 
+O arquivo `backend/.env` deve definir `SECRET_KEY` com um valor aleatório, `DEBUG` como
+`True` ou `False` e `DATABASE_URL` com as credenciais e o endereço do PostgreSQL.
+
 ```bash
 # clonar o repositório
 git clone https://github.com/unb-mds/G7-2026-2.git
