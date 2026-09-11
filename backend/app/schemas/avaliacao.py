@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Self
 from uuid import UUID
 
@@ -31,12 +30,3 @@ class AvaliacaoBase(BaseModel):
 
 class AvaliacaoCreate(AvaliacaoBase):
     pass
-
-
-class AvaliacaoRead(AvaliacaoBase):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
-    usuario_id: UUID
-    created_at: datetime
-    updated_at: datetime
