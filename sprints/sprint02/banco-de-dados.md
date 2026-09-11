@@ -4,78 +4,64 @@
 
 **Estado:** `Defined`
 
-O backend usa SQLAlchemy síncrono para mapear os modelos e PostgreSQL como
-banco de dados. A decisão recebeu aprovação humana explícita durante a revisão
-do PR #55 em 11/09/2026.
+O backend usa SQLAlchemy síncrono, Alembic, PostgreSQL e o driver `psycopg2`. A decisão
+recebeu aprovação humana explícita durante a revisão do PR #55 em 11/09/2026.
 
-A conexão é configurada pela variável obrigatória `DATABASE_URL`, no formato:
+A conexão é configurada exclusivamente por `backend/app/core/config.py`, por meio da
+variável obrigatória `DATABASE_URL`:
 
 ```text
 postgresql+psycopg2://usuario:senha@host:porta/banco
 ```
 
-O arquivo `backend/.env.example` contém um exemplo local sem credenciais reais.
-O módulo `backend/app/core/config.py` é a fonte única da configuração, consumida
-pela sessão em `backend/app/db/session.py`.
+O arquivo `backend/.env.example` contém um exemplo local sem credenciais reais. A sessão
+síncrona está em `backend/app/core/database.py`.
 
-## Entidades e identificadores de importação
+## Modelo implementado
 
-As restrições abaixo fazem parte do modelo físico e garantem chaves estáveis
-para deduplicação e operações de upsert:
+O modelo físico segue `specs.md` e `docs/arquitetura.md`:
 
-| Entidade | Identificador | Restrição no ORM |
-|---|---|---|
-| Departamento | `sigla` | `UNIQUE (sigla)` |
-| Disciplina | `codigo` | `UNIQUE (codigo)` |
-| Professor | `nome`, `id_departamento` | `UNIQUE (nome, id_departamento)` |
-| Turma | `id_disciplinas`, `cod_turma`, `semestre` | `UNIQUE (id_disciplinas, cod_turma, semestre)` |
-| Avaliação | `id_usuario`, `id_turma` | `UNIQUE (id_usuario, id_turma)` |
+| Entidade | Identificador e restrições principais |
+|---|---|
+| Usuário | UUID; e-mail único; sem matrícula, CPF ou histórico acadêmico |
+| Professor | UUID; nome e departamento |
+| Disciplina | UUID; código único; nome, departamento e créditos opcionais |
+| Turma | UUID; única por disciplina, professor e semestre |
+| Avaliação | UUID; única por usuário, professor e disciplina |
 
-O diagrama lógico identifica chaves únicas simples como `UQ` e agrupa as
-colunas de uma mesma chave composta como `UQ1`. Os modelos SQLAlchemy são a
-representação executável dessas restrições.
+A avaliação contém apenas os campos estruturados definidos em `specs.md`. Não existe nota
+geral, ranking persistido ou comentário em texto livre. `didatica` aceita valores de 1 a 5,
+e `qualidade_material` só pode ser preenchida quando há material disponível.
 
-Os PDFs conceitual e lógico podem ser regenerados com
-`python docs/diagramas/gerar_modelos.py`; esse gerador documental requer o
-pacote `reportlab` e não faz parte das dependências de execução do backend.
+Os PDFs conceitual e lógico podem ser regenerados com:
 
-## Lacunas conhecidas da fonte
+```bash
+python docs/diagramas/gerar_modelos.py
+```
 
-- `Professor.email` e `Professor.lattes` são opcionais porque sua presença na
-  fonte pública ainda não está garantida.
-- `Turma.horario` é texto opcional para preservar formatos variados e ausências
-  encontradas durante a futura validação da coleta.
-- O modelo atual associa uma turma a um professor. O suporte a múltiplos
-  docentes por turma continua pendente de evidência da coleta e de aprovação
-  antes de qualquer mudança estrutural.
+O gerador documental requer `reportlab`, que não faz parte das dependências de execução do
+backend.
 
-## Estado das Issues #22 e #23
+## Migrações
 
-As Issues #22 e #23 continuam abertas. Este trabalho prepara o modelo para
-receber os dados, mas não comprova os critérios de aceite do mapeamento ou do
-protótipo de scraping.
+Toda mudança de schema deve passar por uma migração Alembic versionada. Scripts com
+`Base.metadata.create_all` e DDL manual não fazem parte do fluxo.
 
-Ainda precisam ser produzidas e anexadas às respectivas Issues:
-
-- URLs e passos de navegação nas páginas públicas;
-- campos realmente disponíveis e forma de relacioná-los;
-- comportamento de paginação, formulários, JSF, ViewState ou postback;
-- comparação de uma extração com uma oferta real;
-- instruções reproduzíveis do protótipo;
-- conclusão baseada em evidência sobre HTTP direto ou automação de navegador.
-
-Essas informações não devem ser apresentadas como validadas enquanto a
-investigação e suas evidências não forem concluídas.
-
-## Criação das tabelas
-
-Com um `backend/.env` válido e as dependências instaladas:
+Com `backend/.env` configurado e as dependências instaladas:
 
 ```bash
 cd backend
-python create_tables.py
+alembic upgrade head
 ```
 
-O script importa todos os modelos registrados e executa
-`Base.metadata.create_all`. Um fluxo de migrations não faz parte desta entrega
-e não deve ser citado como mecanismo já validado de evolução do schema.
+A migração inicial cria as cinco tabelas, chaves estrangeiras, enums, checks e restrições
+de unicidade descritas na especificação.
+
+## Estado das Issues #22 e #23
+
+As Issues #22 e #23 continuam abertas. O modelo está pronto para receber dados, mas ainda
+faltam as evidências de mapeamento e do protótipo de scraping: URLs, passos de navegação,
+campos disponíveis, comportamento de JSF/ViewState, comparação com oferta real e conclusão
+reproduzível sobre HTTP direto ou automação de navegador.
+
+Essas informações não devem ser apresentadas como validadas antes da investigação.

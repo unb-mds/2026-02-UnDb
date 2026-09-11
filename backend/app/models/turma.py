@@ -1,28 +1,31 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.orm import relationship
+from uuid import UUID, uuid4
 
-from app.db.session import Base
+from sqlalchemy import ForeignKey, String, UniqueConstraint, Uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.core.database import Base
 
 
 class Turma(Base):
-    __tablename__ = "turma"
+    __tablename__ = "turmas"
 
-    id_turma = Column(Integer, primary_key=True, index=True)
-    id_disciplinas = Column(Integer, ForeignKey("disciplinas.id_disciplinas"), nullable=False)
-    id_professor = Column(Integer, ForeignKey("professor.id_professor"), nullable=False)
-    semestre = Column(String(10), nullable=False)
-    cod_turma = Column(String(10), nullable=False)
-    horario = Column(String, nullable=True)
+    id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid4)
+    disciplina_id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("disciplinas.id"), nullable=False
+    )
+    professor_id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("professores.id"), nullable=False
+    )
+    semestre: Mapped[str] = mapped_column(String(10), nullable=False)
 
     disciplina = relationship("Disciplina", back_populates="turmas")
     professor = relationship("Professor", back_populates="turmas")
-    avaliacoes = relationship("Avaliacao", back_populates="turma")
 
     __table_args__ = (
         UniqueConstraint(
-            "id_disciplinas",
-            "cod_turma",
+            "disciplina_id",
+            "professor_id",
             "semestre",
-            name="uq_turma_disciplina_codigo_semestre",
+            name="uq_turma_disciplina_professor_semestre",
         ),
     )

@@ -10,18 +10,18 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 
 | Nome | GitHub | Papel no Sprint atual |
 |---|---|---|
-| _Nome 1_ | [@nicolaszanin06](https://github.com/nicolaszanin06) | Product Owner |
-| _Nome 2_ | [@usuario2](https://github.com/usuario2) | Scrum Master |
-| _Nome 3_ | [@usuario3](https://github.com/usuario3) | Dev Team |
-| _Nome 4_ | [@gabrielrdaraujo](https://github.com/gabrielrdaraujo) | Dev Team |
-| _Nome 5_ | [@usuario5](https://github.com/usuario5) | Dev Team |
-| _Nome 6_ | [@warlleymedeiros](https://github.com/warlleymedeiros) | Dev Team |
+| _Nicolas_ | [@nicolaszanin06](https://github.com/nicolaszanin06) | Product Owner |
+| _Yasmin_ | [@ailoiol](https://github.com/ailoiol) | Scrum Master |
+| _Vinicius_ | [@ViniGvdo](https://github.com/ViniGvdo) | Dev Team |
+| _Gabriel_ | [@gabrielrdaraujo](https://github.com/gabrielrdaraujo) | Dev Team |
+| _Tiago_ | [@TiagoVieira-596](https://github.com/TiagoVieira-596) | Dev Team |
+| _Warlley_ | [@warlleymedeiros](https://github.com/warlleymedeiros) | Dev Team |
 
 ## Tecnologias
 
 - **Backend:** Python 3.12 + FastAPI + Uvicorn
-- **Banco de dados:** PostgreSQL via Docker Compose + SQLAlchemy
-- **Frontend:** _(a definir — proposta: HTML/CSS/JS puro consumindo a API via `fetch`)_
+- **Banco de dados:** PostgreSQL via Docker Compose + SQLAlchemy + Alembic
+- **Frontend:** Next.js
 - **Integração:** dados extraídos do SIGAA
 - **CI/CD:** GitHub Actions
 
@@ -35,7 +35,7 @@ O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanham
 
 ### Releases
 
-- **Release 1:** _(data a definir)_
+- **Release 1:** 28/09/2026
 - **Release 2 (final):** 25/11/2026
 
 ## Como rodar o projeto localmente
@@ -59,6 +59,7 @@ cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backe
 
 # rodar o servidor de desenvolvimento
 cd backend
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
