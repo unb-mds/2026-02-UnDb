@@ -2,7 +2,7 @@
 name: fastapi
 description: Set up, structure, and extend the project's FastAPI backend service — project layout, routers, Pydantic schemas, settings, domain logic, repositories, and database access. Use whenever creating the initial FastAPI project structure, adding a new endpoint/router, defining a request/response schema, configuring environment-based settings, writing aggregation logic, or wiring the database session layer.
 metadata:
-  project-version: "0.3.0"
+  project-version: "0.4.0"
   project-status: "proposed"
   project-category: "technology"
   project-scope: "backend"
@@ -62,13 +62,15 @@ Do not use it to:
 If a rule is not specified in `specs.md` or in `docs/requisitos.md`, do not invent it.
 Stop and record the gap (see Section 13).
 
+Database-backed work must use the synchronous SQLAlchemy session layer defined in Step 4.
+
 ## 6. Pre-conditions
 
 1. Python 3.12 + venv already set up.
 2. All prior Django-specific files removed, preserving Git history.
 3. `.env` file exists with required settings and is listed in `.gitignore`.
 4. Dependencies declared in `requirements.txt`: `fastapi`, `uvicorn[standard]`, `pydantic`,
-   `python-decouple`, `sqlalchemy`, `alembic`, and a PostgreSQL driver.
+   `python-decouple`, `sqlalchemy`, `alembic`, and `psycopg2-binary`.
 5. `specs.md` has been read for the entity or endpoint being implemented.
 6. Authentication and session work follows the validated decision in `specs.md`, Section 7 ("Regras de identificação e sessão").
 
@@ -121,16 +123,24 @@ from decouple import config
 
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
-DATABASE_URL = config("DATABASE_URL", default=None)
+DATABASE_URL = config("DATABASE_URL")
 ```
 
 Never read environment variables anywhere else.
 
-### Step 4 — Database layer
+### Step 4 — Database layer — Defined
 
 Use **SQLAlchemy** as the ORM and **Alembic** for migrations, per ADR 01 in
 `docs/arquitetura.md`. This supersedes the Tortoise ORM proposal from version `0.1.0` of
-this skill.
+this skill. Use synchronous sessions with PostgreSQL and the `psycopg2` driver, as approved
+during the review of PR #55 on 2026-09-11.
+
+Read the required `DATABASE_URL` through `app/core/config.py`; do not load the same setting
+independently in the session module. Use this format:
+
+```text
+postgresql+psycopg2://usuario:senha@host:porta/banco
+```
 
 Rules:
 
@@ -203,8 +213,7 @@ Never:
 Required to:
 
 - make this skill `Defined`;
-- change the ORM or migration tool (currently SQLAlchemy + Alembic, per ADR 01, itself
-  pending team validation);
+- change the ORM, migration tool, execution model, or PostgreSQL driver;
 - change the project structure conventions team-wide;
 - add a structural dependency not already listed in Section 6.
 
@@ -235,6 +244,10 @@ If a rule needed for implementation is not specified:
 2. implement only the part that is specified;
 3. record the gap and hand it off to `requirements`.
 
+If database initialization fails, verify that `DATABASE_URL` is present and uses the
+documented SQLAlchemy PostgreSQL format. Report the exact exception rather than substituting
+another ORM, driver, or URL format.
+
 If `uvicorn` fails to start, report the exact traceback rather than guessing — most failures
 at this stage are a missing environment variable or an import error from an incomplete router.
 
@@ -247,19 +260,26 @@ If a migration conflicts, do not edit an applied migration. Create a new one.
 - [x] project-specific metadata under `metadata`;
 - [x] does not duplicate rules owned by another skill (requirements, ADRs and Docker
       entrypoint are referenced, not repeated);
-- [x] pending decisions stated explicitly (Section 15);
+- [x] defined and pending decisions stated explicitly (Section 15);
 - [x] approval boundaries stated (Section 10).
 
-## 15. Open decisions (Pending Decision)
+## 15. Decision status
 
-- **Sync or async SQLAlchemy.** ADR 01 chose SQLAlchemy but did not specify the execution
-  model. This affects the driver (`psycopg` vs `asyncpg`), session handling, and every
-  repository signature. Decide before writing the first repository.
+### Defined
+
+- ORM/database library: synchronous SQLAlchemy with PostgreSQL and `psycopg2`.
+- Schema migrations: Alembic, with every schema change represented by a versioned migration.
+- `DATABASE_URL` format: `postgresql+psycopg2://usuario:senha@host:porta/banco`.
+
+### Pending Decision
+
 - Whether the SIGAA scraper requires browser automation, which would add a structural
   dependency to the backend image.
 
 ## 16. Change history
 
+- `0.4.0` — synchronous SQLAlchemy with `psycopg2` and the `DATABASE_URL` format recorded
+  as approved; Alembic and the conventions introduced in `0.3.0` retained. Remains `proposed`.
 - `0.3.0` — authentication session decision synchronized with `specs.md`: server-side
   sessions are no longer a pending decision in this skill. Remains `proposed`.
 - `0.2.0` — ORM changed from the proposed Tortoise ORM to SQLAlchemy + Alembic (ADR 01);

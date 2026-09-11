@@ -253,9 +253,11 @@ reavaliada na validação geral da release, permitindo correções para a Releas
 
 ### Demais decisões pendentes
 
+O modelo de execução do banco foi definido durante a revisão do PR #55, em 11/09/2026:
+SQLAlchemy síncrono, Alembic, PostgreSQL e driver `psycopg2`.
+
 | Decisão | Bloqueia | Responsável |
 |---|---|---|
-| Modelo de execução do SQLAlchemy (síncrono ou assíncrono) | RF14–RF16, RNF05 | Time |
 | Estratégia de deploy do frontend Next.js (SSR vs export estático) | Todos os RF de interface | Time |
 | Valor de N (métrica de cobertura) e mínimo do RNF02 | Apenas métrica e exibição | PO |
 | Viabilidade técnica do scraping do SIGAA | RF16–RF19 | Time |
