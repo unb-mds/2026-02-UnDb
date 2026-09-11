@@ -40,6 +40,10 @@ O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanham
 
 ## Como rodar o projeto localmente
 
+**Pré-requisito:** mantenha uma instância PostgreSQL em execução e crie nela o usuário e o
+banco informados em `DATABASE_URL`. Este repositório ainda não provisiona o PostgreSQL via
+Docker Compose; essa configuração é acompanhada pela [Issue #35](../../issues/35).
+
 ```bash
 # clonar o repositório
 git clone https://github.com/unb-mds/G7-2026-2.git
@@ -57,7 +61,8 @@ cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backe
 # edite backend/.env e preencha os valores (o .env real nunca é commitado)
 # DATABASE_URL=postgresql+psycopg2://usuario:senha@localhost:5432/g7
 
-# rodar o servidor de desenvolvimento
+# aplicar as migrações e rodar o servidor de desenvolvimento
+# (o PostgreSQL configurado em DATABASE_URL já deve estar acessível)
 cd backend
 alembic upgrade head
 uvicorn app.main:app --reload
