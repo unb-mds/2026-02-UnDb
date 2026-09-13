@@ -3,8 +3,9 @@
 Sistema de avaliação de professores e disciplinas da UnB.
 Requisitos em [`requisitos.md`](requisitos.md).
 
-> **Estado:** cada ADR informa seu próprio estado. O ADR 03 foi validado pelo grupo para a
-> Release 1; os demais permanecem como **proposta do PO** até validação específica do time.
+> **Estado:** cada ADR informa seu próprio estado. O ADR 02 foi validado por Nicolas e Vinicius
+> em 13/09/2026, e o ADR 03 foi validado pelo grupo para a Release 1; os demais permanecem como
+> **proposta do PO** até validação específica do time.
 
 ---
 
@@ -205,7 +206,7 @@ os idiomas específicos do ORM do Django.
 
 ### ADR 02 — Next.js e Tailwind CSS no frontend
 
-**Estado.** Validada e aprovada pelo time.
+**Estado.** Validada e aprovada por Nicolas e Vinicius em 13/09/2026.
 
 **Contexto.** O frontend estava indefinido. A proposta inicial era HTML, CSS e JavaScript
 puros consumindo a API por `fetch`.
@@ -226,7 +227,9 @@ problema para a Epic de Docker, existe a alternativa de usar exportação estát
 (`output: 'export'`), abrindo mão de renderização no servidor. O Tailwind CSS requer configuração 
 inicial via PostCSS/Tailwind compiler, que já vem nativa no ecossistema atual do Next.js.
 
-**Evidência.** Validação e aprovação registrada pelo time nas discussões da Sprint e vinculada à Issue #28.
+**Evidência.** Nicolas e Vinicius validaram a escolha em 13/09/2026. Como a decisão foi
+considerada simples pelos responsáveis, não foi necessária uma consulta adicional ao grupo.
+O registro da validação está vinculado à Issue #28.
 
 ---
 
