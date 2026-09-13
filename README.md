@@ -21,7 +21,7 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 
 - **Backend:** Python 3.12 + FastAPI + Uvicorn
 - **Banco de dados:** PostgreSQL via Docker Compose + SQLAlchemy + Alembic
-- **Frontend:** Next.js
+- **Frontend:** Next.js + Tailwind CSS
 - **Integração:** dados extraídos do SIGAA
 - **CI/CD:** GitHub Actions
 
