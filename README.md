@@ -78,10 +78,12 @@ A decisão de persistência e as restrições do modelo estão registradas em
 
 ## Fluxo de contribuição
 
-1. Crie uma branch a partir da `main`: `feature/nome-curto-da-tarefa`
-2. Faça commits pequenos e descritivos
-3. Abra um Pull Request referenciando a Issue correspondente (`Closes #12`)
-4. Peça revisão de pelo menos 1 outro membro antes de mergear
+O projeto usa Gitflow: `main` representa releases e `develop` integra o trabalho da
+próxima release. Features e correções comuns partem de `develop`; releases e
+hotfixes são integrados em `main` por Pull Request.
+
+Consulte o [guia de contribuição](CONTRIBUTING.md) para a nomenclatura de branches,
+destinos permitidos, checks e regras de aprovação.
 
 ## Licença
 
