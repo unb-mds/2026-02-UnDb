@@ -1,7 +1,9 @@
 # Mapeamento do Portal Público do SIGAA — Issue #22
 
-**Data do levantamento:** 13/09/2026  
-**Escopo:** RF16–RF17 — professores, disciplinas, turmas e cobertura por departamento/unidade.  
+**Data do levantamento:** 13/09/2026
+
+**Escopo:** RF16–RF17 — professores, disciplinas, turmas e cobertura por departamento/unidade.
+
 **Objetivo:** documentar as fontes públicas e o caminho de navegação necessários para orientar o protótipo da Issue #23 e o modelo da Issue #24.
 
 > Este documento é um levantamento de fontes e comportamento observado. Ele **não** define o modelo de dados da aplicação e **não** comprova, por si só, a viabilidade completa do scraper. Essas responsabilidades permanecem nas Issues #23 e #24.
@@ -319,14 +321,15 @@ O levantamento original ficou limitado à extração textual; a primeira valida�
 A #23 pode começar com um protótipo mínimo e verificável:
 
 1. abrir uma `requests.Session`;
-2. fazer `GET` de `public/turmas/listar.jsf`;
-3. confirmar e extrair `javax.faces.ViewState`;
-4. descobrir dinamicamente:
+2. fazer `GET` de `public/home.jsf`;
+3. seguir, na mesma sessão, o link atual para `public/turmas/listar.jsf?aba=p-ensino`;
+4. confirmar e extrair `javax.faces.ViewState`;
+5. descobrir dinamicamente:
    - valor de “Graduação”;
    - IDs/valores das unidades;
    - nome atual do botão de busca;
-5. submeter uma consulta real, por exemplo uma unidade e `2026.2`;
-6. registrar a estrutura real da resposta:
+6. submeter uma consulta real, por exemplo uma unidade e `2026.2`;
+7. registrar a estrutura real da resposta:
    - disciplina;
    - código da turma;
    - docente;
@@ -334,10 +337,10 @@ A #23 pode começar com um protótipo mínimo e verificável:
    - local;
    - vagas;
    - links/IDs presentes;
-7. verificar paginação/postback;
-8. repetir em unidades estruturalmente diferentes;
-9. verificar se o docente possui `siape` no HTML da turma;
-10. comparar o conjunto de unidades do formulário com a lista de 95 centros/unidades e registrar diferenças.
+8. verificar paginação/postback;
+9. repetir em unidades estruturalmente diferentes;
+10. verificar se o docente possui `siape` no HTML da turma;
+11. comparar o conjunto de unidades do formulário com a lista de 95 centros/unidades e registrar diferenças.
 
 A #23 deve demonstrar viabilidade técnica. Ela não deve assumir que o comportamento histórico do JSF continua idêntico sem revalidá-lo.
 
@@ -388,26 +391,16 @@ Na consulta de 13/09/2026, a #24 já estava fechada, com o critério de campos r
 
 ### Fontes públicas externas
 
-- Portal Público SIGAA UnB:  
-  https://sigaa.unb.br/sigaa/public/home.jsf
-- Centros/unidades:  
-  https://sigaa.unb.br/sigaa/public/centro/lista.jsf?aba=p-academico
-- Busca de docentes:  
-  https://sigaa.unb.br/sigaa/public/docente/busca_docentes.jsf
-- Busca de componentes:  
-  https://sigaa.unb.br/sigaa/public/componentes/busca_componentes.jsf?nivel=S
-- Busca de turmas:  
-  https://sigaa.unb.br/sigaa/public/turmas/listar.jsf
-- Turmas/comunidades publicadas:  
-  https://sigaa.unb.br/sigaa/public/cursosabertos.jsf?aba=p-ensino
-- Exemplo de portal de unidade (CIC):  
-  https://sigaa.unb.br/sigaa/public/departamento/portal.jsf?id=508&lc=pt_BR
-- Exemplo de docentes do CIC:  
-  https://sigaa.unb.br/sigaa/public/departamento/professores.jsf?id=508
-- Exemplo de componentes do CIC:  
-  https://sigaa.unb.br/sigaa/public/departamento/componentes.jsf?id=508
-- Registro público sobre o POST/ViewState no endpoint de turmas da UnB:  
-  https://stackoverflow.com/questions/76593203/post-method-not-working-in-a-jsf-website-using-python-requests
+- Portal Público SIGAA UnB: https://sigaa.unb.br/sigaa/public/home.jsf
+- Centros/unidades: https://sigaa.unb.br/sigaa/public/centro/lista.jsf?aba=p-academico
+- Busca de docentes: https://sigaa.unb.br/sigaa/public/docente/busca_docentes.jsf
+- Busca de componentes: https://sigaa.unb.br/sigaa/public/componentes/busca_componentes.jsf?nivel=S
+- Busca de turmas: https://sigaa.unb.br/sigaa/public/turmas/listar.jsf
+- Turmas/comunidades publicadas: https://sigaa.unb.br/sigaa/public/cursosabertos.jsf?aba=p-ensino
+- Exemplo de portal de unidade (CIC): https://sigaa.unb.br/sigaa/public/departamento/portal.jsf?id=508&lc=pt_BR
+- Exemplo de docentes do CIC: https://sigaa.unb.br/sigaa/public/departamento/professores.jsf?id=508
+- Exemplo de componentes do CIC: https://sigaa.unb.br/sigaa/public/departamento/componentes.jsf?id=508
+- Registro público sobre o POST/ViewState no endpoint de turmas da UnB: https://stackoverflow.com/questions/76593203/post-method-not-working-in-a-jsf-website-using-python-requests
 
 ## 12. Registro da validação — 13/09/2026
 
