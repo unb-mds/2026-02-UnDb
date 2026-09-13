@@ -203,23 +203,30 @@ os idiomas específicos do ORM do Django.
 
 ---
 
-### ADR 02 — Next.js no frontend
+### ADR 02 — Next.js e Tailwind CSS no frontend
+
+**Estado.** Validada e aprovada pelo time.
 
 **Contexto.** O frontend estava indefinido. A proposta inicial era HTML, CSS e JavaScript
 puros consumindo a API por `fetch`.
 
-**Decisão.** Adotar Next.js.
+**Decisão.** Adotar **Next.js** combinado com **Tailwind CSS**.
 
 **Justificativa.** Os cinco critérios de avaliação aparecem em três telas distintas — detalhe
-do professor, comparação e formulário. Sem componentização, a mesma estrutura seria duplicada
+da professora, comparação e formulário. Sem componentização, a mesma estrutura seria duplicada
 em três lugares. A tabela de comparação com ordenação (RF12, RF13) também depende de estado
-de interface. Além do ganho técnico, o aprendizado de um framework moderno é objetivo
-declarado do time, e é o framework usado pelos grupos G3 e G9.
+de interface. O uso de Tailwind CSS acelera a estilização padronizada e responsiva através de 
+classes utilitárias, garantindo consistência visual ágil e sem a necessidade de gerenciar arquivos 
+CSS globais complexos. Além do ganho técnico, o aprendizado de um ecossistema moderno em React 
+é objetivo declarado do time, alinhando-se às escolhas dos grupos G3 e G9.
 
 **Consequência.** Next.js exige runtime Node no container, o que torna a containerização do
 frontend mais pesada do que um build estático servido por nginx. Caso isso se mostre um
 problema para a Epic de Docker, existe a alternativa de usar exportação estática
-(`output: 'export'`), abrindo mão de renderização no servidor.
+(`output: 'export'`), abrindo mão de renderização no servidor. O Tailwind CSS requer configuração 
+inicial via PostCSS/Tailwind compiler, que já vem nativa no ecossistema atual do Next.js.
+
+**Evidência.** Validação e aprovação registrada pelo time nas discussões da Sprint e vinculada à Issue #28.
 
 ---
 
