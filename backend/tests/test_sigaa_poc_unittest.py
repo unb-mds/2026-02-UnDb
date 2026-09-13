@@ -36,5 +36,31 @@ class SigaaPocParserTest(unittest.TestCase):
         self.assertEqual(ofertas[0].componente_id, "177942")
 
 
+class SigaaPocMultipleDocentesParserTest(unittest.TestCase):
+    def test_oferta_preserves_multiple_docentes_from_sigaa_cell(self) -> None:
+        ofertas, total = parse_ofertas("""
+        <table><tbody>
+          <tr class="agrupador"><td><a onclick="jsfcljs({'id':'177944'})"><span class="tituloDisciplina">CIC0004 - ALGORITMOS E PROGRAMAÇÃO DE COMPUTADORES</span></a></td></tr>
+          <tr class="linhaImpar">
+            <td class="turma" align="center">02</td>
+            <td class="anoPeriodo" align="center">2026.2</td>
+            <td class="nome">
+              YURI COSSICH LAVINAS (60h)<br />
+              JOAO GABRIEL ROSSI DE BORBA (30h)<br />
+            </td>
+          </tr>
+        </tbody><tfoot><tr><td><b>1 turmas encontrada(s)</b></td></tr></tfoot></table>
+        """)
+
+        self.assertEqual(total, 1)
+        self.assertEqual(len(ofertas), 1)
+        self.assertEqual(ofertas[0].componente_codigo, "CIC0004")
+        self.assertEqual(ofertas[0].componente_nome, "ALGORITMOS E PROGRAMAÇÃO DE COMPUTADORES")
+        self.assertEqual(ofertas[0].turma_codigo, "02")
+        self.assertEqual(ofertas[0].periodo, "2026.2")
+        self.assertEqual(ofertas[0].docentes, ("YURI COSSICH LAVINAS", "JOAO GABRIEL ROSSI DE BORBA"))
+        self.assertEqual(ofertas[0].componente_id, "177944")
+
+
 if __name__ == "__main__":
     unittest.main()

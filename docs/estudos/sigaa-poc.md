@@ -53,10 +53,16 @@ PYTHONPATH=. python3 -m unittest discover -s tests -v
 PYTHONPATH=. python3 -m app.scrapers.sigaa_poc --real
 ```
 
-O segundo comando faz consultas **públicas, de leitura**, e deve imprimir JSON contendo
-`total_reportado`, `ofertas_extraidas` e a primeira oferta. A disponibilidade e o HTML do
-SIGAA são externos; uma falha, redirect ou divergência entre total e linhas deve ser tratada
-como resultado de integração inconclusivo/falha, não como aprovação.
+O primeiro comando executa os **testes determinísticos do parser**. Eles usam HTML mínimo
+representativo da estrutura observada, não acessam o SIGAA e são os únicos apropriados para
+automação no CI.
+
+O segundo comando (`--real`) é uma **validação integrativa/manual contra o SIGAA real**:
+faz consultas públicas, de leitura, e deve imprimir JSON contendo `total_reportado`,
+`ofertas_extraidas` e a primeira oferta. Ele não é determinístico, não deve ser obrigatório
+no CI e depende da disponibilidade e do comportamento atual do SIGAA. Serve como evidência
+da investigação da Issue #23; falha, redirect ou divergência entre total e linhas devem ser
+tratados como resultado integrativo inconclusivo/falha, não como aprovação.
 
 ## Fatos observados
 
