@@ -2,7 +2,7 @@
 
 Este tutorial explica como integrantes e agentes de IA podem trabalhar com as mesmas responsabilidades e regras do G7, independentemente da ferramenta utilizada. Você não precisa instalar uma integração de skills para começar: um agente que consiga ler os arquivos Markdown já pode seguir o procedimento manual.
 
-**Base da investigação:** checkout local do repositório `unb-mds/G7-2026-2`, em 13/09/2026, commit `a934dcee12c770356741b3e0a42ce66a2618d7c8`. Foram inspecionados os nove `SKILL.md`, suas referências, arquivos de entrada, estrutura e documentação relacionada. O estado remoto de Issues, PRs e configurações do GitHub não foi consultado; este inventário descreve o checkout, sem afirmar que corresponde à versão mais recente da `main` remota. Os exemplos não representam execuções de implementação, testes ou review realizadas para este tutorial.
+**Base da investigação:** checkout local do repositório `unb-mds/G7-2026-2`, atualizado em 13/09/2026 contra o commit `fe7df44ff69251ade527f65a1291ab2995d5af79` de `develop`. Foram inspecionados os nove `SKILL.md`, suas referências, arquivos de entrada, estrutura e documentação relacionada. O estado remoto de Issues, PRs e configurações do GitHub não foi consultado; este inventário descreve esse checkout. Os exemplos não representam execuções de implementação, testes ou review realizadas para este tutorial.
 
 Este documento é explicativo. As regras oficiais do sistema de skills permanecem em [`skills/`](../skills/). Na classificação de `skill-authoring`, esta entrega é **NO-SKILL**: documentação de uso, sem criar ou alterar skills, adapters ou governança.
 
@@ -195,7 +195,7 @@ O handoff pode ocorrer na mesma conversa, em outra conversa, com outro agente ou
 
 ### Git/GitHub e aprovação humana
 
-A ausência de `scrum-github` não significa ausência de toda orientação. O [`README.md`](../README.md) descreve branch `feature/nome-curto-da-tarefa` a partir da `main`, commits pequenos, PR relacionado à Issue e revisão de pelo menos outro integrante antes do merge. Isso é documentação existente, não uma skill de processo implementada.
+A ausência de `scrum-github` não significa ausência de toda orientação. O [`README.md`](../README.md) resume o Gitflow, no qual `main` representa releases e `develop` integra o trabalho da próxima release. O [`CONTRIBUTING.md`](../CONTRIBUTING.md) define as branches de origem e destino, exige vínculo com uma Issue, checks obrigatórios e pelo menos uma aprovação humana antes do merge. Isso é documentação existente, não uma skill de processo implementada.
 
 O [`AGENTS.md`](../AGENTS.md) exige solicitação ou autorização explícita para commit, push, PR e merge, além de confirmação para operações Git destrutivas. A lista canônica de [fronteiras de aprovação humana](../skills/governance/project-governance/references/HUMAN_APPROVAL_BOUNDARIES.md) inclui merge e fechamento relevante de Issue quando representar aceite ou conclusão oficial. Concluir implementação, testes ou review não concede essas aprovações; referências que provoquem fechamento automático também precisam respeitar esse limite.
 
