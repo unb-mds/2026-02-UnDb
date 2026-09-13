@@ -44,10 +44,7 @@ class SigaaPocMultipleDocentesParserTest(unittest.TestCase):
           <tr class="linhaImpar">
             <td class="turma" align="center">02</td>
             <td class="anoPeriodo" align="center">2026.2</td>
-            <td class="nome">
-              YURI COSSICH LAVINAS (60h)<br />
-              JOAO GABRIEL ROSSI DE BORBA (30h)<br />
-            </td>
+            <td class="nome">YURI COSSICH LAVINAS (60h)<br />JOAO GABRIEL ROSSI DE BORBA (30h)<br /></td>
           </tr>
         </tbody><tfoot><tr><td><b>1 turmas encontrada(s)</b></td></tr></tfoot></table>
         """)

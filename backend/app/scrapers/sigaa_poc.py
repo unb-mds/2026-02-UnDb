@@ -112,6 +112,8 @@ class _TurmasParser(HTMLParser):
             self._cell_class = values.get("class")
             self._cell_data = []
             self._in_total = False
+        elif tag == "br" and self._cell_class:
+            self._cell_data.append(" ")
         elif tag == "b":
             self._in_total = True
             self._total_data = []

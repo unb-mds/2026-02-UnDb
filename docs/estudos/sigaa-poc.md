@@ -1,6 +1,7 @@
 # POC de viabilidade da coleta pública SIGAA — Issue #23
 
-**Investigação executada em:** 13/09/2026 (resposta HTTP `Date`: 17:52:31 UTC)  
+**Investigação executada em:** 13/09/2026 (resposta HTTP `Date`: 17:52:31 UTC)
+
 **Escopo:** verificar RF16 com uma oferta pública real. Esta POC não implementa RF17–RF19,
 persistência, job, fila ou API.
 
