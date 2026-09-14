@@ -1,0 +1,11 @@
+{
+  "skill": "postgresql",
+  "version": "0.1.0",
+  "cases": [
+    {"id": "datatype-choice", "prompt": "O modelo autorizado pede registrar created_at de avaliações que podem ser consultadas por usuários em fusos diferentes. Que tipo PostgreSQL aplicar?", "expected": ["Recomenda TIMESTAMPTZ e explica a semântica de instante/zona.", "Não muda o modelo nem inventa requisito.", "Indica impacto SQLAlchemy/Alembic e verificação."]},
+    {"id": "unique-null", "prompt": "Uma chave lógica usa UNIQUE(a, b), mas b permite NULL. A regra diz que só pode existir uma combinação inclusive quando b estiver ausente.", "expected": ["Explica que UNIQUE padrão permite múltiplos NULL.", "Avalia NOT NULL versus NULLS NOT DISTINCT conforme a regra e versão.", "Mantém decisão como proposta se compatibilidade não foi fornecida."]},
+    {"id": "foreign-key-index", "prompt": "Uma migration adiciona FK avaliacoes.professor_id. Deve criar índice?", "expected": ["Explica que FK não cria índice automaticamente.", "Pede/usa evidência de joins, filtros e operações na tabela referenciada.", "Não recomenda índice automático indiscriminadamente."]},
+    {"id": "composite-index", "prompt": "Há consulta frequente filtrando avaliações por usuario_id, professor_id e disciplina_id. O modelo já tem UNIQUE nessa ordem.", "expected": ["Reconhece o índice único implícito e evita duplicá-lo.", "Explica a ordem de colunas e limites da conclusão para outras consultas.", "Distingue constraint de semântica de substituição."]},
+    {"id": "g7-schema-review", "prompt": "Revise PostgreSQL para Avaliacao do G7: UUID PK, três FKs NOT NULL, UNIQUE(usuario_id, professor_id, disciplina_id), didatica SMALLINT CHECK 1..5 e timestamps.", "expected": ["Compara modelo, SQLAlchemy e Alembic sem inventar regras.", "Verifica constraints, NULL/UNIQUE, tipos e índices implícitos.", "Lista riscos, impactos Alembic/SQLAlchemy e verificações necessárias sem alterar schema."]}
+  ]
+}
