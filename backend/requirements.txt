@@ -3,5 +3,5 @@ uvicorn[standard]
 pydantic
 python-decouple
 sqlalchemy
-psycopg2-binary
 alembic
+psycopg2-binary
