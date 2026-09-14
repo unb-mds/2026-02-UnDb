@@ -3,9 +3,10 @@
 Sistema de avaliação de professores e disciplinas da UnB.
 Requisitos em [`requisitos.md`](requisitos.md).
 
-> **Estado:** cada ADR informa seu próprio estado. O ADR 02 foi validado por Nicolas e Vinicius
-> em 13/09/2026, e o ADR 03 foi validado pelo grupo para a Release 1; os demais permanecem como
-> **proposta do PO** até validação específica do time.
+> **Estado:** ADR 01 aprovado na revisão do PR #55; ADR 02 validado por Nicolas e Vinicius
+> em 13/09/2026; ADR 03 validado pelo grupo para a Release 1. Os demais ADRs permanecem
+> propostas arquiteturais. Regras de produto aprovadas e sua rastreabilidade estão em
+> `requisitos.md`; sua aprovação não promove automaticamente os ADRs.
 
 ---
 
@@ -321,8 +322,8 @@ conhecida e assumida, e não deve ser contornada por heurística não verificáv
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
-| Páginas públicas do SIGAA em JSF, com ViewState e postback | Pode inviabilizar scraping por requisição HTTP simples e exigir automação de navegador, alterando dependências, Dockerfile e tempo de importação | Verificar antes de estimar RF16–RF19 |
+| Páginas públicas do SIGAA em JSF, com ViewState e postback | Mudanças de fluxo podem interromper a coleta | POC HTTP validada para CIC/2026.2 em #22/#23; validar cobertura de outras unidades e persistência em #25 |
 | Partida a frio: base vazia no lançamento | O produto não responde nada ao primeiro usuário | RF10 (estado vazio explícito) e ação de povoamento inicial junto ao time |
-| Identificação indireta do avaliador em disciplinas com poucas avaliações | Risco de retaliação | RNF02 — definir mínimo de avaliações antes de exibir resultado detalhado |
+| Identificação indireta do avaliador em disciplinas com poucas avaliações | Risco de retaliação | RNF02 aprovado: mínimo de 3 avaliações para exibir critérios; abaixo disso, apenas contagem e dados insuficientes. O limiar reduz exposição, mas não garante anonimato |
 | Estrutura do SIGAA muda sem aviso | Importação para de funcionar silenciosamente | RF19 (log de execução) e RNF07 (falha isolada) |
 | Runtime Node no container do frontend | Ambiente mais pesado | Alternativa de exportação estática (ADR 02) |

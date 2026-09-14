@@ -27,7 +27,9 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 
 ## Metodologia
 
-O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanhamento fica em [Projects](../../projects) e as tarefas são gerenciadas via [Issues](../../issues).
+O time trabalha com **Scrum**, em sprints de **1 semana**. O acompanhamento fica no
+[G7 - Board de Desenvolvimento](https://github.com/orgs/unb-mds/projects/60) e as tarefas
+são gerenciadas via [Issues](../../issues) e [milestones](../../milestones).
 
 - **Planning:** toda segunda-feira
 - **Daily:** assíncrona, via grupo do time
@@ -42,7 +44,7 @@ O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanham
 
 **Pré-requisito:** mantenha uma instância PostgreSQL em execução e crie nela o usuário e o
 banco informados em `DATABASE_URL`. Este repositório ainda não provisiona o PostgreSQL via
-Docker Compose; essa configuração é acompanhada pela [Issue #35](../../issues/35).
+Docker Compose; essa configuração é acompanhada pela [Issue #34](../../issues/34).
 
 O arquivo `backend/.env` deve definir `SECRET_KEY` com um valor aleatório, `DEBUG` como
 `True` ou `False` e `DATABASE_URL` com as credenciais e o endereço do PostgreSQL.
@@ -77,6 +79,18 @@ A decisão de persistência e as restrições do modelo estão registradas em
 [`sprints/sprint02/banco-de-dados.md`](sprints/sprint02/banco-de-dados.md).
 
 ## Fluxo de contribuição
+
+### Verificações automatizadas
+
+O check `Backend` executa os testes determinísticos com `python -m unittest discover -s tests -v`,
+valida aplicação e migrações em um PostgreSQL 16 descartável de CI, compara o schema com os modelos
+e testa downgrade/upgrade. Também constrói a imagem e verifica a presença das migrações Alembic.
+A versão do banco de CI não define, por si só, a versão de produção.
+
+O acesso real ao SIGAA permanece uma verificação manual documentada na
+[POC](docs/estudos/sigaa-poc.md); não é dependência dos testes determinísticos.
+
+### Branches e revisão
 
 O projeto usa Gitflow: `main` representa releases e `develop` integra o trabalho da
 próxima release. Features e correções comuns partem de `develop`; releases e
