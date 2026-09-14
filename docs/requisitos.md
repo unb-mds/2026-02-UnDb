@@ -7,7 +7,7 @@ desenvolvido para a disciplina de Métodos de Desenvolvimento de Software (MDS) 
 > Mudanças de requisito são feitas aqui primeiro, e o `specs.md` regenerado em seguida.
 
 **Estado:** requisitos funcionais e escopo do Release 1 validados com o time.
-Requisitos não-funcionais estão **propostos** e ainda não passaram por validação.
+RNF02 validado pelo PO nesta revisão; os demais requisitos não-funcionais permanecem **propostos**.
 
 ---
 
@@ -80,8 +80,9 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 - **[RF02] Sessão autenticada:** o sistema deve autenticar o usuário e manter, no servidor,
   uma sessão identificada no navegador por cookie seguro. A sessão deve expirar após sete
   dias consecutivos de inatividade e ser invalidada no logout.
-- **[RF03] Bloqueio de avaliação duplicada:** o sistema deve impedir que o mesmo usuário
-  avalie o mesmo professor na mesma disciplina mais de uma vez.
+- **[RF03] Avaliação única com substituição:** o sistema deve manter apenas uma avaliação
+  por usuário, professor e disciplina. Um novo envio válido para a mesma combinação
+  substitui a avaliação anterior, sem criar registro adicional.
 - **[RF04] Consulta sem cadastro:** o sistema deve permitir consulta livre a todos os
   resultados agregados sem exigir autenticação.
 
@@ -145,7 +146,7 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 | Didática | Nota de 1 a 5 | Opinião | Média |
 | Dificuldade | Fácil / Médio / Difícil | Opinião | Moda |
 | Chamada | Sim / Não | Fato | Maioria, com estado "conflitante" |
-| Material | Não disponibiliza / Ruim / Médio / Bom | Fato + opinião | Maioria + média |
+| Material | Não disponibiliza / Ruim / Médio / Bom | Fato + opinião | Maioria para disponibilidade + moda para qualidade |
 | Recomenda a matéria | Sim / Não | Opinião | Percentual |
 
 **Escala de didática.** Escolhido 1 a 5. Três níveis concentrariam quase todos os professores
@@ -161,14 +162,17 @@ com alto percentual de recomendação indica fator não capturado — insumo par
 
 ## 🛡️ 7. Requisitos Não-Funcionais (RNF)
 
-> **Propostos.** Ainda não validados com o time.
+> **RNF02 validado pelo PO nesta revisão.** Os demais RNFs continuam propostos.
 
 - **[RNF01] Privacidade do avaliador:** a avaliação não deve ser exibida publicamente de
   forma vinculada à identidade nominal de quem avaliou. O sistema não deve armazenar
   matrícula, CPF ou histórico acadêmico.
 - **[RNF02] Proteção contra identificação indireta:** quando um professor tiver poucas
   avaliações em uma disciplina, o resultado agregado pode permitir inferir quem avaliou.
-  O sistema deve definir um mínimo de avaliações antes de exibir resultado detalhado.
+  O sistema só deve exibir critérios agregados a partir de três avaliações por professor
+  e disciplina. Abaixo disso, deve informar a quantidade e a insuficiência de dados, sem
+  exibir valores dos critérios. O mínimo é uma escolha inicial de produto, não garantia
+  empírica de anonimato, e pode ser revisto pelo PO.
 - **[RNF03] Segurança de credenciais:** senhas devem ser armazenadas com hash forte;
   comunicação via HTTPS; consultas protegidas contra SQL Injection.
 - **[RNF04] Reprodutibilidade em containers:** a aplicação deve subir via `docker compose up`
@@ -203,14 +207,15 @@ Restrições que valem para todo o sistema e não pertencem a um RF isolado.
 
 | Requisito | Descrição | Release | Estado |
 |---|---|---|---|
-| RF01–RF04 | Identificação, sessão, duplicata, consulta anônima | R1 | **Bloqueado** — decisão pendente |
+| RF01–RF04 | Identificação, sessão, substituição sem duplicata, consulta anônima | R1 | Planejado — modelo de acesso validado; envio de e-mail ainda depende das decisões da seção 11 |
 | RF05–RF07 | Busca por professor, disciplina e entre departamentos | R1 | Planejado |
 | RF08–RF11 | Consulta agregada, transparência, estado vazio e conflitante | R1 | Planejado |
 | RF12–RF13 | Comparação e ordenação | R1 | Planejado |
 | RF14–RF15 | Registro de avaliação e regras de agregação | R1 | Planejado |
 | RF16–RF19 | Importação SIGAA, cobertura, atualização e log | R1 | Em andamento |
 | RF20–RF22 | Comentários, denúncia e moderação | R2 | Planejado |
-| RNF01–RNF08 | Privacidade, segurança, containers, camadas, resiliência | R1 e R2 | **Proposto** |
+| RNF02 | Mínimo de três avaliações para exibição detalhada | R1 | Validado pelo PO; implementação planejada |
+| RNF01, RNF03–RNF08 | Privacidade, segurança, containers, camadas, resiliência | R1 e R2 | **Proposto** |
 
 ---
 
@@ -251,6 +256,28 @@ A reunião foi convocada no grupo de WhatsApp da equipe. Participaram Nicolas, V
 Gabriel, Tiago e Warlley; Yasmin não participou. A decisão vale para a Release 1 e será
 reavaliada na validação geral da release, permitindo correções para a Release 2.
 
+### Regras de produto — aprovadas pelo PO em 13/09/2026
+
+Nicolas aprovou explicitamente, na conversa de revisão do repositório:
+
+- Material: maioria para disponibilidade e moda para qualidade; não converter categorias em média numérica.
+- Novo envio válido substitui a avaliação anterior para o mesmo usuário/professor/disciplina (RF03).
+- Ordenação exclusivamente pelo percentual de recomendação.
+- Mínimo inicial de três avaliações por professor/disciplina antes de exibir critérios (RNF02).
+
+Na mesma conversa, Nicolas aprovou também os detalhes abaixo para #40/#51:
+
+- Didática: média com uma casa decimal; recomendação: percentual inteiro. Em ambos,
+  arredondamento de metades para cima (half-up).
+- Dificuldade: moda; empate escolhe Difícil > Médio > Fácil.
+- Chamada e disponibilidade de material: maioria simples; empate exato gera "conflitante".
+- Qualidade de material: moda entre respostas que disponibilizam material; empate escolhe
+  Bom > Médio > Ruim. Só é exibida se a disponibilidade agregada tiver maioria de "sim".
+- Comparação por recomendação decrescente; empate usa quantidade de avaliações decrescente
+  e, depois, nome em ordem alfabética. Resultados insuficientes ficam no final, sem percentual artificial.
+
+Essas decisões não validam os demais RNFs nem alteram as pendências de execução e envio de e-mail.
+
 ### Demais decisões pendentes
 
 O modelo de execução do banco foi definido durante a revisão do PR #55, em 11/09/2026:
@@ -258,9 +285,11 @@ SQLAlchemy síncrono, Alembic, PostgreSQL e driver `psycopg2`.
 
 | Decisão | Bloqueia | Responsável |
 |---|---|---|
-| Estratégia de deploy do frontend Next.js (SSR vs export estático) | Todos os RF de interface | Time |
-| Valor de N (métrica de cobertura) e mínimo do RNF02 | Apenas métrica e exibição | PO |
-| Viabilidade técnica do scraping do SIGAA | RF16–RF19 | Time |
+| Estratégia de execução/deploy do frontend Next.js (servidor vs export estático) | Configuração definitiva de execução (#36); não bloqueia o scaffold local #29 | Time |
+| Valor de N da métrica de cobertura | Apenas a métrica; mínimo de exibição já definido separadamente | PO |
+| Provedor de e-mail e validade do link de confirmação | Conclusão do cadastro #48 | Time / PO |
+| Identidade de docentes, homônimos, múltiplos docentes e reimportação | Integração persistida #25 | Time |
+| Cobertura e execução da coleta em todas as unidades | RF17–RF19; POC HTTP já demonstrada em uma unidade | Time |
 
 ### Nota — verificação de que o aluno cursou
 
@@ -273,10 +302,10 @@ não verificável.
 
 ### Nota — viabilidade do scraping
 
-As páginas públicas de turmas do SIGAA são construídas em JSF, com ViewState e postback,
-o que pode inviabilizar scraping por requisição HTTP simples e exigir automação de navegador.
-Isso afeta dependências, Dockerfile e tempo de execução da importação. Deve ser verificado
-antes de estimar RF16–RF19.
+A [POC da #23](estudos/sigaa-poc.md), executada em 13/09/2026, demonstrou coleta HTTP de
+108 ofertas do CIC em 2026.2, preservando sessão e controles JSF. Isso comprova o caso
+demonstrado, não cobertura total, persistência ou atualização periódica. Essas entregas
+e as lacunas de identidade continuam nas #25–#27.
 
 ---
 

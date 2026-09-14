@@ -41,6 +41,24 @@ jobs:
   backend:
     name: Backend
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      SECRET_KEY: ci-only-secret
+      DEBUG: "False"
+      DATABASE_URL: postgresql+psycopg2://ci:ci@localhost:5432/ci
     defaults:
       run:
         working-directory: backend
@@ -61,9 +79,20 @@ jobs:
       - name: Compile Python sources
         run: python -m compileall -q app alembic
 
+      - name: Run deterministic tests
+        run: python -m unittest discover -s tests -v
+
       - name: Import application
-        env:
-          SECRET_KEY: ci-only-secret
-          DEBUG: "False"
-          DATABASE_URL: postgresql+psycopg2://ci:ci@localhost:5432/ci
         run: python -c "from app.main import app; assert app is not None"
+
+      - name: Verify PostgreSQL migrations and model consistency
+        run: |
+          alembic upgrade head
+          alembic check
+          alembic downgrade base
+          alembic upgrade head
+
+      - name: Build backend image and check packaged migrations
+        run: |
+          docker build -t g7-backend-ci .
+          docker run --rm -e SECRET_KEY -e DEBUG -e DATABASE_URL g7-backend-ci alembic heads
