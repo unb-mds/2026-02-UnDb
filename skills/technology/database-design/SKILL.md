@@ -34,7 +34,7 @@ Use ao criar, revisar ou validar um modelo relacional; antes de uma migration; a
 
 Use somente o que estiver disponível e autorizado: requisitos, critérios de aceite, Issues ou decisões aprovadas; documentação de domínio e arquitetura; consultas, filtros, ordenações e fluxos de escrita conhecidos; modelo, migrations, schema e mapeamentos SQLAlchemy; restrições de stack e governança.
 
-No estado observado do G7, PostgreSQL, SQLAlchemy síncrono, Alembic e psycopg2 são a stack presente no backend. Não a substitua nem a promova como decisão normativa sem fonte autorizada; registre qualquer conflito documental.
+A stack autorizada do G7 é PostgreSQL, SQLAlchemy síncrono, Alembic e `psycopg2`, conforme o ADR 01 em `docs/arquitetura.md`. Use essa decisão como fonte e registre qualquer conflito entre arquitetura, documentação, código ou configuração.
 
 ## 6. Pre-conditions
 

@@ -15,4 +15,4 @@ Escolha a garantia estrutural mais próxima da regra autorizada. API e serviço 
 
 O requisito `(usuario_id, professor_id, disciplina_id)` pede FKs e `UNIQUE` composta, uma vez que nomes e relações estejam alinhados ao modelo aprovado. A constraint é barreira de concorrência; “novo envio substitui anterior” é comportamento de escrita. Após autorização, repository/service atualiza a linha encontrada ou aplica upsert com semântica explícita; migration introduz a constraint tratando dados existentes; testes demonstram integridade e reenvio.
 
-O modelo observado usa `Avaliacao(id_usuario, id_turma)` e `uq_usuario_turma_avaliacao`, divergente do requisito desta skill. Registre o conflito; não edite o modelo.
+No G7, use o RF03 de `docs/requisitos.md` e o modelo aprovado em `docs/arquitetura.md` como fontes da regra. Compare essas fontes com SQLAlchemy e Alembic; se os artefatos divergirem, registre o conflito sem eleger silenciosamente uma fonte ou editar o modelo.
