@@ -1,6 +1,6 @@
 # Índices PostgreSQL
 
-Crie índice quando uma consulta, join, filtro, ordenação ou constraint conhecida o justificar. Cada índice acelera algumas leituras, mas aumenta custo de inserção/atualização, espaço e manutenção.
+Use [a orientação genérica de indexação](../../database-design/references/indexing.md) para relacionar índices a consultas e constraints conhecidas. Esta referência acrescenta somente decisões e comportamentos específicos do PostgreSQL.
 
 1. `PRIMARY KEY` e `UNIQUE` já criam índice único B-tree: não crie duplicata.
 2. FK não cria automaticamente índice no lado referenciante. Avalie índice em FK se joins, filtros ou exclusões/atualizações da tabela referenciada o exigirem.

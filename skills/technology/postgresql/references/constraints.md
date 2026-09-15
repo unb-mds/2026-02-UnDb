@@ -1,13 +1,6 @@
 # Constraints e `NULL`
 
-Use a constraint que materializa a regra autorizada mais perto dos dados:
-
-- `PRIMARY KEY`: identidade estável; força `NOT NULL` e cria índice único.
-- `FOREIGN KEY`: referência válida; escolha ação de atualização/exclusão somente se houver regra de produto aprovada.
-- `UNIQUE`: unicidade de valor ou combinação; use composição quando a identidade lógica depende de várias colunas.
-- `NOT NULL`: ausência é inválida; não converta desconhecido em valor sentinela.
-- `CHECK`: domínio ou relação por linha que o banco pode testar.
-- `DEFAULT`: valor de ausência explicitamente autorizado; não substitui validação de entrada.
+Use [a orientação genérica de integridade](../../database-design/references/constraints.md) para escolher a constraint que representa a regra autorizada. Nesta referência, verifique apenas as particularidades PostgreSQL: `PRIMARY KEY` força `NOT NULL` e cria índice único; `FOREIGN KEY` não cria índice automaticamente no lado referenciante; e ações de atualização ou exclusão continuam dependentes de regra aprovada.
 
 ## `UNIQUE` e `NULL`
 
