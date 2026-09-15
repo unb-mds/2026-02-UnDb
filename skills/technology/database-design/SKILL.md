@@ -28,7 +28,7 @@ Use ao criar, revisar ou validar um modelo relacional; antes de uma migration; a
 - Use `requirements` para definir ou esclarecer comportamento e critérios de aceite.
 - Use `architecture` para decisões estruturais de maior nível ou para mudança que exija decisão arquitetural.
 - Use `implementation` para codificar um modelo já autorizado, incluindo repository, service, models e migration.
-- Uma futura `postgresql` deve tratar recursos e boas práticas específicos do PostgreSQL; esta skill não a substitui.
+- Use `postgresql` para recursos e boas práticas específicos do PostgreSQL; esta skill não a substitui.
 
 ## 5. Expected inputs
 
@@ -52,7 +52,7 @@ A stack autorizada do G7 é PostgreSQL, SQLAlchemy síncrono, Alembic e `psycopg
 5. Normalize primeiro: avalie 1FN, 2FN, 3FN, dependências, redundância e anomalias. Desnormalize somente com razão concreta e verificável, consulta/medição que a justifique, risco explícito e estratégia de manutenção. Leia [normalização](references/normalization.md).
 6. Derive índices de consultas, joins, filtros e ordenações conhecidos; não crie índice por hábito ou hipótese. Leia [índices](references/indexing.md).
 7. Verifique a rastreabilidade requisito → modelo → SQLAlchemy → migration → banco. Relate divergências sem escolher a fonte correta.
-8. Faça handoff: ambiguidade para `requirements`; decisão estrutural para `architecture`; mudança autorizada para `implementation`; particularidade PostgreSQL para futura `postgresql`.
+8. Faça handoff: ambiguidade para `requirements`; decisão estrutural para `architecture`; mudança autorizada para `implementation`; particularidade do SGBD para `postgresql`.
 
 Leia [workflow de modelagem](references/modeling-workflow.md) para roteiro e saída e [constraints](references/constraints.md) quando uma regra de integridade estiver em discussão.
 
@@ -81,7 +81,7 @@ O agente pode analisar, comparar e preparar proposta marcada como `Proposed`. No
 
 ## 12. Interaction with other skills
 
-`project-governance` define autoridade e estados; `skill-authoring` governa esta skill. `requirements` fornece regras e critérios autorizados; `architecture` recebe decisões estruturais maiores; `implementation` executa o modelo autorizado; `testing` verifica a implementação. Esta skill não substitui futura `postgresql`, responsável por dialeto, recursos e operação específicos.
+`project-governance` define autoridade e estados; `skill-authoring` governa esta skill. `requirements` fornece regras e critérios autorizados; `architecture` recebe decisões estruturais maiores; `postgresql` aplica particularidades do SGBD ao modelo autorizado; `implementation` executa a mudança autorizada; `testing` verifica a implementação.
 
 ## 13. Handling uncertainty and failures
 
