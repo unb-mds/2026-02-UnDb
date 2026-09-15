@@ -2,8 +2,8 @@
 name: meeting-minutes
 description: Registra atas de reuniões do projeto com fatos, decisões, pendências e encaminhamentos rastreáveis. Use ao criar, revisar ou atualizar uma ata sem inventar presença, consenso, aprovação ou mudança de escopo.
 metadata:
-  project-version: "0.1.0"
-  project-status: "proposed"
+  project-version: "1.0.0"
+  project-status: "defined"
   project-category: "process"
   project-scope: "meeting-records"
   agent-agnostic: "true"
@@ -94,4 +94,4 @@ A promoção desta skill de `proposed` para `defined` também depende de aprova�
 
 ## 13. Handling uncertainty and failures
 
-Se faltar informação, registre "não informado" ou omita o campo quando isso não prejudicar a interpretação. Se fontes divergirem, descreva o conflito e não escolha silenciosamente. Se não houver evidência suficiente de uma decisão, registre o tema como proposta ou `Pending Decision`. Se as notas forem insuficientes para uma ata confiável, produza apenas o registro sustentado e solicite confirmação humana para os pontos materiais restantes.
+Se faltar informação, registre "não informado" ou omita o campo quando isso não prejudicar a interpretação. Se fontes divergirem, descreva o conflito e não escolha silenciosamente. Se houver evidência de que uma alternativa foi efetivamente proposta, mas não aprovada, registre-a como `Proposed`. Se o tema exigir uma decisão e não houver evidência suficiente de decisão ou proposta concreta, registre-o como `Pending Decision`. Quando as fontes não permitirem confirmar o tema ou encaminhamento, marque a informação como não verificada ou omita-a. Se as notas forem insuficientes para uma ata confiável, produza apenas o registro sustentado e solicite confirmação humana para os pontos materiais restantes.

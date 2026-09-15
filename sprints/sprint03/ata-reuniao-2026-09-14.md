@@ -4,7 +4,7 @@
 
 - **Data:** 14 de setembro de 2026
 - **Horário:** 13h
-- **Participantes:** equipe do projeto G7; a presença individual não foi registrada nesta ata
+- **Participantes:** não registrados individualmente
 - **Local ou formato:** não registrado
 - **Objetivo:** revisar e confirmar as pendências da semana referentes à Sprint 03 — Persistência e APIs Base
 
