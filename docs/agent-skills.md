@@ -2,7 +2,7 @@
 
 Este tutorial explica como integrantes e agentes de IA podem trabalhar com as mesmas responsabilidades e regras do G7, independentemente da ferramenta utilizada. Você não precisa instalar uma integração de skills para começar: um agente que consiga ler os arquivos Markdown já pode seguir o procedimento manual.
 
-**Base da investigação:** checkout local do repositório `unb-mds/G7-2026-2`, atualizado em 13/09/2026 contra o commit `fe7df44ff69251ade527f65a1291ab2995d5af79` de `develop`. Foram inspecionados os nove `SKILL.md`, suas referências, arquivos de entrada, estrutura e documentação relacionada. O estado remoto de Issues, PRs e configurações do GitHub não foi consultado; este inventário descreve esse checkout. Os exemplos não representam execuções de implementação, testes ou review realizadas para este tutorial.
+**Base da investigação:** checkout local do repositório `unb-mds/2026-02-UnDb`, atualizado em 13/09/2026 contra o commit `fe7df44ff69251ade527f65a1291ab2995d5af79` de `develop`. Foram inspecionados os nove `SKILL.md`, suas referências, arquivos de entrada, estrutura e documentação relacionada. O estado remoto de Issues, PRs e configurações do GitHub não foi consultado; este inventário descreve esse checkout. Os exemplos não representam execuções de implementação, testes ou review realizadas para este tutorial.
 
 Este documento é explicativo. As regras oficiais do sistema de skills permanecem em [`skills/`](../skills/). Na classificação de `skill-authoring`, esta entrega é **NO-SKILL**: documentação de uso, sem criar ou alterar skills, adapters ou governança.
 
@@ -213,7 +213,7 @@ Nesta investigação, o Codex teve acesso ao checkout local, às instruções `A
 
 ### Passo a passo local
 
-1. Abra a pasta clonada `G7-2026-2` como diretório de trabalho do Codex. Se ainda não tiver o checkout, siga a clonagem no README.
+1. Abra a pasta clonada `2026-02-UnDb` como diretório de trabalho do Codex. Se ainda não tiver o checkout, siga a clonagem no README.
 2. Forneça a Issue: número/link, descrição, critérios autorizados, referências e escopo pedido. Um link sozinho não garante acesso ao conteúdo; cole o texto se necessário.
 3. Peça a identificação das fontes e a leitura explícita das skills aplicáveis.
 4. Autorize claramente a atividade desejada: analisar, implementar, criar testes ou apenas revisar.
@@ -233,7 +233,7 @@ São exemplos de inspeção, não comandos oficiais de teste. Se `rg` não estiv
 ### Prompt para iniciar e implementar
 
 ```text
-Trabalhe no checkout local de G7-2026-2. A tarefa é implementar a Issue #XX.
+Trabalhe no checkout local de 2026-02-UnDb. A tarefa é implementar a Issue #XX.
 Contexto da Issue: [cole descrição, critérios autorizados e referências].
 Escopo autorizado: [descreva a mudança]. Fora do escopo: [limites relevantes].
 
@@ -288,7 +288,7 @@ O uso abaixo é **leitura explícita/manual das skills canônicas**, apoiada pel
 Abra Claude Code na pasta do repositório, forneça a Issue e peça a leitura pelos caminhos. Confira se o agente identifica as fontes corretas e os status antes de começar. Preserve a distinção entre as orientações do arquivo de entrada e a autoridade das skills e documentos de origem.
 
 ```text
-Estamos no repositório G7-2026-2. Implemente a Issue #XX:
+Estamos no repositório 2026-02-UnDb. Implemente a Issue #XX:
 [cole descrição, critérios autorizados, referências e limites de escopo].
 
 Leia CLAUDE.md como entrada e leia também AGENTS.md.
@@ -316,7 +316,7 @@ O caminho depende do acesso disponível na conversa. Não presuma descoberta aut
 Indique qual versão deve ser consultada e peça leitura real dos arquivos. Acesso de leitura permite análise; alterações e execuções dependem das ferramentas efetivamente disponíveis.
 
 ```text
-Use o repositório G7-2026-2 na versão [commit/branch identificada].
+Use o repositório 2026-02-UnDb na versão [commit/branch identificada].
 Minha Issue é #XX: [contexto e escopo autorizado].
 Localize e leia skills/engineering/implementation/SKILL.md como procedimento
 principal e skills/governance/project-governance/SKILL.md para as fronteiras
@@ -350,7 +350,7 @@ Se nem a seleção estiver clara, forneça primeiro os nomes, caminhos, descript
 
 ```text
 Você não tem acesso direto ao repositório. Os arquivos fornecidos são cópias
-de G7-2026-2 no commit [hash], identificadas pelo caminho original.
+de 2026-02-UnDb no commit [hash], identificadas pelo caminho original.
 Use implementation como procedimento principal e project-governance para
 as fronteiras de decisão. A Issue é: [texto e autorização].
 Confira o material recebido e solicite referências essenciais ausentes.
