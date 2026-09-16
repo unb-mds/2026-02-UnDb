@@ -139,7 +139,7 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
 - [Engenharia de requisitos](requisitos.md) — fonte de verdade do escopo e das regras de
   produto;
 - [Board de requisitos no Figma](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3O-de-Professores-UnB-) — pesquisa, personas, Double Diamond, priorização, story map e fluxos;
-- [Especificação de implementação](../specs.md) — tradução dos requisitos para regras de
+- [Especificação de implementação](https://github.com/unb-mds/2026-02-UnDb/blob/develop/specs.md) — tradução dos requisitos para regras de
   implementação;
 - [Arquitetura](arquitetura.md) — decisões e estrutura técnica;
 - [Board de desenvolvimento](https://github.com/orgs/unb-mds/projects/60) — acompanhamento
