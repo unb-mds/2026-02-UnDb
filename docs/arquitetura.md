@@ -162,7 +162,7 @@ Falha em um departamento não interrompe os demais (RNF07).
 ## 6. Estrutura de pastas
 
 ```
-G7-2026-2/
+2026-02-UnDb/
 ├── backend/
 │   ├── app/           # ver seção 2
 │   ├── alembic/       # migrações
