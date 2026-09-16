@@ -6,6 +6,14 @@ Grupo G7 - Métodos de Desenvolvimento de Software 2026/2
 
 Aplicação web para avaliação de professores da UnB, com dados de disciplinas e turmas integrados a partir do SIGAA.
 
+## Documentação do produto
+
+- [Documento de visão](docs/visao.md)
+- [Engenharia de requisitos](docs/requisitos.md)
+- [Board de requisitos no Figma](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3O-de-Professores-UnB-)
+- [Especificação de implementação](specs.md)
+- [Arquitetura](docs/arquitetura.md)
+
 ## Equipe
 
 | Nome | GitHub | Papel no Sprint atual |
