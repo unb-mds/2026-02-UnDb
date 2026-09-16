@@ -1,4 +1,4 @@
-# G7 - Avaliação de Professores UnB
+# UnDb — Avaliação de Professores da UnB
 
 Grupo G7 - Métodos de Desenvolvimento de Software 2026/2
 
@@ -59,8 +59,8 @@ O arquivo `backend/.env` deve definir `SECRET_KEY` com um valor aleatório, `DEB
 
 ```bash
 # clonar o repositório
-git clone https://github.com/unb-mds/G7-2026-2.git
-cd G7-2026-2
+git clone https://github.com/unb-mds/2026-02-UnDb.git
+cd 2026-02-UnDb
 
 # criar e ativar ambiente virtual
 python -m venv venv
