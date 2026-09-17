@@ -122,7 +122,8 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
 
 - alcançar massa crítica de avaliações suficiente para gerar valor;
 - definir o provedor de e-mail e a validade do link de confirmação;
-- resolver identidade de docentes, homônimos, múltiplos docentes e reimportação;
+- reconciliar identidades provisórias de docentes quando um identificador externo se tornar
+  disponível; o modelo de homônimos, múltiplos docentes e reimportação foi definido na #25;
 - comprovar e operacionalizar a cobertura da coleta em todas as unidades do SIGAA;
 - definir a estratégia de execução e deploy do frontend;
 - validar os requisitos não-funcionais ainda propostos, exceto o RNF02 já validado.

@@ -11,7 +11,9 @@ class Disciplina(Base):
 
     id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid4)
     codigo: Mapped[str] = mapped_column(String(20), nullable=False, unique=True)
+    identificador_externo: Mapped[str | None] = mapped_column(String(50), nullable=True)
     nome: Mapped[str] = mapped_column(String(150), nullable=False)
+    nome_normalizado: Mapped[str] = mapped_column(String(150), nullable=False, default="")
     departamento: Mapped[str] = mapped_column(String(100), nullable=False)
     creditos: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
 

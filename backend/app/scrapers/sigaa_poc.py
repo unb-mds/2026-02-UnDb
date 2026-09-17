@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from html.parser import HTMLParser
 from http.cookiejar import CookieJar
 from urllib.parse import urlencode
@@ -34,6 +34,7 @@ class Oferta:
     periodo: str
     docentes: tuple[str, ...]
     componente_id: str | None
+    unidade_id: str | None = None
 
 
 class _FormParser(HTMLParser):
@@ -233,7 +234,8 @@ def coletar_ofertas_reais(
     response = opener.open(request, timeout=30)
     if response.geturl() != TURMAS_URL:
         raise RuntimeError(f"POST redirecionado para {response.geturl()}, sem resultado de turmas.")
-    return parse_ofertas(_decode(response))
+    ofertas, total = parse_ofertas(_decode(response))
+    return [replace(oferta, unidade_id=unidade) for oferta in ofertas], total
 
 
 def main() -> None:

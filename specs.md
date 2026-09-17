@@ -63,17 +63,35 @@ Ordinalidade aprovada para desempate de moda:
 
 Não armazenar matrícula, CPF, IRA ou histórico acadêmico.
 
+### `unidades`
+`id` UUID PK · `fonte` VARCHAR(30) · `codigo` VARCHAR(30) ·
+`identificador_externo` VARCHAR(50) nullable · `nome` VARCHAR(200)
+
+Constraint: `UNIQUE(fonte, codigo)`.
+
 ### `professores`
-`id` UUID PK · `nome` VARCHAR(150) · `departamento` VARCHAR(100)
+`id` UUID PK · `nome` VARCHAR(150) · `nome_normalizado` VARCHAR(150) ·
+`departamento` VARCHAR(100) · `siape` VARCHAR(30) nullable UNIQUE ·
+`identidade_origem` VARCHAR(255) nullable UNIQUE · `identidade_confirmada` BOOLEAN
+
+Sem SIAPE, a importação cria identidade provisória determinística por ocorrência de turma e
+nome normalizado. Homônimos sem identificador externo não são unidos automaticamente.
 
 ### `disciplinas`
-`id` UUID PK · `codigo` VARCHAR(20) UNIQUE · `nome` VARCHAR(150) ·
-`departamento` VARCHAR(100) · `creditos` SMALLINT nullable
+`id` UUID PK · `codigo` VARCHAR(20) UNIQUE · `identificador_externo` VARCHAR(50) nullable ·
+`nome` VARCHAR(150) · `nome_normalizado` VARCHAR(150) · `departamento` VARCHAR(100) ·
+`creditos` SMALLINT nullable
 
 ### `turmas`
-`id` UUID PK · `disciplina_id` FK · `professor_id` FK · `semestre` VARCHAR(10)
+`id` UUID PK · `fonte` VARCHAR(30) · `unidade_id` FK · `disciplina_id` FK ·
+`codigo` VARCHAR(30) · `semestre` VARCHAR(10) · `ativa` BOOLEAN ·
+`ultima_observacao_em` TIMESTAMPTZ
 
-Constraint: `UNIQUE(disciplina_id, professor_id, semestre)`
+Constraint: `UNIQUE(fonte, unidade_id, semestre, disciplina_id, codigo)`.
+
+### `turmas_professores`
+`turma_id` FK · `professor_id` FK · PK composta (`turma_id`, `professor_id`). Uma turma
+pode ter zero ou vários docentes.
 
 ### `avaliacoes`
 | Campo | Tipo | Regra |
@@ -203,8 +221,12 @@ modelo SQLAlchemy diretamente.
 | `GET` | `/auth/confirmar/{token}` | não | Confirma e-mail |
 | `POST` | `/auth/login` | não | Autentica |
 | `POST` | `/auth/logout` | sim | Invalida a sessão atual e remove seu cookie |
-| `GET` | `/professores/busca?nome=` | não | Busca por nome parcial |
-| `GET` | `/disciplinas/busca?termo=` | não | Busca por nome ou código |
+| `GET` | `/professores?nome=` | não | Descobre professores por nome parcial |
+| `GET` | `/professores/{id}` | não | Consulta um professor |
+| `GET` | `/professores/{id}/disciplinas` | não | Lista disciplinas vinculadas |
+| `GET` | `/disciplinas?codigo=&nome=` | não | Descobre disciplinas por código/nome |
+| `GET` | `/disciplinas/{id}` | não | Consulta uma disciplina |
+| `GET` | `/disciplinas/{id}/turmas` | não | Lista turmas e docentes |
 | `GET` | `/professores/{id}/disciplinas/{disciplina_id}` | não | Agregado de um professor numa disciplina |
 | `GET` | `/disciplinas/{id}/professores?ordenar_por=` | não | Comparação, ordenada |
 | `POST` | `/avaliacoes` | sim | Cria ou substitui avaliação |
@@ -227,8 +249,10 @@ contagem/agregação, os dados institucionais persistidos necessários à aprese
 }
 ```
 
-Os endpoints de busca por nome/código continuam pertencendo às Issues #44/#45. A
-importação somente prepara e persiste os registros consumidos por esses endpoints.
+As consultas são parciais, case-insensitive e accent-insensitive. Busca válida sem resultado
+retorna `[]`; recurso individual inexistente retorna 404; homônimos permanecem em itens
+separados. A #25 entrega esse contrato institucional mínimo; #44/#45 implementam a
+experiência de busca no frontend.
 
 ---
 
@@ -259,7 +283,6 @@ Não implementar nem inventar valor para os itens abaixo.
 |---|---|
 | Provedor de envio de e-mail e ambiente de desenvolvimento | Não decidido |
 | Validade do link de confirmação de e-mail | Não decidido |
-| Integração persistida e cobertura do SIGAA | POC HTTP concluída para CIC/2026.2; identidade, reimportação e cobertura total ainda precisam ser resolvidas |
 | Estratégia de povoamento inicial da base | Não decidido |
 
 ---

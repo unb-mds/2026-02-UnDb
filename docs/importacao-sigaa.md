@@ -45,23 +45,25 @@ as unidades terminam sem erro. Cada item de `departamentos` contém:
 - `total_reportado` pelo SIGAA;
 - `ofertas_extraidas` e `ofertas_processadas` (inclui registros já existentes que foram
   reutilizados na reimportação);
-- `erros`, incluindo divergência de contagem, falha de coleta, falha de banco ou oferta que
-  o modelo atual não representa.
+- `estado` (`sucesso`, `parcial` ou `falha`);
+- `erros`, incluindo divergência de contagem, falha de coleta ou falha de banco.
 
 O código de saída é `0` para sucesso integral e `1` quando existe qualquer falha. A rotina
 da #26 pode armazenar o JSON e usar o código de saída para monitoramento, sem precisar
 interpretar texto livre.
 
-## Limitações explícitas
+## Semântica da sincronização
 
-- Ofertas sem docente ou com múltiplos docentes são registradas como falha e não são
-  persistidas. Alterar essa regra exige a decisão de modelo ainda pendente.
-- Professores são reconhecidos por nome e departamento; homônimos permanecem uma limitação
-  conhecida da fonte pública.
-- A reimportação reutiliza disciplina por código, professor por nome/departamento e turma
-  por disciplina/professor/semestre. O modelo atual não mantém um identificador público
-  estável da turma.
-- Falhas da importação não derrubam a API, pois o processo não é executado por endpoints.
+- ofertas sem docente são persistidas com zero vínculos; ofertas com múltiplos docentes
+  preservam todos os vínculos;
+- como a página pública não fornece SIAPE, cada docente recebe identidade provisória por
+  ocorrência de turma. Homônimos não são unidos silenciosamente e uma reconciliação futura
+  pode confirmar a identidade;
+- turma é identificada por fonte, unidade, período, componente e código textual. Uma troca
+  de docente atualiza os vínculos sem duplicar a turma;
+- somente uma coleta completa, com a contagem validada e sem erro de oferta, marca como
+  inativas as turmas ausentes. Execução parcial preserva todos os registros anteriores;
+- falhas da importação não derrubam a API, pois o processo não é executado por endpoints.
 
 ## Verificações
 
@@ -83,19 +85,22 @@ disponibilidade do SIGAA e do PostgreSQL configurado.
 
 ### Evidência executada em 17/09/2026
 
-A consulta pública real do CIC em 2026.2 reportou e extraiu 108 ofertas. Dessas, 98 tinham
-exatamente um docente e foram processadas; nove tinham dois docentes e uma tinha três, totalizando
-dez falhas isoladas conforme a limitação de modelo já registrada.
+A consulta pública real do CIC em 2026.2 reportou e extraiu 108 ofertas. Em 17/09/2026, o
+modelo N:N atual persistiu em memória as 108: 98 tinham exatamente um docente, nove tinham
+dois e uma tinha três. Foram preservados 119 vínculos, 57 disciplinas e 119 identidades
+docentes provisórias, sem perda das dez ofertas multidocentes.
 
 Para verificar o encadeamento sem alterar um banco do projeto, os dados reais foram gravados
 em um banco temporário em memória e consultados pela mesma camada de serviço usada pela API:
 
-- 46 professores, 51 disciplinas e 83 relações de turma distintas foram gravadas;
+- o modelo anterior havia gravado apenas 46 professores, 51 disciplinas e 83 relações de
+  turma, pois descartava ofertas multidocentes e não preservava o código textual da turma;
 - a consulta pública retornou a professora `MARIA EMILIA MACHADO TELLES WALTER` e a disciplina
   `CIC0002` a partir dos registros persistidos;
 - as 98 ofertas aceitas resultaram em 83 relações porque o modelo validado identifica turma por
   disciplina, professor e semestre, sem armazenar o código textual da turma do SIGAA.
 
-Essa verificação confirma coleta, gravação e consulta com dados reais, mas não substitui a
-execução em PostgreSQL. A máquina usada não tinha uma instância PostgreSQL configurada; as
-migrações e a consistência do modelo devem ser verificadas no check `Backend` do Pull Request.
+A execução real em memória valida a fonte e a representação, mas não substitui PostgreSQL.
+Antes de fechar a #25, executar a importação real nesse banco, repeti-la para verificar
+ausência de duplicatas e validar a migração `upgrade/downgrade/upgrade`. As consultas do
+contrato OpenAPI, a idempotência e os casos de falha são cobertos pela suíte determinística.

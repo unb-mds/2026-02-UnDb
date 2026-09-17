@@ -11,9 +11,49 @@ from app.schemas.avaliacao import (
     AvaliacaoAgregadaSuficienteResponse,
 )
 from app.services import avaliacao_service
+from app.schemas.institucional import (
+    DisciplinaDetalheResponse,
+    ProfessorDetalheResponse,
+)
+from app.services import institucional_service
 
 
 router = APIRouter(prefix="/api/professores", tags=["professores"])
+
+
+@router.get("", response_model=list[ProfessorDetalheResponse])
+def listar_professores(
+    session: Annotated[Session, Depends(get_db)],
+    nome: str | None = None,
+) -> list[ProfessorDetalheResponse]:
+    return institucional_service.listar_professores(session, nome)
+
+
+@router.get("/{professor_id}", response_model=ProfessorDetalheResponse)
+def obter_professor(
+    professor_id: UUID,
+    session: Annotated[Session, Depends(get_db)],
+) -> ProfessorDetalheResponse:
+    try:
+        return institucional_service.obter_professor(session, professor_id)
+    except institucional_service.RecursoInstitucionalNaoEncontradoError as erro:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(erro)) from erro
+
+
+@router.get(
+    "/{professor_id}/disciplinas",
+    response_model=list[DisciplinaDetalheResponse],
+)
+def listar_disciplinas_do_professor(
+    professor_id: UUID,
+    session: Annotated[Session, Depends(get_db)],
+) -> list[DisciplinaDetalheResponse]:
+    try:
+        return institucional_service.listar_disciplinas_do_professor(
+            session, professor_id
+        )
+    except institucional_service.RecursoInstitucionalNaoEncontradoError as erro:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(erro)) from erro
 
 
 @router.get(

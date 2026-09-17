@@ -12,6 +12,7 @@ os.environ.setdefault("SECRET_KEY", "teste-local")
 
 from app.main import app
 from app.repositories.avaliacao_repository import listar_por_professor_e_disciplina
+from app.repositories.turma_repository import existe_vinculo_professor_disciplina
 from app.models.enums import Dificuldade, QualidadeMaterial
 from app.schemas.avaliacao import (
     AvaliacaoAgregadaInsuficienteResponse,
@@ -56,6 +57,10 @@ class ConsultaAgregadaServiceTest(unittest.TestCase):
         self.session = Mock()
         self.professor_id = uuid4()
         self.disciplina_id = uuid4()
+        patcher = patch("app.services.avaliacao_service.turma_repository")
+        self.turma_repository = patcher.start()
+        self.addCleanup(patcher.stop)
+        self.turma_repository.existe_vinculo_professor_disciplina.return_value = True
 
     @patch("app.services.avaliacao_service.avaliacao_repository")
     def test_retorna_estado_vazio_sem_criterios(self, repository: Mock) -> None:
@@ -132,6 +137,19 @@ class ConsultaAgregadaServiceTest(unittest.TestCase):
         with self.assertRaisesRegex(RecursoNaoEncontradoError, "disciplina"):
             consultar_agregado(self.session, self.professor_id, self.disciplina_id)
 
+    @patch("app.services.avaliacao_service.avaliacao_repository")
+    def test_rejeita_professor_sem_vinculo_com_disciplina(
+        self, repository: Mock
+    ) -> None:
+        repository.obter_professor.return_value = professor(self.professor_id)
+        repository.obter_disciplina.return_value = disciplina(self.disciplina_id)
+        self.turma_repository.existe_vinculo_professor_disciplina.return_value = False
+
+        with self.assertRaisesRegex(RecursoNaoEncontradoError, "vinculo"):
+            consultar_agregado(self.session, self.professor_id, self.disciplina_id)
+
+        repository.listar_por_professor_e_disciplina.assert_not_called()
+
 
 class ConsultaAgregadaRepositoryTest(unittest.TestCase):
     def test_filtra_simultaneamente_por_professor_e_disciplina(self) -> None:
@@ -151,6 +169,27 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
         parametros = set(consulta.compile().params.values())
         self.assertEqual(parametros, {professor_id, disciplina_id})
 
+    def test_verifica_vinculo_por_professor_e_disciplina(self) -> None:
+        db = Mock()
+        consulta = db.query.return_value.join.return_value.filter.return_value
+        consulta.first.return_value = object()
+        professor_id = uuid4()
+        disciplina_id = uuid4()
+
+        resultado = existe_vinculo_professor_disciplina(
+            db,
+            professor_id,
+            disciplina_id,
+        )
+
+        self.assertTrue(resultado)
+        expressoes = db.query.return_value.join.return_value.filter.call_args.args
+        parametros = {
+            valor
+            for expressao in expressoes
+            for valor in expressao.compile().params.values()
+        }
+        self.assertTrue({professor_id, disciplina_id} <= parametros)
 
 class ConsultaAgregadaContratoTest(unittest.TestCase):
     def test_endpoint_publico_esta_registrado(self) -> None:
