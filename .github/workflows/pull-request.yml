@@ -92,6 +92,18 @@ jobs:
           alembic downgrade base
           alembic upgrade head
 
+      - name: Verify migration with legacy data
+        run: |
+          alembic downgrade base
+          alembic upgrade 20260911_01
+          python -m tests.migration_legacy_check seed
+          alembic upgrade head
+          python -m tests.migration_legacy_check verify-upgrade
+          alembic check
+          alembic downgrade 20260911_01
+          python -m tests.migration_legacy_check verify-downgrade
+          alembic upgrade head
+
       - name: Build backend image and check packaged migrations
         run: |
           docker build -t g7-backend-ci .

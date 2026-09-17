@@ -173,8 +173,36 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.add_column("turmas", sa.Column("professor_id", sa.Uuid(), nullable=True))
     conexao = op.get_bind()
+    vinculos_incompativeis = conexao.scalar(
+        sa.text(
+            "SELECT count(*) FROM ("
+            "SELECT t.id FROM turmas t "
+            "LEFT JOIN turmas_professores tp ON tp.turma_id=t.id "
+            "GROUP BY t.id HAVING count(tp.professor_id) <> 1"
+            ") AS turmas_incompativeis"
+        )
+    )
+    identidades_legadas_duplicadas = conexao.scalar(
+        sa.text(
+            "SELECT count(*) FROM ("
+            "SELECT t.disciplina_id, tp.professor_id, t.semestre "
+            "FROM turmas t "
+            "JOIN turmas_professores tp ON tp.turma_id=t.id "
+            "GROUP BY t.disciplina_id, tp.professor_id, t.semestre "
+            "HAVING count(*) > 1"
+            ") AS identidades_duplicadas"
+        )
+    )
+    # O schema anterior representa exatamente um docente por turma e uma unica
+    # turma por disciplina/docente/semestre. Recusar a conversao evita inventar
+    # docentes, descartar vinculos ou colapsar turmas distintas.
+    if vinculos_incompativeis or identidades_legadas_duplicadas:
+        raise RuntimeError(
+            "downgrade impossivel: os dados atuais nao cabem no modelo anterior de turmas"
+        )
+
+    op.add_column("turmas", sa.Column("professor_id", sa.Uuid(), nullable=True))
     conexao.execute(
         sa.text(
             "UPDATE turmas SET professor_id = ("
@@ -182,16 +210,6 @@ def downgrade() -> None:
             "WHERE tp.turma_id=turmas.id ORDER BY tp.professor_id LIMIT 1)"
         )
     )
-    # O schema anterior não representa turma sem docente. O downgrade é recusado
-    # quando há dados que seriam perdidos, em vez de inventar um professor.
-    sem_docente = conexao.scalar(
-        sa.text("SELECT count(*) FROM turmas WHERE professor_id IS NULL")
-    )
-    if sem_docente:
-        raise RuntimeError(
-            "downgrade impossivel: existem turmas sem docente no modelo novo"
-        )
-
     op.alter_column("turmas", "professor_id", nullable=False)
     op.create_foreign_key(
         "turmas_professor_id_fkey",

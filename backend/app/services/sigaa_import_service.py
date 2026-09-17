@@ -112,6 +112,7 @@ def salvar_oferta(
             oferta.turma_codigo,
         )
     turma.ativa = True
+    turma.ultima_observacao_em = datetime.now(UTC)
 
     professores: list[Professor] = []
     nomes_vistos: set[str] = set()

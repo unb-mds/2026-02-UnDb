@@ -1,5 +1,7 @@
 import unittest
 from contextlib import nullcontext
+from dataclasses import replace
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 from sqlalchemy import create_engine, func, select
@@ -55,11 +57,42 @@ class SigaaImportServiceTest(unittest.TestCase):
             primeira = salvar_oferta(db, _oferta("DOCENTE UM"), "CIC")
             db.commit()
             primeira_id = primeira.id
+            primeira.ultima_observacao_em = datetime(2000, 1, 1, tzinfo=UTC)
+            db.commit()
             segunda = salvar_oferta(db, _oferta("DOCENTE DOIS"), "CIC")
             db.commit()
             self.assertEqual(segunda.id, primeira_id)
             self.assertEqual([p.nome for p in segunda.professores], ["DOCENTE DOIS"])
+            self.assertGreater(
+                segunda.ultima_observacao_em.replace(tzinfo=UTC),
+                datetime(2000, 1, 1, tzinfo=UTC),
+            )
             self.assertEqual(db.scalar(select(func.count(Turma.id))), 1)
+
+    def test_recusa_troca_silenciosa_de_identificador_da_unidade(self) -> None:
+        with Session(self.engine) as db:
+            salvar_oferta(db, _oferta("DOCENTE", turma="01"), "CIC")
+            db.commit()
+
+            oferta_conflitante = replace(
+                _oferta("DOCENTE", turma="02"),
+                unidade_id="999",
+            )
+            with self.assertRaisesRegex(ValueError, "conflito de identidade da unidade"):
+                salvar_oferta(db, oferta_conflitante, "CIC")
+
+            unidade = db.scalar(select(Unidade))
+            self.assertEqual(unidade.identificador_externo, "637")
+
+    def test_recusa_identificador_da_unidade_associado_a_outro_codigo(self) -> None:
+        with Session(self.engine) as db:
+            salvar_oferta(db, _oferta("DOCENTE", turma="01"), "CIC")
+            db.commit()
+
+            with self.assertRaisesRegex(ValueError, "ja pertence a outro codigo"):
+                salvar_oferta(db, _oferta("DOCENTE", turma="02"), "MAT")
+
+            self.assertEqual(db.scalar(select(func.count(Unidade.id))), 1)
 
     def test_homonimos_sem_siape_nao_sao_unidos(self) -> None:
         with Session(self.engine) as db:
