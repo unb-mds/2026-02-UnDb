@@ -35,6 +35,17 @@ class SigaaPocParserTest(unittest.TestCase):
         self.assertEqual(ofertas[0].docentes, ("MARIA EMILIA MACHADO TELLES WALTER",))
         self.assertEqual(ofertas[0].componente_id, "177942")
 
+    def test_oferta_sem_docente_preserva_ausencia(self) -> None:
+        ofertas, total = parse_ofertas("""
+        <table><tbody>
+          <tr class="agrupador"><td><span class="tituloDisciplina">CIC0002 - FUNDAMENTOS TEORICOS DA COMPUTACAO</span></td></tr>
+          <tr class="linhaPar"><td class="turma">01</td><td class="anoPeriodo">2026.2</td><td class="nome"></td></tr>
+        </tbody><tfoot><tr><td><b>1 turmas encontrada(s)</b></td></tr></tfoot></table>
+        """)
+
+        self.assertEqual(total, 1)
+        self.assertEqual(ofertas[0].docentes, ())
+
 
 class SigaaPocMultipleDocentesParserTest(unittest.TestCase):
     def test_oferta_preserves_multiple_docentes_from_sigaa_cell(self) -> None:

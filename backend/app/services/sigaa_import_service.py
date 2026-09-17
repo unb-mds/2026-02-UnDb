@@ -54,14 +54,16 @@ def salvar_oferta(db: Session, oferta: Oferta, departamento: str) -> Turma:
     departamento = departamento.strip()
     if not departamento:
         raise OfertaNaoPersistivelError("A oferta não informa o departamento.")
-    if len(oferta.docentes) != 1:
+    if len(oferta.docentes) != 1 or not oferta.docentes[0].strip():
         raise OfertaNaoPersistivelError(
             "A oferta deve possuir exatamente um docente para o modelo atual; "
             f"turma {oferta.turma_codigo!r} possui {len(oferta.docentes)}."
         )
 
     disciplina = _get_or_create_disciplina(db, oferta, departamento)
-    professor = _get_or_create_professor(db, oferta.docentes[0], departamento)
+    professor = _get_or_create_professor(
+        db, oferta.docentes[0].strip(), departamento
+    )
 
     turma = turma_repository.get_by_disciplina_professor_semestre(
         db, disciplina.id, professor.id, oferta.periodo
@@ -183,7 +185,12 @@ def _importar_departamento(
                 f"{oferta.componente_codigo!r}: {_mensagem_erro(erro)}"
             )
 
-    if total_reportado is not None and total_reportado != len(ofertas):
+    if total_reportado is None:
+        erros.append(
+            "total de ofertas nao informado pelo SIGAA; "
+            "nao foi possivel validar a extracao"
+        )
+    elif total_reportado != len(ofertas):
         erros.append(
             "total informado pelo SIGAA diverge da extracao: "
             f"reportado={total_reportado}, extraido={len(ofertas)}"

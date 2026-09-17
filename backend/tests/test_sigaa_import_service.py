@@ -99,6 +99,16 @@ class SigaaImportServiceTest(unittest.TestCase):
         disciplina_repository.create.assert_not_called()
 
     @patch("app.services.sigaa_import_service.disciplina_repository")
+    def test_recusa_docente_vazio_antes_de_escrever(
+        self, disciplina_repository: Mock
+    ) -> None:
+        with self.assertRaisesRegex(OfertaNaoPersistivelError, "exatamente um docente"):
+            salvar_oferta(Mock(), _oferta("   "), "CIC")
+
+        disciplina_repository.get_by_codigo.assert_not_called()
+        disciplina_repository.create.assert_not_called()
+
+    @patch("app.services.sigaa_import_service.disciplina_repository")
     def test_recusa_departamento_ausente_antes_de_escrever(
         self, disciplina_repository: Mock
     ) -> None:
@@ -224,6 +234,22 @@ class ExecucaoImportacaoTest(unittest.TestCase):
         self.assertFalse(departamento.sucesso)
         self.assertIn("diverge", departamento.erros[0])
         self.assertEqual(departamento.ofertas_processadas, 1)
+
+    @patch("app.services.sigaa_import_service.salvar_oferta")
+    def test_total_ausente_impede_sucesso_silencioso(self, salvar: Mock) -> None:
+        resultado = executar_importacao(
+            _SessionFalsa(),
+            [DepartamentoImportacao("CIC", "DEPTO CIENCIAS DA COMPUTACAO")],
+            ano="2026",
+            periodo="2",
+            coletor=lambda *_: ([], None),
+        )
+
+        departamento = resultado.departamentos[0]
+        self.assertFalse(resultado.sucesso)
+        self.assertFalse(departamento.sucesso)
+        self.assertIn("nao informado", departamento.erros[0])
+        salvar.assert_not_called()
 
     @patch("app.services.sigaa_import_service.salvar_oferta")
     def test_falha_de_commit_e_reportada_e_reverte_contagem(

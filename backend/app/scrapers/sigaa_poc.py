@@ -154,7 +154,12 @@ class _TurmasParser(HTMLParser):
 
 def _docentes(text: str) -> tuple[str, ...]:
     names = re.findall(r"(.*?)(?:\s*\(\d+h\))(?=\s|$)", text)
-    return tuple(" ".join(name.split()) for name in names if name.strip()) or (text.strip(),)
+    docentes = tuple(" ".join(name.split()) for name in names if name.strip())
+    if docentes:
+        return docentes
+
+    docente = text.strip()
+    return (docente,) if docente else ()
 
 
 def parse_form(html: str) -> _FormParser:
