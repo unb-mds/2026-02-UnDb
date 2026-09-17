@@ -21,9 +21,26 @@ class RecursoNaoEncontradoError(Exception):
 
 
 @dataclass(frozen=True)
+class ProfessorInstitucional:
+    id: UUID
+    nome: str
+    departamento: str
+
+
+@dataclass(frozen=True)
+class DisciplinaInstitucional:
+    id: UUID
+    codigo: str
+    nome: str
+    departamento: str
+
+
+@dataclass(frozen=True)
 class ConsultaAgregada:
     professor_id: UUID
     disciplina_id: UUID
+    professor: ProfessorInstitucional
+    disciplina: DisciplinaInstitucional
     total_avaliacoes: int
     dados_suficientes: bool
     criterios: ResultadoAgregado | None = None
@@ -34,10 +51,24 @@ def consultar_agregado(
     professor_id: UUID,
     disciplina_id: UUID,
 ) -> ConsultaAgregada:
-    if not avaliacao_repository.professor_existe(db, professor_id):
+    professor = avaliacao_repository.obter_professor(db, professor_id)
+    if professor is None:
         raise RecursoNaoEncontradoError("professor nao encontrado")
-    if not avaliacao_repository.disciplina_existe(db, disciplina_id):
+    disciplina = avaliacao_repository.obter_disciplina(db, disciplina_id)
+    if disciplina is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
+
+    professor_institucional = ProfessorInstitucional(
+        id=professor.id,
+        nome=professor.nome,
+        departamento=professor.departamento,
+    )
+    disciplina_institucional = DisciplinaInstitucional(
+        id=disciplina.id,
+        codigo=disciplina.codigo,
+        nome=disciplina.nome,
+        departamento=disciplina.departamento,
+    )
 
     registros = avaliacao_repository.listar_por_professor_e_disciplina(
         db,
@@ -49,6 +80,8 @@ def consultar_agregado(
         return ConsultaAgregada(
             professor_id=professor_id,
             disciplina_id=disciplina_id,
+            professor=professor_institucional,
+            disciplina=disciplina_institucional,
             total_avaliacoes=total,
             dados_suficientes=False,
         )
@@ -73,6 +106,8 @@ def consultar_agregado(
     return ConsultaAgregada(
         professor_id=professor_id,
         disciplina_id=disciplina_id,
+        professor=professor_institucional,
+        disciplina=disciplina_institucional,
         total_avaliacoes=total,
         dados_suficientes=True,
         criterios=criterios,

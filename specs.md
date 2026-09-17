@@ -212,6 +212,24 @@ modelo SQLAlchemy diretamente.
 Nenhuma busca filtra por curso ou departamento do usuário (RF07).
 Nenhum endpoint dispara importação do SIGAA em tempo real.
 
+O `GET /professores/{id}/disciplinas/{disciplina_id}` retorna, além dos UUIDs e da
+contagem/agregação, os dados institucionais persistidos necessários à apresentação:
+
+```json
+{
+  "professor": {"id": "uuid", "nome": "...", "departamento": "..."},
+  "disciplina": {
+    "id": "uuid",
+    "codigo": "CIC0002",
+    "nome": "...",
+    "departamento": "CIC"
+  }
+}
+```
+
+Os endpoints de busca por nome/código continuam pertencendo às Issues #44/#45. A
+importação somente prepara e persiste os registros consumidos por esses endpoints.
+
 ---
 
 ## 9. Estrutura do backend

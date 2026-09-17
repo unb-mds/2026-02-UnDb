@@ -1,5 +1,6 @@
 import os
 import unittest
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 from uuid import uuid4
 
@@ -33,6 +34,23 @@ def registro(*, chamada: bool = True, material: bool = True) -> Mock:
     return item
 
 
+def professor(professor_id):
+    return SimpleNamespace(
+        id=professor_id,
+        nome="PROFESSORA TESTE",
+        departamento="CIC",
+    )
+
+
+def disciplina(disciplina_id):
+    return SimpleNamespace(
+        id=disciplina_id,
+        codigo="CIC0001",
+        nome="INTRODUCAO A CIENCIA DA COMPUTACAO",
+        departamento="CIC",
+    )
+
+
 class ConsultaAgregadaServiceTest(unittest.TestCase):
     def setUp(self) -> None:
         self.session = Mock()
@@ -41,8 +59,8 @@ class ConsultaAgregadaServiceTest(unittest.TestCase):
 
     @patch("app.services.avaliacao_service.avaliacao_repository")
     def test_retorna_estado_vazio_sem_criterios(self, repository: Mock) -> None:
-        repository.professor_existe.return_value = True
-        repository.disciplina_existe.return_value = True
+        repository.obter_professor.return_value = professor(self.professor_id)
+        repository.obter_disciplina.return_value = disciplina(self.disciplina_id)
         repository.listar_por_professor_e_disciplina.return_value = []
 
         resultado = consultar_agregado(
@@ -54,14 +72,16 @@ class ConsultaAgregadaServiceTest(unittest.TestCase):
         self.assertEqual(resultado.total_avaliacoes, 0)
         self.assertFalse(resultado.dados_suficientes)
         self.assertIsNone(resultado.criterios)
+        self.assertEqual(resultado.professor.nome, "PROFESSORA TESTE")
+        self.assertEqual(resultado.disciplina.codigo, "CIC0001")
 
     @patch("app.services.avaliacao_service.avaliacao_repository")
     def test_nao_expoe_criterios_com_uma_ou_duas_avaliacoes(
         self,
         repository: Mock,
     ) -> None:
-        repository.professor_existe.return_value = True
-        repository.disciplina_existe.return_value = True
+        repository.obter_professor.return_value = professor(self.professor_id)
+        repository.obter_disciplina.return_value = disciplina(self.disciplina_id)
 
         for quantidade in (1, 2):
             with self.subTest(quantidade=quantidade):
@@ -82,8 +102,8 @@ class ConsultaAgregadaServiceTest(unittest.TestCase):
         self,
         repository: Mock,
     ) -> None:
-        repository.professor_existe.return_value = True
-        repository.disciplina_existe.return_value = True
+        repository.obter_professor.return_value = professor(self.professor_id)
+        repository.obter_disciplina.return_value = disciplina(self.disciplina_id)
         repository.listar_por_professor_e_disciplina.return_value = [
             registro(),
             registro(chamada=False, material=False),
@@ -103,12 +123,12 @@ class ConsultaAgregadaServiceTest(unittest.TestCase):
 
     @patch("app.services.avaliacao_service.avaliacao_repository")
     def test_rejeita_professor_ou_disciplina_inexistente(self, repository: Mock) -> None:
-        repository.professor_existe.return_value = False
+        repository.obter_professor.return_value = None
         with self.assertRaisesRegex(RecursoNaoEncontradoError, "professor"):
             consultar_agregado(self.session, self.professor_id, self.disciplina_id)
 
-        repository.professor_existe.return_value = True
-        repository.disciplina_existe.return_value = False
+        repository.obter_professor.return_value = professor(self.professor_id)
+        repository.obter_disciplina.return_value = None
         with self.assertRaisesRegex(RecursoNaoEncontradoError, "disciplina"):
             consultar_agregado(self.session, self.professor_id, self.disciplina_id)
 
@@ -143,6 +163,17 @@ class ConsultaAgregadaContratoTest(unittest.TestCase):
         resposta = AvaliacaoAgregadaInsuficienteResponse(
             professor_id=uuid4(),
             disciplina_id=uuid4(),
+            professor={
+                "id": uuid4(),
+                "nome": "PROFESSORA TESTE",
+                "departamento": "CIC",
+            },
+            disciplina={
+                "id": uuid4(),
+                "codigo": "CIC0001",
+                "nome": "INTRODUCAO A CIENCIA DA COMPUTACAO",
+                "departamento": "CIC",
+            },
             total_avaliacoes=2,
             dados_suficientes=False,
         ).model_dump()
@@ -152,6 +183,8 @@ class ConsultaAgregadaContratoTest(unittest.TestCase):
             {
                 "professor_id",
                 "disciplina_id",
+                "professor",
+                "disciplina",
                 "total_avaliacoes",
                 "dados_suficientes",
             },
@@ -161,6 +194,17 @@ class ConsultaAgregadaContratoTest(unittest.TestCase):
         resposta = AvaliacaoAgregadaSuficienteResponse(
             professor_id=uuid4(),
             disciplina_id=uuid4(),
+            professor={
+                "id": uuid4(),
+                "nome": "PROFESSORA TESTE",
+                "departamento": "CIC",
+            },
+            disciplina={
+                "id": uuid4(),
+                "codigo": "CIC0001",
+                "nome": "INTRODUCAO A CIENCIA DA COMPUTACAO",
+                "departamento": "CIC",
+            },
             total_avaliacoes=4,
             dados_suficientes=True,
             didatica=4.0,

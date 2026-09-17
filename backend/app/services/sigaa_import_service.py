@@ -1,3 +1,8 @@
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from typing import Any
+
 from sqlalchemy.orm import Session
 
 from app.models.disciplina import Disciplina
@@ -8,7 +13,7 @@ from app.repositories import (
     professor_repository,
     turma_repository,
 )
-from app.scrapers.sigaa_poc import Oferta
+from app.scrapers.sigaa_poc import Oferta, coletar_ofertas_reais
 
 
 class OfertaNaoPersistivelError(ValueError):
@@ -66,3 +71,170 @@ def salvar_oferta(db: Session, oferta: Oferta, departamento: str) -> Turma:
             db, disciplina.id, professor.id, oferta.periodo
         )
     return turma
+
+
+@dataclass(frozen=True)
+class DepartamentoImportacao:
+    departamento: str
+    unidade_sigaa: str
+
+
+@dataclass(frozen=True)
+class ResultadoDepartamento:
+    departamento: str
+    unidade_sigaa: str
+    sucesso: bool
+    total_reportado: int | None
+    ofertas_extraidas: int
+    ofertas_processadas: int
+    erros: tuple[str, ...]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "departamento": self.departamento,
+            "unidade_sigaa": self.unidade_sigaa,
+            "sucesso": self.sucesso,
+            "total_reportado": self.total_reportado,
+            "ofertas_extraidas": self.ofertas_extraidas,
+            "ofertas_processadas": self.ofertas_processadas,
+            "erros": list(self.erros),
+        }
+
+
+@dataclass(frozen=True)
+class ResultadoImportacao:
+    sucesso: bool
+    ano: str
+    periodo: str
+    inicio: datetime
+    fim: datetime
+    departamentos: tuple[ResultadoDepartamento, ...]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "sucesso": self.sucesso,
+            "ano": self.ano,
+            "periodo": self.periodo,
+            "inicio": self.inicio.isoformat(),
+            "fim": self.fim.isoformat(),
+            "departamentos": [item.to_dict() for item in self.departamentos],
+        }
+
+
+ColetorOfertas = Callable[[str, str, str], tuple[list[Oferta], int | None]]
+
+
+def _mensagem_erro(erro: Exception) -> str:
+    detalhe = str(erro).strip()
+    return f"{type(erro).__name__}: {detalhe}" if detalhe else type(erro).__name__
+
+
+def _rollback_seguro(db: Session) -> str | None:
+    try:
+        db.rollback()
+    except Exception as erro:
+        return f"falha adicional no rollback: {_mensagem_erro(erro)}"
+    return None
+
+
+def _importar_departamento(
+    db: Session,
+    solicitacao: DepartamentoImportacao,
+    ano: str,
+    periodo: str,
+    coletor: ColetorOfertas,
+) -> ResultadoDepartamento:
+    departamento = solicitacao.departamento.strip()
+    unidade_sigaa = solicitacao.unidade_sigaa.strip()
+    if not departamento or not unidade_sigaa:
+        return ResultadoDepartamento(
+            departamento=departamento,
+            unidade_sigaa=unidade_sigaa,
+            sucesso=False,
+            total_reportado=None,
+            ofertas_extraidas=0,
+            ofertas_processadas=0,
+            erros=("departamento e unidade SIGAA sao obrigatorios",),
+        )
+
+    try:
+        ofertas, total_reportado = coletor(unidade_sigaa, ano, periodo)
+    except Exception as erro:
+        return ResultadoDepartamento(
+            departamento=departamento,
+            unidade_sigaa=unidade_sigaa,
+            sucesso=False,
+            total_reportado=None,
+            ofertas_extraidas=0,
+            ofertas_processadas=0,
+            erros=(_mensagem_erro(erro),),
+        )
+
+    erros: list[str] = []
+    processadas = 0
+    for oferta in ofertas:
+        try:
+            with db.begin_nested():
+                salvar_oferta(db, oferta, departamento)
+            processadas += 1
+        except Exception as erro:
+            erros.append(
+                f"turma {oferta.turma_codigo!r} de "
+                f"{oferta.componente_codigo!r}: {_mensagem_erro(erro)}"
+            )
+
+    if total_reportado is not None and total_reportado != len(ofertas):
+        erros.append(
+            "total informado pelo SIGAA diverge da extracao: "
+            f"reportado={total_reportado}, extraido={len(ofertas)}"
+        )
+
+    try:
+        db.commit()
+    except Exception as erro:
+        erros.append(f"falha ao confirmar persistencia: {_mensagem_erro(erro)}")
+        erro_rollback = _rollback_seguro(db)
+        if erro_rollback is not None:
+            erros.append(erro_rollback)
+        processadas = 0
+
+    return ResultadoDepartamento(
+        departamento=departamento,
+        unidade_sigaa=unidade_sigaa,
+        sucesso=not erros,
+        total_reportado=total_reportado,
+        ofertas_extraidas=len(ofertas),
+        ofertas_processadas=processadas,
+        erros=tuple(erros),
+    )
+
+
+def executar_importacao(
+    db: Session,
+    departamentos: Sequence[DepartamentoImportacao],
+    ano: str,
+    periodo: str,
+    coletor: ColetorOfertas = coletar_ofertas_reais,
+) -> ResultadoImportacao:
+    """Coleta e persiste unidades isoladamente, retornando o contrato do RF19.
+
+    A funcao nunca propaga falha de uma unidade para a seguinte. O chamador recebe
+    um resultado estruturado que pode ser registrado ou agendado pela Issue #26.
+    """
+    if not departamentos:
+        raise ValueError("ao menos um departamento deve ser informado")
+
+    inicio = datetime.now(UTC)
+    resultados = tuple(
+        _importar_departamento(db, item, ano, periodo, coletor)
+        for item in departamentos
+    )
+    fim = datetime.now(UTC)
+    return ResultadoImportacao(
+        sucesso=all(item.sucesso for item in resultados),
+        ano=ano,
+        periodo=periodo,
+        inicio=inicio,
+        fim=fim,
+        departamentos=resultados,
+    )
