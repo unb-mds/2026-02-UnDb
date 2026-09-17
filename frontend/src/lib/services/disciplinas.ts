@@ -62,6 +62,25 @@ export async function listarDisciplinas(params: { codigo?: string; nome?: string
   return wire.map(paraDisciplina);
 }
 
+/**
+ * Busca por um único termo que pode ser nome parcial ou código (Issue #45).
+ * O backend trata `codigo` e `nome` como filtros combinados por E — para aceitar
+ * qualquer um dos dois a partir de um só campo, consulta os dois em paralelo e
+ * mescla o resultado, sem repetir disciplina.
+ */
+export async function buscarDisciplinas(termo: string): Promise<DisciplinaDetalhe[]> {
+  const [porCodigo, porNome] = await Promise.all([
+    listarDisciplinas({ codigo: termo }),
+    listarDisciplinas({ nome: termo }),
+  ]);
+
+  const porId = new Map<string, DisciplinaDetalhe>();
+  for (const disciplina of [...porCodigo, ...porNome]) {
+    porId.set(disciplina.id, disciplina);
+  }
+  return Array.from(porId.values());
+}
+
 /** GET /api/disciplinas/{id} — lança ApiError com naoEncontrado=true em 404. */
 export async function obterDisciplina(id: string): Promise<DisciplinaDetalhe> {
   const wire = await apiClient.request<DisciplinaDetalheWire>(`/api/disciplinas/${id}`);
