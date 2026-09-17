@@ -51,6 +51,8 @@ são gerenciadas via [Issues](../../issues) e [milestones](../../milestones).
 
 ## Como rodar o projeto localmente
 
+### Backend
+
 **Pré-requisito:** mantenha uma instância PostgreSQL em execução e crie nela o usuário e o
 banco informados em `DATABASE_URL`. Este repositório ainda não provisiona o PostgreSQL via
 Docker Compose; essa configuração é acompanhada pela [Issue #34](../../issues/34).
@@ -90,6 +92,29 @@ A decisão de persistência e as restrições do modelo estão registradas em
 O procedimento para coletar e persistir dados institucionais do SIGAA, incluindo o contrato
 de resultado consumível pela rotina de atualização, está em
 [`docs/importacao-sigaa.md`](docs/importacao-sigaa.md).
+
+### Frontend
+
+**Pré-requisito:** Node.js 20+ e o backend rodando localmente (ver seção acima) — o
+frontend consome a API institucional em tempo de execução, não em build.
+
+```bash
+cd frontend
+npm install
+
+# configurar variáveis de ambiente
+cp .env.example .env.local
+# edite .env.local com a URL onde o backend está rodando
+# NEXT_PUBLIC_API_URL=http://localhost:8000
+
+npm run dev
+```
+
+A aplicação sobe em `http://localhost:3000`. O backend precisa liberar essa origem em
+`CORS_ORIGINS` (ver `backend/.env.example`) para as buscas funcionarem no navegador.
+
+A estratégia definitiva de execução e containerização do frontend ainda está em aberto —
+acompanhada pela [Issue #36](../../issues/36).
 
 ## Fluxo de contribuição
 
