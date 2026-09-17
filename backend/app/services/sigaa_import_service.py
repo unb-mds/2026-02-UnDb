@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.models.professor import Professor
 from app.models.disciplina import Disciplina
+from app.models.professor import Professor
 from app.models.turma import Turma
 from app.repositories import (
     disciplina_repository,
@@ -10,49 +10,59 @@ from app.repositories import (
 )
 from app.scrapers.sigaa_poc import Oferta
 
-# Proposta, não decisão definida — ver Pending Decisions abaixo.
-DEPARTAMENTO_PADRAO = "DEPTO CIÊNCIAS DA COMPUTAÇÃO"
+
+class OfertaNaoPersistivelError(ValueError):
+    """A oferta depende de informação que o modelo ainda não representa."""
 
 
-def _get_or_create_professor(db: Session, nome: str) -> Professor:
-    professor = professor_repository.get_by_nome(db, nome)
+def _get_or_create_professor(
+    db: Session, nome: str, departamento: str
+) -> Professor:
+    professor = professor_repository.get_by_nome_e_departamento(
+        db, nome, departamento
+    )
     if professor is None:
-        professor = professor_repository.create(db, nome, DEPARTAMENTO_PADRAO)
+        professor = professor_repository.create(db, nome, departamento)
     return professor
 
 
-def _get_or_create_disciplina(db: Session, oferta: Oferta) -> Disciplina:
+def _get_or_create_disciplina(
+    db: Session, oferta: Oferta, departamento: str
+) -> Disciplina:
     disciplina = disciplina_repository.get_by_codigo(db, oferta.componente_codigo)
     if disciplina is None:
         disciplina = disciplina_repository.create(
             db,
             codigo=oferta.componente_codigo,
             nome=oferta.componente_nome,
-            departamento=DEPARTAMENTO_PADRAO,
+            departamento=departamento,
         )
     return disciplina
 
 
-def salvar_oferta(db: Session, oferta: Oferta) -> list[Turma]:
-    """Persiste uma Oferta extraída do SIGAA como Disciplina, Professor(es) e Turma(s).
+def salvar_oferta(db: Session, oferta: Oferta, departamento: str) -> Turma:
+    """Persiste uma oferta cujo vínculo cabe no modelo relacional atual.
 
-    Proposta (Pending Decision, ver handoff): uma Turma é criada por docente da
-    oferta, já que o modelo atual não suporta múltiplos professores por Turma.
-    `turma_codigo` da Oferta é descartado — não há campo correspondente no modelo.
+    Ofertas sem docente ou com múltiplos docentes permanecem pendentes de decisão
+    de modelo na Issue #25 e são recusadas antes de qualquer escrita.
     """
-    disciplina = _get_or_create_disciplina(db, oferta)
+    departamento = departamento.strip()
+    if not departamento:
+        raise OfertaNaoPersistivelError("A oferta não informa o departamento.")
+    if len(oferta.docentes) != 1:
+        raise OfertaNaoPersistivelError(
+            "A oferta deve possuir exatamente um docente para o modelo atual; "
+            f"turma {oferta.turma_codigo!r} possui {len(oferta.docentes)}."
+        )
 
-    turmas: list[Turma] = []
-    for nome_docente in oferta.docentes:
-        professor = _get_or_create_professor(db, nome_docente)
+    disciplina = _get_or_create_disciplina(db, oferta, departamento)
+    professor = _get_or_create_professor(db, oferta.docentes[0], departamento)
 
-        turma = turma_repository.get_by_disciplina_professor_semestre(
+    turma = turma_repository.get_by_disciplina_professor_semestre(
+        db, disciplina.id, professor.id, oferta.periodo
+    )
+    if turma is None:
+        turma = turma_repository.create(
             db, disciplina.id, professor.id, oferta.periodo
         )
-        if turma is None:
-            turma = turma_repository.create(
-                db, disciplina.id, professor.id, oferta.periodo
-            )
-        turmas.append(turma)
-
-    return turmas
+    return turma
