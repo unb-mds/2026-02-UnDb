@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Literal, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
@@ -44,3 +44,28 @@ class AvaliacaoBase(BaseModel):
 
 class AvaliacaoCreate(AvaliacaoBase):
     pass
+
+
+class AvaliacaoAgregadaBaseResponse(BaseModel):
+    professor_id: UUID
+    disciplina_id: UUID
+    total_avaliacoes: int = Field(ge=0)
+
+
+class AvaliacaoAgregadaInsuficienteResponse(AvaliacaoAgregadaBaseResponse):
+    dados_suficientes: Literal[False]
+
+
+class AvaliacaoAgregadaSuficienteResponse(AvaliacaoAgregadaBaseResponse):
+    dados_suficientes: Literal[True]
+    didatica: float
+    dificuldade: Dificuldade
+    chamada: bool | Literal["CONFLITANTE"]
+    disponibiliza_material: bool | Literal["CONFLITANTE"]
+    qualidade_material: QualidadeMaterial | None
+    recomenda: int = Field(ge=0, le=100)
+
+
+AvaliacaoAgregadaResponse = (
+    AvaliacaoAgregadaSuficienteResponse | AvaliacaoAgregadaInsuficienteResponse
+)
