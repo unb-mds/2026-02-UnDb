@@ -1,7 +1,6 @@
 ---
 name: grill-me
 description: Estressa um plano, proposta ou decisão antes de sua execução por meio de perguntas que revelam premissas, alternativas, riscos e casos não considerados. Use somente quando uma pessoa pedir explicitamente para ser questionada, testar ou "grillar" seu raciocínio.
-disable-model-invocation: true
 metadata:
   project-version: "0.1.0"
   project-status: "proposed"

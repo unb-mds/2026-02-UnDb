@@ -322,8 +322,10 @@ e as lacunas de identidade continuam nas #25–#27.
 
 ## 13. Rastreabilidade
 
-- **Board de requisitos (Figma):** pesquisa, personas, Double Diamond, priorização,
-  story map e fluxos de usuário
+- **[Documento de visão](visao.md):** síntese derivada do problema, público, valor, escopo,
+  métricas e riscos do produto
+- **[Board de requisitos (Figma)](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3o-de-Professores-UnB-):**
+  pesquisa, personas, Double Diamond, priorização, story map e fluxos de usuário
 - **Epic:** `[EPIC] Avaliações (Core do Produto)` (#14)
 - **Sub-issues:** #38 a #43 e derivadas do story map
 - **Governança:** `skills/governance/project-governance/` define quais decisões exigem

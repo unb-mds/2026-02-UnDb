@@ -1,10 +1,19 @@
-# G7 - Avaliação de Professores UnB
+# UnDb — Avaliação de Professores da UnB
 
 Grupo G7 - Métodos de Desenvolvimento de Software 2026/2
 
 ## Sobre o projeto
 
 Aplicação web para avaliação de professores da UnB, com dados de disciplinas e turmas integrados a partir do SIGAA.
+
+## Documentação do produto
+
+- [Documento de visão](docs/visao.md)
+- [Engenharia de requisitos](docs/requisitos.md)
+- [Site de documentação](https://unb-mds.github.io/2026-02-UnDb/)
+- [Board de requisitos no Figma](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3O-de-Professores-UnB-)
+- [Especificação de implementação](specs.md)
+- [Arquitetura](docs/arquitetura.md)
 
 ## Equipe
 
@@ -51,8 +60,8 @@ O arquivo `backend/.env` deve definir `SECRET_KEY` com um valor aleatório, `DEB
 
 ```bash
 # clonar o repositório
-git clone https://github.com/unb-mds/G7-2026-2.git
-cd G7-2026-2
+git clone https://github.com/unb-mds/2026-02-UnDb.git
+cd 2026-02-UnDb
 
 # criar e ativar ambiente virtual
 python -m venv venv

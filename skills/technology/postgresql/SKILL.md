@@ -25,7 +25,7 @@ Use ao converter um modelo autorizado em DDL/mapping PostgreSQL; revisar uma mig
 
 ## 4. When not to use
 
-- `database-design` decide modelo conceitual/lógico, normalização e regras estruturais.
+- `database-design` analisa e prepara propostas de modelo conceitual/lógico, normalização e regras estruturais; requisitos e arquitetura preservam a autoridade sobre decisões aprovadas.
 - `requirements` define regras de produto e critérios de aceite.
 - `architecture` trata decisões sistêmicas de maior nível.
 - `implementation` altera código e migrations autorizados.
@@ -33,7 +33,7 @@ Use ao converter um modelo autorizado em DDL/mapping PostgreSQL; revisar uma mig
 
 ## 5. Expected inputs
 
-Use somente fontes autorizadas: requisito e modelo aprovados; schema, migration e mapping atuais; padrões de consulta; resultado de `EXPLAIN`/`EXPLAIN ANALYZE` quando houver; e permissões/ambiente conhecidos. A stack `Defined` é PostgreSQL, SQLAlchemy síncrono, Alembic e `psycopg2`; não substitua nenhum elemento.
+Use somente fontes autorizadas: requisito e modelo aprovados; schema, migration e mapping atuais; padrões de consulta; resultado de `EXPLAIN`/`EXPLAIN ANALYZE` quando houver; e permissões/ambiente conhecidos. A stack definida pelo ADR 01 em `docs/arquitetura.md` é PostgreSQL, SQLAlchemy síncrono, Alembic e `psycopg2`; não substitua nenhum elemento.
 
 ## 6. Pre-conditions
 
@@ -78,7 +78,7 @@ O agente pode analisar, revisar e preparar propostas. Mudança de schema, índic
 
 ## 12. Interaction with other skills
 
-`project-governance` e `skill-authoring` definem autoridade e ciclo desta skill. `database-design` é a fonte de decisões de modelo; `requirements` é a fonte de regras de produto; `architecture` recebe decisões estruturais; `implementation` aplica alterações autorizadas; `testing` verifica efeitos. Esta skill aplica PostgreSQL à stack definida e não substitui essas responsabilidades.
+`project-governance` e `skill-authoring` definem autoridade e ciclo desta skill. `database-design` analisa o modelo e prepara propostas sem aprová-las; `requirements` fornece regras de produto autorizadas; `architecture` fornece decisões estruturais aprovadas e recebe novas decisões; `implementation` aplica alterações autorizadas; `testing` verifica efeitos. Esta skill aplica PostgreSQL à stack definida e não substitui essas responsabilidades.
 
 ## 13. Handling uncertainty and failures
 
