@@ -8,3 +8,5 @@ db.sqlite3
 **/.env
 __pycache__/
 **/__pycache__/
+.DS_Store
+site/

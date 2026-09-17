@@ -1,0 +1,79 @@
+site_name: UnDb
+site_description: Documentação de produto, requisitos e arquitetura do UnDb
+site_url: https://unb-mds.github.io/2026-02-UnDb/
+repo_url: https://github.com/unb-mds/2026-02-UnDb
+repo_name: unb-mds/2026-02-UnDb
+edit_uri: edit/develop/docs/
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Usar tema escuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Usar tema claro
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - content.action.edit
+    - content.code.copy
+
+nav:
+  - Início: index.md
+  - Produto:
+      - Visão: visao.md
+      - Requisitos: requisitos.md
+      - Board no Figma: figma.md
+  - Arquitetura:
+      - Visão e decisões: arquitetura.md
+      - Modelos de dados: modelos.md
+  - Estudos:
+      - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
+      - Prova de conceito do SIGAA: estudos/sigaa-poc.md
+      - Docker: estudos/docker.md
+
+exclude_docs: |
+  agent-skills.md
+
+plugins:
+  - search:
+      lang: pt
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+copyright: Grupo 7 — MDS 2026/2 — Universidade de Brasília

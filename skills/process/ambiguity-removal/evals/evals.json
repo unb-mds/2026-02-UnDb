@@ -1,0 +1,51 @@
+{
+  "skill": "ambiguity-removal",
+  "version": "0.1.0",
+  "cases": [
+    {
+      "id": "vague-term",
+      "prompt": "Audite o requisito: 'A busca deve responder rapidamente para muitos usuários.' Não há limite ou definição adicional.",
+      "expected": [
+        "Cita o trecho e identifica quantificador/qualidade vaga ('rapidamente', 'muitos').",
+        "Apresenta pelo menos duas leituras plausíveis sem inventar um número.",
+        "Marca a decisão de limite e método como Pending Decision e recomenda esclarecimento."
+      ]
+    },
+    {
+      "id": "undefined-term",
+      "prompt": "Audite o requisito RF12: 'O sistema deve permitir exportação para o formato institucional.' O glossário e os demais documentos não definem 'formato institucional'.",
+      "expected": [
+        "Classifica 'formato institucional' como termo não definido.",
+        "Não presume PDF, CSV ou outro formato.",
+        "Registra impacto no contrato e encaminha a definição à autoridade de requisitos."
+      ]
+    },
+    {
+      "id": "plausible-readings",
+      "prompt": "Audite: 'O moderador pode remover avaliações denunciadas quando necessário.' Não há definição de quem decide, quais denúncias, prazo ou efeito da remoção.",
+      "expected": [
+        "Cita o trecho e separa ator, gatilho, prazo e efeito como lacunas distintas quando aplicável.",
+        "Mostra leituras plausíveis, em vez de escolher uma política de moderação.",
+        "Recomenda perguntas/decisões pendentes sem alterar o requisito."
+      ]
+    },
+    {
+      "id": "documentation-decision-conflict",
+      "prompt": "Compare docs/requisitos.md, que diz 'um novo envio substitui a avaliação anterior', com uma Issue que diz 'cada envio deve ser preservado no histórico'. Audite o conjunto sem decidir qual prevalece.",
+      "expected": [
+        "Cita as duas fontes e classifica conflito entre requisitos/decisão.",
+        "Verifica e relata o estado/autoridade de cada fonte; não trata a Issue ou a documentação isoladamente como aprovação automática.",
+        "Marca a resolução como Pending Decision e encaminha à autoridade apropriada."
+      ]
+    },
+    {
+      "id": "untestable-acceptance",
+      "prompt": "Audite o critério de aceite: 'Dado um usuário cadastrado, quando ele salvar uma avaliação, então o sistema deve funcionar corretamente.'",
+      "expected": [
+        "Identifica que 'funcionar corretamente' não define resultado observável/verificável.",
+        "Explica quais comportamentos podem ser interpretados de formas diferentes e não inventa critérios.",
+        "Recomenda decompor o critério em resultados observáveis e marca a pendência."
+      ]
+    }
+  ]
+}

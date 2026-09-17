@@ -44,7 +44,8 @@ class QualidadeMaterial(str, Enum):
     BOM = "BOM"
 ```
 
-Ordinalidade para desempate de moda: `DIFICIL > MEDIO > FACIL` e `BOM > MEDIO > RUIM`.
+Ordinalidade aprovada para desempate de moda:
+`DIFICIL > MEDIO > FACIL` e `BOM > MEDIO > RUIM`.
 
 ---
 
@@ -111,10 +112,13 @@ Saída: objeto agregado. Devem ser testáveis unitariamente.
 | `qualidade_material` | Moda, **apenas** entre avaliações com `disponibiliza_material = true` | Valor mais alto | enum \| `null` |
 | `recomenda` | Percentual de `true` sobre o total | — | inteiro 0–100, arredondamento half-up |
 
+As regras de agregação, empate e arredondamento foram aprovadas pelo PO e estão registradas
+na seção 11 dos requisitos, incluindo Material por maioria + moda.
+
 `total_avaliacoes` acompanha sempre o agregado (RF09).
 
-Se `disponibiliza_material` agregar para `false` ou `CONFLITANTE`, `qualidade_material`
-retorna `null`.
+Se `disponibiliza_material` agregar para `false` ou `CONFLITANTE`,
+`qualidade_material` retorna `null`.
 
 Agregação é **calculada na consulta**, não materializada. Não criar tabela ou coluna de
 resultado agregado sem decisão explícita.
@@ -129,7 +133,7 @@ MIN_AVALIACOES_EXIBICAO = 3
 
 **Abaixo do mínimo:** retornar o professor, a disciplina e `total_avaliacoes`, com
 `dados_suficientes: false`. **Nenhum valor de critério é retornado** — com uma ou duas
-avaliações, qualquer valor exibido revela a resposta individual de quem avaliou (RNF02).
+avaliações, a exibição pode permitir inferir respostas individuais (RNF02).
 
 **A partir do mínimo:** retornar todos os critérios agregados, com `dados_suficientes: true`.
 
@@ -148,18 +152,16 @@ Chaves permitidas na comparação entre professores da mesma disciplina:
 
 | Chave | Direção | Observação |
 |---|---|---|
-| `recomendacao` | decrescente | **padrão** |
-| `didatica` | decrescente | |
-| `total_avaliacoes` | decrescente | |
+| `recomendacao` | decrescente | **única chave permitida** |
 
-**Desempate universal:** `total_avaliacoes` decrescente. Se persistir, nome do professor
-em ordem alfabética, para resultado determinístico.
+**Desempate aprovado:** `total_avaliacoes` decrescente. Se persistir,
+nome do professor em ordem alfabética. Total não é chave de ordenação selecionável.
 
 `dificuldade` e `chamada` **não são chaves de ordenação válidas**. Não têm direção boa ou
 ruim; ordenar por elas afirmaria uma direção que o projeto decidiu não afirmar.
 
-Professores com `dados_suficientes: false` aparecem **depois** de todos os que têm dados
-suficientes, independentemente da chave escolhida.
+Professores com `dados_suficientes: false` aparecem depois dos que têm
+dados suficientes. Não atribuir percentual artificial aos resultados insuficientes.
 
 ---
 
@@ -210,6 +212,24 @@ modelo SQLAlchemy diretamente.
 Nenhuma busca filtra por curso ou departamento do usuário (RF07).
 Nenhum endpoint dispara importação do SIGAA em tempo real.
 
+O `GET /professores/{id}/disciplinas/{disciplina_id}` retorna, além dos UUIDs e da
+contagem/agregação, os dados institucionais persistidos necessários à apresentação:
+
+```json
+{
+  "professor": {"id": "uuid", "nome": "...", "departamento": "..."},
+  "disciplina": {
+    "id": "uuid",
+    "codigo": "CIC0002",
+    "nome": "...",
+    "departamento": "CIC"
+  }
+}
+```
+
+Os endpoints de busca por nome/código continuam pertencendo às Issues #44/#45. A
+importação somente prepara e persiste os registros consumidos por esses endpoints.
+
 ---
 
 ## 9. Estrutura do backend
@@ -239,7 +259,7 @@ Não implementar nem inventar valor para os itens abaixo.
 |---|---|
 | Provedor de envio de e-mail e ambiente de desenvolvimento | Não decidido |
 | Validade do link de confirmação de e-mail | Não decidido |
-| Viabilidade do scraping do SIGAA (páginas em JSF com ViewState) | A verificar antes de estimar a importação |
+| Integração persistida e cobertura do SIGAA | POC HTTP concluída para CIC/2026.2; identidade, reimportação e cobertura total ainda precisam ser resolvidas |
 | Estratégia de povoamento inicial da base | Não decidido |
 
 ---

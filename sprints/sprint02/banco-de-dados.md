@@ -59,9 +59,8 @@ de unicidade descritas na especificação.
 
 ## Estado das Issues #22 e #23
 
-As Issues #22 e #23 continuam abertas. O modelo está pronto para receber dados, mas ainda
-faltam as evidências de mapeamento e do protótipo de scraping: URLs, passos de navegação,
-campos disponíveis, comportamento de JSF/ViewState, comparação com oferta real e conclusão
-reproduzível sobre HTTP direto ou automação de navegador.
-
-Essas informações não devem ser apresentadas como validadas antes da investigação.
+As Issues #22 e #23 foram concluídas. O [mapeamento](../../docs/estudos/mapeamento-sigaa.md)
+e a [POC](../../docs/estudos/sigaa-poc.md) registram a investigação de 13/09/2026: HTTP
+foi suficiente para extrair 108 ofertas do CIC em 2026.2. Isso não comprova cobertura
+total nem integração persistida. Homônimos, múltiplos docentes e reimportação continuam
+como pontos de refinamento da #25; atualização e validação de cobertura ficam nas #26/#27.
