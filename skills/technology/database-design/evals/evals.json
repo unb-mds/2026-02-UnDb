@@ -1,0 +1,11 @@
+{
+  "skill": "database-design",
+  "version": "0.1.0",
+  "cases": [
+    {"id": "entities-and-cardinalities", "prompt": "A partir de requisitos autorizados, modele Usuario, Professor, Disciplina, Turma e Avaliacao. Não há regra adicional disponível.", "expected": ["Identifica entidades, relações e cardinalidades com fonte ou pendência.", "Não inventa campos, exclusão ou relação.", "Produz chaves, constraints, riscos e pendências."]},
+    {"id": "normalization-functional-dependency", "prompt": "Uma tabela de turmas repete nome da disciplina e a única fonte diz que codigo_disciplina determina nome_disciplina. Revise a normalização.", "expected": ["Explicita dependência e anomalia de atualização.", "Avalia 1FN, 2FN e 3FN e mantém proposta não aprovada.", "Não desnormaliza sem evidência."]},
+    {"id": "evaluation-logical-uniqueness", "prompt": "Avaliacao é única por (usuario_id, professor_id, disciplina_id), e reenvio válido substitui a anterior.", "expected": ["Propõe FKs e UNIQUE composta.", "Distingue constraint de substituição em repository/service.", "Lista impactos em SQLAlchemy, migration e testes sem implementar."]},
+    {"id": "index-from-access-pattern", "prompt": "A única consulta conhecida lista avaliações por usuario_id, professor_id e disciplina_id. Decida índices.", "expected": ["Relaciona UNIQUE composta ao padrão e ordem.", "Não cria índices adicionais sem consulta.", "Registra custo de escrita e verificação quando aplicável."]},
+    {"id": "requirement-model-conflict", "prompt": "O requisito indica unicidade por usuario_id, professor_id e disciplina_id, mas SQLAlchemy tem UNIQUE(id_usuario, id_turma).", "expected": ["Explicita conflito, sem eleger fonte correta.", "Marca Pending Decision e faz handoff.", "Não altera modelo, migration ou banco automaticamente."]}
+  ]
+}

@@ -1,10 +1,19 @@
-# G7 - Avaliação de Professores UnB
+# UnDb — Avaliação de Professores da UnB
 
 Grupo G7 - Métodos de Desenvolvimento de Software 2026/2
 
 ## Sobre o projeto
 
 Aplicação web para avaliação de professores da UnB, com dados de disciplinas e turmas integrados a partir do SIGAA.
+
+## Documentação do produto
+
+- [Documento de visão](docs/visao.md)
+- [Engenharia de requisitos](docs/requisitos.md)
+- [Site de documentação](https://unb-mds.github.io/2026-02-UnDb/)
+- [Board de requisitos no Figma](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3O-de-Professores-UnB-)
+- [Especificação de implementação](specs.md)
+- [Arquitetura](docs/arquitetura.md)
 
 ## Equipe
 
@@ -21,13 +30,15 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 
 - **Backend:** Python 3.12 + FastAPI + Uvicorn
 - **Banco de dados:** PostgreSQL via Docker Compose + SQLAlchemy + Alembic
-- **Frontend:** Next.js
+- **Frontend:** Next.js + Tailwind CSS
 - **Integração:** dados extraídos do SIGAA
 - **CI/CD:** GitHub Actions
 
 ## Metodologia
 
-O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanhamento fica em [Projects](../../projects) e as tarefas são gerenciadas via [Issues](../../issues).
+O time trabalha com **Scrum**, em sprints de **1 semana**. O acompanhamento fica no
+[G7 - Board de Desenvolvimento](https://github.com/orgs/unb-mds/projects/60) e as tarefas
+são gerenciadas via [Issues](../../issues) e [milestones](../../milestones).
 
 - **Planning:** toda segunda-feira
 - **Daily:** assíncrona, via grupo do time
@@ -42,15 +53,15 @@ O time trabalha com **Scrum**, em sprints de **1 semana**. O board de acompanham
 
 **Pré-requisito:** mantenha uma instância PostgreSQL em execução e crie nela o usuário e o
 banco informados em `DATABASE_URL`. Este repositório ainda não provisiona o PostgreSQL via
-Docker Compose; essa configuração é acompanhada pela [Issue #35](../../issues/35).
+Docker Compose; essa configuração é acompanhada pela [Issue #34](../../issues/34).
 
 O arquivo `backend/.env` deve definir `SECRET_KEY` com um valor aleatório, `DEBUG` como
 `True` ou `False` e `DATABASE_URL` com as credenciais e o endereço do PostgreSQL.
 
 ```bash
 # clonar o repositório
-git clone https://github.com/unb-mds/G7-2026-2.git
-cd G7-2026-2
+git clone https://github.com/unb-mds/2026-02-UnDb.git
+cd 2026-02-UnDb
 
 # criar e ativar ambiente virtual
 python -m venv venv
@@ -78,10 +89,24 @@ A decisão de persistência e as restrições do modelo estão registradas em
 
 ## Fluxo de contribuição
 
-1. Crie uma branch a partir da `main`: `feature/nome-curto-da-tarefa`
-2. Faça commits pequenos e descritivos
-3. Abra um Pull Request referenciando a Issue correspondente (`Closes #12`)
-4. Peça revisão de pelo menos 1 outro membro antes de mergear
+### Verificações automatizadas
+
+O check `Backend` executa os testes determinísticos com `python -m unittest discover -s tests -v`,
+valida aplicação e migrações em um PostgreSQL 16 descartável de CI, compara o schema com os modelos
+e testa downgrade/upgrade. Também constrói a imagem e verifica a presença das migrações Alembic.
+A versão do banco de CI não define, por si só, a versão de produção.
+
+O acesso real ao SIGAA permanece uma verificação manual documentada na
+[POC](docs/estudos/sigaa-poc.md); não é dependência dos testes determinísticos.
+
+### Branches e revisão
+
+O projeto usa Gitflow: `main` representa releases e `develop` integra o trabalho da
+próxima release. Features e correções comuns partem de `develop`; releases e
+hotfixes são integrados em `main` por Pull Request.
+
+Consulte o [guia de contribuição](CONTRIBUTING.md) para a nomenclatura de branches,
+destinos permitidos, checks e regras de aprovação.
 
 ## Licença
 
