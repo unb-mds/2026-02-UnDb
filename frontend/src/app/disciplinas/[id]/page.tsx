@@ -11,13 +11,15 @@ export default async function DetalheDisciplinaPage({
 }) {
   const { id } = await params;
 
-  const [disciplina, turmas] = await Promise.all([
-    obterDisciplina(id).catch((erro) => {
-      if (erro instanceof ApiError && erro.naoEncontrado) notFound();
-      throw erro;
-    }),
-    listarTurmasDaDisciplina(id),
-  ]);
+  // Sequencial, não Promise.all: mesmo motivo de professores/[id]/page.tsx —
+  // o backend consulta a disciplina antes de listar as turmas, então um id
+  // inexistente rejeita as duas chamadas, e a segunda escapava do catch da
+  // primeira, virando 500 em vez de notFound().
+  const disciplina = await obterDisciplina(id).catch((erro) => {
+    if (erro instanceof ApiError && erro.naoEncontrado) notFound();
+    throw erro;
+  });
+  const turmas = await listarTurmasDaDisciplina(id);
 
   const professores = new Map<string, ProfessorDetalhe>();
   for (const turma of turmas) {

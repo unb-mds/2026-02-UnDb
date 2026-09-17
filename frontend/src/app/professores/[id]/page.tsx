@@ -10,13 +10,15 @@ export default async function DetalheProfessorPage({
 }) {
   const { id } = await params;
 
-  const [professor, disciplinas] = await Promise.all([
-    obterProfessor(id).catch((erro) => {
-      if (erro instanceof ApiError && erro.naoEncontrado) notFound();
-      throw erro;
-    }),
-    listarDisciplinasDoProfessor(id),
-  ]);
+  // Sequencial, não Promise.all: o backend também consulta o professor antes
+  // de listar suas disciplinas, então um id inexistente faz as duas chamadas
+  // rejeitarem com 404 — buscando em paralelo, o erro da segunda escapava do
+  // catch da primeira e virava 500 em vez de notFound().
+  const professor = await obterProfessor(id).catch((erro) => {
+    if (erro instanceof ApiError && erro.naoEncontrado) notFound();
+    throw erro;
+  });
+  const disciplinas = await listarDisciplinasDoProfessor(id);
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
