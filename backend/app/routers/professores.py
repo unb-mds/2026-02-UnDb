@@ -41,6 +41,8 @@ def consultar_avaliacoes_professor_disciplina(
         return AvaliacaoAgregadaInsuficienteResponse(
             professor_id=consulta.professor_id,
             disciplina_id=consulta.disciplina_id,
+            professor=consulta.professor,
+            disciplina=consulta.disciplina,
             total_avaliacoes=consulta.total_avaliacoes,
             dados_suficientes=False,
         )
@@ -48,6 +50,8 @@ def consultar_avaliacoes_professor_disciplina(
     return AvaliacaoAgregadaSuficienteResponse(
         professor_id=consulta.professor_id,
         disciplina_id=consulta.disciplina_id,
+        professor=consulta.professor,
+        disciplina=consulta.disciplina,
         total_avaliacoes=consulta.total_avaliacoes,
         dados_suficientes=True,
         didatica=consulta.criterios.didatica,

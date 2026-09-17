@@ -87,6 +87,10 @@ A API sobe em `http://127.0.0.1:8000` e a documentação interativa fica em `htt
 A decisão de persistência e as restrições do modelo estão registradas em
 [`sprints/sprint02/banco-de-dados.md`](sprints/sprint02/banco-de-dados.md).
 
+O procedimento para coletar e persistir dados institucionais do SIGAA, incluindo o contrato
+de resultado consumível pela rotina de atualização, está em
+[`docs/importacao-sigaa.md`](docs/importacao-sigaa.md).
+
 ## Fluxo de contribuição
 
 ### Verificações automatizadas

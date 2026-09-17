@@ -4,6 +4,10 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
 
 from app.models.enums import Dificuldade, QualidadeMaterial
+from app.schemas.institucional import (
+    DisciplinaInstitucionalResponse,
+    ProfessorInstitucionalResponse,
+)
 
 
 class AvaliacaoBase(BaseModel):
@@ -49,6 +53,8 @@ class AvaliacaoCreate(AvaliacaoBase):
 class AvaliacaoAgregadaBaseResponse(BaseModel):
     professor_id: UUID
     disciplina_id: UUID
+    professor: ProfessorInstitucionalResponse
+    disciplina: DisciplinaInstitucionalResponse
     total_avaliacoes: int = Field(ge=0)
 
 

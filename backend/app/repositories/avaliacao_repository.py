@@ -8,12 +8,12 @@ from app.models.disciplina import Disciplina
 from app.models.professor import Professor
 
 
-def professor_existe(db: Session, professor_id: UUID) -> bool:
-    return db.get(Professor, professor_id) is not None
+def obter_professor(db: Session, professor_id: UUID) -> Professor | None:
+    return db.get(Professor, professor_id)
 
 
-def disciplina_existe(db: Session, disciplina_id: UUID) -> bool:
-    return db.get(Disciplina, disciplina_id) is not None
+def obter_disciplina(db: Session, disciplina_id: UUID) -> Disciplina | None:
+    return db.get(Disciplina, disciplina_id)
 
 
 def listar_por_professor_e_disciplina(
