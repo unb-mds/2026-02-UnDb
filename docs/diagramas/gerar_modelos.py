@@ -99,8 +99,8 @@ def draw_note(pdf, x, y, width, height, title, lines):
 def draw_footer(pdf):
     pdf.setFillColor(MUTED)
     pdf.setFont("Helvetica", 7)
-    pdf.drawString(32, 17, "G7 - Avaliacao de Professores UnB | Modelo revisado em 11/09/2026")
-    pdf.drawRightString(PAGE_WIDTH - 32, 17, "PR #55")
+    pdf.drawString(32, 17, "G7 - Avaliacao de Professores UnB | Modelo revisado em 17/09/2026")
+    pdf.drawRightString(PAGE_WIDTH - 32, 17, "Issue #25 - ADR 07")
 
 
 def build_logical_model():
@@ -109,23 +109,39 @@ def build_logical_model():
     pdf.setAuthor("G7 - Metodos de Desenvolvimento de Software")
     draw_title(pdf, "Modelo logico de dados", "SQLAlchemy + Alembic + PostgreSQL")
 
-    draw_table(pdf, 30, 385, 220, "usuarios", [
+    draw_table(pdf, 30, 410, 220, "usuarios", [
         ("PK", "id", "UUID"), ("", "nome", "VARCHAR(100)"),
         ("UQ", "email", "VARCHAR(150)"), ("", "password_hash", "VARCHAR(255)"),
         ("", "email_confirmado", "BOOLEAN"), ("", "created_at", "TIMESTAMPTZ"),
     ])
-    draw_table(pdf, 300, 433, 220, "professores", [
-        ("PK", "id", "UUID"), ("", "nome", "VARCHAR(150)"),
-        ("", "departamento", "VARCHAR(100)"),
+    draw_table(pdf, 30, 280, 220, "unidades", [
+        ("PK", "id", "UUID"), ("UQ1", "fonte", "VARCHAR(30)"),
+        ("UQ1", "codigo", "VARCHAR(30)"),
+        ("UQ", "identificador_externo", "VARCHAR(50) NULL"),
+        ("", "nome", "VARCHAR(200)"),
     ])
-    draw_table(pdf, 300, 270, 220, "disciplinas", [
+    draw_table(pdf, 300, 390, 220, "professores", [
+        ("PK", "id", "UUID"), ("", "nome", "VARCHAR(150)"),
+        ("", "nome_normalizado", "VARCHAR(150)"),
+        ("", "departamento", "VARCHAR(100)"), ("UQ", "siape", "VARCHAR(30) NULL"),
+        ("UQ", "identidade_origem", "VARCHAR(255) NULL"),
+        ("", "identidade_confirmada", "BOOLEAN"),
+    ])
+    draw_table(pdf, 300, 235, 220, "disciplinas", [
         ("PK", "id", "UUID"), ("UQ", "codigo", "VARCHAR(20)"),
-        ("", "nome", "VARCHAR(150)"), ("", "departamento", "VARCHAR(100)"),
+        ("", "identificador_externo", "VARCHAR(50) NULL"),
+        ("", "nome", "VARCHAR(150)"), ("", "nome_normalizado", "VARCHAR(150)"),
+        ("", "departamento", "VARCHAR(100)"),
         ("", "creditos", "SMALLINT NULL"),
     ])
-    draw_table(pdf, 30, 245, 220, "turmas", [
+    draw_table(pdf, 30, 90, 220, "turmas", [
         ("PK", "id", "UUID"), ("FK/UQ1", "disciplina_id", "UUID"),
-        ("FK/UQ1", "professor_id", "UUID"), ("UQ1", "semestre", "VARCHAR(10)"),
+        ("FK/UQ1", "unidade_id", "UUID"), ("UQ1", "fonte", "VARCHAR(30)"),
+        ("UQ1", "codigo", "VARCHAR(30)"), ("UQ1", "semestre", "VARCHAR(10)"),
+        ("", "ativa", "BOOLEAN"), ("", "ultima_observacao_em", "TIMESTAMPTZ"),
+    ])
+    draw_table(pdf, 300, 130, 220, "turmas_professores", [
+        ("PK/FK", "turma_id", "UUID"), ("PK/FK", "professor_id", "UUID"),
     ])
     draw_table(pdf, 560, 315, 250, "avaliacoes", [
         ("PK", "id", "UUID"), ("FK/UQ1", "usuario_id", "UUID"),
@@ -136,17 +152,10 @@ def build_logical_model():
         ("", "created_at", "TIMESTAMPTZ"), ("", "updated_at", "TIMESTAMPTZ"),
     ])
 
-    draw_note(pdf, 300, 80, 510, 145, "Relacionamentos e restricoes", [
-        "usuarios 1:N avaliacoes; professores 1:N turmas e avaliacoes",
-        "disciplinas 1:N turmas e avaliacoes",
-        "turmas UQ1: disciplina_id + professor_id + semestre",
+    draw_note(pdf, 300, 55, 510, 62, "Relacionamentos e restricoes", [
+        "professores N:N turmas; unidades e disciplinas 1:N turmas",
+        "turmas UQ1: disciplina + fonte + unidade + semestre + codigo",
         "avaliacoes UQ1: usuario_id + professor_id + disciplina_id",
-        "qualidade_material e obrigatoria somente quando ha material disponivel",
-        "Nao armazenar matricula, CPF, historico academico ou comentario livre",
-    ])
-    draw_note(pdf, 30, 80, 220, 115, "Legenda", [
-        "PK: chave primaria", "FK: chave estrangeira", "UQ: chave unica",
-        "UQ1: mesma chave composta", "CK: check constraint",
     ])
     draw_footer(pdf)
     pdf.save()
@@ -164,12 +173,20 @@ def build_conceptual_model():
         "identificador", "nome", "e-mail institucional", "senha protegida",
         "e-mail confirmado", "data de criacao",
     ])
-    draw_entity(pdf, 245, 430, 175, "Professor", ["identificador", "nome", "departamento"])
-    draw_entity(pdf, 455, 390, 175, "Disciplina", [
-        "identificador", "codigo", "nome", "departamento", "creditos (opcional)",
+    draw_entity(pdf, 35, 250, 175, "Unidade", [
+        "identificador", "fonte", "codigo", "id externo", "nome",
     ])
-    draw_entity(pdf, 245, 255, 175, "Turma", [
-        "identificador", "disciplina", "professor", "semestre",
+    draw_entity(pdf, 245, 410, 175, "Professor", [
+        "identificador", "nome", "departamento", "SIAPE (opcional)",
+        "identidade de origem", "identidade confirmada",
+    ])
+    draw_entity(pdf, 455, 390, 175, "Disciplina", [
+        "identificador", "codigo", "id externo", "nome", "departamento",
+        "creditos (opcional)",
+    ])
+    draw_entity(pdf, 245, 235, 175, "Turma", [
+        "identificador", "fonte", "unidade", "disciplina", "codigo", "semestre",
+        "ativa",
     ])
     draw_entity(pdf, 455, 95, 250, "Avaliacao", [
         "identificador", "usuario", "professor", "disciplina", "didatica (1 a 5)",
@@ -179,13 +196,13 @@ def build_conceptual_model():
 
     draw_note(pdf, 35, 95, 365, 125, "Cardinalidades", [
         "Um usuario realiza zero ou muitas avaliacoes.",
-        "Um professor recebe zero ou muitas avaliacoes e ministra turmas.",
+        "Um professor recebe avaliacoes e ministra zero ou muitas turmas.",
         "Uma disciplina recebe zero ou muitas avaliacoes e possui turmas.",
-        "Cada turma vincula exatamente uma disciplina e um professor.",
+        "Cada unidade possui turmas; cada turma vincula zero ou muitos professores.",
         "Cada usuario avalia um par professor-disciplina no maximo uma vez.",
     ])
     draw_note(pdf, 665, 405, 145, 90, "Escopo", [
-        "5 entidades", "avaliacao estruturada", "sem comentario livre",
+        "6 entidades", "vinculo N:N", "avaliacao estruturada", "sem comentario livre",
         "sem dados academicos",
     ])
     draw_footer(pdf)

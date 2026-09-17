@@ -10,7 +10,7 @@ from app.domain.avaliacoes import (
     ResultadoAgregado,
     agregar_avaliacoes,
 )
-from app.repositories import avaliacao_repository
+from app.repositories import avaliacao_repository, turma_repository
 
 
 MIN_AVALIACOES_EXIBICAO = 3
@@ -57,6 +57,12 @@ def consultar_agregado(
     disciplina = avaliacao_repository.obter_disciplina(db, disciplina_id)
     if disciplina is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
+    if not turma_repository.existe_vinculo_professor_disciplina(
+        db, professor_id, disciplina_id
+    ):
+        raise RecursoNaoEncontradoError(
+            "professor nao possui vinculo com a disciplina"
+        )
 
     professor_institucional = ProfessorInstitucional(
         id=professor.id,
