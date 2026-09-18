@@ -67,7 +67,8 @@ cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backe
 # edite backend/.env e troque os valores de exemplo, principalmente as senhas
 
 # construir as imagens, iniciar PostgreSQL e API, e aplicar as migrações
-docker compose up --build
+# usando as variáveis configuradas em backend/.env
+docker compose --env-file backend/.env up --build
 ```
 
 A API sobe em `http://127.0.0.1:8000`, o health check em
