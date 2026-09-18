@@ -172,6 +172,8 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
     def test_verifica_vinculo_por_professor_e_disciplina(self) -> None:
         db = Mock()
         db.query.return_value.filter_by.return_value.first.return_value = object()
+        consulta = db.query.return_value.join.return_value.filter.return_value
+        consulta.first.return_value = object()
         professor_id = uuid4()
         disciplina_id = uuid4()
 
@@ -187,6 +189,13 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
             disciplina_id=disciplina_id,
         )
 
+        expressoes = db.query.return_value.join.return_value.filter.call_args.args
+        parametros = {
+            valor
+            for expressao in expressoes
+            for valor in expressao.compile().params.values()
+        }
+        self.assertTrue({professor_id, disciplina_id} <= parametros)
 
 class ConsultaAgregadaContratoTest(unittest.TestCase):
     def test_endpoint_publico_esta_registrado(self) -> None:

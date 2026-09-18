@@ -76,7 +76,8 @@ em inglês, conforme convenção já definida no `CLAUDE.md`.
 ```mermaid
 erDiagram
     USUARIOS ||--o{ AVALIACOES : "registra"
-    PROFESSORES ||--o{ TURMAS : "leciona"
+    UNIDADES ||--o{ TURMAS : "oferta"
+    PROFESSORES }o--o{ TURMAS : "leciona"
     DISCIPLINAS ||--o{ TURMAS : "e ofertada em"
     PROFESSORES ||--o{ AVALIACOES : "recebe"
     DISCIPLINAS ||--o{ AVALIACOES : "contextualiza"
@@ -105,17 +106,28 @@ alimenta a comparação (RF12).
 
 Não são armazenados matrícula, CPF ou histórico acadêmico (RF01, RNF01).
 
+### `unidades`
+`id` (UUID, PK), `fonte`, `codigo`, `identificador_externo`, `nome`.
+
 ### `professores`
-`id` (UUID, PK), `nome`, `departamento`.
+`id` (UUID, PK), `nome`, `nome_normalizado`, `departamento`, `siape` opcional,
+`identidade_origem` opcional e `identidade_confirmada`.
 
 ### `disciplinas`
-`id` (UUID, PK), `codigo` (UNIQUE), `nome`, `departamento`, `creditos`.
+`id` (UUID, PK), `codigo` (UNIQUE), `identificador_externo` opcional, `nome`,
+`nome_normalizado`, `departamento`, `creditos`.
 
 `departamento` é o que permite a busca entre departamentos do RF07 — e é por isso que a
 importação precisa cobrir todos eles (RF17).
 
 ### `turmas`
-`id` (UUID, PK), `disciplina_id` (FK), `professor_id` (FK), `semestre`.
+`id` (UUID, PK), `fonte`, `unidade_id` (FK), `disciplina_id` (FK), `codigo`,
+`semestre`, `ativa` e `ultima_observacao_em`. A identidade é
+`UNIQUE(fonte, unidade_id, semestre, disciplina_id, codigo)`.
+
+O vínculo docente é mantido na tabela associativa `turmas_professores`. Uma turma pode ter
+zero, um ou vários docentes. Docentes não integram a identidade da turma; uma alteração na
+oferta sincroniza os vínculos sem criar outra turma.
 
 ### `avaliacoes`
 | Campo | Tipo | Natureza |
@@ -156,6 +168,12 @@ sequenceDiagram
 ```
 
 Falha em um departamento não interrompe os demais (RNF07).
+
+A importação sincroniza um retrato por unidade e período. Cada unidade é uma transação e
+cada oferta usa savepoint. Somente uma coleta cuja contagem esteja completa e sem erros pode
+marcar como inativas as turmas que desapareceram; resultados parciais preservam o retrato
+anterior. Professores sem SIAPE recebem identidade provisória vinculada à ocorrência na
+fonte, impedindo a união silenciosa de homônimos. Reconciliação posterior é explícita.
 
 ---
 
@@ -318,11 +336,31 @@ conhecida e assumida, e não deve ser contornada por heurística não verificáv
 
 ---
 
+### ADR 07 — Identidade institucional e sincronização do SIGAA
+
+**Estado.** Aprovada pelo responsável do projeto em 17/09/2026 para a Issue #25.
+
+**Contexto.** A fonte pública pode publicar turmas sem docente, com múltiplos docentes e
+sem SIAPE. Nome não é identidade segura, e uma coleta parcial não permite concluir que uma
+turma desapareceu.
+
+**Decisão.** Turma possui identidade estável independente dos docentes e se relaciona com
+eles em N:N. Docentes sem SIAPE recebem identidades provisórias por ocorrência, sem união
+automática de homônimos. A importação sincroniza por unidade/período e somente inativa
+ausências depois de validar o retrato completo.
+
+**Consequência.** Uma mesma pessoa sem SIAPE pode permanecer em mais de uma identidade
+provisória até reconciliação explícita. Essa duplicidade controlada é preferível a atribuir
+avaliações a um homônimo. Agendamento e histórico durável ficam fora da API e pertencem à
+#26.
+
+---
+
 ## 8. Riscos técnicos
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
-| Páginas públicas do SIGAA em JSF, com ViewState e postback | Mudanças de fluxo podem interromper a coleta | POC HTTP validada para CIC/2026.2 em #22/#23; validar cobertura de outras unidades e persistência em #25 |
+| Páginas públicas do SIGAA em JSF, com ViewState e postback | Mudanças de fluxo podem interromper a coleta | POC HTTP e persistência validadas para CIC/2026.2; ampliar cobertura na #27 |
 | Partida a frio: base vazia no lançamento | O produto não responde nada ao primeiro usuário | RF10 (estado vazio explícito) e ação de povoamento inicial junto ao time |
 | Identificação indireta do avaliador em disciplinas com poucas avaliações | Risco de retaliação | RNF02 aprovado: mínimo de 3 avaliações para exibir critérios; abaixo disso, apenas contagem e dados insuficientes. O limiar reduz exposição, mas não garante anonimato |
 | Estrutura do SIGAA muda sem aviso | Importação para de funcionar silenciosamente | RF19 (log de execução) e RNF07 (falha isolada) |

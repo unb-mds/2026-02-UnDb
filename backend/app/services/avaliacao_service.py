@@ -16,6 +16,7 @@ from app.repositories import (
     professor_repository,
     turma_repository,
 )
+from app.repositories import avaliacao_repository, turma_repository
 
 
 MIN_AVALIACOES_EXIBICAO = 3
