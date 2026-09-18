@@ -83,24 +83,27 @@ python -m app.scrapers.sigaa_poc --real
 A execução persistida real usa o primeiro comando deste documento e depende da
 disponibilidade do SIGAA e do PostgreSQL configurado.
 
-### Evidência executada em 17/09/2026
+### Evidências executadas em 17 e 18/09/2026
 
-A consulta pública real do CIC em 2026.2 reportou e extraiu 108 ofertas. Em 17/09/2026, o
-modelo N:N atual persistiu em memória as 108: 98 tinham exatamente um docente, nove tinham
-dois e uma tinha três. Foram preservados 119 vínculos, 57 disciplinas e 119 identidades
-docentes provisórias, sem perda das dez ofertas multidocentes.
+A consulta pública real do CIC em 2026.2 reportou e extraiu 108 ofertas. A composição observada
+foi de 98 ofertas com exatamente um docente, nove com dois e uma com três, totalizando 119
+vínculos, 57 disciplinas e 119 identidades docentes provisórias. O modelo atual identifica a
+turma pela origem, unidade, período, disciplina e código textual da turma, preservando todos os
+docentes associados às dez ofertas multidocentes.
 
-Para verificar o encadeamento sem alterar um banco do projeto, os dados reais foram gravados
-em um banco temporário em memória e consultados pela mesma camada de serviço usada pela API:
+Em 17/09/2026, a validação de conclusão da Issue #25 executou duas importações consecutivas dos
+dados reais no mesmo PostgreSQL 16. As duas execuções retornaram 108 ofertas e mantiveram as
+contagens estáveis em uma unidade, 57 disciplinas, 108 turmas, 119 docentes provisórios e 119
+vínculos, sem duplicatas. A migração dos dados legados e uma consulta pela API também foram
+validadas nessa execução.
 
-- o modelo anterior havia gravado apenas 46 professores, 51 disciplinas e 83 relações de
-  turma, pois descartava ofertas multidocentes e não preservava o código textual da turma;
-- a consulta pública retornou a professora `MARIA EMILIA MACHADO TELLES WALTER` e a disciplina
-  `CIC0002` a partir dos registros persistidos;
-- as 98 ofertas aceitas resultaram em 83 relações porque o modelo validado identifica turma por
-  disciplina, professor e semestre, sem armazenar o código textual da turma do SIGAA.
+Em 18/09/2026, a fonte e o comportamento determinístico foram revalidados sem alterar o banco
+do projeto:
 
-A execução real em memória valida a fonte e a representação, mas não substitui PostgreSQL.
-Antes de fechar a #25, executar a importação real nesse banco, repeti-la para verificar
-ausência de duplicatas e validar a migração `upgrade/downgrade/upgrade`. As consultas do
-contrato OpenAPI, a idempotência e os casos de falha são cobertos pela suíte determinística.
+- a POC consultou novamente o SIGAA público e obteve `total_reportado=108` e
+  `ofertas_extraidas=108` para CIC em 2026.2;
+- a suíte backend completa passou com 51 testes;
+- a primeira oferta extraída continuou sendo o componente `CIC0002`.
+
+A checagem de 18/09 é somente leitura e complementa, sem substituir, a evidência de
+persistência e idempotência em PostgreSQL registrada em 17/09 na Issue #25.
