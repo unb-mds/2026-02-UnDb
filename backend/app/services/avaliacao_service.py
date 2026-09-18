@@ -10,7 +10,11 @@ from app.domain.avaliacoes import (
     ResultadoAgregado,
     agregar_avaliacoes,
 )
-from app.repositories import avaliacao_repository, turma_repository
+from app.repositories import (
+    avaliacao_repository,
+    professor_repository,
+    turma_repository,
+)
 
 
 MIN_AVALIACOES_EXIBICAO = 3
@@ -44,6 +48,12 @@ class ConsultaAgregada:
     total_avaliacoes: int
     dados_suficientes: bool
     criterios: ResultadoAgregado | None = None
+
+
+@dataclass(frozen=True)
+class ComparacaoProfessores:
+    disciplina: DisciplinaInstitucional
+    professores: list[ConsultaAgregada]
 
 
 def consultar_agregado(
@@ -117,4 +127,36 @@ def consultar_agregado(
         total_avaliacoes=total,
         dados_suficientes=True,
         criterios=criterios,
+    )
+
+
+def comparar_professores(
+    db: Session,
+    disciplina_id: UUID,
+) -> ComparacaoProfessores:
+    disciplina = avaliacao_repository.obter_disciplina(db, disciplina_id)
+    if disciplina is None:
+        raise RecursoNaoEncontradoError("disciplina nao encontrada")
+
+    disciplina_institucional = DisciplinaInstitucional(
+        id=disciplina.id,
+        codigo=disciplina.codigo,
+        nome=disciplina.nome,
+        departamento=disciplina.departamento,
+    )
+    comparacao = [
+        consultar_agregado(db, professor.id, disciplina_id)
+        for professor in professor_repository.listar_por_disciplina(db, disciplina_id)
+    ]
+    comparacao.sort(
+        key=lambda resultado: (
+            not resultado.dados_suficientes,
+            -(resultado.criterios.recomenda if resultado.criterios else 0),
+            -resultado.total_avaliacoes,
+            resultado.professor.nome.casefold(),
+        )
+    )
+    return ComparacaoProfessores(
+        disciplina=disciplina_institucional,
+        professores=comparacao,
     )
