@@ -51,6 +51,8 @@ são gerenciadas via [Issues](../../issues) e [milestones](../../milestones).
 
 ## Como rodar o projeto localmente
 
+### Backend
+
 **Pré-requisito:** Docker Engine com o plugin Docker Compose disponível.
 
 O arquivo `backend/.env` deve definir `SECRET_KEY`, `DEBUG`, as credenciais locais do
@@ -82,6 +84,23 @@ A decisão de persistência e as restrições do modelo estão registradas em
 O procedimento para coletar e persistir dados institucionais do SIGAA, incluindo o contrato
 de resultado consumível pela rotina de atualização, está em
 [`docs/importacao-sigaa.md`](docs/importacao-sigaa.md).
+
+### Frontend
+
+**Pré-requisito:** Node.js 20.9 ou superior com npm. O scaffold inicial não depende do
+backend nem exige variáveis de ambiente para iniciar.
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+A aplicação sobe em `http://localhost:3000`. Os comandos disponíveis para lint, build de
+produção e execução do build estão documentados em [`frontend/README.md`](frontend/README.md).
+
+A estratégia definitiva de execução e containerização do frontend ainda está em aberto —
+acompanhada pela [Issue #36](../../issues/36).
 
 ## Fluxo de contribuição
 
