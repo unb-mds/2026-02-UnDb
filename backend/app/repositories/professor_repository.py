@@ -1,9 +1,11 @@
+from uuid import UUID
+
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
 from app.domain.texto import normalizar_busca
-from app.models.professor import Professor
 from app.models.disciplina import Disciplina
+from app.models.professor import Professor
 from app.models.turma import Turma, turmas_professores
 
 
@@ -32,6 +34,24 @@ def get_or_create_provisorio(
         professor.nome_normalizado = normalizar_busca(nome)
         professor.departamento = departamento
     return professor
+
+
+def listar_por_disciplina(db: Session, disciplina_id: UUID) -> list[Professor]:
+    consulta = (
+        select(Professor)
+        .join(
+            turmas_professores,
+            turmas_professores.c.professor_id == Professor.id,
+        )
+        .join(Turma, Turma.id == turmas_professores.c.turma_id)
+        .where(
+            Turma.disciplina_id == disciplina_id,
+            Turma.ativa.is_(True),
+        )
+        .distinct()
+        .order_by(Professor.nome, Professor.id)
+    )
+    return list(db.scalars(consulta).all())
 
 
 def listar(db: Session, nome: str | None = None) -> list[Professor]:
