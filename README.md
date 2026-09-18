@@ -87,17 +87,20 @@ de resultado consumível pela rotina de atualização, está em
 
 ### Frontend
 
-**Pré-requisito:** Node.js 20.9 ou superior com npm. O scaffold inicial não depende do
-backend nem exige variáveis de ambiente para iniciar.
+**Pré-requisitos:** Node.js 20.9 ou superior com npm e o backend em execução, conforme a
+seção anterior.
 
 ```bash
 cd frontend
 npm ci
+cp .env.example .env.local  # Windows: copy .env.example .env.local
 npm run dev
 ```
 
-A aplicação sobe em `http://localhost:3000`. Os comandos disponíveis para lint, build de
-produção e execução do build estão documentados em [`frontend/README.md`](frontend/README.md).
+A aplicação sobe em `http://localhost:3000` e consome por padrão a API em
+`http://localhost:8000`. Ajuste `NEXT_PUBLIC_API_URL` em `.env.local` quando o backend estiver
+publicado em outro endereço. Os comandos disponíveis para lint, build de produção e execução
+do build estão documentados em [`frontend/README.md`](frontend/README.md).
 
 A estratégia definitiva de execução e containerização do frontend ainda está em aberto —
 acompanhada pela [Issue #36](../../issues/36).
