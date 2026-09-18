@@ -33,7 +33,10 @@ export default function BuscaDisciplinasPage() {
         if (!cancelado) setResultados(disciplinas);
       })
       .catch(() => {
-        if (!cancelado) setErro("Não foi possível buscar disciplinas agora. Tente novamente em instantes.");
+        if (!cancelado) {
+          setResultados([]);
+          setErro("Não foi possível buscar disciplinas agora. Tente novamente em instantes.");
+        }
       })
       .finally(() => {
         if (!cancelado) setCarregando(false);
@@ -82,7 +85,7 @@ export default function BuscaDisciplinasPage() {
           </p>
         )}
 
-        {buscaValida && !carregando && resultados.length > 0 && (
+        {buscaValida && !carregando && !erro && resultados.length > 0 && (
           <ul className="flex flex-col gap-2">
             {resultados.map((disciplina) => (
               <li key={disciplina.id}>
