@@ -6,21 +6,30 @@ import type {
 } from "../types/avaliacao";
 import type { DisciplinaInstitucional, ProfessorInstitucional } from "../types/institucional";
 
-/** Formato exato de backend/app/schemas/avaliacao.py — nunca exposto fora deste arquivo. */
-interface AvaliacaoAgregadaWire {
+interface AvaliacaoAgregadaWireBase {
   professor_id: string;
   disciplina_id: string;
   professor: ProfessorInstitucional;
   disciplina: DisciplinaInstitucional;
   total_avaliacoes: number;
-  dados_suficientes: boolean;
-  didatica?: number;
-  dificuldade?: Dificuldade;
-  chamada?: boolean | "CONFLITANTE";
-  disponibiliza_material?: boolean | "CONFLITANTE";
-  qualidade_material?: QualidadeMaterial | null;
-  recomenda?: number;
 }
+
+interface AvaliacaoAgregadaInsuficienteWire extends AvaliacaoAgregadaWireBase {
+  dados_suficientes: false;
+}
+
+interface AvaliacaoAgregadaSuficienteWire extends AvaliacaoAgregadaWireBase {
+  dados_suficientes: true;
+  didatica: number;
+  dificuldade: Dificuldade;
+  chamada: boolean | "CONFLITANTE";
+  disponibiliza_material: boolean | "CONFLITANTE";
+  qualidade_material: QualidadeMaterial | null;
+  recomenda: number;
+}
+
+/** Formato exato de backend/app/schemas/avaliacao.py — nunca exposto fora deste arquivo. */
+type AvaliacaoAgregadaWire = AvaliacaoAgregadaSuficienteWire | AvaliacaoAgregadaInsuficienteWire;
 
 function paraAvaliacaoAgregada(wire: AvaliacaoAgregadaWire): AvaliacaoAgregada {
   const base = {
@@ -38,12 +47,12 @@ function paraAvaliacaoAgregada(wire: AvaliacaoAgregadaWire): AvaliacaoAgregada {
   return {
     ...base,
     dadosSuficientes: true,
-    didatica: wire.didatica!,
-    dificuldade: wire.dificuldade!,
-    chamada: wire.chamada!,
-    disponibilizaMaterial: wire.disponibiliza_material!,
-    qualidadeMaterial: wire.qualidade_material ?? null,
-    recomenda: wire.recomenda!,
+    didatica: wire.didatica,
+    dificuldade: wire.dificuldade,
+    chamada: wire.chamada,
+    disponibilizaMaterial: wire.disponibiliza_material,
+    qualidadeMaterial: wire.qualidade_material,
+    recomenda: wire.recomenda,
   };
 }
 

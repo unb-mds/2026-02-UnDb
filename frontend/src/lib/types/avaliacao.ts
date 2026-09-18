@@ -29,3 +29,8 @@ export interface AvaliacaoAgregadaSuficiente extends AvaliacaoAgregadaBase {
 }
 
 export type AvaliacaoAgregada = AvaliacaoAgregadaSuficiente | AvaliacaoAgregadaInsuficiente;
+
+export interface ComparacaoProfessores {
+  disciplina: DisciplinaInstitucional;
+  professores: AvaliacaoAgregada[];
+}

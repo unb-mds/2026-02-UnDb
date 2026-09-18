@@ -33,7 +33,10 @@ export default function BuscaProfessoresPage() {
         if (!cancelado) setResultados(professores);
       })
       .catch(() => {
-        if (!cancelado) setErro("Não foi possível buscar professores agora. Tente novamente em instantes.");
+        if (!cancelado) {
+          setResultados([]);
+          setErro("Não foi possível buscar professores agora. Tente novamente em instantes.");
+        }
       })
       .finally(() => {
         if (!cancelado) setCarregando(false);
@@ -85,7 +88,7 @@ export default function BuscaProfessoresPage() {
           </p>
         )}
 
-        {buscaValida && !carregando && resultados.length > 0 && (
+        {buscaValida && !carregando && !erro && resultados.length > 0 && (
           <ul className="flex flex-col gap-2">
             {resultados.map((professor) => (
               <li key={professor.id}>
