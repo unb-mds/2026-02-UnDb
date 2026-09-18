@@ -109,6 +109,9 @@ class ComparacaoProfessoresRepositoryTest(unittest.TestCase):
         self.assertEqual(resultado, [])
         consulta = db.scalars.call_args.args[0]
         self.assertIn(disciplina_id, consulta.compile().params.values())
+        sql = str(consulta.compile())
+        self.assertIn("JOIN turmas_professores", sql)
+        self.assertIn("turmas.ativa IS true", sql)
 
 
 class ComparacaoProfessoresContratoTest(unittest.TestCase):

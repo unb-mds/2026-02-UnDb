@@ -12,13 +12,6 @@ from app.schemas.avaliacao import (
     ComparacaoProfessoresResponse,
 )
 from app.services import avaliacao_service
-from typing import Annotated
-from uuid import UUID
-
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-
-from app.core.database import get_db
 from app.schemas.institucional import (
     DisciplinaDetalheResponse,
     TurmaInstitucionalResponse,
@@ -78,6 +71,8 @@ def _para_resposta(consulta: avaliacao_service.ConsultaAgregada) -> AvaliacaoAgr
         qualidade_material=consulta.criterios.qualidade_material,
         recomenda=consulta.criterios.recomenda,
     )
+
+
 @router.get("", response_model=list[DisciplinaDetalheResponse])
 def listar_disciplinas(
     session: Annotated[Session, Depends(get_db)],

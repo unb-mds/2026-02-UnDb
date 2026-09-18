@@ -15,7 +15,6 @@ app.add_middleware(
 )
 
 app.include_router(avaliacoes.router)
-app.include_router(disciplinas.router)
 app.include_router(professores.router)
 app.include_router(disciplinas.router)
 
