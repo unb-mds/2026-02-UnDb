@@ -53,38 +53,30 @@ são gerenciadas via [Issues](../../issues) e [milestones](../../milestones).
 
 ### Backend
 
-**Pré-requisito:** mantenha uma instância PostgreSQL em execução e crie nela o usuário e o
-banco informados em `DATABASE_URL`. Este repositório ainda não provisiona o PostgreSQL via
-Docker Compose; essa configuração é acompanhada pela [Issue #34](../../issues/34).
+**Pré-requisito:** Docker Engine com o plugin Docker Compose disponível.
 
-O arquivo `backend/.env` deve definir `SECRET_KEY` com um valor aleatório, `DEBUG` como
-`True` ou `False` e `DATABASE_URL` com as credenciais e o endereço do PostgreSQL.
+O arquivo `backend/.env` deve definir `SECRET_KEY`, `DEBUG`, as credenciais locais do
+PostgreSQL (`POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_DB`) e a `DATABASE_URL` com
+o host `db`. O `.env` real nunca deve ser versionado.
 
 ```bash
 # clonar o repositório
 git clone https://github.com/unb-mds/2026-02-UnDb.git
 cd 2026-02-UnDb
 
-# criar e ativar ambiente virtual
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# instalar dependências do backend
-pip install -r backend/requirements.txt
-
 # configurar variáveis de ambiente
 cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backend\.env
-# edite backend/.env e preencha os valores (o .env real nunca é commitado)
-# DATABASE_URL=postgresql+psycopg2://usuario:senha@localhost:5432/g7
+# edite backend/.env e troque os valores de exemplo, principalmente as senhas
 
-# aplicar as migrações e rodar o servidor de desenvolvimento
-# (o PostgreSQL configurado em DATABASE_URL já deve estar acessível)
-cd backend
-alembic upgrade head
-uvicorn app.main:app --reload
+# construir as imagens, iniciar PostgreSQL e API, e aplicar as migrações
+# usando as variáveis configuradas em backend/.env
+docker compose --env-file backend/.env up --build
 ```
 
-A API sobe em `http://127.0.0.1:8000` e a documentação interativa fica em `http://127.0.0.1:8000/docs`.
+A API sobe em `http://127.0.0.1:8000`, o health check em
+`http://127.0.0.1:8000/health` e a documentação interativa em
+`http://127.0.0.1:8000/docs`. Para encerrar os serviços, use `docker compose down`.
+O volume `postgres_data` preserva os dados do banco entre recriações dos containers.
 
 A decisão de persistência e as restrições do modelo estão registradas em
 [`sprints/sprint02/banco-de-dados.md`](sprints/sprint02/banco-de-dados.md).
@@ -95,23 +87,17 @@ de resultado consumível pela rotina de atualização, está em
 
 ### Frontend
 
-**Pré-requisito:** Node.js 20+ e o backend rodando localmente (ver seção acima) — o
-frontend consome a API institucional em tempo de execução, não em build.
+**Pré-requisito:** Node.js 20.9 ou superior com npm. O scaffold inicial não depende do
+backend nem exige variáveis de ambiente para iniciar.
 
 ```bash
 cd frontend
-npm install
-
-# configurar variáveis de ambiente
-cp .env.example .env.local
-# edite .env.local com a URL onde o backend está rodando
-# NEXT_PUBLIC_API_URL=http://localhost:8000
-
+npm ci
 npm run dev
 ```
 
-A aplicação sobe em `http://localhost:3000`. O backend precisa liberar essa origem em
-`CORS_ORIGINS` (ver `backend/.env.example`) para as buscas funcionarem no navegador.
+A aplicação sobe em `http://localhost:3000`. Os comandos disponíveis para lint, build de
+produção e execução do build estão documentados em [`frontend/README.md`](frontend/README.md).
 
 A estratégia definitiva de execução e containerização do frontend ainda está em aberto —
 acompanhada pela [Issue #36](../../issues/36).

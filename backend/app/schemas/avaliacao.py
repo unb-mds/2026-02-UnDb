@@ -75,3 +75,8 @@ class AvaliacaoAgregadaSuficienteResponse(AvaliacaoAgregadaBaseResponse):
 AvaliacaoAgregadaResponse = (
     AvaliacaoAgregadaSuficienteResponse | AvaliacaoAgregadaInsuficienteResponse
 )
+
+
+class ComparacaoProfessoresResponse(BaseModel):
+    disciplina: DisciplinaInstitucionalResponse
+    professores: list[AvaliacaoAgregadaResponse]
