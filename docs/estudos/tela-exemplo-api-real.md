@@ -1,32 +1,44 @@
 # Tela de exemplo consumindo API real — Issue #30
 
-**Situação:** os três critérios de aceite da #30 já são atendidos pelas telas de produto
-entregues nas #44/#45, sem precisar de uma tela descartável adicional. Este documento
-registra a evidência, em vez de duplicar código só para fechar a issue formalmente.
+**Avaliação técnica:** os três critérios de aceite da #30 estão implementados nas telas de
+produto entregues pelas #44/#45. Esta conclusão registra o estado do código e dos contratos
+HTTP atuais; a decisão de considerar essa evidência suficiente para fechar ou reclassificar
+a issue continua pertencendo ao Product Owner.
 
-## Por que não construir a tela de exemplo separada
+## Por que não construir uma tela de exemplo separada
 
-A #30 existe para provar, **antes** de construir as telas definitivas, que a separação
-frontend/backend funciona na prática — seu próprio objetivo diz isso: "antes de construir
-as telas definitivas de produto". As telas definitivas (`/professores`, `/disciplinas` e
-`/professores/[id]/disciplinas/[disciplinaId]`) já existem e já fazem exatamente o que a
-#30 pede, só que com dado de produto real em vez de `/health`. Construir uma tela de exemplo
-agora seria construir depois do que ela deveria preceder — trabalho redundante, não
-verificação adicional.
+A #30 foi criada para provar, **antes** das telas definitivas, que a separação
+frontend/backend funcionaria na prática. As telas integradas de busca de professores e de
+disciplinas (`/professores` e `/disciplinas`) já exercitam o mesmo fluxo com dados do produto.
+Uma tela descartável adicional repetiria esse comportamento, sem ampliar a cobertura técnica.
 
-## Evidência — os três critérios, com arquivo e linha
+## Evidência dos três critérios
 
-| Critério da #30 | Onde | Evidência |
-|---|---|---|
-| Requisição real via `fetch()` a um endpoint do backend | `frontend/src/lib/services/api-client.ts` | `fetch(url)` sem mock, usado por toda chamada de serviço (`listarProfessores`, `listarDisciplinas`, `consultarAvaliacaoAgregada`) |
-| Dados retornados são exibidos na tela | `frontend/src/app/professores/page.tsx` | Bloco `resultados.map(...)` renderiza o array retornado pela API |
-| Erros de requisição tratados de forma visível | `frontend/src/app/professores/page.tsx` | `.catch(() => setErro("Não foi possível buscar professores agora..."))`, renderizado em `{erro && <p>{erro}</p>}` |
+As referências abaixo correspondem ao `develop` após a integração da #96 no commit
+`d39ee44`:
 
-Testado com backend rodando localmente de verdade (não mock) — ver
-`docs/estudos/verificacao-busca-professor-disciplina.md`, que documenta exatamente esse
-fluxo com dado real do SIGAA.
+| Critério da #30 | Evidência no frontend |
+|---|---|
+| Requisição real via `fetch()` a um endpoint do backend | `frontend/src/app/professores/page.tsx:31` chama `listarProfessores`; `frontend/src/lib/services/professores.ts:44-46` encaminha a consulta a `/api/professores`; `frontend/src/lib/services/api-client.ts:17-26` monta a URL, executa `fetch(url)` e desserializa a resposta. |
+| Dados retornados são exibidos na tela | `frontend/src/app/professores/page.tsx:91-103` percorre `resultados` e renderiza nome e departamento de cada professor retornado. |
+| Erros de requisição são tratados de forma visível | `frontend/src/app/professores/page.tsx:35-40` limpa resultados anteriores e registra a mensagem de erro; `frontend/src/app/professores/page.tsx:71-82` mantém a região com `aria-live="polite"` e exibe essa mensagem ao usuário. |
 
-## Recomendação
+O contrato correspondente existe no backend em
+`backend/app/routers/professores.py:21-29`: `GET /api/professores`, com resposta tipada como
+lista de professores. O mesmo padrão também é usado pela busca de disciplinas.
 
-Fechar a #30 referenciando este documento, em vez de mantê-la aberta esperando uma tela que
-não agrega verificação nova sobre o que as #44/#45/#43 já provam.
+## Limite da evidência de execução
+
+`docs/estudos/verificacao-busca-professor-disciplina.md` registra o backend e o frontend
+executados contra dados reais do SIGAA e valida o contrato HTTP, inclusive CORS. Essa
+verificação usou `curl` e não observou em navegador a interação client-side de digitar,
+receber a lista ou provocar a mensagem de erro. Portanto, ela sustenta o contrato real e,
+com a inspeção acima, confirma que os critérios estão implementados, mas não deve ser
+apresentada como teste E2E de navegador já executado.
+
+## Recomendação técnica
+
+Submeter ao Product Owner a decisão de fechar ou reclassificar a #30 com base nesta
+evidência. Se o processo exigir demonstração E2E observada, executar primeiro o fluxo de
+sucesso e o de falha em um navegador com frontend e backend reais; isso complementa a
+evidência existente sem exigir uma tela descartável.
