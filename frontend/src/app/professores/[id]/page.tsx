@@ -40,13 +40,19 @@ export default async function DetalheProfessorPage({
         ) : (
           <ul className="mt-2 flex flex-col gap-2">
             {disciplinas.map((disciplina) => (
-              <li key={disciplina.id}>
-                <Link
-                  href={`/disciplinas/${disciplina.id}`}
-                  className="block rounded-lg border border-foreground/10 px-4 py-3 transition hover:border-foreground/30 hover:bg-foreground/[0.03]"
-                >
+              <li
+                key={disciplina.id}
+                className="rounded-lg border border-foreground/10 px-4 py-3 transition hover:border-foreground/30 hover:bg-foreground/[0.03]"
+              >
+                <Link href={`/professores/${id}/disciplinas/${disciplina.id}`} className="block">
                   <span className="font-mono text-xs text-foreground/60">{disciplina.codigo}</span>
                   <span className="block font-medium">{disciplina.nome}</span>
+                </Link>
+                <Link
+                  href={`/disciplinas/${disciplina.id}`}
+                  className="mt-1 inline-block text-xs text-foreground/60 underline underline-offset-2 hover:text-foreground"
+                >
+                  Ver outros professores desta disciplina →
                 </Link>
               </li>
             ))}

@@ -1,5 +1,10 @@
 import type { DisciplinaInstitucional, ProfessorInstitucional } from "./institucional";
 
+/** Espelha backend/app/schemas/avaliacao.py — contrato da Issue #40/#25. */
+
+export type Dificuldade = "FACIL" | "MEDIO" | "DIFICIL";
+export type QualidadeMaterial = "RUIM" | "MEDIO" | "BOM";
+
 interface AvaliacaoAgregadaBase {
   professorId: string;
   disciplinaId: string;
@@ -15,10 +20,11 @@ export interface AvaliacaoAgregadaInsuficiente extends AvaliacaoAgregadaBase {
 export interface AvaliacaoAgregadaSuficiente extends AvaliacaoAgregadaBase {
   dadosSuficientes: true;
   didatica: number;
-  dificuldade: "FACIL" | "MEDIO" | "DIFICIL";
+  dificuldade: Dificuldade;
   chamada: boolean | "CONFLITANTE";
   disponibilizaMaterial: boolean | "CONFLITANTE";
-  qualidadeMaterial: "RUIM" | "MEDIO" | "BOM" | null;
+  qualidadeMaterial: QualidadeMaterial | null;
+  /** Percentual inteiro, 0–100 — única chave de ordenação válida (RF13). */
   recomenda: number;
 }
 
