@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend
 
-## Getting Started
+Scaffold do frontend do UnDb com Next.js 16, TypeScript e Tailwind CSS.
 
-First, run the development server:
+## Execução local
+
+**Pré-requisitos:** Node.js 20.9 ou superior com npm e o backend acessível pelo navegador.
 
 ```bash
+npm ci
+copy .env.example .env.local  # Windows
+# cp .env.example .env.local  # Linux/macOS
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A aplicação fica disponível em [http://localhost:3000](http://localhost:3000). Configure
+`NEXT_PUBLIC_API_URL` em `.env.local` com a URL pública do backend. Para a execução local
+documentada no repositório, o valor padrão é `http://localhost:8000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+O App Router está em `src/app/`. Para alterar a página inicial, edite
+`src/app/page.tsx`; o servidor de desenvolvimento atualiza a página automaticamente.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Comandos disponíveis
 
-## Learn More
+- `npm run dev`: inicia o servidor de desenvolvimento.
+- `npm run lint`: executa o ESLint.
+- `npm run build`: gera o build de produção.
+- `npm run start`: serve um build de produção já gerado.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A estratégia definitiva de execução e containerização do frontend permanece pendente na
+[Issue #36](https://github.com/unb-mds/2026-02-UnDb/issues/36).
