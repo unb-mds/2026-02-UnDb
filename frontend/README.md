@@ -30,48 +30,113 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 A estratégia definitiva de execução e containerização do frontend permanece pendente na
 [Issue #36](https://github.com/unb-mds/2026-02-UnDb/issues/36).
 
-## Proposta parcial de padrão visual — Issue #31
+## Padrão visual básico — Issue #31
 
-Esta seção registra o que já existe no frontend e a proposta inicial da Issue #31. Ela não
-representa um padrão visual aprovado nem conclui a Issue. Paleta, tipografia e layout ainda
-precisam de decisão explícita do time antes de se tornarem regras para novas telas.
+Base implementada nesta entrega para orientar as próximas telas. A solicitação de
+implementação da [Issue #31](https://github.com/unb-mds/2026-02-UnDb/issues/31) é a origem
+deste trabalho; este registro não afirma aprovação coletiva nem fechamento da issue.
+Os valores ficam centralizados em `src/app/globals.css` e o header em `src/app/layout.tsx`.
 
-### Paleta candidata
+### Referência pesquisada
 
-Os tokens estão em `src/app/globals.css` e geram as classes Tailwind correspondentes.
+O [SuaGradeUnB](https://github.com/unb-mds/2023-2-SuaGradeUnB) atende ao mesmo contexto
+universitário. Suas [notas da versão 1.0.0](https://github.com/unb-mds/2023-2-SuaGradeUnB/releases/tag/v1.0.0)
+registram uma identidade com cores próximas às da UnB e nome associado à universidade.
+Para o UnDb, a escolha é manter o azul já existente como destaque sobre uma base neutra,
+e usar o nome do projeto no header. Não foram copiados componentes ou valores de cores
+da referência. A paleta abaixo consolida os tokens que já existiam no UnDb.
 
-| Token | Uso proposto | Claro | Escuro | Estado atual |
-|---|---|---|---|---|
-| `--background` / `bg-background` | Fundo da página | `#ffffff` | `#0a0a0a` | Em uso |
-| `--foreground` / `text-foreground` | Texto principal | `#171717` | `#ededed` | Em uso |
-| `--accent` / `text-accent` | Link e elemento interativo primário | `#2563eb` | `#60a5fa` | Disponível, ainda não aplicado |
+### Paleta
 
-As telas atuais usam opacidade sobre `foreground` (`text-foreground/70`, `/60`, `/50`) para
-texto secundário. Dificuldade e chamada não recebem codificação de valor em vermelho/verde,
-ícone de alerta ou posição em ranking, conforme a restrição de apresentação definida em
-`docs/requisitos.md`. A comparação agregada atual está em `/disciplinas/[id]`.
+| Token / classe Tailwind | Uso | Claro | Escuro |
+|---|---|---|---|
+| `--background` / `bg-background` | Fundo e campos | `#ffffff` | `#0a0a0a` |
+| `--foreground` / `text-foreground` | Texto principal | `#171717` | `#ededed` |
+| `--accent` / `text-accent` | Marca, destaque de navegação e foco | `#2563eb` | `#60a5fa` |
 
-### Tipografia observada
+O tema acompanha `prefers-color-scheme`; `color-scheme` adapta também os controles nativos.
+Use `text-foreground/70` para descrições e `/60` para metadados. `/50` fica reservado a
+informação auxiliar; não o use para instruções essenciais. Bordas de cartões usam
+`border-foreground/10`, campos `/20` e hover de cartões `/30` com `bg-foreground/[0.03]`.
+Erros de busca usam `text-red-600 dark:text-red-400`, sempre acompanhados de mensagem.
+Não use vermelho/verde, alertas ou ranking para julgar Dificuldade e Chamada: são
+informações neutras, conforme [requisitos](../docs/requisitos.md).
 
-- A interface aplica atualmente `Arial, Helvetica, sans-serif` no `body`.
-- Geist Sans e Geist Mono são carregadas via `next/font` e disponibilizadas como variáveis.
-- `font-mono` já é usada em identificadores, como códigos de disciplina.
-- As telas atuais usam tamanhos de `text-xs` a `text-3xl`, conforme o contexto.
+### Tipografia
 
-Definir a família principal e uma escala tipográfica normativa continua pendente na Issue
-#31. A presença das fontes e classes no código não constitui aprovação desse padrão.
+Geist Sans é a família principal, aplicada no `body`, com fallback Arial, Helvetica e
+sans-serif. Geist Mono (`font-mono`) fica reservada a códigos e identificadores. Ambas
+já são carregadas por `next/font` no layout raiz, sem nova dependência.
 
-### Layout observado
+| Papel | Classes | Tamanho / entrelinha |
+|---|---|---|
+| Título da página inicial | `text-3xl font-semibold` | 30 / 36 px |
+| Título das demais páginas | `text-2xl font-semibold` | 24 / 32 px |
+| Marca no header | `text-xl font-semibold` | 20 / 28 px |
+| Título de cartão de entrada | `text-lg font-medium` | 18 / 28 px |
+| Corpo e campos de busca | `text-base` | 16 / 24 px |
+| Descrições e navegação | `text-sm` | 14 / 20 px |
+| Rótulos auxiliares | `text-xs` | 12 / 16 px |
 
-As telas de busca usam coluna centralizada com `max-w-2xl`, `px-4`, `py-10` e `gap-6`.
-Outras telas possuem necessidades distintas: a página inicial usa espaçamento e cartões
-maiores, enquanto a comparação em `/disciplinas/[id]` usa `max-w-5xl` e grade responsiva.
-Links em listas normalmente usam borda e mudança neutra de fundo no `hover`.
+Mantenha um `h1` por página e hierarquia semântica de títulos. Peso regular para texto,
+`font-medium` para ações e `font-semibold` para títulos.
 
-### O que falta para concluir a Issue #31
+### Layout base e espaçamentos
 
-- pesquisar e registrar as referências visuais previstas na Issue;
-- obter aprovação explícita do time para a paleta, a tipografia e o layout base;
-- decidir quais variações de largura, escala e cartão fazem parte do padrão;
-- aplicar o padrão aprovado às telas existentes e verificar sua responsividade;
-- substituir este registro parcial pela documentação definitiva do padrão aprovado.
+```text
+┌──────────────────────────────────────────────────────┐
+│ UnDb                         Professores Disciplinas │ header: max-w-5xl
+├──────────────────────────────────────────────────────┤
+│         Título e descrição                           │
+│         Campo de busca / conteúdo                    │ main: max-w-2xl
+│         Lista de resultados / cartões                │
+└──────────────────────────────────────────────────────┘
+Comparações: o conteúdo pode ocupar max-w-5xl.
+Em telas estreitas, navegação e cartões quebram em linhas.
+```
+
+- Header compartilhado em todas as rotas: marca ligada a `/`, navegação para
+  `/professores` e `/disciplinas`, borda inferior, `px-4 py-3`, sem altura fixa.
+- Buscas e detalhes: `mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10`.
+  A largura máxima é 42 rem (672 px com raiz de 16 px).
+- Comparação de professores: `max-w-5xl` (64 rem / 1024 px) e grade responsiva existente.
+- Início: `max-w-2xl`, `gap-8 py-16`, cartões em uma coluna e duas a partir de `sm`.
+  Página não encontrada: mesma largura, `gap-3 py-16`.
+- Espaçamentos: 4, 8, 12, 16, 24, 32, 40 e 64 px, correspondendo às unidades
+  Tailwind 1, 2, 3, 4, 6, 8, 10 e 16. Cartões de entrada usam `p-5` (20 px).
+- Listas: `gap-2`, cartões `rounded-lg px-4 py-3`. Cartões de entrada: `rounded-xl`.
+- Campos: `rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base`.
+- Links e controles recebem contorno azul de 2 px no `focus-visible`, com afastamento
+  de 4 px. Não remova essa indicação de navegação por teclado.
+
+### Exemplo para novas telas
+
+O header é herdado do layout; não o repita na página.
+
+```tsx
+<main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+  <div>
+    <h1 className="text-2xl font-semibold">Título da tela</h1>
+    <p className="mt-1 text-sm text-foreground/70">Descrição da tarefa.</p>
+  </div>
+  {/* Conteúdo da tela */}
+</main>
+```
+
+### Verificação
+
+O frontend ainda não possui suíte de testes automatizados de interface nem script `test`.
+Execute `npm run lint` e `npm run build`, como no CI. Eles verificam código e compilação,
+mas não substituem a inspeção visual. Para revisar a interface com `npm run dev`:
+
+- confira início, buscas, detalhes, comparação e página não encontrada;
+- confira temas claro e escuro e larguras de 320, 768 e 1280 px;
+- navegue por Tab e confira foco, links do header e quebra de linhas sem rolagem horizontal;
+- confira estados de carregamento, lista vazia e erro com o backend disponível/indisponível.
+
+Verificação desta entrega (18/09/2026): lint e build de produção passaram. Uma checagem
+pontual no Edge headless cobriu início, as duas buscas e página não encontrada nos dois
+temas e nas três larguras acima (24 combinações), verificando ausência de transbordamento
+horizontal, header, destinos de navegação, fonte e tema. O foco por Tab na página inicial
+também foi verificado. As capturas móveis dos dois temas foram inspecionadas visualmente.
+Essa checagem não adiciona uma suíte ao projeto e não cobre fluxos com dados do backend.
