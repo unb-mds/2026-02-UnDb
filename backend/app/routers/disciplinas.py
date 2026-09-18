@@ -21,10 +21,14 @@ router = APIRouter(prefix="/api/disciplinas", tags=["disciplinas"])
 def comparar_professores_da_disciplina(
     disciplina_id: UUID,
     session: Annotated[Session, Depends(get_db)],
-    ordenar_por: Annotated[Literal["recomendacao"], Query()],
+    ordenar_por: Annotated[Literal["recomendacao"], Query(...)],
 ) -> ComparacaoProfessoresResponse:
     try:
-        comparacao = avaliacao_service.comparar_professores(session, disciplina_id)
+        comparacao = avaliacao_service.comparar_professores(
+            session,
+            disciplina_id,
+            ordenar_por=ordenar_por,
+        )
     except avaliacao_service.RecursoNaoEncontradoError as erro:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

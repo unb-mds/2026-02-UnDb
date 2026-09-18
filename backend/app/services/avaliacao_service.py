@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Literal
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -130,9 +131,28 @@ def consultar_agregado(
     )
 
 
+def _ordenar_comparacao(
+    comparacao: list["ConsultaAgregada"],
+    ordenar_por: Literal["recomendacao"],
+) -> list["ConsultaAgregada"]:
+    if ordenar_por != "recomendacao":
+        raise ValueError("ordenar_por inválido")
+
+    return sorted(
+        comparacao,
+        key=lambda resultado: (
+            not resultado.dados_suficientes,
+            -(resultado.criterios.recomenda if resultado.criterios else 0),
+            -resultado.total_avaliacoes,
+            resultado.professor.nome.casefold(),
+        ),
+    )
+
+
 def comparar_professores(
     db: Session,
     disciplina_id: UUID,
+    ordenar_por: Literal["recomendacao"] = "recomendacao",
 ) -> ComparacaoProfessores:
     disciplina = avaliacao_repository.obter_disciplina(db, disciplina_id)
     if disciplina is None:
@@ -148,15 +168,8 @@ def comparar_professores(
         consultar_agregado(db, professor.id, disciplina_id)
         for professor in professor_repository.listar_por_disciplina(db, disciplina_id)
     ]
-    comparacao.sort(
-        key=lambda resultado: (
-            not resultado.dados_suficientes,
-            -(resultado.criterios.recomenda if resultado.criterios else 0),
-            -resultado.total_avaliacoes,
-            resultado.professor.nome.casefold(),
-        )
-    )
+    comparacao_ordenada = _ordenar_comparacao(comparacao, ordenar_por)
     return ComparacaoProfessores(
         disciplina=disciplina_institucional,
-        professores=comparacao,
+        professores=comparacao_ordenada,
     )
