@@ -33,7 +33,7 @@ não possui Docker CLI ou Docker Desktop.
 - Diff contra `develop`: limitado a este registro; instruções duplicadas no README e
   uma correção de consulta pertencente à PR #106 foram removidas do escopo.
 - Suíte backend local: inconclusiva, pois o runtime disponível não contém FastAPI e
-  SQLAlchemy. A continuidade depende do check `Backend` do GitHub Actions.
+  SQLAlchemy. O check `Backend` do GitHub Actions passou após a correção da branch.
 
 ## Limites
 
