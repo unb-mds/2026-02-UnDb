@@ -10,25 +10,6 @@ def existe_vinculo_professor_disciplina(
     db: Session, professor_id: UUID, disciplina_id: UUID
 ) -> bool:
     return (
-        db.query(Turma.id)
-        .join(
-            turmas_professores,
-            turmas_professores.c.turma_id == Turma.id,
-        )
-        .filter(
-            turmas_professores.c.professor_id == professor_id,
-            Turma.disciplina_id == disciplina_id,
-            Turma.ativa.is_(True),
-        )
-        .first()
-        is not None
-    )
-
-
-def get_by_disciplina_professor_semestre(
-    db: Session, disciplina_id: UUID, professor_id: UUID, semestre: str
-) -> Turma | None:
-    return (
         db.query(turmas_professores.c.turma_id)
         .join(Turma, Turma.id == turmas_professores.c.turma_id)
         .filter(

@@ -51,45 +51,13 @@ são gerenciadas via [Issues](../../issues) e [milestones](../../milestones).
 
 ## Como rodar o projeto localmente
 
+### Ambiente completo com Docker Compose
+
 **Pré-requisito:** Docker Engine com o plugin Docker Compose disponível.
 
 O arquivo `backend/.env` deve definir `SECRET_KEY`, `DEBUG`, as credenciais locais do
 PostgreSQL (`POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_DB`) e a `DATABASE_URL` com
 o host `db`. O `.env` real nunca deve ser versionado.
-
-## Executando com Docker Compose
-
-### Pré-requisitos
-- Docker Desktop instalado e em execução
-
-### Configuração
-1. Copie o arquivo de exemplo de variáveis de ambiente:
-```bash
-   cp backend/.env.example .env
-```
-2. Preencha as variáveis no `.env` (usuário, senha e nome do banco).
-
-### Subindo o ambiente
-```bash
-docker compose up --build -d
-```
-
-### Rodando as migrações
-```bash
-docker compose exec backend alembic upgrade head
-```
-
-### Verificando as tabelas
-```bash
-docker compose exec db psql -U <usuario> -d <banco> -c "\dt"
-```
-
-### Persistência de dados
-Os dados do PostgreSQL são armazenados em um volume nomeado (`postgres_data`), garantindo que sobrevivam a reinicializações:
-```bash
-docker compose down     # remove containers, mantém o volume
-docker compose up -d    # dados continuam disponíveis
-```
 
 ```bash
 # clonar o repositório
@@ -100,15 +68,42 @@ cd 2026-02-UnDb
 cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backend\.env
 # edite backend/.env e troque os valores de exemplo, principalmente as senhas
 
-# construir as imagens, iniciar PostgreSQL e API, e aplicar as migrações
+# construir as imagens, iniciar PostgreSQL, API e frontend, e aplicar as migrações
 # usando as variáveis configuradas em backend/.env
 docker compose --env-file backend/.env up --build
 ```
 
 A API sobe em `http://127.0.0.1:8000`, o health check em
 `http://127.0.0.1:8000/health` e a documentação interativa em
-`http://127.0.0.1:8000/docs`. Para encerrar os serviços, use `docker compose down`.
+`http://127.0.0.1:8000/docs`. O frontend fica em `http://localhost:3000`.
+Para encerrar os serviços, use `docker compose --env-file backend/.env down`.
 O volume `postgres_data` preserva os dados do banco entre recriações dos containers.
+
+O frontend executa o servidor Next.js com build otimizado, sem recarga automática no
+container. Depois de alterar seu código, execute novamente o comando com `--build`.
+O build precisa de acesso à internet para instalar dependências e baixar as fontes Geist
+usadas por `next/font/google`. Não precisa de dados do backend durante a compilação.
+
+O navegador acessa a API por `NEXT_PUBLIC_API_URL` (padrão `http://localhost:8000`),
+enquanto o servidor Next.js usa `API_INTERNAL_URL=http://backend:8000` na rede do Compose.
+Nunca use `http://backend:8000` como URL pública: esse nome só existe entre containers.
+Para personalizar a URL pública, adicione `NEXT_PUBLIC_API_URL` ao `backend/.env` passado
+ao Compose e reconstrua o frontend. Ajuste também `CORS_ORIGINS` com a origem do frontend
+aberta no navegador. `frontend/.env.local` é usado apenas na execução fora do Docker;
+nenhum `.env` entra na imagem do frontend.
+
+Para verificar a composição e acompanhar a inicialização:
+
+```bash
+docker compose --env-file backend/.env config --quiet
+docker compose --env-file backend/.env ps
+docker compose --env-file backend/.env logs backend frontend
+```
+
+O health check do frontend verifica seu servidor HTTP. Aguarde também a conclusão das
+migrações e a API ficar disponível antes de consultar dados; a ordem de início dos
+containers não garante prontidão da API. A configuração atende ao ambiente local e não
+define hospedagem pública, TLS ou operação em produção.
 
 A decisão de persistência e as restrições do modelo estão registradas em
 [`sprints/sprint02/banco-de-dados.md`](sprints/sprint02/banco-de-dados.md).
@@ -116,6 +111,31 @@ A decisão de persistência e as restrições do modelo estão registradas em
 O procedimento para coletar e persistir dados institucionais do SIGAA, incluindo o contrato
 de resultado consumível pela rotina de atualização, está em
 [`docs/importacao-sigaa.md`](docs/importacao-sigaa.md).
+
+### Frontend com recarga automática, fora do Docker
+
+**Pré-requisitos:** Node.js 20.9 ou superior com npm (a imagem usa Node.js 24) e o backend
+acessível. Para usar apenas backend e banco no Compose, sem ocupar a porta 3000:
+
+```bash
+docker compose --env-file backend/.env up --build backend db
+```
+
+```bash
+cd frontend
+npm ci
+cp .env.example .env.local  # Windows: copy .env.example .env.local
+npm run dev
+```
+
+A aplicação sobe em `http://localhost:3000` e consome por padrão a API em
+`http://localhost:8000`. Ajuste `NEXT_PUBLIC_API_URL` em `.env.local` quando o backend estiver
+publicado em outro endereço. Os comandos disponíveis para lint, build de produção e execução
+do build estão documentados em [`frontend/README.md`](frontend/README.md).
+
+A estratégia implementada para revisão na [Issue #36](../../issues/36) usa servidor
+Next.js, sem exportação estática. A justificativa, as alternativas e as consequências
+estão no [ADR 08](docs/arquitetura.md#adr-08--execução-e-containerização-do-frontend).
 
 ## Fluxo de contribuição
 

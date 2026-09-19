@@ -24,6 +24,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-g7}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-troque-por-uma-senha-local}
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg2://g7:troque-por-uma-senha-local@db:5432/g7}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
     ports:
       - "8000:8000"
     depends_on:
@@ -33,6 +34,24 @@ services:
       - sh
       - -c
       - alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    environment:
+      API_INTERNAL_URL: http://backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   postgres_data:
