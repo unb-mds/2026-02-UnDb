@@ -190,6 +190,8 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
             for valor in expressao.compile().params.values()
         }
         self.assertTrue({professor_id, disciplina_id} <= parametros)
+        
+
 
 class ConsultaAgregadaContratoTest(unittest.TestCase):
     def test_endpoint_publico_esta_registrado(self) -> None:

@@ -59,6 +59,40 @@ O arquivo `backend/.env` deve definir `SECRET_KEY`, `DEBUG`, as credenciais loca
 PostgreSQL (`POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_DB`) e a `DATABASE_URL` com
 o host `db`. O `.env` real nunca deve ser versionado.
 
+## Executando com Docker Compose
+
+### Pré-requisitos
+- Docker Desktop instalado e em execução
+
+### Configuração
+1. Copie o arquivo de exemplo de variáveis de ambiente:
+```bash
+   cp backend/.env.example .env
+```
+2. Preencha as variáveis no `.env` (usuário, senha e nome do banco).
+
+### Subindo o ambiente
+```bash
+docker compose up --build -d
+```
+
+### Rodando as migrações
+```bash
+docker compose exec backend alembic upgrade head
+```
+
+### Verificando as tabelas
+```bash
+docker compose exec db psql -U <usuario> -d <banco> -c "\dt"
+```
+
+### Persistência de dados
+Os dados do PostgreSQL são armazenados em um volume nomeado (`postgres_data`), garantindo que sobrevivam a reinicializações:
+```bash
+docker compose down     # remove containers, mantém o volume
+docker compose up -d    # dados continuam disponíveis
+```
+
 ```bash
 # clonar o repositório
 git clone https://github.com/unb-mds/2026-02-UnDb.git
