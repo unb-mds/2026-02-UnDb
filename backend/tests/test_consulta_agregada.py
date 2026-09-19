@@ -169,29 +169,30 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
         parametros = set(consulta.compile().params.values())
         self.assertEqual(parametros, {professor_id, disciplina_id})
 
-def test_verifica_vinculo_por_professor_e_disciplina(self) -> None:
-    db = Mock()
-    consulta = db.query.return_value.join.return_value.filter.return_value
-    consulta.first.return_value = object()
-    professor_id = uuid4()
-    disciplina_id = uuid4()
+    def test_verifica_vinculo_por_professor_e_disciplina(self) -> None:
+        db = Mock()
+        consulta = db.query.return_value.join.return_value.filter.return_value
+        consulta.first.return_value = object()
+        professor_id = uuid4()
+        disciplina_id = uuid4()
 
-    resultado = existe_vinculo_professor_disciplina(
-        db,
-        professor_id,
-        disciplina_id,
-    )
+        resultado = existe_vinculo_professor_disciplina(
+            db,
+            professor_id,
+            disciplina_id,
+        )
 
-    self.assertTrue(resultado)
+        self.assertTrue(resultado)
 
-    expressoes = db.query.return_value.join.return_value.filter.call_args.args
-    parametros = {
-        valor
-        for expressao in expressoes
-        for valor in expressao.compile().params.values()
-    }
+        expressoes = db.query.return_value.join.return_value.filter.call_args.args
+        parametros = {
+            valor
+            for expressao in expressoes
+            for valor in expressao.compile().params.values()
+        }
 
-    self.assertTrue({professor_id, disciplina_id} <= parametros)
+        self.assertTrue({professor_id, disciplina_id} <= parametros)
+
 
 class ConsultaAgregadaContratoTest(unittest.TestCase):
     def test_endpoint_publico_esta_registrado(self) -> None:
