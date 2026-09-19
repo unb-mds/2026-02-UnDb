@@ -2,9 +2,16 @@ import { ApiError } from "./http-error";
 
 /**
  * Base da API institucional pública (Issue #25) — sem autenticação, RF04.
- * Configurar em .env.local; ver .env.example.
+ * No navegador, usa a URL pública definida no build. No servidor, permite
+ * acessar a API pela rede interna do Compose; ver .env.example.
  */
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+function apiBaseUrl(): string {
+  return typeof window === "undefined"
+    ? process.env.API_INTERNAL_URL || PUBLIC_API_URL
+    : PUBLIC_API_URL;
+}
 
 function buildQuery(params: Record<string, string | undefined>): string {
   const entries = Object.entries(params).filter(
@@ -15,7 +22,7 @@ function buildQuery(params: Record<string, string | undefined>): string {
 }
 
 async function request<T>(path: string, query: Record<string, string | undefined> = {}): Promise<T> {
-  const url = `${API_BASE_URL}${path}${buildQuery(query)}`;
+  const url = `${apiBaseUrl()}${path}${buildQuery(query)}`;
   const response = await fetch(url);
 
   if (!response.ok) {

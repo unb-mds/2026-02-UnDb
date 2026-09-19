@@ -240,11 +240,11 @@ classes utilitárias, garantindo consistência visual ágil e sem a necessidade 
 CSS globais complexos. Além do ganho técnico, o aprendizado de um ecossistema moderno em React 
 é objetivo declarado do time, alinhando-se às escolhas dos grupos G3 e G9.
 
-**Consequência.** Next.js exige runtime Node no container, o que torna a containerização do
-frontend mais pesada do que um build estático servido por nginx. Caso isso se mostre um
-problema para a Epic de Docker, existe a alternativa de usar exportação estática
-(`output: 'export'`), abrindo mão de renderização no servidor. O Tailwind CSS requer configuração 
-inicial via PostCSS/Tailwind compiler, que já vem nativa no ecossistema atual do Next.js.
+**Consequência.** A execução com servidor Next.js exige runtime Node; uma exportação
+estática (`output: 'export'`) dispensa esse runtime na hospedagem, mas limita recursos
+dinâmicos. A escolha entre esses modos e a containerização pertencem à #36 (ADR 08),
+não à aprovação da stack na #28. Tailwind CSS 4 é compilado pelo plugin
+`@tailwindcss/postcss`, já configurado em `frontend/postcss.config.mjs`.
 
 **Evidência.** Nicolas e Vinicius validaram a escolha em 13/09/2026. Como a decisão foi
 considerada simples pelos responsáveis, não foi necessária uma consulta adicional ao grupo.
@@ -356,6 +356,65 @@ avaliações a um homônimo. Agendamento e histórico durável ficam fora da API
 
 ---
 
+### ADR 08 — Execução e containerização do frontend
+
+**Estado.** Aprovado pelo responsável em 19/09/2026, após revisão do resumo da
+implementação e das validações, com autorização explícita para publicar a PR e fechar
+a Issue #36. A aprovação desta estratégia não promove a skill Docker nem substitui
+a revisão da PR antes do merge.
+
+**Contexto e evidências.** Next.js + Tailwind foram aprovados na #28 (ADR 02), e a estrutura
+da #29 entrou pela PR #95. O Compose de backend e PostgreSQL foi integrado pela PR #93
+(#34). As PRs #96 e #98 adicionaram buscas no navegador e páginas de detalhe, comparação
+e avaliação agregada que consultam a API no servidor. As rotas com `[id]` e
+`[disciplinaId]` não têm `generateStaticParams`; seus dados mudam com a importação e as
+avaliações. O backend continua responsável por persistência, contratos e regras de negócio.
+
+**Solução implementada.** Manter servidor Next.js e incluir `frontend` no Compose desta
+fase. Para edição local, usar `npm run dev`; para verificar o build fora do Docker,
+`npm run build` seguido de `npm run start`. No Docker, gerar `output: 'standalone'`
+por meio de `BUILD_STANDALONE=true` e executar o servidor mínimo com Node.js 24 em imagem
+oficial Debian slim. O build inclui Tailwind/PostCSS; o runtime inclui o servidor rastreado,
+`public/` e `.next/static/`, executando como usuário sem privilégios. A composição serve
+um build otimizado para integração local, sem definir infraestrutura pública de produção.
+
+**Alternativas e justificativa.**
+
+| Alternativa | Consequência para o estado atual |
+|---|---|
+| Servidor Node + standalone (implementada) | Preserva as rotas e consultas por requisição e reduz o conteúdo da imagem final; exige um processo Node em execução |
+| Exportação estática | Dispensa Node na hospedagem, mas exige enumerar rotas no build ou reformular a navegação e as consultas atuais; dados renderizados no build exigiriam regeneração e novos IDs não teriam páginas automaticamente |
+| Frontend somente fora do Docker | Continua útil para edição, mas não oferece inicialização conjunta e ambiente de runtime reproduzível com API e banco |
+
+A exportação estática não é equivalente a servir o build atual: rotas dinâmicas sem
+`generateStaticParams` e renderização por requisição não são suportadas nesse modo.
+Não é necessário mudar stack, contratos ou telas para containerizar a execução existente.
+Ver [exportação estática](https://nextjs.org/docs/app/guides/static-exports) e
+[output standalone](https://nextjs.org/docs/app/api-reference/config/next-config-js/output).
+
+**Comunicação e configuração.** O navegador usa `NEXT_PUBLIC_API_URL`, pública e fixada
+no build (padrão `http://localhost:8000`). O servidor usa `API_INTERNAL_URL`, privada ao
+runtime (Compose: `http://backend:8000`), com fallback para a URL pública fora do Docker.
+Isso evita que `localhost` dentro do container aponte para o próprio frontend ou que o
+navegador tente resolver o nome interno `backend`. CORS continua configurado no FastAPI
+por `CORS_ORIGINS`; o frontend não acessa o banco diretamente nem recebe suas credenciais.
+
+**Consequências e limites.** A imagem precisa ser reconstruída após alteração de código ou
+URL pública. `.env*`, dependências locais e builds do host não entram no contexto Docker.
+O build requer internet para npm e fontes Geist, mas não requer a API ativa. O health check
+do frontend verifica HTTP; `depends_on` ordena o início, sem garantir prontidão do backend.
+É preciso aguardar migrações e API antes de consultar dados. Hosting, TLS, publicação de
+imagens, alta disponibilidade e revisão operacional de produção permanecem fora do escopo.
+
+**Rastreabilidade.** #36 é a referência comum dos épicos #11 e #13. A #32 foi encerrada por
+duplicidade, conforme comentário remoto, e não recebe implementação paralela. #34 mantém
+seu escopo de backend/banco e persistência; a validação coletiva por dois membros é #37.
+A skill Docker recebe somente atualização de referências, mantendo estado `proposed`.
+Resultados reproduzíveis desta entrega ficam em
+[`estudos/verificacao-execucao-frontend.md`](estudos/verificacao-execucao-frontend.md).
+
+---
+
 ## 8. Riscos técnicos
 
 | Risco | Impacto | Mitigação |
@@ -364,4 +423,4 @@ avaliações a um homônimo. Agendamento e histórico durável ficam fora da API
 | Partida a frio: base vazia no lançamento | O produto não responde nada ao primeiro usuário | RF10 (estado vazio explícito) e ação de povoamento inicial junto ao time |
 | Identificação indireta do avaliador em disciplinas com poucas avaliações | Risco de retaliação | RNF02 aprovado: mínimo de 3 avaliações para exibir critérios; abaixo disso, apenas contagem e dados insuficientes. O limiar reduz exposição, mas não garante anonimato |
 | Estrutura do SIGAA muda sem aviso | Importação para de funcionar silenciosamente | RF19 (log de execução) e RNF07 (falha isolada) |
-| Runtime Node no container do frontend | Ambiente mais pesado | Alternativa de exportação estática (ADR 02) |
+| Runtime Node no container do frontend | Ambiente mais pesado que hospedagem estática | Build standalone em múltiplas etapas; exportação estática exigiria reavaliar as rotas atuais (ADR 08) |

@@ -27,8 +27,45 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
 
-A estratégia definitiva de execução e containerização do frontend permanece pendente na
-[Issue #36](https://github.com/unb-mds/2026-02-UnDb/issues/36).
+## Execução com Docker — Issue #36
+
+Na raiz do repositório, configure `backend/.env` conforme o [README principal](../README.md)
+e execute `docker compose --env-file backend/.env up --build`. O frontend fica em
+`http://localhost:3000`, junto da API e do PostgreSQL. Para trabalhar com recarga automática,
+inicie somente `backend db` no Compose e use `npm run dev` nesta pasta.
+
+A imagem usa Node.js 24 em Debian slim e build em múltiplas etapas. O Docker define
+`BUILD_STANDALONE=true` para gerar `.next/standalone`; o container executa `node server.js`
+como usuário `node`, sem root. `public/` e `.next/static/` são copiados explicitamente para
+servir imagens, fontes e CSS. Dependências de desenvolvimento ficam no estágio de build,
+incluindo Tailwind 4 e seu plugin PostCSS. Sem `BUILD_STANDALONE`, o build local continua
+compatível com `npm run start`.
+
+| Variável | Onde configurar | Momento e finalidade |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | `.env.local` fora do Docker; argumento de build no Docker, interpolado do `backend/.env` pelo Compose | URL acessível ao navegador, incorporada ao JavaScript no build; padrão `http://localhost:8000` |
+| `API_INTERNAL_URL` | Ambiente do servidor; definida pelo Compose como `http://backend:8000` | Lida em runtime apenas pelo servidor Next.js; fora do Docker pode ser omitida para usar a URL pública |
+| `CORS_ORIGINS` | `backend/.env` | Origens autorizadas pela API; padrão `http://localhost:3000` |
+
+Não coloque segredos em `NEXT_PUBLIC_*` ou em argumentos de build. Os arquivos `.env*`
+são excluídos do contexto Docker. Alterar `NEXT_PUBLIC_API_URL` exige reconstruir a imagem;
+passá-la somente ao container já construído não muda o JavaScript do navegador.
+
+Para construir e executar somente a imagem, a partir da raiz (com API acessível no host):
+
+```bash
+docker build -t undb-frontend --build-arg NEXT_PUBLIC_API_URL=http://localhost:8000 frontend
+docker run --rm -p 3000:3000 --add-host=host.docker.internal:host-gateway -e API_INTERNAL_URL=http://host.docker.internal:8000 undb-frontend
+```
+
+O build precisa de internet para dependências e fontes Geist. O container serve um build
+otimizado, sem bind mount ou recarga automática; alterações de código exigem rebuild.
+Essa composição é para validação local, sem definir provedor de deploy ou TLS.
+
+As buscas são Client Components; detalhes e comparação consultam FastAPI em Server
+Components por requisição. Por isso a entrega mantém servidor Next.js e não usa
+`output: 'export'`. A análise e o estado da decisão estão no
+[ADR 08](../docs/arquitetura.md#adr-08--execução-e-containerização-do-frontend).
 
 ## Padrão visual básico — Issue #31
 
