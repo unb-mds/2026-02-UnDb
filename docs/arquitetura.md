@@ -358,9 +358,10 @@ avaliações a um homônimo. Agendamento e histórico durável ficam fora da API
 
 ### ADR 08 — Execução e containerização do frontend
 
-**Estado.** Proposta implementada para revisão na Issue #36, por solicitação do responsável
-em 18/09/2026. O registro não afirma aprovação coletiva nem publicação da solução.
-O aceite arquitetural permanece sujeito à revisão humana desta entrega.
+**Estado.** Aprovado pelo responsável em 19/09/2026, após revisão do resumo da
+implementação e das validações, com autorização explícita para publicar a PR e fechar
+a Issue #36. A aprovação desta estratégia não promove a skill Docker nem substitui
+a revisão da PR antes do merge.
 
 **Contexto e evidências.** Next.js + Tailwind foram aprovados na #28 (ADR 02), e a estrutura
 da #29 entrou pela PR #95. O Compose de backend e PostgreSQL foi integrado pela PR #93
