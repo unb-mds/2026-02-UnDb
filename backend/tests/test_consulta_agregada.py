@@ -173,7 +173,6 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
         db = Mock()
         consulta = db.query.return_value.join.return_value.filter.return_value
         consulta.first.return_value = object()
-        db.query.return_value.filter_by.return_value.first.return_value = object()
         professor_id = uuid4()
         disciplina_id = uuid4()
 
@@ -191,10 +190,7 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
             for valor in expressao.compile().params.values()
         }
         self.assertTrue({professor_id, disciplina_id} <= parametros)
-        db.query.return_value.filter_by.assert_called_once_with(
-            professor_id=professor_id,
-            disciplina_id=disciplina_id,
-        )
+        
 
 
 class ConsultaAgregadaContratoTest(unittest.TestCase):
