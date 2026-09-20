@@ -107,3 +107,6 @@ do projeto:
 
 A checagem de 18/09 é somente leitura e complementa, sem substituir, a evidência de
 persistência e idempotência em PostgreSQL registrada em 17/09 na Issue #25.
+
+Para executar a importação com registro consultável e integrá-la a um agendador, consulte
+[`operacao-importacao-sigaa.md`](operacao-importacao-sigaa.md).
