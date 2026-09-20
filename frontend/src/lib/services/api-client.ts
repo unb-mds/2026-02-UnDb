@@ -33,4 +33,20 @@ async function request<T>(path: string, query: Record<string, string | undefined
   return response.json() as Promise<T>;
 }
 
-export const apiClient = { request };
+async function post<TResponse, TBody>(path: string, body: TBody): Promise<TResponse> {
+  const response = await fetch(`${apiBaseUrl()}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const detalhe = await response.json().catch(() => null);
+    const mensagem = typeof detalhe?.detail === "string" ? detalhe.detail : "Não foi possível concluir a solicitação.";
+    throw new ApiError(mensagem, response.status);
+  }
+
+  return response.json() as Promise<TResponse>;
+}
+
+export const apiClient = { post, request };

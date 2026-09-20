@@ -37,6 +37,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/disciplinas" className="py-2 hover:text-accent hover:underline underline-offset-4">
                 Disciplinas
               </Link>
+              <Link href="/cadastro" className="py-2 hover:text-accent hover:underline underline-offset-4">
+                Criar conta
+              </Link>
             </nav>
           </div>
         </header>

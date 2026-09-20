@@ -106,6 +106,11 @@ alimenta a comparação (RF12).
 
 Não são armazenados matrícula, CPF ou histórico acadêmico (RF01, RNF01).
 
+### `email_confirmation_tokens`
+`id` (UUID, PK), `usuario_id` (FK), `token_hash` (VARCHAR(64), UNIQUE),
+`expires_at`, `used_at` opcional e `created_at` (TIMESTAMPTZ). O token aberto nunca é
+persistido; cada link é de uso único e expira em 24 horas.
+
 ### `unidades`
 `id` (UUID, PK), `fonte`, `codigo`, `identificador_externo`, `nome`.
 
@@ -278,8 +283,17 @@ expiração, incluindo em ambiente de desenvolvimento, além de armazenamento pe
 sessões no backend. Ex-alunos sem acesso ao domínio aceito e outros vínculos institucionais
 não conseguem concluir o cadastro na Release 1.
 
-**Pendência.** O provedor de envio e a validade do link de confirmação ainda precisam ser
-definidos antes da implementação desse fluxo.
+**Decisão complementar aprovada em 19/09/2026.** Resend é o provedor de produção, isolado
+por uma interface interna de envio. O desenvolvimento usa um adaptador `console`, que
+registra o link no terminal sem depender de domínio externo. O link expira em 24 horas,
+usa token opaco aleatório de uso único e somente seu hash é persistido. Senhas usam
+Argon2id. Cadastro repetido recebe a mesma resposta genérica `202`, sem revelar a
+existência da conta. A confirmação é acionada por `POST` depois que a página do frontend
+recebe o token, evitando que pré-visualizadores consumam o link por uma requisição `GET`.
+
+Na Release 1, a confirmação é demonstrada exclusivamente pelo adaptador `console`. O envio
+real para endereços arbitrários depende de domínio remetente verificado no Resend e fica
+planejado para ativação na Release 2; essa dependência não bloqueia os testes locais.
 
 **Evidência.** Reunião presencial de 09/09/2026 nas mesas do UAC, convocada pelo grupo de
 WhatsApp. Participaram Nicolas, Vinicius, Gabriel, Tiago e Warlley; Yasmin não participou.
