@@ -46,6 +46,8 @@ nav:
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
       - Docker: estudos/docker.md
+  - Processo:
+      - Template de ata de reunião: atas/template-ata-reuniao.md
 
 exclude_docs: |
   agent-skills.md
