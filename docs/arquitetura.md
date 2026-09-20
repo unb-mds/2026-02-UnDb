@@ -76,7 +76,8 @@ em inglês, conforme convenção já definida no `CLAUDE.md`.
 ```mermaid
 erDiagram
     USUARIOS ||--o{ AVALIACOES : "registra"
-    PROFESSORES ||--o{ TURMAS : "leciona"
+    UNIDADES ||--o{ TURMAS : "oferta"
+    PROFESSORES }o--o{ TURMAS : "leciona"
     DISCIPLINAS ||--o{ TURMAS : "e ofertada em"
     PROFESSORES ||--o{ AVALIACOES : "recebe"
     DISCIPLINAS ||--o{ AVALIACOES : "contextualiza"
@@ -105,17 +106,33 @@ alimenta a comparação (RF12).
 
 Não são armazenados matrícula, CPF ou histórico acadêmico (RF01, RNF01).
 
+### `email_confirmation_tokens`
+`id` (UUID, PK), `usuario_id` (FK), `token_hash` (VARCHAR(64), UNIQUE),
+`expires_at`, `used_at` opcional e `created_at` (TIMESTAMPTZ). O token aberto nunca é
+persistido; cada link é de uso único e expira em 24 horas.
+
+### `unidades`
+`id` (UUID, PK), `fonte`, `codigo`, `identificador_externo`, `nome`.
+
 ### `professores`
-`id` (UUID, PK), `nome`, `departamento`.
+`id` (UUID, PK), `nome`, `nome_normalizado`, `departamento`, `siape` opcional,
+`identidade_origem` opcional e `identidade_confirmada`.
 
 ### `disciplinas`
-`id` (UUID, PK), `codigo` (UNIQUE), `nome`, `departamento`, `creditos`.
+`id` (UUID, PK), `codigo` (UNIQUE), `identificador_externo` opcional, `nome`,
+`nome_normalizado`, `departamento`, `creditos`.
 
 `departamento` é o que permite a busca entre departamentos do RF07 — e é por isso que a
 importação precisa cobrir todos eles (RF17).
 
 ### `turmas`
-`id` (UUID, PK), `disciplina_id` (FK), `professor_id` (FK), `semestre`.
+`id` (UUID, PK), `fonte`, `unidade_id` (FK), `disciplina_id` (FK), `codigo`,
+`semestre`, `ativa` e `ultima_observacao_em`. A identidade é
+`UNIQUE(fonte, unidade_id, semestre, disciplina_id, codigo)`.
+
+O vínculo docente é mantido na tabela associativa `turmas_professores`. Uma turma pode ter
+zero, um ou vários docentes. Docentes não integram a identidade da turma; uma alteração na
+oferta sincroniza os vínculos sem criar outra turma.
 
 ### `avaliacoes`
 | Campo | Tipo | Natureza |
@@ -156,6 +173,12 @@ sequenceDiagram
 ```
 
 Falha em um departamento não interrompe os demais (RNF07).
+
+A importação sincroniza um retrato por unidade e período. Cada unidade é uma transação e
+cada oferta usa savepoint. Somente uma coleta cuja contagem esteja completa e sem erros pode
+marcar como inativas as turmas que desapareceram; resultados parciais preservam o retrato
+anterior. Professores sem SIAPE recebem identidade provisória vinculada à ocorrência na
+fonte, impedindo a união silenciosa de homônimos. Reconciliação posterior é explícita.
 
 ---
 
@@ -222,11 +245,11 @@ classes utilitárias, garantindo consistência visual ágil e sem a necessidade 
 CSS globais complexos. Além do ganho técnico, o aprendizado de um ecossistema moderno em React 
 é objetivo declarado do time, alinhando-se às escolhas dos grupos G3 e G9.
 
-**Consequência.** Next.js exige runtime Node no container, o que torna a containerização do
-frontend mais pesada do que um build estático servido por nginx. Caso isso se mostre um
-problema para a Epic de Docker, existe a alternativa de usar exportação estática
-(`output: 'export'`), abrindo mão de renderização no servidor. O Tailwind CSS requer configuração 
-inicial via PostCSS/Tailwind compiler, que já vem nativa no ecossistema atual do Next.js.
+**Consequência.** A execução com servidor Next.js exige runtime Node; uma exportação
+estática (`output: 'export'`) dispensa esse runtime na hospedagem, mas limita recursos
+dinâmicos. A escolha entre esses modos e a containerização pertencem à #36 (ADR 08),
+não à aprovação da stack na #28. Tailwind CSS 4 é compilado pelo plugin
+`@tailwindcss/postcss`, já configurado em `frontend/postcss.config.mjs`.
 
 **Evidência.** Nicolas e Vinicius validaram a escolha em 13/09/2026. Como a decisão foi
 considerada simples pelos responsáveis, não foi necessária uma consulta adicional ao grupo.
@@ -260,8 +283,17 @@ expiração, incluindo em ambiente de desenvolvimento, além de armazenamento pe
 sessões no backend. Ex-alunos sem acesso ao domínio aceito e outros vínculos institucionais
 não conseguem concluir o cadastro na Release 1.
 
-**Pendência.** O provedor de envio e a validade do link de confirmação ainda precisam ser
-definidos antes da implementação desse fluxo.
+**Decisão complementar aprovada em 19/09/2026.** Resend é o provedor de produção, isolado
+por uma interface interna de envio. O desenvolvimento usa um adaptador `console`, que
+registra o link no terminal sem depender de domínio externo. O link expira em 24 horas,
+usa token opaco aleatório de uso único e somente seu hash é persistido. Senhas usam
+Argon2id. Cadastro repetido recebe a mesma resposta genérica `202`, sem revelar a
+existência da conta. A confirmação é acionada por `POST` depois que a página do frontend
+recebe o token, evitando que pré-visualizadores consumam o link por uma requisição `GET`.
+
+Na Release 1, a confirmação é demonstrada exclusivamente pelo adaptador `console`. O envio
+real para endereços arbitrários depende de domínio remetente verificado no Resend e fica
+planejado para ativação na Release 2; essa dependência não bloqueia os testes locais.
 
 **Evidência.** Reunião presencial de 09/09/2026 nas mesas do UAC, convocada pelo grupo de
 WhatsApp. Participaram Nicolas, Vinicius, Gabriel, Tiago e Warlley; Yasmin não participou.
@@ -318,12 +350,91 @@ conhecida e assumida, e não deve ser contornada por heurística não verificáv
 
 ---
 
+### ADR 07 — Identidade institucional e sincronização do SIGAA
+
+**Estado.** Aprovada pelo responsável do projeto em 17/09/2026 para a Issue #25.
+
+**Contexto.** A fonte pública pode publicar turmas sem docente, com múltiplos docentes e
+sem SIAPE. Nome não é identidade segura, e uma coleta parcial não permite concluir que uma
+turma desapareceu.
+
+**Decisão.** Turma possui identidade estável independente dos docentes e se relaciona com
+eles em N:N. Docentes sem SIAPE recebem identidades provisórias por ocorrência, sem união
+automática de homônimos. A importação sincroniza por unidade/período e somente inativa
+ausências depois de validar o retrato completo.
+
+**Consequência.** Uma mesma pessoa sem SIAPE pode permanecer em mais de uma identidade
+provisória até reconciliação explícita. Essa duplicidade controlada é preferível a atribuir
+avaliações a um homônimo. Agendamento e histórico durável ficam fora da API e pertencem à
+#26.
+
+---
+
+### ADR 08 — Execução e containerização do frontend
+
+**Estado.** Aprovado pelo responsável em 19/09/2026, após revisão do resumo da
+implementação e das validações, com autorização explícita para publicar a PR e fechar
+a Issue #36. A aprovação desta estratégia não promove a skill Docker nem substitui
+a revisão da PR antes do merge.
+
+**Contexto e evidências.** Next.js + Tailwind foram aprovados na #28 (ADR 02), e a estrutura
+da #29 entrou pela PR #95. O Compose de backend e PostgreSQL foi integrado pela PR #93
+(#34). As PRs #96 e #98 adicionaram buscas no navegador e páginas de detalhe, comparação
+e avaliação agregada que consultam a API no servidor. As rotas com `[id]` e
+`[disciplinaId]` não têm `generateStaticParams`; seus dados mudam com a importação e as
+avaliações. O backend continua responsável por persistência, contratos e regras de negócio.
+
+**Solução implementada.** Manter servidor Next.js e incluir `frontend` no Compose desta
+fase. Para edição local, usar `npm run dev`; para verificar o build fora do Docker,
+`npm run build` seguido de `npm run start`. No Docker, gerar `output: 'standalone'`
+por meio de `BUILD_STANDALONE=true` e executar o servidor mínimo com Node.js 24 em imagem
+oficial Debian slim. O build inclui Tailwind/PostCSS; o runtime inclui o servidor rastreado,
+`public/` e `.next/static/`, executando como usuário sem privilégios. A composição serve
+um build otimizado para integração local, sem definir infraestrutura pública de produção.
+
+**Alternativas e justificativa.**
+
+| Alternativa | Consequência para o estado atual |
+|---|---|
+| Servidor Node + standalone (implementada) | Preserva as rotas e consultas por requisição e reduz o conteúdo da imagem final; exige um processo Node em execução |
+| Exportação estática | Dispensa Node na hospedagem, mas exige enumerar rotas no build ou reformular a navegação e as consultas atuais; dados renderizados no build exigiriam regeneração e novos IDs não teriam páginas automaticamente |
+| Frontend somente fora do Docker | Continua útil para edição, mas não oferece inicialização conjunta e ambiente de runtime reproduzível com API e banco |
+
+A exportação estática não é equivalente a servir o build atual: rotas dinâmicas sem
+`generateStaticParams` e renderização por requisição não são suportadas nesse modo.
+Não é necessário mudar stack, contratos ou telas para containerizar a execução existente.
+Ver [exportação estática](https://nextjs.org/docs/app/guides/static-exports) e
+[output standalone](https://nextjs.org/docs/app/api-reference/config/next-config-js/output).
+
+**Comunicação e configuração.** O navegador usa `NEXT_PUBLIC_API_URL`, pública e fixada
+no build (padrão `http://localhost:8000`). O servidor usa `API_INTERNAL_URL`, privada ao
+runtime (Compose: `http://backend:8000`), com fallback para a URL pública fora do Docker.
+Isso evita que `localhost` dentro do container aponte para o próprio frontend ou que o
+navegador tente resolver o nome interno `backend`. CORS continua configurado no FastAPI
+por `CORS_ORIGINS`; o frontend não acessa o banco diretamente nem recebe suas credenciais.
+
+**Consequências e limites.** A imagem precisa ser reconstruída após alteração de código ou
+URL pública. `.env*`, dependências locais e builds do host não entram no contexto Docker.
+O build requer internet para npm e fontes Geist, mas não requer a API ativa. O health check
+do frontend verifica HTTP; `depends_on` ordena o início, sem garantir prontidão do backend.
+É preciso aguardar migrações e API antes de consultar dados. Hosting, TLS, publicação de
+imagens, alta disponibilidade e revisão operacional de produção permanecem fora do escopo.
+
+**Rastreabilidade.** #36 é a referência comum dos épicos #11 e #13. A #32 foi encerrada por
+duplicidade, conforme comentário remoto, e não recebe implementação paralela. #34 mantém
+seu escopo de backend/banco e persistência; a validação coletiva por dois membros é #37.
+A skill Docker recebe somente atualização de referências, mantendo estado `proposed`.
+Resultados reproduzíveis desta entrega ficam em
+[`estudos/verificacao-execucao-frontend.md`](estudos/verificacao-execucao-frontend.md).
+
+---
+
 ## 8. Riscos técnicos
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
-| Páginas públicas do SIGAA em JSF, com ViewState e postback | Mudanças de fluxo podem interromper a coleta | POC HTTP validada para CIC/2026.2 em #22/#23; validar cobertura de outras unidades e persistência em #25 |
+| Páginas públicas do SIGAA em JSF, com ViewState e postback | Mudanças de fluxo podem interromper a coleta | POC HTTP e persistência validadas para CIC/2026.2; ampliar cobertura na #27 |
 | Partida a frio: base vazia no lançamento | O produto não responde nada ao primeiro usuário | RF10 (estado vazio explícito) e ação de povoamento inicial junto ao time |
 | Identificação indireta do avaliador em disciplinas com poucas avaliações | Risco de retaliação | RNF02 aprovado: mínimo de 3 avaliações para exibir critérios; abaixo disso, apenas contagem e dados insuficientes. O limiar reduz exposição, mas não garante anonimato |
 | Estrutura do SIGAA muda sem aviso | Importação para de funcionar silenciosamente | RF19 (log de execução) e RNF07 (falha isolada) |
-| Runtime Node no container do frontend | Ambiente mais pesado | Alternativa de exportação estática (ADR 02) |
+| Runtime Node no container do frontend | Ambiente mais pesado que hospedagem estática | Build standalone em múltiplas etapas; exportação estática exigiria reavaliar as rotas atuais (ADR 08) |

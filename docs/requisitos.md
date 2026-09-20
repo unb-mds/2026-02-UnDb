@@ -278,6 +278,21 @@ Na mesma conversa, Nicolas aprovou também os detalhes abaixo para #40/#51:
 
 Essas decisões não validam os demais RNFs nem alteram as pendências de execução e envio de e-mail.
 
+### Contrato de cadastro — aprovado para a Issue #48 em 19/09/2026
+
+- senha entre 8 e 128 caracteres, armazenada com Argon2id;
+- confirmação por token opaco aleatório, de uso único, com validade de 24 horas; somente o
+  hash do token é persistido;
+- cadastro repetido retorna resposta genérica `202`, sem revelar se o e-mail já existe e
+  sem alterar a conta existente;
+- Resend é o provedor de produção, atrás de uma interface interna; na Release 1, o fluxo é
+  exercitado exclusivamente pelo adaptador local sem envio externo;
+- o formulário e a API aceitam somente nome, e-mail `@aluno.unb.br` e senha;
+- a página de confirmação recebe o token e solicita a mutação por `POST` à API.
+
+O domínio remetente do Resend é uma dependência operacional para envio a usuários reais,
+planejada para a Release 2, e não uma mudança no domínio institucional aceito no cadastro.
+
 ### Demais decisões pendentes
 
 O modelo de execução do banco foi definido durante a revisão do PR #55, em 11/09/2026:
@@ -287,8 +302,6 @@ SQLAlchemy síncrono, Alembic, PostgreSQL e driver `psycopg2`.
 |---|---|---|
 | Estratégia de execução/deploy do frontend Next.js (servidor vs export estático) | Configuração definitiva de execução (#36); não bloqueia o scaffold local #29 | Time |
 | Valor de N da métrica de cobertura | Apenas a métrica; mínimo de exibição já definido separadamente | PO |
-| Provedor de e-mail e validade do link de confirmação | Conclusão do cadastro #48 | Time / PO |
-| Identidade de docentes, homônimos, múltiplos docentes e reimportação | Integração persistida #25 | Time |
 | Cobertura e execução da coleta em todas as unidades | RF17–RF19; POC HTTP já demonstrada em uma unidade | Time |
 
 ### Nota — verificação de que o aluno cursou
@@ -304,8 +317,38 @@ não verificável.
 
 A [POC da #23](estudos/sigaa-poc.md), executada em 13/09/2026, demonstrou coleta HTTP de
 108 ofertas do CIC em 2026.2, preservando sessão e controles JSF. Isso comprova o caso
-demonstrado, não cobertura total, persistência ou atualização periódica. Essas entregas
-e as lacunas de identidade continuam nas #25–#27.
+demonstrado, não cobertura total, persistência ou atualização periódica. A integração
+persistida é tratada na #25; cobertura e atualização periódica continuam nas #26/#27.
+
+### Decisões da integração institucional — aprovadas em 17/09/2026
+
+Para concluir a Issue #25, o time aprovou o seguinte contrato:
+
+- toda oferta válida do SIGAA é representável, inclusive sem docente ou com múltiplos
+  docentes;
+- professor possui UUID interno e SIAPE quando a fonte o disponibilizar; sem identificador
+  externo, cada ocorrência recebe identidade provisória, explicitamente não confirmada, e
+  homônimos nunca são unidos automaticamente;
+- turma e professor têm relação muitos-para-muitos. A identidade da turma é composta por
+  fonte, unidade, período, componente e código textual da turma; docentes não fazem parte
+  dessa identidade;
+- unidade preserva o identificador público do SIGAA, o código interno e o nome exibido;
+- disciplina preserva UUID interno, identificador público do componente e código acadêmico;
+  conflitos entre essas identidades exigem reconciliação explícita;
+- reimportação sincroniza o retrato da unidade/período: cria, atualiza e marca como inativas
+  as turmas ausentes. Ausências só podem inativar registros quando a coleta completa foi
+  validada; uma coleta parcial ou com erro nunca remove nem inativa dados anteriores;
+- cada unidade é uma transação independente e cada oferta usa savepoint, de modo que uma
+  falha não impeça as demais ofertas ou unidades;
+- `sucesso=true` significa execução integral, sem erro nem divergência. O resultado
+  estruturado é responsabilidade da #25; agendamento, histórico durável e monitoramento são
+  responsabilidade da #26; cobertura de todas as unidades é responsabilidade da #27;
+- a API nunca dispara coleta. A #25 entrega leitura institucional mínima; as Issues #44 e
+  #45 permanecem responsáveis pela experiência de busca no frontend.
+
+Consultas por nome são parciais, sem distinção de maiúsculas/minúsculas ou acentos. Busca
+válida sem correspondência retorna lista vazia; recurso individual inexistente retorna 404;
+homônimos são sempre apresentados separadamente.
 
 ---
 
