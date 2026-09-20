@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, Integer, JSON, String, Uuid, func
+from sqlalchemy import DateTime, Integer, JSON, Text, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -60,7 +60,7 @@ class ImportacaoExecucao(Base):
     )
 
     erro: Mapped[str | None] = mapped_column(
-        String,
+        Text,
         nullable=True,
     )
 
