@@ -8,26 +8,40 @@ cd "${BACKEND_DIR}"
 
 export PYTHONPATH="${BACKEND_DIR}"
 
-if [[ -z "${DATABASE_URL:-}" ]]; then
-  echo "DATABASE_URL não foi definida." >&2
+for variavel in DATABASE_URL SECRET_KEY SIGAA_ANO SIGAA_PERIODO SIGAA_DEPARTAMENTOS; do
+  if [[ -z "${!variavel:-}" ]]; then
+    echo "${variavel} não foi definida." >&2
+    exit 1
+  fi
+done
+
+if [[ ! "${SIGAA_ANO}" =~ ^[0-9]{4}$ ]]; then
+  echo "SIGAA_ANO deve conter quatro dígitos." >&2
   exit 1
 fi
 
-if [[ -z "${SECRET_KEY:-}" ]]; then
-  echo "SECRET_KEY não foi definida." >&2
+if [[ ! "${SIGAA_PERIODO}" =~ ^(1|2)$ ]]; then
+  echo "SIGAA_PERIODO deve ser 1 ou 2." >&2
   exit 1
 fi
 
-ANO="$(date +%Y)"
-MES="$(date +%-m)"
+IFS=';' read -r -a departamentos <<< "${SIGAA_DEPARTAMENTOS}"
+argumentos_departamento=()
 
-if (( MES <= 6 )); then
-  PERIODO="1"
-else
-  PERIODO="2"
+for departamento in "${departamentos[@]}"; do
+  departamento="${departamento#"${departamento%%[![:space:]]*}"}"
+  departamento="${departamento%"${departamento##*[![:space:]]}"}"
+  if [[ -n "${departamento}" ]]; then
+    argumentos_departamento+=(--departamento "${departamento}")
+  fi
+done
+
+if (( ${#argumentos_departamento[@]} == 0 )); then
+  echo "SIGAA_DEPARTAMENTOS não contém departamentos válidos." >&2
+  exit 1
 fi
 
 python -m app.commands.importar_sigaa_agendado \
-  --departamento "${SIGAA_DEPARTAMENTO:-CIC=DEPTO CIÊNCIAS DA COMPUTAÇÃO}" \
-  --ano "${ANO}" \
-  --periodo "${PERIODO}"
+  "${argumentos_departamento[@]}" \
+  --ano "${SIGAA_ANO}" \
+  --periodo "${SIGAA_PERIODO}"

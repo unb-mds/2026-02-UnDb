@@ -45,23 +45,25 @@ as unidades terminam sem erro. Cada item de `departamentos` contém:
 - `total_reportado` pelo SIGAA;
 - `ofertas_extraidas` e `ofertas_processadas` (inclui registros já existentes que foram
   reutilizados na reimportação);
-- `erros`, incluindo divergência de contagem, falha de coleta, falha de banco ou oferta que
-  o modelo atual não representa.
+- `estado` (`sucesso`, `parcial` ou `falha`);
+- `erros`, incluindo divergência de contagem, falha de coleta ou falha de banco.
 
 O código de saída é `0` para sucesso integral e `1` quando existe qualquer falha. A rotina
 da #26 pode armazenar o JSON e usar o código de saída para monitoramento, sem precisar
 interpretar texto livre.
 
-## Limitações explícitas
+## Semântica da sincronização
 
-- Ofertas sem docente ou com múltiplos docentes são registradas como falha e não são
-  persistidas. Alterar essa regra exige a decisão de modelo ainda pendente.
-- Professores são reconhecidos por nome e departamento; homônimos permanecem uma limitação
-  conhecida da fonte pública.
-- A reimportação reutiliza disciplina por código, professor por nome/departamento e turma
-  por disciplina/professor/semestre. O modelo atual não mantém um identificador público
-  estável da turma.
-- Falhas da importação não derrubam a API, pois o processo não é executado por endpoints.
+- ofertas sem docente são persistidas com zero vínculos; ofertas com múltiplos docentes
+  preservam todos os vínculos;
+- como a página pública não fornece SIAPE, cada docente recebe identidade provisória por
+  ocorrência de turma. Homônimos não são unidos silenciosamente e uma reconciliação futura
+  pode confirmar a identidade;
+- turma é identificada por fonte, unidade, período, componente e código textual. Uma troca
+  de docente atualiza os vínculos sem duplicar a turma;
+- somente uma coleta completa, com a contagem validada e sem erro de oferta, marca como
+  inativas as turmas ausentes. Execução parcial preserva todos os registros anteriores;
+- falhas da importação não derrubam a API, pois o processo não é executado por endpoints.
 
 ## Verificações
 
@@ -81,26 +83,30 @@ python -m app.scrapers.sigaa_poc --real
 A execução persistida real usa o primeiro comando deste documento e depende da
 disponibilidade do SIGAA e do PostgreSQL configurado.
 
-### Evidência executada em 17/09/2026
+### Evidências executadas em 17 e 18/09/2026
 
-A consulta pública real do CIC em 2026.2 reportou e extraiu 108 ofertas. Dessas, 98 tinham
-exatamente um docente e foram processadas; nove tinham dois docentes e uma tinha três, totalizando
-dez falhas isoladas conforme a limitação de modelo já registrada.
+A consulta pública real do CIC em 2026.2 reportou e extraiu 108 ofertas. A composição observada
+foi de 98 ofertas com exatamente um docente, nove com dois e uma com três, totalizando 119
+vínculos, 57 disciplinas e 119 identidades docentes provisórias. O modelo atual identifica a
+turma pela origem, unidade, período, disciplina e código textual da turma, preservando todos os
+docentes associados às dez ofertas multidocentes.
 
-Para verificar o encadeamento sem alterar um banco do projeto, os dados reais foram gravados
-em um banco temporário em memória e consultados pela mesma camada de serviço usada pela API:
+Em 17/09/2026, a validação de conclusão da Issue #25 executou duas importações consecutivas dos
+dados reais no mesmo PostgreSQL 16. As duas execuções retornaram 108 ofertas e mantiveram as
+contagens estáveis em uma unidade, 57 disciplinas, 108 turmas, 119 docentes provisórios e 119
+vínculos, sem duplicatas. A migração dos dados legados e uma consulta pela API também foram
+validadas nessa execução.
 
-- 46 professores, 51 disciplinas e 83 relações de turma distintas foram gravadas;
-- a consulta pública retornou a professora `MARIA EMILIA MACHADO TELLES WALTER` e a disciplina
-  `CIC0002` a partir dos registros persistidos;
-- as 98 ofertas aceitas resultaram em 83 relações porque o modelo validado identifica turma por
-  disciplina, professor e semestre, sem armazenar o código textual da turma do SIGAA.
+Em 18/09/2026, a fonte e o comportamento determinístico foram revalidados sem alterar o banco
+do projeto:
 
-Essa verificação confirma coleta, gravação e consulta com dados reais, mas não substitui a
-execução em PostgreSQL. A máquina usada não tinha uma instância PostgreSQL configurada; as
-migrações e a consistência do modelo devem ser verificadas no check `Backend` do Pull Request.
+- a POC consultou novamente o SIGAA público e obteve `total_reportado=108` e
+  `ofertas_extraidas=108` para CIC em 2026.2;
+- a suíte backend completa passou com 51 testes;
+- a primeira oferta extraída continuou sendo o componente `CIC0002`.
 
-## Limitação atual
+A checagem de 18/09 é somente leitura e complementa, sem substituir, a evidência de
+persistência e idempotência em PostgreSQL registrada em 17/09 na Issue #25.
 
 A importação registra falhas individuais quando uma oferta possui mais
 de um docente. O modelo atual exige exatamente um docente por turma.
@@ -141,3 +147,5 @@ Após as duas execuções, a contagem de registros persistidos permaneceu estáv
 46 professores, 51 disciplinas, 83 turmas — confirmando que a reimportação reaproveita
 registros existentes em vez de duplicá-los. As 10 falhas por execução são a limitação
 já conhecida de turmas com múltiplos docentes (ver seção "Limitações explícitas").
+Para executar a importação com registro consultável e integrá-la a um agendador, consulte
+[`operacao-importacao-sigaa.md`](operacao-importacao-sigaa.md).

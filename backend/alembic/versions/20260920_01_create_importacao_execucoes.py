@@ -1,11 +1,18 @@
+"""Create the import execution history.
+
+Revision ID: 20260920_01
+Revises: 20260919_03
+Create Date: 2026-09-20
+"""
+
 from collections.abc import Sequence
 
 from alembic import op
 import sqlalchemy as sa
 
 
-down_revision: str | Sequence[str] | None = "20260911_01"
-down_revision: str | Sequence[str] | None = "20260917_02"
+revision: str = "20260920_01"
+down_revision: str | Sequence[str] | None = "20260919_03"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
