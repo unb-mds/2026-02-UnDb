@@ -14,7 +14,6 @@ __all__ = [
     "Professor",
     "Turma",
     "TokenConfirmacaoEmail",
-    "Usuario",
-]
     "Unidade",
+    "Usuario",
 ]
