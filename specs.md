@@ -217,7 +217,7 @@ dados suficientes. Não atribuir percentual artificial aos resultados insuficien
 6. O logout invalida a sessão no servidor e remove o cookie do navegador.
 7. Ex-alunos sem acesso ao domínio aceito e outros vínculos institucionais não são
    contemplados pelo cadastro da Release 1.
-8. Senhas têm entre 15 e 128 caracteres e são armazenadas com Argon2id.
+8. Senhas têm entre 8 e 128 caracteres e são armazenadas com Argon2id.
 9. O token de confirmação é opaco, aleatório, de uso único, expira em 24 horas e somente
    seu hash é persistido.
 10. Cadastro repetido retorna a mesma resposta genérica `202`, não altera a conta existente

@@ -62,7 +62,7 @@ export default function CadastroPage() {
             autoComplete="email"
             required
             maxLength={150}
-            pattern="^[^@\\s]+@aluno\\.unb\\.br$"
+            pattern="[^@]+@aluno[.]unb[.]br"
             placeholder="seu-email@aluno.unb.br"
             className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
           />
@@ -75,13 +75,13 @@ export default function CadastroPage() {
             type="password"
             autoComplete="new-password"
             required
-            minLength={15}
+            minLength={8}
             maxLength={128}
             aria-describedby="senha-ajuda"
             className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
           />
           <span id="senha-ajuda" className="text-xs text-foreground/60">
-            Use entre 15 e 128 caracteres. Frases longas são bem-vindas.
+            Use entre 8 e 128 caracteres.
           </span>
         </label>
 

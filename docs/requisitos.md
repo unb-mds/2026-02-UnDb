@@ -280,7 +280,7 @@ Essas decisões não validam os demais RNFs nem alteram as pendências de execu�
 
 ### Contrato de cadastro — aprovado para a Issue #48 em 19/09/2026
 
-- senha entre 15 e 128 caracteres, armazenada com Argon2id;
+- senha entre 8 e 128 caracteres, armazenada com Argon2id;
 - confirmação por token opaco aleatório, de uso único, com validade de 24 horas; somente o
   hash do token é persistido;
 - cadastro repetido retorna resposta genérica `202`, sem revelar se o e-mail já existe e

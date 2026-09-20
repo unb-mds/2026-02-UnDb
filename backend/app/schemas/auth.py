@@ -11,7 +11,7 @@ class CadastroRequest(BaseModel):
 
     nome: str
     email: str = Field(max_length=150)
-    senha: str = Field(min_length=15, max_length=128)
+    senha: str = Field(min_length=8, max_length=128)
 
     @field_validator("nome")
     @classmethod

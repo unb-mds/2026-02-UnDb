@@ -63,7 +63,13 @@ class AuthSchemaTest(unittest.TestCase):
             )
 
     def test_rejeita_senha_fora_do_intervalo_aprovado(self) -> None:
-        for senha in ("curta", "x" * 129):
+        CadastroRequest(
+            nome="Maria",
+            email="maria@aluno.unb.br",
+            senha="12345678",
+        )
+
+        for senha in ("1234567", "x" * 129):
             with self.subTest(tamanho=len(senha)), self.assertRaises(ValidationError):
                 CadastroRequest(
                     nome="Maria",
