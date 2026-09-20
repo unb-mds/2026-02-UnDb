@@ -121,7 +121,8 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
 ### Riscos e decisões pendentes
 
 - alcançar massa crítica de avaliações suficiente para gerar valor;
-- definir o provedor de e-mail e a validade do link de confirmação;
+- obter, na Release 2, domínio remetente verificado para ativar o envio externo pelo Resend;
+  a Release 1 usa apenas o modo local definido para a Issue #48;
 - reconciliar identidades provisórias de docentes quando um identificador externo se tornar
   disponível; o modelo de homônimos, múltiplos docentes e reimportação foi definido na #25;
 - comprovar e operacionalizar a cobertura da coleta em todas as unidades do SIGAA;

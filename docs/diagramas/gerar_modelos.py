@@ -99,8 +99,8 @@ def draw_note(pdf, x, y, width, height, title, lines):
 def draw_footer(pdf):
     pdf.setFillColor(MUTED)
     pdf.setFont("Helvetica", 7)
-    pdf.drawString(32, 17, "G7 - Avaliacao de Professores UnB | Modelo revisado em 17/09/2026")
-    pdf.drawRightString(PAGE_WIDTH - 32, 17, "Issue #25 - ADR 07")
+    pdf.drawString(32, 17, "G7 - Avaliacao de Professores UnB | Modelo revisado em 19/09/2026")
+    pdf.drawRightString(PAGE_WIDTH - 32, 17, "Issues #25 e #48 - ADR 07")
 
 
 def build_logical_model():
@@ -152,10 +152,17 @@ def build_logical_model():
         ("", "created_at", "TIMESTAMPTZ"), ("", "updated_at", "TIMESTAMPTZ"),
     ])
 
-    draw_note(pdf, 300, 55, 510, 62, "Relacionamentos e restricoes", [
+    draw_table(pdf, 560, 145, 250, "email_confirmation_tokens", [
+        ("PK", "id", "UUID"), ("FK", "usuario_id", "UUID"),
+        ("UQ", "token_hash", "VARCHAR(64)"), ("", "expires_at", "TIMESTAMPTZ"),
+        ("", "used_at", "TIMESTAMPTZ NULL"), ("", "created_at", "TIMESTAMPTZ"),
+    ])
+
+    draw_note(pdf, 300, 35, 510, 86, "Relacionamentos e restricoes", [
         "professores N:N turmas; unidades e disciplinas 1:N turmas",
         "turmas UQ1: disciplina + fonte + unidade + semestre + codigo",
         "avaliacoes UQ1: usuario_id + professor_id + disciplina_id",
+        "usuario 1:N tokens de confirmacao; hash unico com validade de 24 horas",
     ])
     draw_footer(pdf)
     pdf.save()
@@ -188,10 +195,13 @@ def build_conceptual_model():
         "identificador", "fonte", "unidade", "disciplina", "codigo", "semestre",
         "ativa",
     ])
-    draw_entity(pdf, 455, 95, 250, "Avaliacao", [
+    draw_entity(pdf, 430, 80, 210, "Avaliacao", [
         "identificador", "usuario", "professor", "disciplina", "didatica (1 a 5)",
         "dificuldade", "faz chamada", "disponibiliza material",
         "qualidade do material (condicional)", "recomendacao", "datas de criacao e alteracao",
+    ])
+    draw_entity(pdf, 665, 245, 145, "Token de confirmacao", [
+        "identificador", "usuario", "hash do token", "expira em", "usado em", "criado em",
     ])
 
     draw_note(pdf, 35, 95, 365, 125, "Cardinalidades", [
@@ -200,9 +210,10 @@ def build_conceptual_model():
         "Uma disciplina recebe zero ou muitas avaliacoes e possui turmas.",
         "Cada unidade possui turmas; cada turma vincula zero ou muitos professores.",
         "Cada usuario avalia um par professor-disciplina no maximo uma vez.",
+        "Um usuario possui zero ou muitos tokens de confirmacao de e-mail.",
     ])
     draw_note(pdf, 665, 405, 145, 90, "Escopo", [
-        "6 entidades", "vinculo N:N", "avaliacao estruturada", "sem comentario livre",
+        "7 entidades", "vinculo N:N", "avaliacao estruturada", "sem comentario livre",
         "sem dados academicos",
     ])
     draw_footer(pdf)

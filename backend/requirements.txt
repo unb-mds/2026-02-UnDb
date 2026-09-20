@@ -5,3 +5,5 @@ python-decouple
 sqlalchemy
 alembic
 psycopg2-binary
+pwdlib[argon2]
+resend
