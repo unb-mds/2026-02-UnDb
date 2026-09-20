@@ -130,7 +130,7 @@ jobs:
           set -euo pipefail
           docker compose config --quiet
           docker compose up --build --wait backend db
-          curl --fail --retry 10 --retry-delay 2 --retry-connrefused \
+          curl --fail --retry 10 --retry-delay 2 --retry-all-errors \
             http://127.0.0.1:8000/health
 
       - name: Verify migrations and named-volume persistence
