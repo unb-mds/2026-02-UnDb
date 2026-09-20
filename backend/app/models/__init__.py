@@ -4,6 +4,7 @@ from app.models.professor import Professor
 from app.models.turma import Turma
 from app.models.unidade import Unidade
 from app.models.usuario import Usuario
+from app.models.importacao_execucao import ImportacaoExecucao
 
 __all__ = [
     "Avaliacao",
