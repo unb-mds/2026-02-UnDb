@@ -108,3 +108,36 @@ de um docente. O modelo atual exige exatamente um docente por turma.
 Essas ofertas não interrompem o processamento das demais. A quantidade
 extraída, a quantidade processada e as mensagens de erro ficam registradas
 na tabela `importacao_execucoes`.
+
+## Execução periódica
+
+**Mecanismo definido:** cron do sistema operacional, com periodicidade diária.
+
+Script: `scripts/importar-sigaa-cron.sh`. Ele ativa o venv do projeto, entra em
+`backend/` e chama o comando de importação já documentado acima.
+
+Entrada de crontab utilizada:0 3 * * * /caminho/absoluto/para/2026-02-UnDb/scripts/importar-sigaa-cron.sh >> /tmp/importacao-sigaa.log 2>&1
+
+
+Para configurar: `crontab -e` e adicionar a linha acima, ajustando o caminho absoluto
+do repositório. O log fica disponível em `/tmp/importacao-sigaa.log` (ou outro caminho
+definido no redirecionamento).
+
+**Nota:** a frequência diária (03:00) foi escolhida para evitar sobrecarga
+desnecessária na fonte pública do SIGAA. Uma frequência de produção definitiva pode
+ser revisada pelo time; ver pendência na Issue #26.
+
+### Evidência de execução repetida em 20/09/2026
+
+Duas execuções manuais do script, simulando o disparo do cron, foram realizadas em
+sequência para validar repetibilidade e idempotência:
+
+| Execução | Início (UTC) | Fim (UTC) | Ofertas processadas | Falhas |
+|---|---|---|---|---|
+| 1 | 15:41:08 | 15:41:13 | 98 | 10 (múltiplos docentes) |
+| 2 | 15:45:07 | 15:45:11 | 98 | 10 (múltiplos docentes) |
+
+Após as duas execuções, a contagem de registros persistidos permaneceu estável:
+46 professores, 51 disciplinas, 83 turmas — confirmando que a reimportação reaproveita
+registros existentes em vez de duplicá-los. As 10 falhas por execução são a limitação
+já conhecida de turmas com múltiplos docentes (ver seção "Limitações explícitas").
