@@ -93,7 +93,6 @@ def executar_importacao_agendada(
             "erro": registro.erro,
         }
 
-        db.add(registro)
         db.commit()
         db.refresh(registro)
         return registro

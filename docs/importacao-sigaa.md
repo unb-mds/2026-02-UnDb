@@ -99,3 +99,12 @@ em um banco temporário em memória e consultados pela mesma camada de serviço 
 Essa verificação confirma coleta, gravação e consulta com dados reais, mas não substitui a
 execução em PostgreSQL. A máquina usada não tinha uma instância PostgreSQL configurada; as
 migrações e a consistência do modelo devem ser verificadas no check `Backend` do Pull Request.
+
+## Limitação atual
+
+A importação registra falhas individuais quando uma oferta possui mais
+de um docente. O modelo atual exige exatamente um docente por turma.
+
+Essas ofertas não interrompem o processamento das demais. A quantidade
+extraída, a quantidade processada e as mensagens de erro ficam registradas
+na tabela `importacao_execucoes`.

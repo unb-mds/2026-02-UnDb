@@ -4,8 +4,8 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision: str = "20260919_02"
 down_revision: str | Sequence[str] | None = "20260911_01"
+down_revision: str | Sequence[str] | None = "20260917_02"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
