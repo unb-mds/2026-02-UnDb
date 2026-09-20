@@ -109,6 +109,55 @@ jobs:
           docker build -t g7-backend-ci .
           docker run --rm -e SECRET_KEY -e DEBUG -e DATABASE_URL g7-backend-ci alembic heads
 
+  docker-compose:
+    name: Docker Compose
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ci-only-secret
+      DEBUG: "False"
+      POSTGRES_USER: ci
+      POSTGRES_PASSWORD: ci
+      POSTGRES_DB: ci
+      DATABASE_URL: postgresql+psycopg2://ci:ci@db:5432/ci
+      CORS_ORIGINS: http://localhost:3000
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Start backend and PostgreSQL through Compose
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker compose config --quiet
+          docker compose up --build --wait backend db
+          curl --fail --retry 10 --retry-delay 2 --retry-all-errors \
+            http://127.0.0.1:8000/health
+
+      - name: Verify migrations and named-volume persistence
+        shell: bash
+        run: |
+          set -euo pipefail
+          revision_before="$(
+            docker compose exec -T db \
+              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc \
+              "SELECT version_num FROM alembic_version" | tr -d '[:space:]'
+          )"
+          test -n "$revision_before"
+
+          docker compose down
+          docker compose up -d --wait db
+
+          revision_after="$(
+            docker compose exec -T db \
+              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc \
+              "SELECT version_num FROM alembic_version" | tr -d '[:space:]'
+          )"
+          test "$revision_after" = "$revision_before"
+
+      - name: Remove Compose resources
+        if: always()
+        run: docker compose down --volumes --remove-orphans
+
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
