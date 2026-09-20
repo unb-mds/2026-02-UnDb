@@ -10,12 +10,19 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import ssl
 from dataclasses import asdict, dataclass, replace
 from html.parser import HTMLParser
 from http.cookiejar import CookieJar
 from urllib.parse import urlencode
-from urllib.request import HTTPCookieProcessor, Request, build_opener
+from urllib.request import (
+    HTTPSHandler,
+    HTTPCookieProcessor,
+    Request,
+    build_opener,
+)
 
+import certifi
 
 BASE_URL = "https://sigaa.unb.br"
 HOME_URL = f"{BASE_URL}/sigaa/public/home.jsf"
@@ -203,7 +210,14 @@ def coletar_ofertas_reais(
     periodo: str = "2",
 ) -> tuple[list[Oferta], int | None]:
     """Executa o fluxo HTTP público, preservando a sessão JSF em memória."""
-    opener = build_opener(HTTPCookieProcessor(CookieJar()))
+    cookie_jar = CookieJar()
+    ssl_context = ssl.create_default_context(
+        cafile=certifi.where()
+)
+    opener = build_opener(
+        HTTPCookieProcessor(cookie_jar),
+        HTTPSHandler(context=ssl_context),
+)
     headers = {"User-Agent": USER_AGENT}
     _decode(opener.open(Request(HOME_URL, headers=headers), timeout=30))
     form_html = _decode(opener.open(Request(TURMAS_PORTAL_URL, headers=headers), timeout=30))
