@@ -63,6 +63,16 @@ Ordinalidade aprovada para desempate de moda:
 
 Não armazenar matrícula, CPF, IRA ou histórico acadêmico.
 
+### `email_confirmation_tokens`
+| Campo | Tipo | Regra |
+|---|---|---|
+| `id` | UUID | PK |
+| `usuario_id` | FK → `usuarios` | obrigatório |
+| `token_hash` | VARCHAR(64) | UNIQUE, obrigatório; nunca persistir token aberto |
+| `expires_at` | TIMESTAMPTZ | obrigatório; 24 horas após emissão |
+| `used_at` | TIMESTAMPTZ | nulo até o primeiro uso válido |
+| `created_at` | TIMESTAMPTZ | default now |
+
 ### `unidades`
 `id` UUID PK · `fonte` VARCHAR(30) · `codigo` VARCHAR(30) ·
 `identificador_externo` VARCHAR(50) nullable · `nome` VARCHAR(200)
@@ -207,6 +217,14 @@ dados suficientes. Não atribuir percentual artificial aos resultados insuficien
 6. O logout invalida a sessão no servidor e remove o cookie do navegador.
 7. Ex-alunos sem acesso ao domínio aceito e outros vínculos institucionais não são
    contemplados pelo cadastro da Release 1.
+8. Senhas têm entre 15 e 128 caracteres e são armazenadas com Argon2id.
+9. O token de confirmação é opaco, aleatório, de uso único, expira em 24 horas e somente
+   seu hash é persistido.
+10. Cadastro repetido retorna a mesma resposta genérica `202`, não altera a conta existente
+    e não informa se o endereço já está cadastrado.
+11. Na Release 1, `EMAIL_BACKEND=console` escreve o link no terminal e é o único modo
+    previsto. A ativação de `EMAIL_BACKEND=resend`, com chave e remetente configurados
+    externamente, fica planejada para a Release 2.
 
 ---
 
@@ -218,7 +236,7 @@ modelo SQLAlchemy diretamente.
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
 | `POST` | `/auth/cadastro` | não | Cria usuário, dispara e-mail de confirmação |
-| `GET` | `/auth/confirmar/{token}` | não | Confirma e-mail |
+| `POST` | `/auth/confirmar` | não | Confirma e-mail a partir do token no corpo |
 | `POST` | `/auth/login` | não | Autentica |
 | `POST` | `/auth/logout` | sim | Invalida a sessão atual e remove seu cookie |
 | `GET` | `/professores?nome=` | não | Descobre professores por nome parcial |
@@ -281,8 +299,6 @@ Não implementar nem inventar valor para os itens abaixo.
 
 | Item | Situação |
 |---|---|
-| Provedor de envio de e-mail e ambiente de desenvolvimento | Não decidido |
-| Validade do link de confirmação de e-mail | Não decidido |
 | Estratégia de povoamento inicial da base | Não decidido |
 
 ---

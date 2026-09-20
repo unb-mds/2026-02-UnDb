@@ -278,6 +278,21 @@ Na mesma conversa, Nicolas aprovou também os detalhes abaixo para #40/#51:
 
 Essas decisões não validam os demais RNFs nem alteram as pendências de execução e envio de e-mail.
 
+### Contrato de cadastro — aprovado para a Issue #48 em 19/09/2026
+
+- senha entre 15 e 128 caracteres, armazenada com Argon2id;
+- confirmação por token opaco aleatório, de uso único, com validade de 24 horas; somente o
+  hash do token é persistido;
+- cadastro repetido retorna resposta genérica `202`, sem revelar se o e-mail já existe e
+  sem alterar a conta existente;
+- Resend é o provedor de produção, atrás de uma interface interna; na Release 1, o fluxo é
+  exercitado exclusivamente pelo adaptador local sem envio externo;
+- o formulário e a API aceitam somente nome, e-mail `@aluno.unb.br` e senha;
+- a página de confirmação recebe o token e solicita a mutação por `POST` à API.
+
+O domínio remetente do Resend é uma dependência operacional para envio a usuários reais,
+planejada para a Release 2, e não uma mudança no domínio institucional aceito no cadastro.
+
 ### Demais decisões pendentes
 
 O modelo de execução do banco foi definido durante a revisão do PR #55, em 11/09/2026:
@@ -287,7 +302,6 @@ SQLAlchemy síncrono, Alembic, PostgreSQL e driver `psycopg2`.
 |---|---|---|
 | Estratégia de execução/deploy do frontend Next.js (servidor vs export estático) | Configuração definitiva de execução (#36); não bloqueia o scaffold local #29 | Time |
 | Valor de N da métrica de cobertura | Apenas a métrica; mínimo de exibição já definido separadamente | PO |
-| Provedor de e-mail e validade do link de confirmação | Conclusão do cadastro #48 | Time / PO |
 | Cobertura e execução da coleta em todas as unidades | RF17–RF19; POC HTTP já demonstrada em uma unidade | Time |
 
 ### Nota — verificação de que o aluno cursou

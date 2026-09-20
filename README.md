@@ -92,6 +92,19 @@ ao Compose e reconstrua o frontend. Ajuste também `CORS_ORIGINS` com a origem d
 aberta no navegador. `frontend/.env.local` é usado apenas na execução fora do Docker;
 nenhum `.env` entra na imagem do frontend.
 
+Por padrão, `EMAIL_BACKEND=console`: após um cadastro válido, o link de confirmação aparece
+nos logs do backend e pode ser aberto no navegador, sem domínio ou serviço externo. Para
+acompanhar o link:
+
+```bash
+docker compose --env-file backend/.env logs -f backend
+```
+
+Na Release 1, o fluxo de confirmação permanece exclusivamente nesse modo de teste. A
+ativação do envio real fica planejada para a Release 2; quando houver domínio remetente
+verificado, configure `EMAIL_BACKEND=resend`, `RESEND_API_KEY` e `EMAIL_FROM` no ambiente.
+Nunca versione a chave.
+
 Para verificar a composição e acompanhar a inicialização:
 
 ```bash
