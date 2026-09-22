@@ -83,7 +83,15 @@ def main() -> None:
             usuario = db.get(Usuario, usuario_id)
             assert usuario is not None
             avaliacao = avaliacao_service.registrar_avaliacao(db, usuario, dados)
-            quantidade = db.scalar(select(func.count()).select_from(Avaliacao))
+            quantidade = db.scalar(
+                select(func.count())
+                .select_from(Avaliacao)
+                .where(
+                    Avaliacao.usuario_id == usuario_id,
+                    Avaliacao.professor_id == professor_id,
+                    Avaliacao.disciplina_id == disciplina_id,
+                )
+            )
             return avaliacao.id, quantidade
 
     try:
