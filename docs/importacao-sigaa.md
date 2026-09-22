@@ -108,5 +108,25 @@ do projeto:
 A checagem de 18/09 é somente leitura e complementa, sem substituir, a evidência de
 persistência e idempotência em PostgreSQL registrada em 17/09 na Issue #25.
 
+### Evidência operacional recebida em 20/09/2026
+
+Antes da integração da implementação atual da Issue #26 em `develop`, duas execuções
+manuais consecutivas do script disponível naquela revisão simularam o disparo pelo cron:
+
+| Execução | Início (UTC) | Fim (UTC) | Ofertas extraídas | Ofertas processadas | Erros de oferta |
+|---|---|---|---|---|---|
+| 1 | 15:41:08 | 15:41:13 | 108 | 98 | 10 |
+| 2 | 15:45:07 | 15:45:11 | 108 | 98 | 10 |
+
+As duas execuções terminaram e mantiveram estáveis as contagens observadas naquela revisão:
+46 professores, 51 disciplinas e 83 turmas. Isso fornece evidência de repetibilidade e de
+ausência de duplicação para o cenário executado, mas não representa sucesso integral segundo
+o contrato atual, pois cada execução registrou dez erros de oferta.
+
+Os erros ocorreram na revisão anterior para ofertas com múltiplos docentes. Eles não descrevem
+uma limitação do modelo vigente: a modelagem aprovada e o serviço atual preservam zero, um ou
+vários vínculos docentes por turma. A evidência atual de persistência integral de 108 ofertas
+está registrada acima, nas validações de 17 e 18/09/2026.
+
 Para executar a importação com registro consultável e integrá-la a um agendador, consulte
 [`operacao-importacao-sigaa.md`](operacao-importacao-sigaa.md).
