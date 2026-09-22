@@ -3,6 +3,7 @@ import json
 import os
 import unittest
 from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 from uuid import uuid4
 
 from fastapi import HTTPException
@@ -28,6 +29,7 @@ from app.models.enums import Dificuldade, QualidadeMaterial
 from app.models.professor import Professor
 from app.models.sessao_usuario import SessaoUsuario
 from app.models.usuario import Usuario
+from app.repositories import avaliacao_repository
 from app.routers import avaliacoes as avaliacoes_router
 from app.schemas.avaliacao import AvaliacaoCreate, AvaliacaoResponse
 from app.services import avaliacao_service
@@ -282,6 +284,89 @@ class RegistroAvaliacaoTest(unittest.TestCase):
         self.assertEqual(substituida.didatica, 1)
         self.assertFalse(substituida.disponibiliza_material)
         self.assertIsNone(substituida.qualidade_material)
+
+    def test_usuarios_diferentes_podem_avaliar_o_mesmo_par(self) -> None:
+        outro_usuario = Usuario(
+            nome="Ana",
+            email="ana@aluno.unb.br",
+            password_hash="hash-de-teste",
+            email_confirmado=True,
+        )
+        self.db.add(outro_usuario)
+        self.db.commit()
+
+        avaliacao_service.registrar_avaliacao(self.db, self.usuario, self.dados)
+        avaliacao_service.registrar_avaliacao(self.db, outro_usuario, self.dados)
+
+        registros = list(self.db.scalars(select(Avaliacao)).all())
+        self.assertEqual(len(registros), 2)
+        self.assertEqual(
+            {registro.usuario_id for registro in registros},
+            {self.usuario.id, outro_usuario.id},
+        )
+
+    def test_mesmo_usuario_pode_avaliar_pares_distintos(self) -> None:
+        outro_professor = Professor(nome="Outro Professor", departamento="CIC")
+        outra_disciplina = Disciplina(
+            codigo="CIC0002",
+            nome="Outra Disciplina",
+            departamento="CIC",
+        )
+        self.db.add_all((outro_professor, outra_disciplina))
+        self.db.commit()
+
+        dados_distintos = (
+            self.dados,
+            self.dados.model_copy(update={"professor_id": outro_professor.id}),
+            self.dados.model_copy(update={"disciplina_id": outra_disciplina.id}),
+        )
+        for dados in dados_distintos:
+            avaliacao_service.registrar_avaliacao(self.db, self.usuario, dados)
+
+        registros = list(self.db.scalars(select(Avaliacao)).all())
+        self.assertEqual(len(registros), 3)
+        self.assertEqual(
+            {(registro.professor_id, registro.disciplina_id) for registro in registros},
+            {
+                (self.professor.id, self.disciplina.id),
+                (outro_professor.id, self.disciplina.id),
+                (self.professor.id, outra_disciplina.id),
+            },
+        )
+
+    def test_conflito_de_unicidade_recupera_sem_invalidar_sessao(self) -> None:
+        avaliacao_service.registrar_avaliacao(self.db, self.usuario, self.dados)
+        obter_original = (
+            avaliacao_repository.obter_por_avaliador_professor_disciplina
+        )
+        chamadas = 0
+
+        def simular_leitura_concorrente(*args, **kwargs):  # type: ignore[no-untyped-def]
+            nonlocal chamadas
+            chamadas += 1
+            if chamadas == 1:
+                return None
+            return obter_original(*args, **kwargs)
+
+        novos_dados = self.dados.model_copy(
+            update={"didatica": 2, "recomenda": False}
+        )
+        with patch.object(
+            avaliacao_repository,
+            "obter_por_avaliador_professor_disciplina",
+            side_effect=simular_leitura_concorrente,
+        ):
+            substituida = avaliacao_service.registrar_avaliacao(
+                self.db,
+                self.usuario,
+                novos_dados,
+            )
+
+        quantidade = self.db.scalar(select(func.count()).select_from(Avaliacao))
+        self.assertEqual(quantidade, 1)
+        self.assertEqual(substituida.didatica, 2)
+        self.assertFalse(substituida.recomenda)
+        self.assertTrue(self.db.is_active)
 
     def test_rejeita_professor_ou_disciplina_inexistente_sem_persistir(self) -> None:
         casos = (

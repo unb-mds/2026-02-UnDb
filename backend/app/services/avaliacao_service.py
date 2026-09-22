@@ -1,9 +1,7 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from typing import Literal
 from uuid import UUID
 
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.domain.avaliacoes import (
@@ -30,10 +28,6 @@ class RecursoNaoEncontradoError(Exception):
     pass
 
 
-def _agora_utc() -> datetime:
-    return datetime.now(timezone.utc)
-
-
 def _persistir_avaliacao(
     db: Session,
     usuario: Usuario,
@@ -50,7 +44,6 @@ def _persistir_avaliacao(
         disponibiliza_material=dados.disponibiliza_material,
         qualidade_material=dados.qualidade_material,
         recomenda=dados.recomenda,
-        atualizado_em=_agora_utc(),
     )
 
 
@@ -65,13 +58,7 @@ def registrar_avaliacao(
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
 
     avaliacao = _persistir_avaliacao(db, usuario, dados)
-    try:
-        db.commit()
-    except IntegrityError:
-        db.rollback()
-        avaliacao = _persistir_avaliacao(db, usuario, dados)
-        db.commit()
-
+    db.commit()
     db.refresh(avaliacao)
     return avaliacao
 

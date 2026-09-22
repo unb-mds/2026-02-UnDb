@@ -104,6 +104,9 @@ jobs:
           python -m tests.migration_legacy_check verify-downgrade
           alembic upgrade head
 
+      - name: Verify concurrent evaluation replacement in PostgreSQL
+        run: python -m tests.postgresql_avaliacao_concurrency_check
+
       - name: Build backend image and check packaged migrations
         run: |
           docker build -t g7-backend-ci .
