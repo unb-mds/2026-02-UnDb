@@ -111,6 +111,12 @@ Não são armazenados matrícula, CPF ou histórico acadêmico (RF01, RNF01).
 `expires_at`, `used_at` opcional e `created_at` (TIMESTAMPTZ). O token aberto nunca é
 persistido; cada link é de uso único e expira em 24 horas.
 
+### `sessoes_usuario`
+`id` (UUID, PK), `usuario_id` (FK), `token_hash` (VARCHAR(64), UNIQUE), `expires_at` e
+`created_at` (TIMESTAMPTZ). O navegador recebe o token aberto aleatório, enquanto o banco
+persiste somente seu hash. Cada atividade que passa pela dependência de autenticação renova
+`expires_at` por sete dias; consultas públicas não renovam sessão.
+
 ### `unidades`
 `id` (UUID, PK), `fonte`, `codigo`, `identificador_externo`, `nome`.
 
