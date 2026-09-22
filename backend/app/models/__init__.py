@@ -2,6 +2,7 @@ from app.models.avaliacao import Avaliacao
 from app.models.disciplina import Disciplina
 from app.models.importacao_execucao import ImportacaoExecucao
 from app.models.professor import Professor
+from app.models.sessao_usuario import SessaoUsuario
 from app.models.turma import Turma
 from app.models.token_confirmacao_email import TokenConfirmacaoEmail
 from app.models.unidade import Unidade
@@ -12,6 +13,7 @@ __all__ = [
     "Disciplina",
     "ImportacaoExecucao",
     "Professor",
+    "SessaoUsuario",
     "Turma",
     "TokenConfirmacaoEmail",
     "Unidade",

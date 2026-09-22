@@ -38,5 +38,21 @@ class ConfirmacaoEmailRequest(BaseModel):
     token: str = Field(min_length=32, max_length=200)
 
 
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    email: str = Field(min_length=1, max_length=150)
+    senha: str = Field(min_length=1, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def normalizar_email(cls, email: str) -> str:
+        return email.strip().casefold()
+
+
+class SessaoResponse(BaseModel):
+    autenticado: bool
+
+
 class MensagemResponse(BaseModel):
     message: str
