@@ -66,6 +66,17 @@ def obter_sessao_autenticada(
     return _validar_sessao(request, response, db, renovar_cookie=True)
 
 
+def obter_sessao_opcional(
+    request: Request,
+    response: Response,
+    db: Annotated[Session, Depends(get_db)],
+) -> SessaoUsuario | None:
+    try:
+        return _validar_sessao(request, response, db, renovar_cookie=True)
+    except HTTPException:
+        return None
+
+
 def obter_sessao_para_logout(
     request: Request,
     response: Response,

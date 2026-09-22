@@ -50,5 +50,9 @@ class LoginRequest(BaseModel):
         return email.strip().casefold()
 
 
+class SessaoResponse(BaseModel):
+    autenticado: bool
+
+
 class MensagemResponse(BaseModel):
     message: str

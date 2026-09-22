@@ -1,15 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
-import { entrar, sair } from "@/lib/services/auth";
+import { FormEvent, useEffect, useState } from "react";
+import { consultarSessao, entrar, sair } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
 
 export default function LoginPage() {
   const [carregando, setCarregando] = useState(false);
+  const [sessaoCarregada, setSessaoCarregada] = useState(false);
   const [autenticado, setAutenticado] = useState(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    let ativo = true;
+
+    consultarSessao()
+      .then((sessao) => {
+        if (ativo) setAutenticado(sessao.autenticado);
+      })
+      .catch(() => {
+        if (ativo) setErro("Não foi possível verificar a sessão agora.");
+      })
+      .finally(() => {
+        if (ativo) setSessaoCarregada(true);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -62,7 +82,9 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {!autenticado ? (
+      {!sessaoCarregada ? (
+        <p className="text-sm text-foreground/70">Verificando sessão…</p>
+      ) : !autenticado ? (
         <form onSubmit={enviar} className="flex flex-col gap-4">
           <label className="flex flex-col gap-2">
             <span className="text-sm font-medium">E-mail institucional</span>

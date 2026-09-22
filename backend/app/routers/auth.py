@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import (
     definir_cookie_sessao,
+    obter_sessao_opcional,
     obter_sessao_para_logout,
     remover_cookie_sessao,
 )
@@ -15,6 +16,7 @@ from app.schemas.auth import (
     ConfirmacaoEmailRequest,
     LoginRequest,
     MensagemResponse,
+    SessaoResponse,
 )
 from app.services import auth_service
 from app.services.email_service import EmailDeliveryError, EmailSender, get_email_sender
@@ -74,6 +76,13 @@ def login(
 
     definir_cookie_sessao(response, autenticacao.token)
     return MensagemResponse(message=auth_service.LOGIN_MESSAGE)
+
+
+@router.get("/sessao", response_model=SessaoResponse)
+def consultar_sessao(
+    sessao: Annotated[SessaoUsuario | None, Depends(obter_sessao_opcional)],
+) -> SessaoResponse:
+    return SessaoResponse(autenticado=sessao is not None)
 
 
 @router.post("/logout", response_model=MensagemResponse)

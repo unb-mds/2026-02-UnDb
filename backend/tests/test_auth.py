@@ -18,6 +18,7 @@ from app.core.auth import (
     SESSION_COOKIE_NAME,
     definir_cookie_sessao,
     obter_sessao_autenticada,
+    obter_sessao_opcional,
     obter_usuario_confirmado,
 )
 from app.core.config import DEBUG
@@ -188,6 +189,7 @@ class AuthServiceTest(unittest.TestCase):
         self.assertIn("/api/auth/cadastro", caminhos)
         self.assertIn("/api/auth/confirmar", caminhos)
         self.assertIn("/api/auth/login", caminhos)
+        self.assertIn("/api/auth/sessao", caminhos)
         self.assertIn("/api/auth/logout", caminhos)
 
     def _criar_usuario(self, *, confirmado: bool = True) -> Usuario:
@@ -403,6 +405,49 @@ class AuthServiceTest(unittest.TestCase):
 
         self.assertEqual(contexto.exception.status_code, 401)
         self.assertIn(SESSION_COOKIE_NAME, response.headers["set-cookie"])
+
+    def test_consulta_de_sessao_reflete_cookie_persistido(self) -> None:
+        self._criar_usuario()
+        autenticacao = auth_service.autenticar(
+            self.db,
+            LoginRequest(
+                email="maria@aluno.unb.br",
+                senha="uma senha longa e segura",
+            ),
+        )
+        request = Request(
+            {
+                "type": "http",
+                "headers": [
+                    (
+                        b"cookie",
+                        f"{SESSION_COOKIE_NAME}={autenticacao.token}".encode(),
+                    )
+                ],
+            }
+        )
+        response = Response()
+
+        sessao = obter_sessao_opcional(request, response, self.db)
+        resultado = auth_router.consultar_sessao(sessao)
+
+        self.assertTrue(resultado.autenticado)
+        self.assertIn("Max-Age=604800", response.headers["set-cookie"])
+
+    def test_consulta_de_sessao_limpa_cookie_invalido(self) -> None:
+        request = Request(
+            {
+                "type": "http",
+                "headers": [(b"cookie", f"{SESSION_COOKIE_NAME}=invalido".encode())],
+            }
+        )
+        response = Response()
+
+        sessao = obter_sessao_opcional(request, response, self.db)
+        resultado = auth_router.consultar_sessao(sessao)
+
+        self.assertFalse(resultado.autenticado)
+        self.assertIn("Max-Age=0", response.headers["set-cookie"])
 
     def test_usuario_sem_email_confirmado_e_bloqueado_para_escrita(self) -> None:
         usuario = self._criar_usuario(confirmado=False)

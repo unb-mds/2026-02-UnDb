@@ -252,6 +252,7 @@ modelo SQLAlchemy diretamente.
 | `POST` | `/auth/cadastro` | não | Cria usuário, dispara e-mail de confirmação |
 | `POST` | `/auth/confirmar` | não | Confirma e-mail a partir do token no corpo |
 | `POST` | `/auth/login` | não | Autentica |
+| `GET` | `/auth/sessao` | opcional | Informa se o navegador possui sessão válida e renova sua validade |
 | `POST` | `/auth/logout` | sim | Invalida a sessão atual e remove seu cookie |
 | `GET` | `/professores?nome=` | não | Descobre professores por nome parcial |
 | `GET` | `/professores/{id}` | não | Consulta um professor |
