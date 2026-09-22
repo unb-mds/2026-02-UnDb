@@ -1,12 +1,15 @@
+import asyncio
+import json
 import os
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from fastapi import HTTPException
 from pydantic import ValidationError
 from sqlalchemy import CheckConstraint, UniqueConstraint, create_engine, func, select
 from sqlalchemy.orm import Session
+from sqlalchemy.pool import StaticPool
 
 os.environ.setdefault(
     "DATABASE_URL",
@@ -15,11 +18,15 @@ os.environ.setdefault(
 os.environ.setdefault("SECRET_KEY", "teste-local")
 
 from app.core.database import Base
+from app.core.auth import SESSION_COOKIE_NAME
+from app.core.database import get_db
+from app.core.security import gerar_hash_token
 from app.main import app
 from app.models.avaliacao import Avaliacao
 from app.models.disciplina import Disciplina
 from app.models.enums import Dificuldade, QualidadeMaterial
 from app.models.professor import Professor
+from app.models.sessao_usuario import SessaoUsuario
 from app.models.usuario import Usuario
 from app.routers import avaliacoes as avaliacoes_router
 from app.schemas.avaliacao import AvaliacaoCreate, AvaliacaoResponse
@@ -316,6 +323,220 @@ class RegistroAvaliacaoTest(unittest.TestCase):
             ]["$ref"],
             "#/components/schemas/AvaliacaoResponse",
         )
+
+
+class RegistroAvaliacaoHttpTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.engine = create_engine(
+            "sqlite+pysqlite:///:memory:",
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+        )
+        Base.metadata.create_all(self.engine)
+        self.db = Session(self.engine)
+        self.usuario_confirmado = Usuario(
+            nome="Maria",
+            email="maria.http@aluno.unb.br",
+            password_hash="hash-de-teste",
+            email_confirmado=True,
+        )
+        self.usuario_nao_confirmado = Usuario(
+            nome="Ana",
+            email="ana.http@aluno.unb.br",
+            password_hash="hash-de-teste",
+            email_confirmado=False,
+        )
+        self.professor = Professor(nome="Professora HTTP", departamento="CIC")
+        self.disciplina = Disciplina(
+            codigo="CIC0099",
+            nome="Disciplina HTTP",
+            departamento="CIC",
+        )
+        self.db.add_all(
+            (
+                self.usuario_confirmado,
+                self.usuario_nao_confirmado,
+                self.professor,
+                self.disciplina,
+            )
+        )
+        self.db.flush()
+        self.token_confirmado = "token-confirmado"
+        self.token_nao_confirmado = "token-nao-confirmado"
+        expiracao = datetime.now(timezone.utc) + timedelta(days=1)
+        self.db.add_all(
+            (
+                SessaoUsuario(
+                    usuario_id=self.usuario_confirmado.id,
+                    token_hash=gerar_hash_token(self.token_confirmado),
+                    expires_at=expiracao,
+                ),
+                SessaoUsuario(
+                    usuario_id=self.usuario_nao_confirmado.id,
+                    token_hash=gerar_hash_token(self.token_nao_confirmado),
+                    expires_at=expiracao,
+                ),
+            )
+        )
+        self.db.commit()
+        self.payload = {
+            "professor_id": str(self.professor.id),
+            "disciplina_id": str(self.disciplina.id),
+            "didatica": 4,
+            "dificuldade": "MEDIO",
+            "chamada": True,
+            "disponibiliza_material": True,
+            "qualidade_material": "BOM",
+            "recomenda": True,
+        }
+
+        def override_get_db():
+            with Session(self.engine) as session:
+                yield session
+
+        app.dependency_overrides[get_db] = override_get_db
+
+    def tearDown(self) -> None:
+        app.dependency_overrides.pop(get_db, None)
+        self.db.close()
+        self.engine.dispose()
+
+    @staticmethod
+    async def _request(
+        payload: dict,
+        token: str | None = None,
+    ) -> tuple[int, dict]:
+        corpo = json.dumps(payload).encode("utf-8")
+        headers = [
+            (b"content-type", b"application/json"),
+            (b"content-length", str(len(corpo)).encode("ascii")),
+        ]
+        if token is not None:
+            headers.append(
+                (b"cookie", f"{SESSION_COOKIE_NAME}={token}".encode("ascii"))
+            )
+
+        recebido = False
+
+        async def receive():
+            nonlocal recebido
+            if recebido:
+                return {"type": "http.disconnect"}
+            recebido = True
+            return {"type": "http.request", "body": corpo, "more_body": False}
+
+        mensagens = []
+
+        async def send(message):
+            mensagens.append(message)
+
+        await app(
+            {
+                "type": "http",
+                "asgi": {"version": "3.0"},
+                "http_version": "1.1",
+                "method": "POST",
+                "scheme": "http",
+                "path": "/api/avaliacoes",
+                "raw_path": b"/api/avaliacoes",
+                "query_string": b"",
+                "headers": headers,
+                "client": ("127.0.0.1", 12345),
+                "server": ("testserver", 80),
+                "root_path": "",
+                "state": {},
+            },
+            receive,
+            send,
+        )
+        inicio = next(
+            mensagem
+            for mensagem in mensagens
+            if mensagem["type"] == "http.response.start"
+        )
+        resposta = b"".join(
+            mensagem.get("body", b"")
+            for mensagem in mensagens
+            if mensagem["type"] == "http.response.body"
+        )
+        return inicio["status"], json.loads(resposta)
+
+    def test_http_exige_sessao_valida(self) -> None:
+        for token in (None, "token-invalido"):
+            with self.subTest(token=token):
+                status_code, resposta = asyncio.run(self._request(self.payload, token))
+                self.assertEqual(status_code, 401)
+                self.assertIn("Sessão", resposta["detail"])
+
+        quantidade = self.db.scalar(select(func.count()).select_from(Avaliacao))
+        self.assertEqual(quantidade, 0)
+
+    def test_http_bloqueia_email_nao_confirmado(self) -> None:
+        status_code, resposta = asyncio.run(
+            self._request(self.payload, self.token_nao_confirmado)
+        )
+
+        self.assertEqual(status_code, 403)
+        self.assertIn("Confirme seu e-mail", resposta["detail"])
+        quantidade = self.db.scalar(select(func.count()).select_from(Avaliacao))
+        self.assertEqual(quantidade, 0)
+
+    def test_http_persiste_usuario_confirmado_e_retorna_schema(self) -> None:
+        status_code, resposta = asyncio.run(
+            self._request(self.payload, self.token_confirmado)
+        )
+
+        self.db.expire_all()
+        registro = self.db.scalar(select(Avaliacao))
+        self.assertEqual(status_code, 200)
+        self.assertEqual(registro.usuario_id, self.usuario_confirmado.id)
+        self.assertEqual(resposta["id"], str(registro.id))
+        self.assertNotIn("usuario_id", resposta)
+
+    def test_http_substitui_sem_duplicar_e_atualiza_updated_at(self) -> None:
+        primeiro_status, primeira_resposta = asyncio.run(
+            self._request(self.payload, self.token_confirmado)
+        )
+        registro = self.db.scalar(select(Avaliacao))
+        instante_antigo = datetime(2000, 1, 1, tzinfo=timezone.utc)
+        registro.updated_at = instante_antigo
+        self.db.commit()
+
+        segundo_status, segunda_resposta = asyncio.run(
+            self._request(
+                {
+                    **self.payload,
+                    "didatica": 1,
+                    "dificuldade": "DIFICIL",
+                    "chamada": False,
+                    "disponibiliza_material": False,
+                    "qualidade_material": None,
+                    "recomenda": False,
+                },
+                self.token_confirmado,
+            )
+        )
+
+        self.db.expire_all()
+        substituida = self.db.scalar(select(Avaliacao))
+        quantidade = self.db.scalar(select(func.count()).select_from(Avaliacao))
+        self.assertEqual((primeiro_status, segundo_status), (200, 200))
+        self.assertEqual(quantidade, 1)
+        self.assertEqual(segunda_resposta["id"], primeira_resposta["id"])
+        self.assertEqual(substituida.didatica, 1)
+        self.assertNotEqual(substituida.updated_at, instante_antigo)
+
+    def test_http_rejeita_comentario_sem_persistir(self) -> None:
+        status_code, _ = asyncio.run(
+            self._request(
+                {**self.payload, "comentario": "campo livre proibido"},
+                self.token_confirmado,
+            )
+        )
+
+        self.assertEqual(status_code, 422)
+        quantidade = self.db.scalar(select(func.count()).select_from(Avaliacao))
+        self.assertEqual(quantidade, 0)
 
 
 if __name__ == "__main__":
