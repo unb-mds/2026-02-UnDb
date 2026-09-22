@@ -23,7 +23,7 @@ function buildQuery(params: Record<string, string | undefined>): string {
 
 async function request<T>(path: string, query: Record<string, string | undefined> = {}): Promise<T> {
   const url = `${apiBaseUrl()}${path}${buildQuery(query)}`;
-  const response = await fetch(url);
+  const response = await fetch(url, { credentials: "include" });
 
   if (!response.ok) {
     const detalhe = await response.json().catch(() => null);
@@ -36,6 +36,7 @@ async function request<T>(path: string, query: Record<string, string | undefined
 async function post<TResponse, TBody>(path: string, body: TBody): Promise<TResponse> {
   const response = await fetch(`${apiBaseUrl()}${path}`, {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });

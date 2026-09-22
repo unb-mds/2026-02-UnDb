@@ -2,21 +2,33 @@ import os
 import unittest
 from datetime import datetime, timedelta, timezone
 
+from fastapi import HTTPException
 from pydantic import ValidationError
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session
+from starlette.requests import Request
+from starlette.responses import Response
 
 os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 os.environ.setdefault("SECRET_KEY", "teste-local")
 os.environ.setdefault("EMAIL_BACKEND", "console")
 os.environ.setdefault("FRONTEND_URL", "http://localhost:3000")
 
+from app.core.auth import (
+    SESSION_COOKIE_NAME,
+    definir_cookie_sessao,
+    obter_sessao_autenticada,
+    obter_usuario_confirmado,
+)
+from app.core.config import DEBUG
 from app.core.database import Base
-from app.core.security import password_hash
+from app.core.security import gerar_hash_senha, gerar_hash_token, password_hash
 from app.main import app
+from app.models.sessao_usuario import SessaoUsuario
 from app.models.token_confirmacao_email import TokenConfirmacaoEmail
 from app.models.usuario import Usuario
-from app.schemas.auth import CadastroRequest
+from app.routers import auth as auth_router
+from app.schemas.auth import CadastroRequest, LoginRequest
 from app.services import auth_service
 from app.services.email_service import EmailDeliveryError
 
@@ -76,6 +88,10 @@ class AuthSchemaTest(unittest.TestCase):
                     email="maria@aluno.unb.br",
                     senha=senha,
                 )
+
+    def test_normaliza_email_no_login(self) -> None:
+        dados = LoginRequest(email="  MARIA@ALUNO.UNB.BR ", senha="senha válida")
+        self.assertEqual(dados.email, "maria@aluno.unb.br")
 
 
 class AuthServiceTest(unittest.TestCase):
@@ -171,6 +187,237 @@ class AuthServiceTest(unittest.TestCase):
         caminhos = app.openapi()["paths"]
         self.assertIn("/api/auth/cadastro", caminhos)
         self.assertIn("/api/auth/confirmar", caminhos)
+        self.assertIn("/api/auth/login", caminhos)
+        self.assertIn("/api/auth/logout", caminhos)
+
+    def _criar_usuario(self, *, confirmado: bool = True) -> Usuario:
+        usuario = Usuario(
+            nome="Maria",
+            email="maria@aluno.unb.br",
+            password_hash=gerar_hash_senha("uma senha longa e segura"),
+            email_confirmado=confirmado,
+        )
+        self.db.add(usuario)
+        self.db.commit()
+        return usuario
+
+    def test_login_valido_cria_sessao_persistida_sem_armazenar_token_aberto(self) -> None:
+        usuario = self._criar_usuario()
+
+        autenticacao = auth_service.autenticar(
+            self.db,
+            LoginRequest(
+                email="MARIA@ALUNO.UNB.BR",
+                senha="uma senha longa e segura",
+            ),
+        )
+
+        sessao = self.db.scalar(select(SessaoUsuario))
+        self.assertEqual(autenticacao.usuario.id, usuario.id)
+        self.assertIsNotNone(sessao)
+        self.assertEqual(sessao.usuario_id, usuario.id)
+        self.assertEqual(sessao.token_hash, gerar_hash_token(autenticacao.token))
+        self.assertNotEqual(sessao.token_hash, autenticacao.token)
+        self.assertGreater(
+            auth_service._como_utc(sessao.expires_at),
+            datetime.now(timezone.utc) + timedelta(days=6, hours=23),
+        )
+
+    def test_credenciais_invalidas_nao_criam_sessao(self) -> None:
+        self._criar_usuario()
+
+        for email, senha in (
+            ("desconhecida@aluno.unb.br", "uma senha longa e segura"),
+            ("maria@aluno.unb.br", "senha incorreta"),
+        ):
+            with self.subTest(email=email), self.assertRaises(
+                auth_service.CredenciaisInvalidasError
+            ):
+                auth_service.autenticar(
+                    self.db, LoginRequest(email=email, senha=senha)
+                )
+
+        quantidade = self.db.scalar(select(func.count()).select_from(SessaoUsuario))
+        self.assertEqual(quantidade, 0)
+
+    def test_endpoint_login_define_cookie_e_credencial_invalida_retorna_401(self) -> None:
+        self._criar_usuario()
+        response = Response()
+
+        resultado = auth_router.login(
+            LoginRequest(
+                email="maria@aluno.unb.br",
+                senha="uma senha longa e segura",
+            ),
+            response,
+            self.db,
+        )
+
+        self.assertEqual(resultado.message, auth_service.LOGIN_MESSAGE)
+        self.assertIn(SESSION_COOKIE_NAME, response.headers["set-cookie"])
+
+        with self.assertRaises(HTTPException) as contexto:
+            auth_router.login(
+                LoginRequest(
+                    email="maria@aluno.unb.br",
+                    senha="senha incorreta",
+                ),
+                Response(),
+                self.db,
+            )
+        self.assertEqual(contexto.exception.status_code, 401)
+
+    def test_atividade_autenticada_renova_sessao_por_sete_dias(self) -> None:
+        self._criar_usuario()
+        autenticacao = auth_service.autenticar(
+            self.db,
+            LoginRequest(
+                email="maria@aluno.unb.br",
+                senha="uma senha longa e segura",
+            ),
+        )
+        sessao = self.db.scalar(select(SessaoUsuario))
+        sessao.expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        self.db.commit()
+
+        renovada = auth_service.validar_e_renovar_sessao(
+            self.db, autenticacao.token
+        )
+
+        self.assertGreater(
+            auth_service._como_utc(renovada.expires_at),
+            datetime.now(timezone.utc) + timedelta(days=6, hours=23),
+        )
+
+    def test_sessao_expirada_e_removida_e_rejeitada(self) -> None:
+        self._criar_usuario()
+        autenticacao = auth_service.autenticar(
+            self.db,
+            LoginRequest(
+                email="maria@aluno.unb.br",
+                senha="uma senha longa e segura",
+            ),
+        )
+        sessao = self.db.scalar(select(SessaoUsuario))
+        sessao.expires_at = datetime.now(timezone.utc) - timedelta(seconds=1)
+        self.db.commit()
+
+        with self.assertRaises(auth_service.SessaoInvalidaError):
+            auth_service.validar_e_renovar_sessao(self.db, autenticacao.token)
+
+        quantidade = self.db.scalar(select(func.count()).select_from(SessaoUsuario))
+        self.assertEqual(quantidade, 0)
+
+    def test_logout_invalida_sessao(self) -> None:
+        self._criar_usuario()
+        autenticacao = auth_service.autenticar(
+            self.db,
+            LoginRequest(
+                email="maria@aluno.unb.br",
+                senha="uma senha longa e segura",
+            ),
+        )
+        sessao = auth_service.validar_e_renovar_sessao(
+            self.db, autenticacao.token
+        )
+
+        mensagem = auth_service.encerrar_sessao(self.db, sessao)
+
+        self.assertEqual(mensagem, auth_service.LOGOUT_MESSAGE)
+        with self.assertRaises(auth_service.SessaoInvalidaError):
+            auth_service.validar_e_renovar_sessao(self.db, autenticacao.token)
+
+    def test_endpoint_logout_invalida_sessao_e_remove_cookie(self) -> None:
+        self._criar_usuario()
+        autenticacao = auth_service.autenticar(
+            self.db,
+            LoginRequest(
+                email="maria@aluno.unb.br",
+                senha="uma senha longa e segura",
+            ),
+        )
+        sessao = auth_service.validar_e_renovar_sessao(
+            self.db, autenticacao.token
+        )
+        response = Response()
+
+        resultado = auth_router.logout(response, sessao, self.db)
+
+        self.assertEqual(resultado.message, auth_service.LOGOUT_MESSAGE)
+        cookie = response.headers["set-cookie"]
+        self.assertIn(f"{SESSION_COOKIE_NAME}=", cookie)
+        self.assertIn("Max-Age=0", cookie)
+        with self.assertRaises(auth_service.SessaoInvalidaError):
+            auth_service.validar_e_renovar_sessao(self.db, autenticacao.token)
+
+    def test_cookie_de_sessao_tem_atributos_aprovados(self) -> None:
+        response = Response()
+
+        definir_cookie_sessao(response, "token-aleatorio")
+
+        cookie = response.headers["set-cookie"]
+        self.assertIn(f"{SESSION_COOKIE_NAME}=token-aleatorio", cookie)
+        self.assertIn("HttpOnly", cookie)
+        self.assertIn("SameSite=lax", cookie)
+        self.assertIn("Path=/", cookie)
+        self.assertIn("Max-Age=604800", cookie)
+        if DEBUG:
+            self.assertNotIn("; Secure", cookie)
+        else:
+            self.assertIn("; Secure", cookie)
+
+    def test_dependencia_autenticada_aceita_cookie_e_o_renova(self) -> None:
+        self._criar_usuario()
+        autenticacao = auth_service.autenticar(
+            self.db,
+            LoginRequest(
+                email="maria@aluno.unb.br",
+                senha="uma senha longa e segura",
+            ),
+        )
+        request = Request(
+            {
+                "type": "http",
+                "headers": [
+                    (
+                        b"cookie",
+                        f"{SESSION_COOKIE_NAME}={autenticacao.token}".encode(),
+                    )
+                ],
+            }
+        )
+        response = Response()
+
+        sessao = obter_sessao_autenticada(request, response, self.db)
+
+        self.assertEqual(sessao.usuario.email, "maria@aluno.unb.br")
+        self.assertIn(SESSION_COOKIE_NAME, response.headers["set-cookie"])
+        self.assertIn("Max-Age=604800", response.headers["set-cookie"])
+
+    def test_dependencia_autenticada_rejeita_ausencia_de_cookie(self) -> None:
+        request = Request({"type": "http", "headers": []})
+        response = Response()
+
+        with self.assertRaises(HTTPException) as contexto:
+            obter_sessao_autenticada(request, response, self.db)
+
+        self.assertEqual(contexto.exception.status_code, 401)
+        self.assertIn(SESSION_COOKIE_NAME, response.headers["set-cookie"])
+
+    def test_usuario_sem_email_confirmado_e_bloqueado_para_escrita(self) -> None:
+        usuario = self._criar_usuario(confirmado=False)
+
+        with self.assertRaises(HTTPException) as contexto:
+            obter_usuario_confirmado(usuario)
+
+        self.assertEqual(contexto.exception.status_code, 403)
+
+    def test_usuario_confirmado_e_disponibilizado_para_escrita(self) -> None:
+        usuario = self._criar_usuario(confirmado=True)
+
+        resultado = obter_usuario_confirmado(usuario)
+
+        self.assertEqual(resultado.id, usuario.id)
 
 
 if __name__ == "__main__":

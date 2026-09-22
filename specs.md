@@ -73,6 +73,15 @@ Não armazenar matrícula, CPF, IRA ou histórico acadêmico.
 | `used_at` | TIMESTAMPTZ | nulo até o primeiro uso válido |
 | `created_at` | TIMESTAMPTZ | default now |
 
+### `sessoes_usuario`
+| Campo | Tipo | Regra |
+|---|---|---|
+| `id` | UUID | PK |
+| `usuario_id` | FK → `usuarios` | obrigatório |
+| `token_hash` | VARCHAR(64) | UNIQUE, obrigatório; nunca persistir token aberto |
+| `expires_at` | TIMESTAMPTZ | obrigatório; sete dias após a última atividade autenticada válida |
+| `created_at` | TIMESTAMPTZ | default now |
+
 ### `unidades`
 `id` UUID PK · `fonte` VARCHAR(30) · `codigo` VARCHAR(30) ·
 `identificador_externo` VARCHAR(50) nullable · `nome` VARCHAR(200)
@@ -225,6 +234,11 @@ dados suficientes. Não atribuir percentual artificial aos resultados insuficien
 11. Na Release 1, `EMAIL_BACKEND=console` escreve o link no terminal e é o único modo
     previsto. A ativação de `EMAIL_BACKEND=resend`, com chave e remetente configurados
     externamente, fica planejada para a Release 2.
+12. O cookie de sessão chama-se `undb_session`. O servidor persiste somente o hash do token
+    aleatório e renova tanto `expires_at` quanto o `Max-Age` do cookie quando uma rota passa
+    pela dependência de autenticação. Rotas públicas não renovam sessão.
+13. Login não exige e-mail já confirmado; a dependência de escrita de avaliação exige
+    autenticação e `email_confirmado = true`.
 
 ---
 

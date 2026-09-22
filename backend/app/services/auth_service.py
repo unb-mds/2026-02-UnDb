@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
@@ -5,11 +6,17 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import FRONTEND_URL
-from app.core.security import gerar_hash_senha, gerar_hash_token, gerar_token_confirmacao
+from app.core.security import (
+    gerar_hash_senha,
+    gerar_hash_token,
+    gerar_token_confirmacao,
+    verificar_senha,
+)
+from app.models.sessao_usuario import SessaoUsuario
 from app.models.token_confirmacao_email import TokenConfirmacaoEmail
 from app.models.usuario import Usuario
-from app.repositories import usuario_repository
-from app.schemas.auth import CadastroRequest
+from app.repositories import sessao_repository, usuario_repository
+from app.schemas.auth import CadastroRequest, LoginRequest
 from app.services.email_service import EmailDeliveryError, EmailSender
 
 
@@ -18,11 +25,30 @@ CADASTRO_MESSAGE = (
 )
 CONFIRMACAO_MESSAGE = "E-mail confirmado. Sua conta já pode registrar avaliações."
 TOKEN_INVALIDO_MESSAGE = "Link de confirmação inválido ou expirado."
+LOGIN_MESSAGE = "Autenticação realizada com sucesso."
+LOGOUT_MESSAGE = "Sessão encerrada com sucesso."
+SESSION_INVALIDA_MESSAGE = "Sessão ausente, inválida ou expirada."
+EMAIL_NAO_CONFIRMADO_MESSAGE = "Confirme seu e-mail antes de registrar avaliações."
 TOKEN_TTL = timedelta(hours=24)
+SESSION_TTL = timedelta(days=7)
 
 
 class TokenConfirmacaoInvalidoError(Exception):
     pass
+
+
+class CredenciaisInvalidasError(Exception):
+    pass
+
+
+class SessaoInvalidaError(Exception):
+    pass
+
+
+@dataclass(frozen=True)
+class Autenticacao:
+    usuario: Usuario
+    token: str
 
 
 def _agora_utc() -> datetime:
@@ -96,3 +122,46 @@ def confirmar_email(db: Session, token_aberto: str) -> str:
     token.used_at = _agora_utc()
     db.commit()
     return CONFIRMACAO_MESSAGE
+
+
+def autenticar(db: Session, dados: LoginRequest) -> Autenticacao:
+    usuario = usuario_repository.obter_por_email(db, dados.email)
+    if usuario is None or not verificar_senha(dados.senha, usuario.password_hash):
+        raise CredenciaisInvalidasError("E-mail ou senha inválidos.")
+
+    token_aberto = gerar_token_confirmacao()
+    sessao = SessaoUsuario(
+        usuario=usuario,
+        token_hash=gerar_hash_token(token_aberto),
+        expires_at=_agora_utc() + SESSION_TTL,
+    )
+    sessao_repository.adicionar(db, sessao)
+    db.commit()
+    return Autenticacao(usuario=usuario, token=token_aberto)
+
+
+def validar_e_renovar_sessao(db: Session, token_aberto: str | None) -> SessaoUsuario:
+    if not token_aberto:
+        raise SessaoInvalidaError(SESSION_INVALIDA_MESSAGE)
+
+    sessao = sessao_repository.obter_por_token_hash(
+        db, gerar_hash_token(token_aberto)
+    )
+    if sessao is None:
+        raise SessaoInvalidaError(SESSION_INVALIDA_MESSAGE)
+
+    agora = _agora_utc()
+    if _como_utc(sessao.expires_at) <= agora:
+        sessao_repository.remover(db, sessao)
+        db.commit()
+        raise SessaoInvalidaError(SESSION_INVALIDA_MESSAGE)
+
+    sessao.expires_at = agora + SESSION_TTL
+    db.commit()
+    return sessao
+
+
+def encerrar_sessao(db: Session, sessao: SessaoUsuario) -> str:
+    sessao_repository.remover(db, sessao)
+    db.commit()
+    return LOGOUT_MESSAGE
