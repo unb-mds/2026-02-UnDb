@@ -26,6 +26,12 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 - `npm run lint`: executa o ESLint.
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
+- `npm test`: compila os módulos do formulário com TypeScript em diretório temporário e
+  executa testes com o runner nativo do Node, sem novas dependências.
+- `npm run test:browser`: verifica o formulário no Edge/Chromium headless com respostas
+  controladas de teste; exige build padrão prévio, Node 22+ e portas 8000, 3100 e 9223 livres.
+  No Windows usa o caminho padrão do Edge; em outros ambientes configure `BROWSER_PATH`.
+  Esse comando não usa o backend real nem comprova persistência.
 
 ## Execução com Docker — Issue #36
 
@@ -162,9 +168,9 @@ O header é herdado do layout; não o repita na página.
 
 ### Verificação
 
-O frontend ainda não possui suíte de testes automatizados de interface nem script `test`.
-Execute `npm run lint` e `npm run build`, como no CI. Eles verificam código e compilação,
-mas não substituem a inspeção visual. Para revisar a interface com `npm run dev`:
+Execute `npm test`, `npm run lint` e `npm run build`, como no CI. Os testes cobrem a lógica
+do formulário e o cliente HTTP; o teste opcional `npm run test:browser` verifica sua interface.
+Esses comandos não substituem a integração com a API real. Para revisar a interface com `npm run dev`:
 
 - confira início, buscas, detalhes, comparação e página não encontrada;
 - confira temas claro e escuro e larguras de 320, 768 e 1280 px;
@@ -177,3 +183,30 @@ temas e nas três larguras acima (24 combinações), verificando ausência de tr
 horizontal, header, destinos de navegação, fonte e tema. O foco por Tab na página inicial
 também foi verificado. As capturas móveis dos dois temas foram inspecionadas visualmente.
 Essa checagem não adiciona uma suíte ao projeto e não cobre fluxos com dados do backend.
+
+## Formulário de avaliação — Issue #42
+
+Na consulta de um professor em uma disciplina, use **Avaliar este professor na disciplina**.
+A rota `/professores/[id]/disciplinas/[disciplinaId]/avaliar` carrega a identificação pela
+consulta institucional existente e oferece os cinco critérios de `AvaliacaoCreate`.
+Todos são obrigatórios, sem escolha inicial; Material é convertido em disponibilidade
+e qualidade, usando `false`/`null` para **Não disponibiliza**.
+
+Antes de enviar, o navegador consulta `/api/auth/sessao`. Sessão ausente/inválida recebe
+orientação para entrar; a confirmação de e-mail permanece responsabilidade da proteção
+do endpoint. O envio usa `POST /avaliacoes` e o cliente compartilhado com
+`credentials: "include"`, sem ler o cookie HttpOnly nem enviar identificador de usuário.
+As respostas são mantidas em caso de erro. O sucesso só aparece após resposta HTTP de
+sucesso com JSON, conforme o padrão do cliente existente. A mensagem informa que um
+envio válido substitui a avaliação anterior, sem presumir um campo específico no retorno.
+
+**Integração bloqueada em 22/09/2026:** a `develop` (`0402064`) contém cadastro/sessão
+(PRs #107/#114), mas o router `/avaliacoes` ainda está vazio. #39/#50 continuam abertas.
+A Issue #42 e esse router indicam `/avaliacoes`; `specs.md` descreve o prefixo geral `/api`.
+A implementação de #39 precisa consolidar o caminho e o contrato de resposta antes do
+aceite ponta a ponta. Esta entrega segue o caminho explícito da #42 e não altera o backend.
+Não há API simulada no código de produção. As respostas controladas existem somente nos
+testes; sucesso persistido, substituição e proteção real do POST permanecem não verificados.
+
+Veja os cenários executados e o handoff em
+[`verificacao-formulario-avaliacao.md`](../docs/estudos/verificacao-formulario-avaliacao.md).

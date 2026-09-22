@@ -181,5 +181,8 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+      - name: Test evaluation form logic and HTTP client
+        run: npm test
+
       - name: Build frontend
         run: npm run build

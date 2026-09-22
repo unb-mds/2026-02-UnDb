@@ -97,6 +97,12 @@ export default async function AvaliacaoAgregadaPage({
       <p className="text-xs text-foreground/50">
         Dificuldade e chamada não indicam algo bom ou ruim — são informativos.
       </p>
+      <Link
+        href={`/professores/${id}/disciplinas/${disciplinaId}/avaliar`}
+        className="self-start rounded-lg bg-accent px-4 py-2.5 font-medium text-white transition hover:opacity-90"
+      >
+        Avaliar este professor na disciplina
+      </Link>
     </main>
   );
 }

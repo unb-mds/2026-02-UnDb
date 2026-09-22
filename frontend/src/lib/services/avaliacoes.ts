@@ -1,10 +1,19 @@
 import { apiClient } from "./api-client";
 import type {
   AvaliacaoAgregada,
+  AvaliacaoInput,
   Dificuldade,
   QualidadeMaterial,
 } from "../types/avaliacao";
 import type { DisciplinaInstitucional, ProfessorInstitucional } from "../types/institucional";
+
+/**
+ * Destino definido na #42 e no router existente. A implementação de #39/#50
+ * ainda precisa definir a resposta; não presumimos campos de criação/substituição.
+ */
+export async function enviarAvaliacao(dados: AvaliacaoInput): Promise<void> {
+  await apiClient.post<unknown, AvaliacaoInput>("/avaliacoes", dados);
+}
 
 interface AvaliacaoAgregadaWireBase {
   professor_id: string;
