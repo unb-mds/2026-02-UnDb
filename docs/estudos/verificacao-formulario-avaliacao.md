@@ -1,93 +1,70 @@
 # Verificação do formulário de avaliação — Issue #42
 
-## Escopo e evidências
+## Escopo autorizado após o review do PR #117
 
-Implementação exclusivamente de frontend, conforme orientação explícita do responsável
-em 22/09/2026 após constatar que as dependências de escrita não estavam implementadas.
-Base: `origin/develop`, commit `0402064`. Branch: `feature/42-formulario-avaliacao`.
+Em 22/09/2026, o responsável autorizou a divisão de escopo para resolver o P1 do review.
+As issues [#42](https://github.com/unb-mds/2026-02-UnDb/issues/42) e
+[#116](https://github.com/unb-mds/2026-02-UnDb/issues/116) foram atualizadas no GitHub
+antes das mudanças locais, e os corpos publicados foram conferidos por leitura da API.
 
-Foram consultadas integralmente as issues #42, #14, #29, #31, #38, #39, #47, #48, #49 e #50,
-seus comentários, PRs recentes, branches remotas e histórico atualizado com `git fetch`.
-Nenhum push, publicação de branch, PR ou merge faz parte desta entrega.
+- #42: interface, cinco critérios, validações locais e feature gate.
+- #116: sessão, POST /avaliacoes real, persistência, substituição sem duplicata e remoção
+  do gate após a validação integrada, coordenando #39/#47/#48/#49/#50.
+- As regras de produto de docs/requisitos.md e specs.md não foram alteradas.
+- Branch: `feature/42-formulario-avaliacao`; base desta correção: `1c498a5`.
+- A descrição substituta do PR fica apenas em arquivo local, com `Relacionado a #42`.
+  Esta etapa não autoriza push, alteração remota do PR, merge ou fechamento de issue.
 
-| Fonte verificada no GitHub em 22/09/2026 | Estado e efeito na implementação |
-| --- | --- |
-| [#42](https://github.com/unb-mds/2026-02-UnDb/issues/42) | Aberta; formulário com cinco critérios, sessão e envio real |
-| [#14](https://github.com/unb-mds/2026-02-UnDb/issues/14) | Aberta; escrita pendente em #39/#42/#50 |
-| [#29](https://github.com/unb-mds/2026-02-UnDb/issues/29), [#31](https://github.com/unb-mds/2026-02-UnDb/issues/31) | Fechadas; estrutura, tema, tipografia e padrões existentes reaproveitados |
-| [#38](https://github.com/unb-mds/2026-02-UnDb/issues/38) | Fechada; escalas conferidas contra `AvaliacaoCreate` e enums reais |
-| [#47](https://github.com/unb-mds/2026-02-UnDb/issues/47) | Fechada; identidade por sessão no servidor e cookie HttpOnly |
-| [#48](https://github.com/unb-mds/2026-02-UnDb/issues/48), [PR #107](https://github.com/unb-mds/2026-02-UnDb/pull/107) | Cadastro integrado em develop |
-| [#49](https://github.com/unb-mds/2026-02-UnDb/issues/49), [PR #114](https://github.com/unb-mds/2026-02-UnDb/pull/114) | Sessão integrada; comentário de aceite separa explicitamente o POST futuro |
-| [#39](https://github.com/unb-mds/2026-02-UnDb/issues/39), [#50](https://github.com/unb-mds/2026-02-UnDb/issues/50) | Abertas, sem PR aberta; router vazio, sem contrato de resposta implementado |
+## Feature gate
 
-Não foi encontrado trabalho prévio da #42 nas branches, PRs ou commits consultados.
-O padrão adotado segue `CONTRIBUTING.md`, o template e PRs #103/#104/#107/#114:
-branch `feature/<issue>-<descricao>`, título/commit `feat(frontend): ... (#42)` e
-descrição com Objetivo, Tipo de mudança, Validação e Checklist.
-A prévia deve usar **Refs #42**, sem fechamento automático enquanto a integração estiver bloqueada.
+`avaliacao-form.tsx` define `envioHabilitado = false`, sem configuração pública para
+ativação. O botão fica desabilitado e associado ao aviso de indisponibilidade. O handler
+preserva a validação local e retorna antes de consultar sessão ou enviar POST. Assim,
+clique, submissão por teclado/requestSubmit e acesso direto à rota não liberam o envio.
+Os cinco campos continuam disponíveis e a tela informa que as respostas não serão
+salvas. A consulta institucional de professor/disciplina já existente continua funcionando.
 
-## Solução
+O cliente HTTP e o tratamento de respostas permanecem preparados para #116, mas o fluxo
+de envio está bloqueado. Remover o gate exige concluir e verificar a integração real.
 
-- Link da consulta agregada para a rota de avaliação do mesmo professor/disciplina.
-- Identificação obtida da API institucional existente, sem aceitar nomes arbitrários do usuário.
-- Cinco selects nativos obrigatórios, sem valores predefinidos; labels acessíveis e foco compartilhado.
-- Didática 1–5; Dificuldade `FACIL`/`MEDIO`/`DIFICIL`; Chamada e Recomenda booleanos.
-- Material tem quatro opções visuais e produz `disponibiliza_material` + `qualidade_material`:
-  Não disponibiliza → `false`/`null`; Ruim/Médio/Bom → `true` + `RUIM`/`MEDIO`/`BOM`.
-- Sessão consultada no navegador e POST com `credentials: include`; identidade nunca vem do formulário.
-- Respostas mantidas após erro, bloqueio de envios simultâneos e anúncio acessível de resultados.
-- Tratamento de 401, 403, 404/405, 422 com detalhes por campo, 429, 5xx, rejeições adicionais e falha de rede.
-- O cliente conserva detalhes retornados pela API; a tela não transforma rejeição em sucesso.
-- Confirmação visual somente depois de resposta bem-sucedida; sem contrato inventado para distinguir criação/substituição.
-- Sem histórico acadêmico, verificação de disciplina cursada, comentário livre ou nota composta.
-- Dificuldade e Chamada usam a mesma apresentação neutra dos demais controles, sem escala de bom/ruim.
+## CI e testes
 
-## Comandos e resultados
+O job Frontend usa Node 22 e `windows-latest`, com `BROWSER_PATH` apontando para Edge.
+Executa `npm ci`, lint, testes unitários, build e então `npm run test:browser`.
+A imagem Windows inclui Edge conforme o
+[inventário oficial](https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md).
+Os jobs de backend e Docker Compose continuam no Ubuntu.
 
-Executados no diretório `frontend/`, com Node `v24.21.0`:
+A suíte de navegador verifica navegação, acesso direto, cinco campos obrigatórios,
+validação local, bloqueio no botão e no handler, nenhuma chamada de sessão/POST,
+preservação das respostas, teclado e larguras 320/768/1280 nos temas claro/escuro.
+Confirma a hidratação por um erro de validação gerado pelo handler React antes de
+exercitar submissões válidas. O servidor controlado devolveria 405 se recebesse um POST.
+Os cenários de sucesso/erro HTTP preparados continuam cobertos na suíte unitária;
+testes de navegador do fluxo liberado deverão acompanhar a remoção do gate na #116.
 
-| Comando | Resultado |
-| --- | --- |
-| `npm test` | 18 testes aprovados; inclui as 240 combinações válidas, entradas inválidas, booleanos, material, payload, credenciais e erros HTTP |
-| `npm run lint` | Aprovado |
-| `npm run build` | Aprovado, incluindo a rota dinâmica `/professores/[id]/disciplinas/[disciplinaId]/avaliar` |
-| `npm run test:browser` | Edge headless: navegação, obrigatoriedade, cookie HttpOnly de teste, payload, sucesso controlado 201/200, bloqueio durante envio, 401/403/422/404/503, sessão ausente, preservação de respostas e ausência de overflow em 320/768/1280 px nos dois temas |
-| `git diff --check` | Aprovado |
+O runner requer build padrão, Node 22+, Edge/Chromium e portas 8000/3100/9223 livres.
+Usa perfil temporário exclusivo e encerra os processos que inicia.
 
-O teste de navegador precisa do build padrão, portas 8000/3100/9223 livres e Node 22+.
-`BROWSER_PATH` permite selecionar Edge/Chromium fora do caminho padrão do Windows.
-O runner inicia serviços locais de teste e encerra seus processos; o perfil do navegador
-é temporário e exclusivo. Não utiliza perfil pessoal ou dados reais.
-A primeira execução no sandbox falhou por timeout de `Page.enable`; a execução fora do
-sandbox foi aprovada. Não é falha do formulário.
+## Verificação local desta correção
 
-Não havia framework de testes de frontend. Os novos testes usam TypeScript já instalado,
-runner nativo do Node e protocolo nativo de automação do navegador, sem adicionar dependências.
-O CI executa `npm test`; o teste de navegador permanece opcional e exige navegador instalado.
+Ambiente: Windows, Node v24.21.0 e Edge headless.
 
-## Limites: integração real ainda bloqueada
+- `npm test`: 18 testes aprovados, incluindo 240 combinações válidas.
+- `npm run lint`: aprovado.
+- `npm run build`: aprovado.
+- `npm run test:browser`: aprovado no Edge fora do sandbox; no sandbox houve timeout em Page.enable.
+- `git diff --check`: aprovado.
 
-**Os testes controlados não comprovam integração com FastAPI, persistência ou substituição.**
-Nenhum backend simulado é usado pela aplicação: apenas os testes fornecem respostas fictícias.
+O CI remoto não foi executado para esta correção porque não houve push. Backend e
+Docker Compose não foram reexecutados; a alteração não modifica esses componentes.
 
-- `backend/app/routers/avaliacoes.py` contém somente `APIRouter(prefix="/avaliacoes", ...)`.
-  Não há handler POST, schema de resposta ou operação de criação/substituição integrada.
-- `specs.md` descreve prefixo geral `/api`, enquanto #42 e o router atual indicam `/avaliacoes`.
-  Foi seguido o destino explícito solicitado para #42. #39 deverá consolidar o contrato.
-- Não é possível validar sucesso, substituição, concorrência ou rejeições reais do POST ainda inexistente.
-- Python não está instalado neste host: `python --version`, fora do sandbox, retornou
-  `Python was not found`. Docker também não está disponível no PATH. Portanto a suíte
-  `python -m unittest discover -s tests -v` não pôde ser executada neste ambiente.
-- Backend, modelos e migrations não foram alterados, conforme escopo confirmado pelo responsável.
+## Limites e handoff para #116
 
-## Handoff para #39/#50 e aceite de #42
-
-1. Implementar o POST e consolidar o caminho, status e corpo da resposta.
-2. Aplicar as dependências de sessão/e-mail confirmado entregues por #49.
-3. Garantir substituição e unicidade conforme #50, incluindo concorrência.
-4. Conferir o cliente contra o contrato final; hoje ele aguarda resposta JSON bem-sucedida
-   e não lê campos de criação/substituição não definidos.
-5. Executar formulário → API real → banco, cobrindo cadastro/login, sessão ausente/inválida/expirada,
-   e-mail não confirmado, entrada inválida, criação e segundo envio válido sem nova linha.
-6. Só então avaliar a conclusão integral da Issue #42. Esta entrega não solicita seu fechamento.
+Respostas controladas não comprovam integração com FastAPI, persistência ou substituição.
+O router atual não implementa POST. #116 deve consolidar o contrato com #39, aplicar
+sessão/e-mail confirmado de #49, garantir unicidade/substituição conforme #50 e validar
+formulário → API real → banco (criação, segundo envio sem nova linha, concorrência,
+sessão ausente/inválida/expirada, e-mail não confirmado e entrada inválida).
+Somente depois deverá remover o gate e atualizar os testes para o fluxo liberado.
+A #42 não depende desse aceite integrado; seu fechamento não é solicitado nesta etapa.

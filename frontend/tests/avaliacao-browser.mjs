@@ -25,10 +25,7 @@ const perfil = mkdtempSync(join(tmpdir(), "undb-avaliacao-browser-"));
 const professorId = "11111111-1111-4111-8111-111111111111";
 const disciplinaId = "22222222-2222-4222-8222-222222222222";
 const caminho = `/professores/${professorId}/disciplinas/${disciplinaId}`;
-let autenticado = true;
-let status = 201;
-let detalhe = null;
-let atraso = 0;
+let consultasSessao = 0;
 const envios = [];
 const fixture = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3100");
@@ -45,13 +42,13 @@ const fixture = createServer(async (req, res) => {
       total_avaliacoes: 0, dados_suficientes: false,
     }));
   } else if (req.url === "/api/auth/sessao") {
-    res.end(JSON.stringify({ autenticado }));
+    consultasSessao += 1; res.end(JSON.stringify({ autenticado: true }));
   } else if (req.method === "POST" && req.url === "/avaliacoes") {
     let body = "";
     for await (const chunk of req) body += chunk;
     envios.push({ body: JSON.parse(body), cookie: req.headers.cookie });
-    await new Promise((resolve) => setTimeout(resolve, atraso));
-    res.writeHead(status).end(JSON.stringify(detalhe ? { detail: detalhe } : {}));
+
+    res.writeHead(405).end(JSON.stringify({ detail: "Envio indisponível" }));
   } else { res.writeHead(404).end(JSON.stringify({ detail: "Not Found" })); }
 });
 
@@ -117,44 +114,33 @@ try {
   await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 5'), "formulário");
   assert.match(await texto(), /Professor de teste/);
   assert.match(await texto(), /CIC0001 — Disciplina de teste/);
+  // Confirma que o handler React está ativo antes de testar o bloqueio de envio.
+  await avaliar('document.querySelector("form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
+  await aguardarTexto("Selecione uma opção válida para Didática.");
   await enviar();
   assert.equal(await avaliar('document.querySelector("form").checkValidity()'), false);
   assert.equal(envios.length, 0);
   await avaliar(`Object.entries({didatica:"5", dificuldade:"DIFICIL", chamada:"false", material:"NAO_DISPONIBILIZA", recomenda:"false"}).forEach(([nome, valor]) => { const campo = document.querySelector('[name="'+nome+'"]'); campo.value = valor; campo.dispatchEvent(new Event("change", {bubbles:true})); })`);
-  atraso = 600;
+  assert.equal(await avaliar('document.querySelector("form").checkValidity()'), true);
+  assert.equal(await avaliar('document.querySelector("button[type=submit]").disabled'), true);
+  await aguardarTexto("suas respostas não serão enviadas nem salvas");
   await enviar();
-  await aguardar(async () => await avaliar('document.querySelector("button[type=submit]").disabled'), "envio em andamento");
+  // Exercita o handler mesmo sem o botão: Enter/requestSubmit não pode contornar o gate.
+  await avaliar('document.querySelector("form").requestSubmit()');
+  await avaliar('document.querySelector("form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  assert.equal(consultasSessao, 0);
+  assert.equal(envios.length, 0);
   assert.ok(!(await texto()).includes("Avaliação registrada com sucesso"));
-  assert.equal(await avaliar('document.querySelector("fieldset").disabled'), true);
-  await enviar();
-  await aguardarTexto("Avaliação registrada com sucesso");
-  assert.equal(envios.length, 1);
-  assert.equal(envios[0].cookie, "undb_session=cookie-apenas-de-teste");
-  assert.deepEqual(envios[0].body, { professor_id: professorId, disciplina_id: disciplinaId, didatica: 5, dificuldade: "DIFICIL", chamada: false, recomenda: false, disponibiliza_material: false, qualidade_material: null });
-  status = 200; atraso = 0;
-  await avaliar('const campo = document.querySelector("[name=material]"); campo.value = "BOM"; campo.dispatchEvent(new Event("change", {bubbles:true}));');
-  assert.ok(!(await texto()).includes("Avaliação registrada com sucesso"));
-  await enviar(); await aguardarTexto("Avaliação registrada com sucesso");
-  assert.equal(envios.length, 2);
-  assert.equal(envios[1].body.qualidade_material, "BOM");
-  assert.equal(envios[1].body.disponibiliza_material, true);
-  for (const [codigo, detail, mensagem] of [
-    [401, "Sessão inválida ou expirada.", "Entre na sua conta"],
-    [403, "Confirme o e-mail institucional.", "link recebido"],
-    [422, [{ loc: ["body", "didatica"], msg: "Nota inválida" }], "Revise os campos: Didática"],
-    [404, "Not Found", "ainda não está disponível"],
-    [503, "Serviço indisponível", "não conseguiu confirmar"],
-  ]) {
-    status = codigo; detalhe = detail;
-    await enviar(); await aguardarTexto(mensagem);
-    assert.equal(await avaliar('document.querySelector("[name=material]").value'), "BOM");
-    assert.ok(!(await texto()).includes("Avaliação registrada com sucesso"));
-  }
-  autenticado = false;
-  const quantidade = envios.length;
-  await enviar(); await aguardarTexto("Entre na sua conta");
-  assert.equal(envios.length, quantidade);
-  assert.equal(await avaliar('document.querySelector("[role=alert] a").getAttribute("href")'), "/login");
+  assert.equal(await avaliar('document.querySelector("[name=material]").value'), "NAO_DISPONIBILIZA");
+  // Acesso direto à rota mantém o gate e permite validar campos localmente.
+  await cdp("Page.navigate", { url: `http://localhost:3100${caminho}/avaliar` });
+  await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 5'), "formulário direto");
+  assert.equal(await avaliar('document.querySelector("button[type=submit]").disabled'), true);
+  assert.equal(await avaliar('document.querySelector("form").reportValidity()'), false);
+  // Aguarda hidratação por uma mudança observável no handler React.
+  await avaliar('document.querySelector("form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
+  await aguardarTexto("Selecione uma opção válida para Didática.");
   await avaliar('document.querySelector("[name=didatica]").focus()');
   await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
   await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
@@ -166,7 +152,9 @@ try {
       assert.equal(await avaliar("document.documentElement.scrollWidth <= window.innerWidth"), true, `${tema}, ${width}px`);
     }
   }
-  console.log("Interface aprovada: navegação, escalas, obrigatoriedade, cookie, payload, 201/200 controlados, bloqueio de duplo envio, 401/403/422/404/503, sessão ausente, preservação das respostas e 6 combinações de tema/largura.");
+  assert.equal(consultasSessao, 0);
+  assert.equal(envios.length, 0);
+  console.log("Interface aprovada: navegação, acesso direto, cinco critérios obrigatórios, validação local, gate no botão e handler, ausência de sessão/POST, preservação das respostas, teclado e 6 combinações de tema/largura.");
   console.log("Limite: respostas controladas de teste; persistência real e substituição no banco NÃO verificadas.");
 } finally {
   if (socket?.readyState === WebSocket.OPEN) {

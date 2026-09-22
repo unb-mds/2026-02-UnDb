@@ -7,6 +7,9 @@ import { consultarSessao } from "@/lib/services/auth";
 import { enviarAvaliacao } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
 
+// Remover somente na #116, após validar formulário → API real → banco.
+const envioHabilitado = false;
+
 export default function AvaliacaoForm({ professorId, disciplinaId }: {
   professorId: string;
   disciplinaId: string;
@@ -32,6 +35,8 @@ export default function AvaliacaoForm({ professorId, disciplinaId }: {
       return;
     }
 
+    if (!envioHabilitado) return;
+
     enviandoRef.current = true;
     setEnviando(true);
     try {
@@ -53,9 +58,13 @@ export default function AvaliacaoForm({ professorId, disciplinaId }: {
   return (
     <form onSubmit={enviar} className="flex flex-col gap-6" aria-busy={enviando}>
       <p className="text-sm text-foreground/70">
-        Responda aos cinco critérios. Para enviar, entre na sua conta e confirme seu e-mail institucional.
-        Um novo envio válido substitui sua avaliação anterior deste professor nesta disciplina.
+        Responda aos cinco critérios. O envio de avaliações ainda não está disponível.
       </p>
+      {!envioHabilitado && (
+        <p id="envio-indisponivel" role="status" className="text-sm text-foreground/70">
+          Você pode preencher os campos, mas suas respostas não serão enviadas nem salvas.
+        </p>
+      )}
       <fieldset disabled={enviando} className="flex min-w-0 flex-col gap-4">
         <legend className="sr-only">Critérios da avaliação</legend>
         {criteriosAvaliacao.map((criterio) => (
@@ -80,7 +89,8 @@ export default function AvaliacaoForm({ professorId, disciplinaId }: {
       </p>
       <button
         type="submit"
-        disabled={enviando}
+        disabled={!envioHabilitado || enviando}
+        aria-describedby={!envioHabilitado ? "envio-indisponivel" : undefined}
         className="rounded-lg bg-accent px-4 py-2.5 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {enviando ? "Enviando…" : "Enviar avaliação"}
