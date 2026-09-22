@@ -1,14 +1,19 @@
 # Operação recorrente da importação do SIGAA
 
-## Estado da decisão operacional
+## Decisão operacional vigente
 
 A importação é executada fora da API pelo comando
 `python -m app.commands.importar_sigaa_agendado`. O script
 `scripts/cron/sigaa-import.sh` permite integrá-lo ao cron.
 
-A frequência e o horário ainda precisam ser confirmados pelo time na Issue #26. O exemplo
-de crontab abaixo usa execução diária às 03:00 apenas como referência de configuração; ele
-não registra essa frequência como decisão aprovada.
+A política aprovada combina dois perfis, sempre no fuso `America/Sao_Paulo`:
+
+- **durante o período de matrícula:** execução diária às 03:00;
+- **no restante do semestre:** execução semanal, aos domingos às 03:00.
+
+A troca de perfil deve acompanhar as datas do calendário acadêmico oficial da UnB. Essas
+datas não ficam embutidas no código porque mudam a cada semestre; o responsável pela operação
+ativa o perfil diário no início da matrícula e retorna ao perfil semanal quando ela terminar.
 
 Cada execução cria uma linha em `importacao_execucoes` com status `em_andamento` e a atualiza
 para `sucesso` ou `falha`, incluindo timestamps, contadores, erros e o resultado detalhado.
@@ -60,16 +65,34 @@ Proteja o arquivo porque ele contém credenciais:
 chmod 600 /etc/undb/sigaa-import.env
 ```
 
-Depois que o time aprovar a frequência, registre uma entrada com `crontab -e`. Exemplo diário
-às 03:00:
+Edite o agendamento com `crontab -e` e mantenha ativo **somente um** dos perfis abaixo. O
+servidor deve usar o fuso `America/Sao_Paulo`; quando a implementação de cron aceitar
+`CRON_TZ`, registre-o no próprio crontab.
+
+Durante o período de matrícula, execute diariamente às 03:00:
 
 ```cron
+CRON_TZ=America/Sao_Paulo
 0 3 * * * /bin/bash -lc 'set -a; source /etc/undb/sigaa-import.env; set +a; /caminho/para/2026-02-UnDb/scripts/cron/sigaa-import.sh' >> /var/log/undb-sigaa-import.log 2>&1
 ```
 
+No restante do semestre, execute aos domingos às 03:00:
+
+```cron
+CRON_TZ=America/Sao_Paulo
+0 3 * * 0 /bin/bash -lc 'set -a; source /etc/undb/sigaa-import.env; set +a; /caminho/para/2026-02-UnDb/scripts/cron/sigaa-import.sh' >> /var/log/undb-sigaa-import.log 2>&1
+```
+
+Ao trocar de perfil:
+
+1. consulte no calendário acadêmico oficial as datas de início e fim da matrícula;
+2. substitua a expressão de agendamento, sem manter as duas entradas ativas;
+3. execute o comando manualmente uma vez e confirme o novo registro no banco;
+4. verifique no dia seguinte, ou no domingo seguinte, se o cron criou outra execução.
+
 Atualize `SIGAA_ANO`, `SIGAA_PERIODO` e a lista completa de departamentos quando o período
-acadêmico mudar. A enumeração e validação de cobertura das unidades continua rastreada nas
-Issues #26 e #27.
+acadêmico mudar. A enumeração e validação de cobertura das unidades continua rastreada na
+Issue #27.
 
 ## Verificação da execução
 
