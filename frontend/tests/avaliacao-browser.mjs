@@ -2,7 +2,8 @@
 // Requer build padrão (API localhost:8000), Node 22+ e Edge/Chromium headless.
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync } from "node:fs";
+import { rm } from "node:fs/promises";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -43,7 +44,7 @@ const fixture = createServer(async (req, res) => {
     }));
   } else if (req.url === "/api/auth/sessao") {
     consultasSessao += 1; res.end(JSON.stringify({ autenticado: true }));
-  } else if (req.method === "POST" && req.url === "/avaliacoes") {
+  } else if (req.method === "POST" && req.url === "/api/avaliacoes") {
     let body = "";
     for await (const chunk of req) body += chunk;
     envios.push({ body: JSON.parse(body), cookie: req.headers.cookie });
@@ -77,6 +78,42 @@ async function aguardar(condicao, descricao) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   throw new Error(`Timeout: ${descricao}`);
+}
+function aguardarSaida(processo, timeout = 5000) {
+  if (!processo || processo.exitCode !== null || processo.signalCode !== null) {
+    return Promise.resolve(true);
+  }
+  return new Promise((resolve) => {
+    const concluir = (encerrou) => {
+      clearTimeout(timer);
+      processo.off("exit", aoSair);
+      resolve(encerrou);
+    };
+    const aoSair = () => concluir(true);
+    const timer = setTimeout(() => concluir(false), timeout);
+    processo.once("exit", aoSair);
+  });
+}
+async function encerrarProcesso(processo, descricao) {
+  if (!processo || processo.exitCode !== null || processo.signalCode !== null) return;
+  processo.kill();
+  if (await aguardarSaida(processo)) return;
+  processo.kill("SIGKILL");
+  if (!(await aguardarSaida(processo))) {
+    throw new Error(`Timeout ao encerrar ${descricao}.`);
+  }
+}
+async function removerPerfilTemporario() {
+  const codigosRetentaveis = new Set(["EBUSY", "ENOTEMPTY", "EPERM"]);
+  for (let tentativa = 1; tentativa <= 20; tentativa += 1) {
+    try {
+      await rm(perfil, { recursive: true, force: true });
+      return;
+    } catch (erro) {
+      if (!codigosRetentaveis.has(erro?.code) || tentativa === 20) throw erro;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  }
 }
 const texto = () => avaliar("document.body.innerText");
 const enviar = () => avaliar('document.querySelector("button[type=submit]").click()');
@@ -161,10 +198,10 @@ try {
     await cdp("Browser.close").catch(() => {});
     socket.close();
   }
-  browser?.kill();
-  next?.kill();
+  if (!(await aguardarSaida(browser))) await encerrarProcesso(browser, "o navegador");
+  await encerrarProcesso(next, "o Next.js");
   fixture.closeAllConnections();
   await new Promise((resolve) => fixture.close(resolve));
   // Somente o perfil temporário exclusivo criado por este teste.
-  rmSync(perfil, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+  await removerPerfilTemporario();
 }

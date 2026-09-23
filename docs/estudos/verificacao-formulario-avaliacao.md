@@ -8,10 +8,11 @@ As issues [#42](https://github.com/unb-mds/2026-02-UnDb/issues/42) e
 antes das mudanças locais, e os corpos publicados foram conferidos por leitura da API.
 
 - #42: interface, cinco critérios, validações locais e feature gate.
-- #116: sessão, POST /avaliacoes real, persistência, substituição sem duplicata e remoção
-  do gate após a validação integrada, coordenando #39/#47/#48/#49/#50.
+- #116: integração da sessão com o `POST /api/avaliacoes` entregue pela #39, validação da
+  persistência e substituição sem duplicata e remoção do gate, coordenando #47/#48/#49/#50.
 - As regras de produto de docs/requisitos.md e specs.md não foram alteradas.
-- Branch: `feature/42-formulario-avaliacao`; base desta correção: `1c498a5`.
+- Branch: `feature/42-formulario-avaliacao`; base desta rodada: `f2d1d03`; `develop`
+  verificado em `6864911`.
 - A descrição substituta do PR fica apenas em arquivo local, com `Relacionado a #42`.
   Esta etapa não autoriza push, alteração remota do PR, merge ou fechamento de issue.
 
@@ -24,8 +25,9 @@ clique, submissão por teclado/requestSubmit e acesso direto à rota não libera
 Os cinco campos continuam disponíveis e a tela informa que as respostas não serão
 salvas. A consulta institucional de professor/disciplina já existente continua funcionando.
 
-O cliente HTTP e o tratamento de respostas permanecem preparados para #116, mas o fluxo
-de envio está bloqueado. Remover o gate exige concluir e verificar a integração real.
+O cliente HTTP usa o contrato atual do backend (`POST /api/avaliacoes`) e o tratamento de
+respostas permanece preparado para #116, mas o fluxo de envio está bloqueado. Remover o
+gate exige concluir e verificar a integração real.
 
 ## CI e testes
 
@@ -44,27 +46,32 @@ Os cenários de sucesso/erro HTTP preparados continuam cobertos na suíte unitá
 testes de navegador do fluxo liberado deverão acompanhar a remoção do gate na #116.
 
 O runner requer build padrão, Node 22+, Edge/Chromium e portas 8000/3100/9223 livres.
-Usa perfil temporário exclusivo e encerra os processos que inicia.
+Usa perfil temporário exclusivo, aguarda a saída dos processos que inicia e repete a
+remoção do perfil enquanto o Windows ainda mantiver handles transitórios.
 
 ## Verificação local desta correção
 
-Ambiente: Windows, Node v24.21.0 e Edge headless.
+Ambiente: Windows, Node v24.18.0 e Edge headless.
 
 - `npm test`: 18 testes aprovados, incluindo 240 combinações válidas.
 - `npm run lint`: aprovado.
 - `npm run build`: aprovado.
-- `npm run test:browser`: aprovado no Edge fora do sandbox; no sandbox houve timeout em Page.enable.
+- `npm run test:browser`: aprovado quatro vezes consecutivas no Edge, sem erro de limpeza
+  do perfil temporário.
 - `git diff --check`: aprovado.
 
-O CI remoto não foi executado para esta correção porque não houve push. Backend e
-Docker Compose não foram reexecutados; a alteração não modifica esses componentes.
+O CI remoto da nova correção ainda não foi executado porque não houve push. No SHA anterior,
+backend, Docker Compose, lint, testes unitários e build passaram; apenas a limpeza do perfil
+após o teste Edge retornou código 1. Backend e Docker Compose não foram reexecutados
+localmente; esta rodada não modifica esses componentes.
 
 ## Limites e handoff para #116
 
 Respostas controladas não comprovam integração com FastAPI, persistência ou substituição.
-O router atual não implementa POST. #116 deve consolidar o contrato com #39, aplicar
-sessão/e-mail confirmado de #49, garantir unicidade/substituição conforme #50 e validar
-formulário → API real → banco (criação, segundo envio sem nova linha, concorrência,
-sessão ausente/inválida/expirada, e-mail não confirmado e entrada inválida).
+O `develop` atual implementa `POST /api/avaliacoes` pela #39. A #116 deve conectar o
+formulário a esse contrato, aplicar sessão/e-mail confirmado de #49, garantir
+unicidade/substituição conforme #50 e validar formulário → API real → banco (criação,
+segundo envio sem nova linha, concorrência, sessão ausente/inválida/expirada, e-mail não
+confirmado e entrada inválida).
 Somente depois deverá remover o gate e atualizar os testes para o fluxo liberado.
 A #42 não depende desse aceite integrado; seu fechamento não é solicitado nesta etapa.

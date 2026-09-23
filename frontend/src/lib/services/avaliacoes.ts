@@ -8,11 +8,11 @@ import type {
 import type { DisciplinaInstitucional, ProfessorInstitucional } from "../types/institucional";
 
 /**
- * Destino definido na #42 e no router existente. A implementação de #39/#50
- * ainda precisa definir a resposta; não presumimos campos de criação/substituição.
+ * Destino implementado pela #39 no router de avaliações. A integração completa da
+ * interface permanece na #116; não presumimos campos de criação/substituição.
  */
 export async function enviarAvaliacao(dados: AvaliacaoInput): Promise<void> {
-  await apiClient.post<unknown, AvaliacaoInput>("/avaliacoes", dados);
+  await apiClient.post<unknown, AvaliacaoInput>("/api/avaliacoes", dados);
 }
 
 interface AvaliacaoAgregadaWireBase {

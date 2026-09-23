@@ -69,7 +69,7 @@ test("rejeita campos vazios, ausentes ou fora das escalas sem presumir valores",
 });
 
 for (const status of [200, 201]) {
-  test(`envia POST /avaliacoes com cookie e JSON; aguarda confirmação HTTP ${status}`, async (t) => {
+  test(`envia POST /api/avaliacoes com cookie e JSON; aguarda confirmação HTTP ${status}`, async (t) => {
     const entrada = criarEntradaAvaliacao(formulario(), "p", "d");
     const chamadas = [];
     t.mock.method(globalThis, "fetch", async (url, init) => {
@@ -78,7 +78,7 @@ for (const status of [200, 201]) {
     });
     assert.equal(await enviarAvaliacao(entrada), undefined);
     assert.equal(chamadas.length, 1);
-    assert.equal(new URL(chamadas[0].url).pathname, "/avaliacoes");
+    assert.equal(new URL(chamadas[0].url).pathname, "/api/avaliacoes");
     assert.equal(chamadas[0].init.method, "POST");
     assert.equal(chamadas[0].init.credentials, "include");
     assert.equal(chamadas[0].init.headers["Content-Type"], "application/json");

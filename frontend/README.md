@@ -193,7 +193,7 @@ Todos são obrigatórios, sem escolha inicial; Material é convertido em disponi
 e qualidade, usando `false`/`null` para **Não disponibiliza**.
 
 **Feature gate ativo:** o botão de envio está desabilitado e o handler interrompe a
-submissão antes de consultar a sessão ou chamar `POST /avaliacoes`, inclusive por acesso
+submissão antes de consultar a sessão ou chamar `POST /api/avaliacoes`, inclusive por acesso
 direto à rota. Os campos continuam disponíveis para validação local, com aviso explícito
 de que as respostas não serão enviadas nem salvas. O gate é fixo no código, sem opção
 pública de ativação; sua remoção pertence à #116 após validar a integração real.
