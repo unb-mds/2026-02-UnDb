@@ -26,6 +26,12 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 - `npm run lint`: executa o ESLint.
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
+- `npm test`: compila os módulos do formulário com TypeScript em diretório temporário e
+  executa testes com o runner nativo do Node, sem novas dependências.
+- `npm run test:browser`: verifica o formulário no Edge/Chromium headless com respostas
+  controladas de teste; exige build padrão prévio, Node 22+ e portas 8000, 3100 e 9223 livres.
+  No Windows usa o caminho padrão do Edge; em outros ambientes configure `BROWSER_PATH`.
+  Esse comando não usa o backend real nem comprova persistência.
 
 ## Execução com Docker — Issue #36
 
@@ -162,9 +168,9 @@ O header é herdado do layout; não o repita na página.
 
 ### Verificação
 
-O frontend ainda não possui suíte de testes automatizados de interface nem script `test`.
-Execute `npm run lint` e `npm run build`, como no CI. Eles verificam código e compilação,
-mas não substituem a inspeção visual. Para revisar a interface com `npm run dev`:
+Execute `npm test`, `npm run lint` e `npm run build`, como no CI. Os testes cobrem a lógica
+do formulário e o cliente HTTP; `npm run test:browser` verifica a interface e o feature gate no CI, após o build, com Node 22 e Edge no runner Windows.
+Esses comandos não substituem a integração com a API real. Para revisar a interface com `npm run dev`:
 
 - confira início, buscas, detalhes, comparação e página não encontrada;
 - confira temas claro e escuro e larguras de 320, 768 e 1280 px;
@@ -177,3 +183,27 @@ temas e nas três larguras acima (24 combinações), verificando ausência de tr
 horizontal, header, destinos de navegação, fonte e tema. O foco por Tab na página inicial
 também foi verificado. As capturas móveis dos dois temas foram inspecionadas visualmente.
 Essa checagem não adiciona uma suíte ao projeto e não cobre fluxos com dados do backend.
+
+## Formulário de avaliação — Issue #42
+
+Na consulta de um professor em uma disciplina, use **Avaliar este professor na disciplina**.
+A rota `/professores/[id]/disciplinas/[disciplinaId]/avaliar` carrega a identificação pela
+consulta institucional existente e oferece os cinco critérios de `AvaliacaoCreate`.
+Todos são obrigatórios, sem escolha inicial; Material é convertido em disponibilidade
+e qualidade, usando `false`/`null` para **Não disponibiliza**.
+
+**Feature gate ativo:** o botão de envio está desabilitado e o handler interrompe a
+submissão antes de consultar a sessão ou chamar `POST /api/avaliacoes`, inclusive por acesso
+direto à rota. Os campos continuam disponíveis para validação local, com aviso explícito
+de que as respostas não serão enviadas nem salvas. O gate é fixo no código, sem opção
+pública de ativação; sua remoção pertence à #116 após validar a integração real.
+
+A #42 entrega UI e validações locais. A #116 conecta sessão, API e banco, confirma
+persistência e substituição sem duplicata e libera o envio, em coordenação com
+#39/#47/#48/#49/#50. O cliente HTTP já preparado permanece coberto por testes unitários;
+nenhum backend simulado é usado pela aplicação. O teste de navegador usa dados controlados
+e verifica que o formulário não consulta sessão nem envia avaliações com o gate ativo.
+Esses testes não comprovam integração real ou persistência.
+
+Veja os cenários executados e o handoff em
+[`verificacao-formulario-avaliacao.md`](../docs/estudos/verificacao-formulario-avaliacao.md).
