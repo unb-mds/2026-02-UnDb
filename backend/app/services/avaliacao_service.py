@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Literal
 from uuid import UUID
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.domain.avaliacoes import (
@@ -11,11 +13,14 @@ from app.domain.avaliacoes import (
     ResultadoAgregado,
     agregar_avaliacoes,
 )
+from app.models.avaliacao import Avaliacao
+from app.models.usuario import Usuario
 from app.repositories import (
     avaliacao_repository,
     professor_repository,
     turma_repository,
 )
+from app.schemas.avaliacao import AvaliacaoCreate
 
 
 MIN_AVALIACOES_EXIBICAO = 3
@@ -23,6 +28,52 @@ MIN_AVALIACOES_EXIBICAO = 3
 
 class RecursoNaoEncontradoError(Exception):
     pass
+
+
+def _agora_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _persistir_avaliacao(
+    db: Session,
+    usuario: Usuario,
+    dados: AvaliacaoCreate,
+) -> Avaliacao:
+    return avaliacao_repository.salvar_ou_substituir(
+        db,
+        usuario_id=usuario.id,
+        professor_id=dados.professor_id,
+        disciplina_id=dados.disciplina_id,
+        didatica=dados.didatica,
+        dificuldade=dados.dificuldade,
+        chamada=dados.chamada,
+        disponibiliza_material=dados.disponibiliza_material,
+        qualidade_material=dados.qualidade_material,
+        recomenda=dados.recomenda,
+        atualizado_em=_agora_utc(),
+    )
+
+
+def registrar_avaliacao(
+    db: Session,
+    usuario: Usuario,
+    dados: AvaliacaoCreate,
+) -> Avaliacao:
+    if avaliacao_repository.obter_professor(db, dados.professor_id) is None:
+        raise RecursoNaoEncontradoError("professor nao encontrado")
+    if avaliacao_repository.obter_disciplina(db, dados.disciplina_id) is None:
+        raise RecursoNaoEncontradoError("disciplina nao encontrada")
+
+    avaliacao = _persistir_avaliacao(db, usuario, dados)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        avaliacao = _persistir_avaliacao(db, usuario, dados)
+        db.commit()
+
+    db.refresh(avaliacao)
+    return avaliacao
 
 
 @dataclass(frozen=True)
