@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Literal
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -10,7 +12,14 @@ from app.domain.avaliacoes import (
     ResultadoAgregado,
     agregar_avaliacoes,
 )
-from app.repositories import avaliacao_repository, turma_repository
+from app.models.avaliacao import Avaliacao
+from app.models.usuario import Usuario
+from app.repositories import (
+    avaliacao_repository,
+    professor_repository,
+    turma_repository,
+)
+from app.schemas.avaliacao import AvaliacaoCreate
 
 
 MIN_AVALIACOES_EXIBICAO = 3
@@ -18,6 +27,51 @@ MIN_AVALIACOES_EXIBICAO = 3
 
 class RecursoNaoEncontradoError(Exception):
     pass
+
+
+def _agora_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _persistir_avaliacao(
+    db: Session,
+    usuario: Usuario,
+    dados: AvaliacaoCreate,
+) -> Avaliacao:
+    return avaliacao_repository.salvar_ou_substituir(
+        db,
+        usuario_id=usuario.id,
+        professor_id=dados.professor_id,
+        disciplina_id=dados.disciplina_id,
+        didatica=dados.didatica,
+        dificuldade=dados.dificuldade,
+        chamada=dados.chamada,
+        disponibiliza_material=dados.disponibiliza_material,
+        qualidade_material=dados.qualidade_material,
+        recomenda=dados.recomenda,
+        atualizado_em=_agora_utc(),
+    )
+
+
+def registrar_avaliacao(
+    db: Session,
+    usuario: Usuario,
+    dados: AvaliacaoCreate,
+) -> Avaliacao:
+    if avaliacao_repository.obter_professor(db, dados.professor_id) is None:
+        raise RecursoNaoEncontradoError("professor nao encontrado")
+    if avaliacao_repository.obter_disciplina(db, dados.disciplina_id) is None:
+        raise RecursoNaoEncontradoError("disciplina nao encontrada")
+
+    try:
+        avaliacao = _persistir_avaliacao(db, usuario, dados)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+
+    db.refresh(avaliacao)
+    return avaliacao
 
 
 @dataclass(frozen=True)
@@ -44,6 +98,12 @@ class ConsultaAgregada:
     total_avaliacoes: int
     dados_suficientes: bool
     criterios: ResultadoAgregado | None = None
+
+
+@dataclass(frozen=True)
+class ComparacaoProfessores:
+    disciplina: DisciplinaInstitucional
+    professores: list[ConsultaAgregada]
 
 
 def consultar_agregado(
@@ -117,4 +177,48 @@ def consultar_agregado(
         total_avaliacoes=total,
         dados_suficientes=True,
         criterios=criterios,
+    )
+
+
+def _ordenar_comparacao(
+    comparacao: list["ConsultaAgregada"],
+    ordenar_por: Literal["recomendacao"],
+) -> list["ConsultaAgregada"]:
+    if ordenar_por != "recomendacao":
+        raise ValueError("ordenar_por inválido")
+
+    return sorted(
+        comparacao,
+        key=lambda resultado: (
+            not resultado.dados_suficientes,
+            -(resultado.criterios.recomenda if resultado.criterios else 0),
+            -resultado.total_avaliacoes,
+            resultado.professor.nome.casefold(),
+        ),
+    )
+
+
+def comparar_professores(
+    db: Session,
+    disciplina_id: UUID,
+    ordenar_por: Literal["recomendacao"] = "recomendacao",
+) -> ComparacaoProfessores:
+    disciplina = avaliacao_repository.obter_disciplina(db, disciplina_id)
+    if disciplina is None:
+        raise RecursoNaoEncontradoError("disciplina nao encontrada")
+
+    disciplina_institucional = DisciplinaInstitucional(
+        id=disciplina.id,
+        codigo=disciplina.codigo,
+        nome=disciplina.nome,
+        departamento=disciplina.departamento,
+    )
+    comparacao = [
+        consultar_agregado(db, professor.id, disciplina_id)
+        for professor in professor_repository.listar_por_disciplina(db, disciplina_id)
+    ]
+    comparacao_ordenada = _ordenar_comparacao(comparacao, ordenar_por)
+    return ComparacaoProfessores(
+        disciplina=disciplina_institucional,
+        professores=comparacao_ordenada,
     )

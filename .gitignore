@@ -4,6 +4,7 @@ db.sqlite3
 .vscode/
 .idea/
 *.log
+*.save
 .env
 **/.env
 __pycache__/
