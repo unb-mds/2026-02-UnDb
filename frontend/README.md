@@ -169,7 +169,7 @@ O header é herdado do layout; não o repita na página.
 ### Verificação
 
 Execute `npm test`, `npm run lint` e `npm run build`, como no CI. Os testes cobrem a lógica
-do formulário e o cliente HTTP; `npm run test:browser` verifica a interface e o feature gate no CI, após o build, com Node 22 e Edge no runner Windows.
+do formulário e o cliente HTTP; `npm run test:browser` verifica a interface e os estados de envio no CI, após o build, com Node 22 e Edge no runner Windows.
 Esses comandos não substituem a integração com a API real. Para revisar a interface com `npm run dev`:
 
 - confira início, buscas, detalhes, comparação e página não encontrada;
@@ -184,26 +184,40 @@ horizontal, header, destinos de navegação, fonte e tema. O foco por Tab na pá
 também foi verificado. As capturas móveis dos dois temas foram inspecionadas visualmente.
 Essa checagem não adiciona uma suíte ao projeto e não cobre fluxos com dados do backend.
 
-## Formulário de avaliação — Issue #42
+## Formulário de avaliação — Issues #42 e #116
 
 Na consulta de um professor em uma disciplina, use **Avaliar este professor na disciplina**.
-A rota `/professores/[id]/disciplinas/[disciplinaId]/avaliar` carrega a identificação pela
-consulta institucional existente e oferece os cinco critérios de `AvaliacaoCreate`.
-Todos são obrigatórios, sem escolha inicial; Material é convertido em disponibilidade
-e qualidade, usando `false`/`null` para **Não disponibiliza**.
+A rota `/professores/[id]/disciplinas/[disciplinaId]/avaliar` identifica professor e disciplina
+pela API e oferece os cinco critérios obrigatórios, sem respostas predefinidas. Material
+é convertido em disponibilidade e qualidade; **Não disponibiliza** envia `false`/`null`.
+Não há comentário livre, histórico acadêmico nem comprovação de disciplina cursada.
+Dificuldade e Chamada são apresentadas sem indicação de bom/ruim.
 
-**Feature gate ativo:** o botão de envio está desabilitado e o handler interrompe a
-submissão antes de consultar a sessão ou chamar `POST /api/avaliacoes`, inclusive por acesso
-direto à rota. Os campos continuam disponíveis para validação local, com aviso explícito
-de que as respostas não serão enviadas nem salvas. O gate é fixo no código, sem opção
-pública de ativação; sua remoção pertence à #116 após validar a integração real.
+O envio está liberado para `POST /api/avaliacoes`. O cliente consulta a sessão existente,
+envia o cookie com `credentials: include` e não envia identidade de estudante no JSON.
+O servidor autentica novamente, exige e-mail confirmado e rejeita campos adicionais.
+Só há sucesso após resposta válida da API. Erros preservam as respostas; o link para
+entrar abre outra aba, mantendo o formulário preenchido.
 
-A #42 entrega UI e validações locais. A #116 conecta sessão, API e banco, confirma
-persistência e substituição sem duplicata e libera o envio, em coordenação com
-#39/#47/#48/#49/#50. O cliente HTTP já preparado permanece coberto por testes unitários;
-nenhum backend simulado é usado pela aplicação. O teste de navegador usa dados controlados
-e verifica que o formulário não consulta sessão nem envia avaliações com o gate ativo.
-Esses testes não comprovam integração real ou persistência.
+A persistência usa `INSERT ... ON CONFLICT DO UPDATE` com a restrição única de
+usuário/professor/disciplina já presente nas migrations. Reenvios preservam ID e data de
+criação, substituem todos os critérios e atualizam `updated_at`, inclusive sob concorrência.
 
-Veja os cenários executados e o handoff em
+`npm run test:browser` usa respostas controladas para verificar UI, erros e recuperação.
+A integração real tem um runner separado, sem mocks de API ou banco. Após instalar as
+dependências do backend e gerar o build padrão do frontend, configure `DATABASE_URL`
+para um PostgreSQL de testes, `SECRET_KEY`, `UNDB_INTEGRATION_TEST=1` e `BROWSER_PATH`
+(caminho de Edge/Chrome; Edge padrão no Windows). Em `backend/`, com o venv ativado:
+
+```sh
+alembic upgrade head
+python -m tests.integration_avaliacao
+```
+
+O runner exige portas 8000/3100/9223 livres, Node 22+ e banco migrado; cria fixtures
+identificadas por UUID, inicia a API real e limpa somente seus dados/processos ao final.
+`--api-only` executa sessão, validação e concorrência HTTP/PostgreSQL sem navegador.
+O CI mantém um job específico com PostgreSQL 16 para o fluxo completo.
+
+Veja escopo, resultados e limites em
 [`verificacao-formulario-avaliacao.md`](../docs/estudos/verificacao-formulario-avaliacao.md).

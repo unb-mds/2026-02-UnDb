@@ -7,6 +7,7 @@ const { criteriosAvaliacao, criarEntradaAvaliacao, mensagemErroAvaliacao } = awa
 const { enviarAvaliacao } = await carregar("services/avaliacoes.js");
 const { consultarSessao } = await carregar("services/auth.js");
 const { ApiError } = await carregar("services/http-error.js");
+const { apiClient } = await carregar("services/api-client.js");
 
 function formulario(alteracoes = {}) {
   const dados = new FormData();
@@ -144,6 +145,17 @@ test("falha de rede não é sucesso e explica que o envio não foi confirmado", 
   t.mock.method(globalThis, "fetch", async () => { throw new TypeError("Failed to fetch"); });
   await assert.rejects(enviarAvaliacao(criarEntradaAvaliacao(formulario(), "p", "d")), (erro) => {
     assert.match(mensagemErroAvaliacao(erro), /Verifique sua conexão/);
+    return true;
+  });
+});
+
+test("consulta normaliza validação estruturada sem converter 422 em não encontrado", async (t) => {
+  const detalhes = [{ loc: ["path", "id"], msg: "Identificador inválido" }];
+  t.mock.method(globalThis, "fetch", async () => Response.json({ detail: detalhes }, { status: 422 }));
+  await assert.rejects(apiClient.request("/api/professores/abc"), (erro) => {
+    assert.equal(erro.message, "Identificador inválido");
+    assert.equal(erro.naoEncontrado, false);
+    assert.deepEqual(erro.detalhes, detalhes);
     return true;
   });
 });

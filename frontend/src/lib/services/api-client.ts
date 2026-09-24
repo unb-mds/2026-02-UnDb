@@ -27,7 +27,7 @@ async function request<T>(path: string, query: Record<string, string | undefined
 
   if (!response.ok) {
     const detalhe = await response.json().catch(() => null);
-    throw new ApiError(detalhe?.detail ?? `Falha ao consultar ${path}`, response.status);
+    throw new ApiError(mensagemErro(detalhe?.detail), response.status, detalhe?.detail);
   }
 
   return response.json() as Promise<T>;
@@ -43,7 +43,7 @@ async function post<TResponse, TBody>(path: string, body: TBody): Promise<TRespo
 
   if (!response.ok) {
     const detalhe = await response.json().catch(() => null);
-    const mensagem = typeof detalhe?.detail === "string" ? detalhe.detail : "Não foi possível concluir a solicitação.";
+    const mensagem = mensagemErro(detalhe?.detail);
     throw new ApiError(mensagem, response.status, detalhe?.detail);
   }
 
@@ -51,3 +51,14 @@ async function post<TResponse, TBody>(path: string, body: TBody): Promise<TRespo
 }
 
 export const apiClient = { post, request };
+
+function mensagemErro(detalhe: unknown): string {
+  if (typeof detalhe === "string") return detalhe;
+  if (Array.isArray(detalhe)) {
+    const mensagens = detalhe.flatMap((item) =>
+      item && typeof item.msg === "string" ? [item.msg] : [],
+    );
+    if (mensagens.length) return mensagens.join(" ");
+  }
+  return "Não foi possível concluir a solicitação.";
+}

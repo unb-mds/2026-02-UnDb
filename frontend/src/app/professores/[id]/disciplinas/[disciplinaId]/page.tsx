@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { identificadorValido } from "@/lib/identificador";
 import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
 import type { Dificuldade, QualidadeMaterial } from "@/lib/types/avaliacao";
@@ -29,6 +30,7 @@ export default async function AvaliacaoAgregadaPage({
   params: Promise<{ id: string; disciplinaId: string }>;
 }) {
   const { id, disciplinaId } = await params;
+  if (!identificadorValido(id) || !identificadorValido(disciplinaId)) notFound();
 
   const avaliacao = await consultarAvaliacaoAgregada(id, disciplinaId).catch((erro) => {
     if (erro instanceof ApiError && erro.naoEncontrado) notFound();
