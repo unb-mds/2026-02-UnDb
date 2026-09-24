@@ -1,7 +1,7 @@
-// Teste de interface com respostas controladas, NÃO é integração com FastAPI.
+// Interface controlada por padrão; E2E_FIXTURE ativa FastAPI/PostgreSQL reais (runner Python).
 // Requer build padrão (API localhost:8000), Node 22+ e Edge/Chromium headless.
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { createServer } from "node:http";
@@ -13,7 +13,8 @@ const navegador = process.env.BROWSER_PATH ?? "C:/Program Files (x86)/Microsoft/
 assert.ok(existsSync(navegador), "Informe BROWSER_PATH com o executável Edge/Chromium.");
 assert.ok(globalThis.WebSocket, "O teste de navegador requer Node 22+ (WebSocket nativo).");
 // Não se conectar a servidores ou navegadores já em uso na máquina.
-for (const porta of [8000, 3100, 9223]) {
+const real = process.env.E2E_FIXTURE ? JSON.parse(process.env.E2E_FIXTURE) : null;
+for (const porta of (real ? [3100, 9223] : [8000, 3100, 9223])) {
   const reserva = createServer();
   await new Promise((resolve, reject) => {
     reserva.once("error", () => reject(new Error(`A porta ${porta} precisa estar livre para este teste.`)));
@@ -23,10 +24,19 @@ for (const porta of [8000, 3100, 9223]) {
 }
 const frontend = fileURLToPath(new URL("../", import.meta.url));
 const perfil = mkdtempSync(join(tmpdir(), "undb-avaliacao-browser-"));
-const professorId = "11111111-1111-4111-8111-111111111111";
-const disciplinaId = "22222222-2222-4222-8222-222222222222";
+const professorId = real?.professorId ?? "11111111-1111-4111-8111-111111111111";
+const disciplinaId = real?.disciplinaId ?? "22222222-2222-4222-8222-222222222222";
 const caminho = `/professores/${professorId}/disciplinas/${disciplinaId}`;
 let consultasSessao = 0;
+let autenticado = true;
+let statusEnvio = 200;
+let statusConsulta = 200;
+let statusConfirmacao = 400;
+let statusCadastro = 202;
+let falhaComplementar = false;
+let consultaInterrompida = false;
+const professor = { id: professorId, nome: "Professor de teste", departamento: "CIC", siape: null, identidade_confirmada: true };
+const disciplina = { id: disciplinaId, codigo: "CIC0001", nome: "Disciplina de teste", departamento: "CIC", creditos: null, identificador_externo: null };
 const envios = [];
 const fixture = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3100");
@@ -35,6 +45,9 @@ const fixture = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Content-Type", "application/json");
   if (req.method === "OPTIONS") { res.writeHead(204).end(); return; }
+  const institucional = req.url.startsWith("/api/professores/") || req.url.startsWith("/api/disciplinas/");
+  if (institucional && consultaInterrompida) { req.socket.destroy(); return; }
+  if (institucional && statusConsulta !== 200) { res.writeHead(statusConsulta).end(JSON.stringify({detail:"Serviço indisponível"})); return; }
   if (req.url === `/api${caminho}`) {
     res.end(JSON.stringify({
       professor_id: professorId, disciplina_id: disciplinaId,
@@ -42,14 +55,26 @@ const fixture = createServer(async (req, res) => {
       disciplina: { id: disciplinaId, codigo: "CIC0001", nome: "Disciplina de teste", departamento: "CIC" },
       total_avaliacoes: 0, dados_suficientes: false,
     }));
+  } else if (req.url === `/api/professores/${professorId}`) {
+    res.end(JSON.stringify(professor));
+  } else if (req.url === `/api/disciplinas/${disciplinaId}`) {
+    res.end(JSON.stringify(disciplina));
+  } else if (req.url === `/api/professores/${professorId}/disciplinas` || req.url === `/api/disciplinas/${disciplinaId}/turmas`) {
+    res.writeHead(falhaComplementar ? 503 : 200).end(JSON.stringify(falhaComplementar ? {detail:"Falha complementar"} : []));
+  } else if (req.url.startsWith(`/api/disciplinas/${disciplinaId}/professores`)) {
+    res.end(JSON.stringify({disciplina, professores:[]}));
   } else if (req.url === "/api/auth/sessao") {
-    consultasSessao += 1; res.end(JSON.stringify({ autenticado: true }));
+    consultasSessao += 1; res.end(JSON.stringify({ autenticado }));
   } else if (req.method === "POST" && req.url === "/api/avaliacoes") {
     let body = "";
     for await (const chunk of req) body += chunk;
     envios.push({ body: JSON.parse(body), cookie: req.headers.cookie });
 
-    res.writeHead(405).end(JSON.stringify({ detail: "Envio indisponível" }));
+    res.writeHead(statusEnvio).end(JSON.stringify(statusEnvio === 200 ? {} : {detail:"Rejeição de teste"}));
+  } else if (req.url === "/api/auth/confirmar") {
+    res.writeHead(statusConfirmacao).end(JSON.stringify(statusConfirmacao === 200 ? {message:"E-mail confirmado."} : {detail:"Falha de confirmação"}));
+  } else if (req.url === "/api/auth/cadastro") {
+    res.writeHead(statusCadastro).end(JSON.stringify(statusCadastro === 202 ? {message:"Se o endereço informado estiver disponível, enviaremos um link de confirmação."} : {detail:[{loc:["body","nome"],msg:"Nome inválido"}]}));
   } else { res.writeHead(404).end(JSON.stringify({ detail: "Not Found" })); }
 });
 
@@ -120,7 +145,7 @@ const enviar = () => avaliar('document.querySelector("button[type=submit]").clic
 const aguardarTexto = (trecho) => aguardar(async () => (await texto()).includes(trecho), trecho);
 
 try {
-  await new Promise((resolve, reject) => { fixture.once("error", reject); fixture.listen(8000, resolve); });
+  if (!real) await new Promise((resolve, reject) => { fixture.once("error", reject); fixture.listen(8000, resolve); });
   next = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", "3100"], {
     cwd: frontend, stdio: "ignore", windowsHide: true,
     env: { ...process.env, API_INTERNAL_URL: "http://localhost:8000" },
@@ -144,14 +169,14 @@ try {
   });
   await cdp("Page.enable");
   await cdp("Network.enable");
-  await cdp("Network.setCookie", { name: "undb_session", value: "cookie-apenas-de-teste", url: "http://localhost:8000", httpOnly: true, sameSite: "Lax" });
+  if (!real) await cdp("Network.setCookie", { name: "undb_session", value: "cookie-apenas-de-teste", url: "http://localhost:8000", httpOnly: true, sameSite: "Lax" });
   await cdp("Page.navigate", { url: `http://localhost:3100${caminho}` });
   await aguardarTexto("Avaliar este professor na disciplina");
   await avaliar('Array.from(document.querySelectorAll("a")).find(a => a.textContent.includes("Avaliar este professor")).click()');
   await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 5'), "formulário");
   assert.match(await texto(), /Professor de teste/);
-  assert.match(await texto(), /CIC0001 — Disciplina de teste/);
-  // Confirma que o handler React está ativo antes de testar o bloqueio de envio.
+  assert.match(await texto(), /Disciplina de teste/);
+  // Confirma hidratação antes de testar a validação local.
   await avaliar('document.querySelector("form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
   await aguardarTexto("Selecione uma opção válida para Didática.");
   await enviar();
@@ -159,23 +184,87 @@ try {
   assert.equal(envios.length, 0);
   await avaliar(`Object.entries({didatica:"5", dificuldade:"DIFICIL", chamada:"false", material:"NAO_DISPONIBILIZA", recomenda:"false"}).forEach(([nome, valor]) => { const campo = document.querySelector('[name="'+nome+'"]'); campo.value = valor; campo.dispatchEvent(new Event("change", {bubbles:true})); })`);
   assert.equal(await avaliar('document.querySelector("form").checkValidity()'), true);
-  assert.equal(await avaliar('document.querySelector("button[type=submit]").disabled'), true);
-  await aguardarTexto("suas respostas não serão enviadas nem salvas");
-  await enviar();
-  // Exercita o handler mesmo sem o botão: Enter/requestSubmit não pode contornar o gate.
-  await avaliar('document.querySelector("form").requestSubmit()');
-  await avaliar('document.querySelector("form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  assert.equal(consultasSessao, 0);
-  assert.equal(envios.length, 0);
-  assert.ok(!(await texto()).includes("Avaliação registrada com sucesso"));
-  assert.equal(await avaliar('document.querySelector("[name=material]").value'), "NAO_DISPONIBILIZA");
-  // Acesso direto à rota mantém o gate e permite validar campos localmente.
+  assert.equal(await avaliar('document.querySelector("button[type=submit]").disabled'), false);
+  const respostas = () => avaliar('Object.fromEntries(new FormData(document.querySelector("form")))');
+  const preenchidas = await respostas();
+  if (real) {
+    const banco = () => JSON.parse(executarPython("--inspect"));
+    for (const token of [null, "sessao-invalida", real.expiredToken]) {
+      await cdp("Network.clearBrowserCookies");
+      if (token) await cdp("Network.setCookie", { name:"undb_session", value:token, url:"http://localhost:8000", httpOnly:true, sameSite:"Lax" });
+      await enviar();
+      await aguardarTexto("Entre na sua conta");
+      assert.deepEqual(await respostas(), preenchidas);
+      assert.deepEqual(banco(), []);
+    }
+    // Login HTTP real preserva as respostas no formulário original.
+    const login = await avaliar(`fetch("http://localhost:8000/api/auth/login", {method:"POST", credentials:"include", headers:{"Content-Type":"application/json"}, body:JSON.stringify(${JSON.stringify({email:real.email, senha:real.senha})})}).then(r=>r.status)`);
+    assert.equal(login, 200);
+    await enviar();
+    await aguardarTexto("link recebido");
+    assert.deepEqual(banco(), []);
+    assert.deepEqual(await respostas(), preenchidas);
+    const confirmacao = await avaliar(`fetch("http://localhost:8000/api/auth/confirmar", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({token:${JSON.stringify(real.confirmationToken)}})}).then(r=>r.status)`);
+    assert.equal(confirmacao, 200);
+    // Altera só o corpo da requisição: a rejeição 422 vem da API real.
+    await avaliar(`window.fetchOriginal = window.fetch; window.fetch = (url, init) => {
+      if (String(url).endsWith("/api/avaliacoes")) init = {...init, body:JSON.stringify({...JSON.parse(init.body), didatica:6})};
+      return window.fetchOriginal(url, init);
+    }`);
+    await enviar();
+    await aguardarTexto("Revise os campos: Didática");
+    await avaliar('window.fetch = window.fetchOriginal');
+    assert.deepEqual(banco(), []);
+    assert.deepEqual(await respostas(), preenchidas);
+    await enviar();
+    await aguardarTexto("Avaliação registrada com sucesso");
+    const primeira = banco();
+    assert.equal(primeira.length, 1);
+    assert.equal(primeira[0].usuario_id, real.usuarioId);
+    assert.equal(primeira[0].didatica, 5);
+    assert.equal(primeira[0].qualidade_material, null);
+    await avaliar('document.querySelector("[name=didatica]").value="2"; document.querySelector("[name=material]").value="BOM"');
+    await enviar();
+    await aguardarTexto("Avaliação registrada com sucesso");
+    const segunda = banco();
+    assert.equal(segunda.length, 1);
+    assert.equal(segunda[0].id, primeira[0].id);
+    assert.equal(segunda[0].created_at, primeira[0].created_at);
+    assert.equal(segunda[0].didatica, 2);
+    assert.equal(segunda[0].qualidade_material, "BOM");
+    assert.equal(segunda[0].disponibiliza_material, true);
+    assert.ok(segunda[0].updated_at >= primeira[0].updated_at);
+    await cdp("Network.setBlockedURLs", {urls:["*api/avaliacoes*"]});
+    await enviar();
+    await aguardarTexto("Verifique sua conexão");
+    assert.equal((await respostas()).material, "BOM");
+    assert.deepEqual(banco(), segunda);
+    await cdp("Network.setBlockedURLs", {urls:[]});
+    console.log("Integração real: formulário → FastAPI → PostgreSQL; criação, substituição com mesmo ID/linha, sessões ausente/inválida/expirada, e-mail não confirmado, 422 e falha de rede sem perda das respostas.");
+  } else {
+    autenticado = false;
+    await enviar();
+    await aguardarTexto("Entre na sua conta");
+    assert.equal(envios.length, 0);
+    autenticado = true;
+    for (const [status, mensagem] of [[401,"Entre na sua conta"], [403,"link recebido"], [422,"Revise as opções"], [503,"não conseguiu confirmar"]]) {
+      statusEnvio = status;
+      await enviar();
+      await aguardarTexto(mensagem);
+      assert.deepEqual(await respostas(), preenchidas);
+      assert.ok(!(await texto()).includes("Avaliação registrada com sucesso"));
+    }
+    statusEnvio = 200;
+    await enviar();
+    await aguardarTexto("Avaliação registrada com sucesso");
+    assert.ok(envios.at(-1).cookie.includes("undb_session="));
+    assert.ok(!("usuario_id" in envios.at(-1).body));
+    assert.ok(consultasSessao > 0);
+  }
+  // Acesso direto não predefine respostas e mantém os cinco campos obrigatórios.
   await cdp("Page.navigate", { url: `http://localhost:3100${caminho}/avaliar` });
   await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 5'), "formulário direto");
-  assert.equal(await avaliar('document.querySelector("button[type=submit]").disabled'), true);
   assert.equal(await avaliar('document.querySelector("form").reportValidity()'), false);
-  // Aguarda hidratação por uma mudança observável no handler React.
   await avaliar('document.querySelector("form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
   await aguardarTexto("Selecione uma opção válida para Didática.");
   await avaliar('document.querySelector("[name=didatica]").focus()');
@@ -189,10 +278,9 @@ try {
       assert.equal(await avaliar("document.documentElement.scrollWidth <= window.innerWidth"), true, `${tema}, ${width}px`);
     }
   }
-  assert.equal(consultasSessao, 0);
-  assert.equal(envios.length, 0);
-  console.log("Interface aprovada: navegação, acesso direto, cinco critérios obrigatórios, validação local, gate no botão e handler, ausência de sessão/POST, preservação das respostas, teclado e 6 combinações de tema/largura.");
-  console.log("Limite: respostas controladas de teste; persistência real e substituição no banco NÃO verificadas.");
+  assert.equal(await avaliar('document.querySelectorAll("textarea, [name=historico], [name=comentario]").length'), 0);
+  if (!real) await verificarCorrecoesInterface();
+  console.log("Interface aprovada: cinco critérios, escalas, validação local, respostas preservadas, teclado, acesso direto e 6 combinações de tema/largura.");
 } finally {
   if (socket?.readyState === WebSocket.OPEN) {
     await cdp("Browser.close").catch(() => {});
@@ -201,7 +289,77 @@ try {
   if (!(await aguardarSaida(browser))) await encerrarProcesso(browser, "o navegador");
   await encerrarProcesso(next, "o Next.js");
   fixture.closeAllConnections();
-  await new Promise((resolve) => fixture.close(resolve));
+  if (fixture.listening) await new Promise((resolve) => fixture.close(resolve));
   // Somente o perfil temporário exclusivo criado por este teste.
   await removerPerfilTemporario();
+}
+
+function executarPython(acao) {
+  const result = spawnSync(process.env.E2E_PYTHON, ["-m", "tests.integration_avaliacao", acao], {
+    cwd: join(frontend, "../backend"), encoding:"utf8", windowsHide:true, env:process.env,
+  });
+  assert.equal(result.status, 0, result.stderr);
+  return result.stdout;
+}
+
+async function verificarCorrecoesInterface() {
+  for (const rota of ["/professores/abc", "/disciplinas/abc", `/professores/${professorId}/disciplinas/abc`, `/professores/abc/disciplinas/${disciplinaId}/avaliar`]) {
+    await cdp("Page.navigate", {url:`http://localhost:3100${rota}`});
+    await aguardarTexto("Não encontramos isso");
+    assert.equal(await avaliar('!!document.querySelector("header")'), true);
+  }
+  for (const modo of ["503", "conexao", "complementar"]) {
+    statusConsulta = modo === "503" ? 503 : 200;
+    consultaInterrompida = modo === "conexao";
+    falhaComplementar = modo === "complementar";
+    const rotas = [`/professores/${professorId}`, `/disciplinas/${disciplinaId}`];
+    if (modo !== "complementar") rotas.push(caminho);
+    for (const rota of rotas) {
+      await cdp("Page.navigate", {url:`http://localhost:3100${rota}`});
+      await aguardarTexto("Não foi possível carregar esta página");
+      assert.equal(await avaliar('!!document.querySelector("header")'), true);
+    }
+  }
+  falhaComplementar = false;
+  consultaInterrompida = false;
+  statusConsulta = 200;
+  await avaliar('document.querySelector("main button").click()');
+  await aguardarTexto("Comparação de professores");
+  await cdp("Page.navigate", {url:`http://localhost:3100${caminho}`});
+  await aguardarTexto("Avaliar este professor na disciplina");
+  await cdp("Page.navigate", {url:"http://localhost:3100/cadastro"});
+  await aguardar(async () => await avaliar('!!document.querySelector("[name=nome]")'), "cadastro");
+  await avaliar(`document.querySelector('[name=nome]').value='   '; document.querySelector('[name=email]').value='TESTE@ALUNO.UNB.BR'; document.querySelector('[name=senha]').value='senha-teste-local'`);
+  assert.equal(await avaliar('document.querySelector("form").checkValidity()'), true);
+  await enviar();
+  await aguardarTexto("Informe seu nome");
+  assert.equal(await avaliar('document.activeElement.name'), "nome");
+  await avaliar('document.querySelector("[name=nome]").value="Estudante"');
+  statusCadastro = 422;
+  await enviar();
+  await aguardarTexto("Revise os dados do cadastro");
+  assert.equal(await avaliar('document.querySelector("[name=email]").value'), "TESTE@ALUNO.UNB.BR");
+  statusCadastro = 202;
+  await enviar();
+  await aguardarTexto("Se o endereço informado estiver disponível");
+  for (const tema of ["light", "dark"]) {
+    await cdp("Emulation.setEmulatedMedia", {features:[{name:"prefers-color-scheme", value:tema}]});
+    const contraste = await avaliar(`(() => {
+      const style = getComputedStyle(document.querySelector('button[type=submit]'));
+      const lum = rgb => { const c = rgb.match(/[\\d.]+/g).slice(0,3).map(Number).map(x => {x/=255; return x<=0.04045 ? x/12.92 : ((x+0.055)/1.055)**2.4}); return c[0]*0.2126+c[1]*0.7152+c[2]*0.0722; };
+      const a=lum(style.color), b=lum(style.backgroundColor); return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+    })()`);
+    assert.ok(contraste >= 4.5, `${tema}: ${contraste}`);
+  }
+  statusConfirmacao = 503;
+  await cdp("Page.navigate", {url:"http://localhost:3100/confirmar-email?token=teste"});
+  await aguardarTexto("Verifique sua conexão");
+  assert.ok(!(await texto()).includes("Este link é inválido"));
+  statusConfirmacao = 200;
+  await avaliar('document.querySelector("main button").click()');
+  await aguardarTexto("E-mail confirmado.");
+  statusConfirmacao = 400;
+  await cdp("Page.navigate", {url:"http://localhost:3100/confirmar-email?token=invalido"});
+  await aguardarTexto("Este link é inválido ou expirou");
+  console.log("Regressões de interface: IDs malformados, indisponibilidade e recuperação, domínio maiúsculo, nome em branco, 422, confirmação transitória/token inválido e contraste claro/escuro.");
 }

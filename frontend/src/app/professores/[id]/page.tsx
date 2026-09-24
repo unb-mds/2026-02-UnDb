@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { identificadorValido } from "@/lib/identificador";
 import { listarDisciplinasDoProfessor, obterProfessor } from "@/lib/services/professores";
 import { ApiError } from "@/lib/services/http-error";
 
@@ -9,6 +10,7 @@ export default async function DetalheProfessorPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  if (!identificadorValido(id)) notFound();
 
   // Sequencial, não Promise.all: o backend também consulta o professor antes
   // de listar suas disciplinas, então um id inexistente faz as duas chamadas

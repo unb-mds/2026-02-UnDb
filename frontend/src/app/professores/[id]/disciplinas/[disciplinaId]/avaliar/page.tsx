@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { identificadorValido } from "@/lib/identificador";
 import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
 import AvaliacaoForm from "./avaliacao-form";
@@ -8,9 +9,10 @@ export default async function AvaliarPage({ params }: {
   params: Promise<{ id: string; disciplinaId: string }>;
 }) {
   const { id, disciplinaId } = await params;
+  if (!identificadorValido(id) || !identificadorValido(disciplinaId)) notFound();
   const consultaHref = `/professores/${id}/disciplinas/${disciplinaId}`;
   const avaliacao = await consultarAvaliacaoAgregada(id, disciplinaId).catch((erro) => {
-    if (erro instanceof ApiError && (erro.status === 404 || erro.status === 422)) notFound();
+    if (erro instanceof ApiError && erro.naoEncontrado) notFound();
     return null;
   });
 
