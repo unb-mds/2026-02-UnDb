@@ -5,6 +5,19 @@ import type { DisciplinaInstitucional, ProfessorInstitucional } from "./instituc
 export type Dificuldade = "FACIL" | "MEDIO" | "DIFICIL";
 export type QualidadeMaterial = "RUIM" | "MEDIO" | "BOM";
 
+/** Entrada individual de AvaliacaoCreate; a identidade vem exclusivamente da sessão. */
+export type AvaliacaoInput = {
+  professor_id: string;
+  disciplina_id: string;
+  didatica: number;
+  dificuldade: Dificuldade;
+  chamada: boolean;
+  recomenda: boolean;
+} & (
+  | { disponibiliza_material: false; qualidade_material: null }
+  | { disponibiliza_material: true; qualidade_material: QualidadeMaterial }
+);
+
 interface AvaliacaoAgregadaBase {
   professorId: string;
   disciplinaId: string;

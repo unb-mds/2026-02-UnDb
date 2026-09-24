@@ -44,7 +44,7 @@ async function post<TResponse, TBody>(path: string, body: TBody): Promise<TRespo
   if (!response.ok) {
     const detalhe = await response.json().catch(() => null);
     const mensagem = typeof detalhe?.detail === "string" ? detalhe.detail : "Não foi possível concluir a solicitação.";
-    throw new ApiError(mensagem, response.status);
+    throw new ApiError(mensagem, response.status, detalhe?.detail);
   }
 
   return response.json() as Promise<TResponse>;
