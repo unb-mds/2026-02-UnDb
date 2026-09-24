@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from typing import Literal
 from uuid import UUID
 
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.domain.avaliacoes import (
@@ -64,13 +63,12 @@ def registrar_avaliacao(
     if avaliacao_repository.obter_disciplina(db, dados.disciplina_id) is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
 
-    avaliacao = _persistir_avaliacao(db, usuario, dados)
     try:
-        db.commit()
-    except IntegrityError:
-        db.rollback()
         avaliacao = _persistir_avaliacao(db, usuario, dados)
         db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
     db.refresh(avaliacao)
     return avaliacao

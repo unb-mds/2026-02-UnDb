@@ -2,11 +2,13 @@
 
 import { FormEvent, useState } from "react";
 import { cadastrarUsuario } from "@/lib/services/auth";
+import { ApiError } from "@/lib/services/http-error";
 
 export default function CadastroPage() {
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [erroNome, setErroNome] = useState(false);
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -15,17 +17,26 @@ export default function CadastroPage() {
     setErro(null);
     const elementoFormulario = evento.currentTarget;
     const formulario = new FormData(elementoFormulario);
+    const nome = String(formulario.get("nome") ?? "").trim();
+    setErroNome(!nome);
+    if (!nome) {
+      setCarregando(false);
+      (elementoFormulario.elements.namedItem("nome") as HTMLInputElement).focus();
+      return;
+    }
 
     try {
       const resposta = await cadastrarUsuario({
-        nome: String(formulario.get("nome") ?? ""),
-        email: String(formulario.get("email") ?? ""),
+        nome,
+        email: String(formulario.get("email") ?? "").trim().toLowerCase(),
         senha: String(formulario.get("senha") ?? ""),
       });
       setMensagem(resposta.message);
       elementoFormulario.reset();
-    } catch {
-      setErro("Não foi possível realizar o cadastro agora. Tente novamente em instantes.");
+    } catch (falha) {
+      setErro(falha instanceof ApiError && falha.status === 422
+        ? `Revise os dados do cadastro. ${falha.message}`
+        : "Não foi possível realizar o cadastro agora. Tente novamente em instantes.");
     } finally {
       setCarregando(false);
     }
@@ -49,8 +60,12 @@ export default function CadastroPage() {
             autoComplete="name"
             required
             maxLength={100}
+            aria-invalid={erroNome}
+            aria-describedby={erroNome ? "nome-erro" : undefined}
+            onChange={() => setErroNome(false)}
             className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
           />
+          {erroNome && <span id="nome-erro" role="alert" className="text-sm text-red-600 dark:text-red-400">Informe seu nome; ele não pode conter apenas espaços.</span>}
         </label>
 
         <label className="flex flex-col gap-2">
@@ -62,7 +77,7 @@ export default function CadastroPage() {
             autoComplete="email"
             required
             maxLength={150}
-            pattern="[^@]+@aluno[.]unb[.]br"
+            pattern="[^@]+@[aA][lL][uU][nN][oO][.][uU][nN][bB][.][bB][rR]"
             placeholder="seu-email@aluno.unb.br"
             className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
           />
@@ -88,7 +103,7 @@ export default function CadastroPage() {
         <button
           type="submit"
           disabled={carregando}
-          className="rounded-lg bg-accent px-4 py-2.5 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {carregando ? "Enviando…" : "Criar conta"}
         </button>

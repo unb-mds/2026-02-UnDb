@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { identificadorValido } from "@/lib/identificador";
 import {
   compararProfessoresDaDisciplina,
   listarTurmasDaDisciplina,
@@ -68,6 +69,7 @@ export default async function DetalheDisciplinaPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  if (!identificadorValido(id)) notFound();
 
   // Sequencial, não Promise.all: mesmo motivo de professores/[id]/page.tsx —
   // o backend consulta a disciplina antes de listar as turmas, então um id
