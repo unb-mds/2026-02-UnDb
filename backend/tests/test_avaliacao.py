@@ -283,6 +283,51 @@ class RegistroAvaliacaoTest(unittest.TestCase):
         self.assertFalse(substituida.disponibiliza_material)
         self.assertIsNone(substituida.qualidade_material)
 
+    def test_usuarios_e_pares_distintos_nao_se_substituem(self) -> None:
+        outro_usuario = Usuario(
+            nome="Ana",
+            email="ana@aluno.unb.br",
+            password_hash="hash-de-teste",
+            email_confirmado=True,
+        )
+        outra_disciplina = Disciplina(
+            codigo="CIC0002",
+            nome="Outra Disciplina",
+            departamento="CIC",
+        )
+        self.db.add_all((outro_usuario, outra_disciplina))
+        self.db.commit()
+
+        primeira = avaliacao_service.registrar_avaliacao(
+            self.db, self.usuario, self.dados
+        )
+        segundo_usuario = avaliacao_service.registrar_avaliacao(
+            self.db, outro_usuario, self.dados
+        )
+        outro_par = avaliacao_service.registrar_avaliacao(
+            self.db,
+            self.usuario,
+            self.dados.model_copy(update={"disciplina_id": outra_disciplina.id}),
+        )
+
+        registros = self.db.scalars(select(Avaliacao)).all()
+        self.assertEqual(len(registros), 3)
+        self.assertEqual(
+            {registro.id for registro in registros},
+            {primeira.id, segundo_usuario.id, outro_par.id},
+        )
+        self.assertEqual(
+            {
+                (registro.usuario_id, registro.professor_id, registro.disciplina_id)
+                for registro in registros
+            },
+            {
+                (self.usuario.id, self.professor.id, self.disciplina.id),
+                (outro_usuario.id, self.professor.id, self.disciplina.id),
+                (self.usuario.id, self.professor.id, outra_disciplina.id),
+            },
+        )
+
     def test_rejeita_professor_ou_disciplina_inexistente_sem_persistir(self) -> None:
         casos = (
             ("professor", self.dados.model_copy(update={"professor_id": uuid4()})),
