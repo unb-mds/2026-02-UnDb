@@ -149,18 +149,18 @@ class AuthServiceTest(unittest.TestCase):
         self.assertEqual(usuario.password_hash, hash_original)
         self.assertEqual(segundo_sender.envios, [])
 
-    def test_confirma_token_valido_e_reuso_e_idempotente(self) -> None:
+    def test_confirma_token_valido_e_rejeita_reuso(self) -> None:
         sender = FakeEmailSender()
         auth_service.cadastrar(self.db, self.dados, sender)
         token_aberto = sender.envios[0][1].split("token=", 1)[1]
 
         primeira = auth_service.confirmar_email(self.db, token_aberto)
-        segunda = auth_service.confirmar_email(self.db, token_aberto)
+        with self.assertRaises(auth_service.TokenConfirmacaoInvalidoError):
+            auth_service.confirmar_email(self.db, token_aberto)
 
         usuario = self.db.scalar(select(Usuario))
         token = self.db.scalar(select(TokenConfirmacaoEmail))
         self.assertEqual(primeira, auth_service.CONFIRMACAO_MESSAGE)
-        self.assertEqual(segunda, auth_service.CONFIRMACAO_MESSAGE)
         self.assertTrue(usuario.email_confirmado)
         self.assertIsNotNone(token.used_at)
 

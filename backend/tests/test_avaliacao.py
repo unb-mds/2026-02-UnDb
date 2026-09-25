@@ -27,6 +27,8 @@ from app.models.disciplina import Disciplina
 from app.models.enums import Dificuldade, QualidadeMaterial
 from app.models.professor import Professor
 from app.models.sessao_usuario import SessaoUsuario
+from app.models.turma import Turma
+from app.models.unidade import Unidade
 from app.models.usuario import Usuario
 from app.routers import avaliacoes as avaliacoes_router
 from app.schemas.avaliacao import AvaliacaoCreate, AvaliacaoResponse
@@ -215,7 +217,16 @@ class RegistroAvaliacaoTest(unittest.TestCase):
             nome="Disciplina Teste",
             departamento="CIC",
         )
-        self.db.add_all((self.usuario, self.professor, self.disciplina))
+        self.unidade = Unidade(codigo="CIC", nome="CIC")
+        self.db.add_all((self.usuario, self.professor, self.disciplina, self.unidade))
+        self.db.flush()
+        self.db.add(Turma(
+            disciplina=self.disciplina,
+            unidade=self.unidade,
+            codigo="01",
+            semestre="2026.2",
+            professores=[self.professor],
+        ))
         self.db.commit()
         self.dados = AvaliacaoCreate(
             professor_id=self.professor.id,
@@ -296,6 +307,13 @@ class RegistroAvaliacaoTest(unittest.TestCase):
             departamento="CIC",
         )
         self.db.add_all((outro_usuario, outra_disciplina))
+        self.db.add(Turma(
+            disciplina=outra_disciplina,
+            unidade=self.unidade,
+            codigo="01",
+            semestre="2026.2",
+            professores=[self.professor],
+        ))
         self.db.commit()
 
         primeira = avaliacao_service.registrar_avaliacao(
@@ -342,6 +360,22 @@ class RegistroAvaliacaoTest(unittest.TestCase):
 
         quantidade = self.db.scalar(select(func.count()).select_from(Avaliacao))
         self.assertEqual(quantidade, 0)
+
+    def test_rejeita_par_sem_vinculo_sem_persistir(self) -> None:
+        outro_professor = Professor(nome="Professor sem vínculo", departamento="CIC")
+        self.db.add(outro_professor)
+        self.db.commit()
+
+        with self.assertRaisesRegex(
+            avaliacao_service.RecursoNaoEncontradoError, "vinculo"
+        ):
+            avaliacao_service.registrar_avaliacao(
+                self.db,
+                self.usuario,
+                self.dados.model_copy(update={"professor_id": outro_professor.id}),
+            )
+
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(Avaliacao)), 0)
 
     def test_router_traduz_referencia_inexistente_para_404(self) -> None:
         with self.assertRaises(HTTPException) as contexto:
@@ -397,15 +431,24 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
             nome="Disciplina HTTP",
             departamento="CIC",
         )
+        self.unidade = Unidade(codigo="CIC", nome="CIC")
         self.db.add_all(
             (
                 self.usuario_confirmado,
                 self.usuario_nao_confirmado,
                 self.professor,
                 self.disciplina,
+                self.unidade,
             )
         )
         self.db.flush()
+        self.db.add(Turma(
+            disciplina=self.disciplina,
+            unidade=self.unidade,
+            codigo="01",
+            semestre="2026.2",
+            professores=[self.professor],
+        ))
         self.token_confirmado = "token-confirmado"
         self.token_nao_confirmado = "token-nao-confirmado"
         expiracao = datetime.now(timezone.utc) + timedelta(days=1)
@@ -537,6 +580,22 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
         self.assertEqual(registro.usuario_id, self.usuario_confirmado.id)
         self.assertEqual(resposta["id"], str(registro.id))
         self.assertNotIn("usuario_id", resposta)
+
+    def test_http_rejeita_professor_sem_vinculo(self) -> None:
+        outro_professor = Professor(nome="Professor sem vínculo", departamento="CIC")
+        self.db.add(outro_professor)
+        self.db.commit()
+
+        status_code, resposta = asyncio.run(
+            self._request(
+                {**self.payload, "professor_id": str(outro_professor.id)},
+                self.token_confirmado,
+            )
+        )
+
+        self.assertEqual(status_code, 404)
+        self.assertIn("vinculo", resposta["detail"])
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(Avaliacao)), 0)
 
     def test_http_substitui_sem_duplicar_e_atualiza_updated_at(self) -> None:
         primeiro_status, primeira_resposta = asyncio.run(

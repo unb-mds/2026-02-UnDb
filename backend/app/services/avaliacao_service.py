@@ -62,6 +62,12 @@ def registrar_avaliacao(
         raise RecursoNaoEncontradoError("professor nao encontrado")
     if avaliacao_repository.obter_disciplina(db, dados.disciplina_id) is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
+    if not turma_repository.existe_vinculo_professor_disciplina(
+        db, dados.professor_id, dados.disciplina_id
+    ):
+        raise RecursoNaoEncontradoError(
+            "professor nao possui vinculo com a disciplina"
+        )
 
     try:
         avaliacao = _persistir_avaliacao(db, usuario, dados)

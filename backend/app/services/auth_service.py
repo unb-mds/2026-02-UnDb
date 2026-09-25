@@ -111,8 +111,6 @@ def confirmar_email(db: Session, token_aberto: str) -> str:
         raise TokenConfirmacaoInvalidoError(TOKEN_INVALIDO_MESSAGE)
 
     if token.used_at is not None:
-        if token.usuario.email_confirmado:
-            return CONFIRMACAO_MESSAGE
         raise TokenConfirmacaoInvalidoError(TOKEN_INVALIDO_MESSAGE)
 
     if _como_utc(token.expires_at) <= _agora_utc():

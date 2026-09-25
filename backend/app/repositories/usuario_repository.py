@@ -13,7 +13,7 @@ def obter_token_por_hash(db: Session, token_hash: str) -> TokenConfirmacaoEmail 
     return db.scalar(
         select(TokenConfirmacaoEmail).where(
             TokenConfirmacaoEmail.token_hash == token_hash
-        )
+        ).with_for_update()
     )
 
 
