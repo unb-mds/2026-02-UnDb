@@ -64,6 +64,21 @@ class SigaaPocParserTest(unittest.TestCase):
         self.assertEqual(total, 1)
         self.assertEqual(ofertas[0].docentes, ())
 
+    def test_sem_resultados_explicitos_retorna_total_zero(self) -> None:
+        ofertas, total = parse_ofertas(
+            "<div class='info'>N&#227;o foram encontrados resultados para a busca "
+            "com estes par&#226;metros.</div>"
+        )
+
+        self.assertEqual(ofertas, [])
+        self.assertEqual(total, 0)
+
+    def test_pagina_sem_resultado_nem_mensagem_mantem_total_desconhecido(self) -> None:
+        ofertas, total = parse_ofertas("<div>Resposta inesperada do SIGAA</div>")
+
+        self.assertEqual(ofertas, [])
+        self.assertIsNone(total)
+
 
 class SigaaPocMultipleDocentesParserTest(unittest.TestCase):
     def test_oferta_preserves_multiple_docentes_from_sigaa_cell(self) -> None:

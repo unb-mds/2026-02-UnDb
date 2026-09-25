@@ -11,6 +11,7 @@ import argparse
 import json
 import re
 from dataclasses import asdict, dataclass, replace
+from html import unescape
 from html.parser import HTMLParser
 from http.cookiejar import CookieJar
 from urllib.parse import urlencode
@@ -174,6 +175,10 @@ def parse_form(html: str) -> _FormParser:
 def parse_ofertas(html: str) -> tuple[list[Oferta], int | None]:
     parser = _TurmasParser()
     parser.feed(html)
+    if not parser.ofertas and parser.total_reportado is None:
+        texto = " ".join(unescape(html).split()).casefold()
+        if "não foram encontrados resultados para a busca com estes parâmetros." in texto:
+            return [], 0
     return parser.ofertas, parser.total_reportado
 
 
