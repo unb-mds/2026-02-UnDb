@@ -128,12 +128,12 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
   consultar todas as opções de unidade da página pública de turmas do SIGAA e importar
   as que oferecem turmas de graduação, inclusive departamentos, institutos, faculdades
   e campi. Não se limita aos cursos de interesse imediato do time. Pré-requisito do RF07.
-- **[RF18] Rotina de atualização:** o sistema deve atualizar os dados importados
-  periodicamente.
 - **[RF19] Log de execução:** cada execução de importação deve registrar sucesso ou falha.
 
 ### Módulo 7 — Release 2
 
+- **[RF18] Rotina de atualização:** o sistema deve atualizar os dados importados
+  periodicamente.
 - **[RF20] Comentários em texto livre:** permitir comentário textual sobre a disciplina.
 - **[RF21] Denúncia de conteúdo:** permitir sinalizar avaliação abusiva.
 - **[RF22] Fila de moderação:** interface para aprovar ou remover conteúdo denunciado.
@@ -213,7 +213,8 @@ Restrições que valem para todo o sistema e não pertencem a um RF isolado.
 | RF08–RF11 | Consulta agregada, transparência, estado vazio e conflitante | R1 | Planejado |
 | RF12–RF13 | Comparação e ordenação | R1 | Planejado |
 | RF14–RF15 | Registro de avaliação e regras de agregação | R1 | Planejado |
-| RF16–RF19 | Importação SIGAA, cobertura, atualização e log | R1 | Em andamento |
+| RF16–RF17, RF19 | Importação manual do SIGAA, cobertura de graduação e log | R1 | Validado localmente; operação inicial manual |
+| RF18 | Atualização periódica dos dados importados | R2 | Planejado; agendamento local ainda não configurado |
 | RF20–RF22 | Comentários, denúncia e moderação | R2 | Planejado |
 | RNF02 | Mínimo de três avaliações para exibição detalhada | R1 | Validado pelo PO; implementação planejada |
 | RNF01, RNF03–RNF08 | Privacidade, segurança, containers, camadas, resiliência | R1 e R2 | **Proposto** |
@@ -314,6 +315,12 @@ para distinguir ausência de turmas de uma unidade não consultada. Outros níve
 ensino ficaram fora desta decisão. A evidência de execução está em
 [`estudos/validacao-release-1-sigaa-2026-09-24.md`](estudos/validacao-release-1-sigaa-2026-09-24.md).
 
+Na preparação da Release 1, o PO definiu que a importação inicial pode ser executada
+manualmente no ambiente local, inclusive na apresentação. A atualização periódica do
+banco (RF18) passa para a Release 2. O comando de importação e seu registro de sucesso
+ou falha (RF19) permanecem na Release 1; não é necessário instalar um agendamento
+para lançar a versão 1.0.0.
+
 ### Nota — verificação de que o aluno cursou
 
 O escopo original previa impedir avaliação de disciplina não cursada. O histórico de
@@ -368,6 +375,7 @@ homônimos são sempre apresentados separadamente.
 |---|---|
 | Avaliação de personalidade do professor | Subjetivo demais e com risco de ataque pessoal |
 | Comentários em texto livre e moderação | Release 2 |
+| Atualização periódica automática dos dados do SIGAA (RF18) | Release 2; a Release 1 usa importação manual |
 | Calouro como usuário primário | É matriculado automaticamente, sem escolha; torna-se usuário no 2º semestre |
 | Verificação de que o aluno cursou a disciplina | Dado indisponível publicamente (ver seção 11) |
 

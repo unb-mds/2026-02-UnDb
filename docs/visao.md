@@ -67,11 +67,12 @@ O objetivo é permitir uma decisão de matrícula mais fundamentada,
 - substituição de avaliação anterior para a mesma combinação de estudante, professor e
   disciplina;
 - exibição detalhada somente a partir de três avaliações por professor e disciplina;
-- importação periódica de professores, disciplinas e turmas a partir de páginas públicas do
-  SIGAA, com registro de sucesso ou falha.
+- importação manual de professores, disciplinas e turmas de graduação de todas as unidades
+  do formulário público do SIGAA, com registro de sucesso ou falha.
 
 ### Release 2
 
+- atualização periódica dos dados importados do SIGAA;
 - comentários em texto livre;
 - denúncia de conteúdo;
 - fila de moderação.
@@ -84,7 +85,8 @@ Não fazem parte da primeira release:
 - comentários em texto livre e a respectiva moderação;
 - calouros como público primário;
 - verificação de que o estudante cursou a disciplina, pois o histórico individual não está
-  disponível publicamente no SIGAA.
+  disponível publicamente no SIGAA;
+- atualização periódica automática dos dados do SIGAA, prevista para a Release 2.
 
 O produto não cria nota geral nem índice composto. A ordenação usa exclusivamente o
 percentual de recomendação. Dificuldade e chamada são informações neutras e não devem ser
@@ -125,7 +127,8 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
   a Release 1 usa apenas o modo local definido para a Issue #48;
 - reconciliar identidades provisórias de docentes quando um identificador externo se tornar
   disponível; o modelo de homônimos, múltiplos docentes e reimportação foi definido na #25;
-- comprovar e operacionalizar a cobertura da coleta em todas as unidades do SIGAA;
+- manter a cobertura de todas as unidades com turmas de graduação nas importações
+  manuais da Release 1 e operacionalizar a atualização periódica na Release 2;
 - definir a estratégia de execução e deploy do frontend;
 - validar os requisitos não-funcionais ainda propostos, exceto o RNF02 já validado.
 
