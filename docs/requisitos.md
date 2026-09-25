@@ -21,8 +21,7 @@ comparável, **independentemente de quantas pessoas ele conheça no curso**.
 
 ## 2. Origem dos requisitos — pesquisa com usuários
 
-Conversas abertas com **20 a 30 alunos da UnB**, de diferentes semestres, conduzidas antes
-da definição de escopo.
+Durante o desenvolvimento, nós e nosso grupo identificamos a dificuldade que alunos enfrentam ao tentar acessar conhecimento específico sem depender de contatos pessoais. Isso nos motivou a criar uma solução que democratizasse esse acesso
 
 ### 2.1 Situação atual
 
