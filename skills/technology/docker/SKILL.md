@@ -1,8 +1,8 @@
 ---
 name: docker
-description: Write, review, and troubleshoot Dockerfiles, docker-compose files, and .dockerignore for this project's services (backend API, database, and future frontend). Use whenever the team needs to containerize a service, set up a local Docker-based dev environment, debug a container build/run failure, or prepare a service for containerized deployment.
+description: Write, review, and troubleshoot Dockerfiles, docker-compose files, and .dockerignore for this project's services (backend API, database, and frontend). Use whenever the team needs to containerize a service, set up a local Docker-based dev environment, debug a container build/run failure, or prepare a service for containerized deployment.
 metadata:
-  project-version: "0.1.0"
+  project-version: "0.1.1"
   project-status: "proposed"
   project-category: "technology"
   project-scope: "project-wide"
@@ -41,7 +41,7 @@ Do not use it to:
 ## 4. When not to use
 
 - Pure application code changes with no impact on how the service is built or run.
-- Questions about what the backend framework should be (`Pending Decision` as of this version — see Section 15).
+- Questions about choosing application frameworks; consult the architectural decisions and the applicable technology skill.
 
 ## 5. Expected inputs
 
@@ -116,7 +116,11 @@ volumes:
   pgdata:
 ```
 
-Add a `frontend` service here once the frontend stack is `Defined`.
+The frontend stack is Next.js + Tailwind CSS, approved in #28 (ADR 02).
+For execution/containerization and its approval state, consult
+[`docs/arquitetura.md`, ADR 08](../../../docs/arquitetura.md#adr-08--execução-e-containerização-do-frontend)
+and #36. Inspect the actual root Compose and Dockerfiles before applying this example;
+the example is not the current project configuration.
 
 ### Step 5 — Build and run locally
 
@@ -167,7 +171,7 @@ Before considering the work done:
 ## 12. Interaction with other skills
 
 - **`skill-authoring`**: governs the lifecycle of this skill itself.
-- **Backend framework skill** (`technology`, not yet created): defines the app's internal structure that this skill's Dockerfile `CMD` must match.
+- **`fastapi`** (`technology`): consult its current status and guidance for the backend structure that the Dockerfile `CMD` must match.
 - **Future CI/CD skill** (`process`, not yet created): will reference the Dockerfile(s) produced here to build images in GitHub Actions.
 
 ## 13. Handling uncertainty and failures
@@ -193,5 +197,5 @@ If a container fails to build or run, report the exact error output rather than 
 
 ## 15. Open decisions (Pending Decision)
 
-- Frontend stack and its containerization (blocks writing a `frontend` service in `docker-compose.yml`).
+- Frontend execution/containerization: tracked only in #36 for epics #11 and #13; #32 was closed as duplicate. The stack is approved in #28; the implementation and architectural approval state are recorded in ADR 08. Do not infer approval from the presence of container files or promote this skill automatically.
 - Whether a separate production Dockerfile/Compose file is needed before the November 25 release, or whether the dev configuration will be reused.

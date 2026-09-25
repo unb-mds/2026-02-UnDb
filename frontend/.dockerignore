@@ -1,0 +1,12 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+.git/
+.env
+.env.*
+*.log
+*.pem
+*.tsbuildinfo
+next-env.d.ts

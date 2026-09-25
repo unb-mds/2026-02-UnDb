@@ -1,9 +1,27 @@
 import unittest
 
 from app.scrapers.sigaa_poc import parse_form, parse_ofertas
+from pegar_id import listar_unidades
 
 
 class SigaaPocParserTest(unittest.TestCase):
+    def test_lista_ids_de_todas_as_unidades_do_formulario(self) -> None:
+        html = """
+        <form id="formTurma">
+          <input type="hidden" name="javax.faces.ViewState" value="state-atual">
+          <select name="formTurma:inputDepto">
+            <option value="0">-- SELECIONE --</option>
+            <option value="508">DEPTO CIÊNCIAS DA COMPUTAÇÃO</option>
+            <option value="509">DEPARTAMENTO DE MATEMÁTICA</option>
+          </select>
+        </form>
+        """
+
+        self.assertEqual(listar_unidades(html), [
+            ("508", "DEPTO CIÊNCIAS DA COMPUTAÇÃO"),
+            ("509", "DEPARTAMENTO DE MATEMÁTICA"),
+        ])
+
     def test_form_extracts_jsf_state_options_and_dynamic_submit(self) -> None:
         form = parse_form("""
         <form id="formTurma" action="/sigaa/public/turmas/listar.jsf">
@@ -45,6 +63,32 @@ class SigaaPocParserTest(unittest.TestCase):
 
         self.assertEqual(total, 1)
         self.assertEqual(ofertas[0].docentes, ())
+
+    def test_marcador_docente_a_definir_nao_cria_professor(self) -> None:
+        ofertas, total = parse_ofertas("""
+        <table><tbody>
+          <tr class="agrupador"><td><span class="tituloDisciplina">FCE0794 - DISCIPLINA</span></td></tr>
+          <tr class="linhaPar"><td class="turma">03</td><td class="anoPeriodo">2026.2</td><td class="nome">A DEFINIR DOCENTE (60h)</td></tr>
+        </tbody><tfoot><tr><td><b>1 turmas encontrada(s)</b></td></tr></tfoot></table>
+        """)
+
+        self.assertEqual(total, 1)
+        self.assertEqual(ofertas[0].docentes, ())
+
+    def test_sem_resultados_explicitos_retorna_total_zero(self) -> None:
+        ofertas, total = parse_ofertas(
+            "<div class='info'>N&#227;o foram encontrados resultados para a busca "
+            "com estes par&#226;metros.</div>"
+        )
+
+        self.assertEqual(ofertas, [])
+        self.assertEqual(total, 0)
+
+    def test_pagina_sem_resultado_nem_mensagem_mantem_total_desconhecido(self) -> None:
+        ofertas, total = parse_ofertas("<div>Resposta inesperada do SIGAA</div>")
+
+        self.assertEqual(ofertas, [])
+        self.assertIsNone(total)
 
 
 class SigaaPocMultipleDocentesParserTest(unittest.TestCase):

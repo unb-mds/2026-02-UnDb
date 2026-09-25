@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal, Self
 from uuid import UUID
 
@@ -50,6 +51,14 @@ class AvaliacaoCreate(AvaliacaoBase):
     pass
 
 
+class AvaliacaoResponse(AvaliacaoBase):
+    model_config = ConfigDict(extra="forbid", from_attributes=True)
+
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+
 class AvaliacaoAgregadaBaseResponse(BaseModel):
     professor_id: UUID
     disciplina_id: UUID
@@ -75,3 +84,8 @@ class AvaliacaoAgregadaSuficienteResponse(AvaliacaoAgregadaBaseResponse):
 AvaliacaoAgregadaResponse = (
     AvaliacaoAgregadaSuficienteResponse | AvaliacaoAgregadaInsuficienteResponse
 )
+
+
+class ComparacaoProfessoresResponse(BaseModel):
+    disciplina: DisciplinaInstitucionalResponse
+    professores: list[AvaliacaoAgregadaResponse]

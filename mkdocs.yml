@@ -42,10 +42,16 @@ nav:
   - Arquitetura:
       - Visão e decisões: arquitetura.md
       - Modelos de dados: modelos.md
+      - Importação do SIGAA: importacao-sigaa.md
+      - Operação do SIGAA: operacao-importacao-sigaa.md
+  - Releases:
+      - Release 1.0.0: releases/1.0.0.md
   - Estudos:
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
       - Docker: estudos/docker.md
+  - Processo:
+      - Template de ata de reunião: atas/template-ata-reuniao.md
 
 exclude_docs: |
   agent-skills.md

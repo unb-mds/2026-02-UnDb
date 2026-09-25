@@ -125,14 +125,16 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 
 - **[RF16] Importação de professores e disciplinas:** o sistema deve obter dados de
   professores, disciplinas e turmas a partir de páginas públicas do SIGAA.
-- **[RF17] Cobertura de todos os departamentos:** a importação deve cobrir todos os
-  departamentos, e não apenas os cursos de interesse imediato do time. Pré-requisito do RF07.
-- **[RF18] Rotina de atualização:** o sistema deve atualizar os dados importados
-  periodicamente.
+- **[RF17] Cobertura de todas as unidades com turmas de graduação:** a importação deve
+  consultar todas as opções de unidade da página pública de turmas do SIGAA e importar
+  as que oferecem turmas de graduação, inclusive departamentos, institutos, faculdades
+  e campi. Não se limita aos cursos de interesse imediato do time. Pré-requisito do RF07.
 - **[RF19] Log de execução:** cada execução de importação deve registrar sucesso ou falha.
 
 ### Módulo 7 — Release 2
 
+- **[RF18] Rotina de atualização:** o sistema deve atualizar os dados importados
+  periodicamente.
 - **[RF20] Comentários em texto livre:** permitir comentário textual sobre a disciplina.
 - **[RF21] Denúncia de conteúdo:** permitir sinalizar avaliação abusiva.
 - **[RF22] Fila de moderação:** interface para aprovar ou remover conteúdo denunciado.
@@ -212,7 +214,8 @@ Restrições que valem para todo o sistema e não pertencem a um RF isolado.
 | RF08–RF11 | Consulta agregada, transparência, estado vazio e conflitante | R1 | Planejado |
 | RF12–RF13 | Comparação e ordenação | R1 | Planejado |
 | RF14–RF15 | Registro de avaliação e regras de agregação | R1 | Planejado |
-| RF16–RF19 | Importação SIGAA, cobertura, atualização e log | R1 | Em andamento |
+| RF16–RF17, RF19 | Importação manual do SIGAA, cobertura de graduação e log | R1 | Validado localmente; operação inicial manual |
+| RF18 | Atualização periódica dos dados importados | R2 | Planejado; agendamento local ainda não configurado |
 | RF20–RF22 | Comentários, denúncia e moderação | R2 | Planejado |
 | RNF02 | Mínimo de três avaliações para exibição detalhada | R1 | Validado pelo PO; implementação planejada |
 | RNF01, RNF03–RNF08 | Privacidade, segurança, containers, camadas, resiliência | R1 e R2 | **Proposto** |
@@ -278,6 +281,21 @@ Na mesma conversa, Nicolas aprovou também os detalhes abaixo para #40/#51:
 
 Essas decisões não validam os demais RNFs nem alteram as pendências de execução e envio de e-mail.
 
+### Contrato de cadastro — aprovado para a Issue #48 em 19/09/2026
+
+- senha entre 8 e 128 caracteres, armazenada com Argon2id;
+- confirmação por token opaco aleatório, de uso único, com validade de 24 horas; somente o
+  hash do token é persistido;
+- cadastro repetido retorna resposta genérica `202`, sem revelar se o e-mail já existe e
+  sem alterar a conta existente;
+- Resend é o provedor de produção, atrás de uma interface interna; na Release 1, o fluxo é
+  exercitado exclusivamente pelo adaptador local sem envio externo;
+- o formulário e a API aceitam somente nome, e-mail `@aluno.unb.br` e senha;
+- a página de confirmação recebe o token e solicita a mutação por `POST` à API.
+
+O domínio remetente do Resend é uma dependência operacional para envio a usuários reais,
+planejada para a Release 2, e não uma mudança no domínio institucional aceito no cadastro.
+
 ### Demais decisões pendentes
 
 O modelo de execução do banco foi definido durante a revisão do PR #55, em 11/09/2026:
@@ -287,9 +305,22 @@ SQLAlchemy síncrono, Alembic, PostgreSQL e driver `psycopg2`.
 |---|---|---|
 | Estratégia de execução/deploy do frontend Next.js (servidor vs export estático) | Configuração definitiva de execução (#36); não bloqueia o scaffold local #29 | Time |
 | Valor de N da métrica de cobertura | Apenas a métrica; mínimo de exibição já definido separadamente | PO |
-| Provedor de e-mail e validade do link de confirmação | Conclusão do cadastro #48 | Time / PO |
-| Identidade de docentes, homônimos, múltiplos docentes e reimportação | Integração persistida #25 | Time |
-| Cobertura e execução da coleta em todas as unidades | RF17–RF19; POC HTTP já demonstrada em uma unidade | Time |
+| Execução e operação da coleta em todas as unidades | RF17–RF19; escopo de graduação definido abaixo | Time |
+
+### Escopo de cobertura definido na validação da Release 1
+
+Em 24/09/2026, ficou definido que RF17 abrange todas as opções da página pública de
+turmas do SIGAA que tenham ofertas no nível `GRADUAÇÃO`, inclusive institutos,
+faculdades e campi. A enumeração deve considerar também opções sem ofertas no período,
+para distinguir ausência de turmas de uma unidade não consultada. Outros níveis de
+ensino ficaram fora desta decisão. A evidência de execução está em
+[`estudos/validacao-release-1-sigaa-2026-09-24.md`](estudos/validacao-release-1-sigaa-2026-09-24.md).
+
+Na preparação da Release 1, o PO definiu que a importação inicial pode ser executada
+manualmente no ambiente local, inclusive na apresentação. A atualização periódica do
+banco (RF18) passa para a Release 2. O comando de importação e seu registro de sucesso
+ou falha (RF19) permanecem na Release 1; não é necessário instalar um agendamento
+para lançar a versão 1.0.0.
 
 ### Nota — verificação de que o aluno cursou
 
@@ -304,8 +335,38 @@ não verificável.
 
 A [POC da #23](estudos/sigaa-poc.md), executada em 13/09/2026, demonstrou coleta HTTP de
 108 ofertas do CIC em 2026.2, preservando sessão e controles JSF. Isso comprova o caso
-demonstrado, não cobertura total, persistência ou atualização periódica. Essas entregas
-e as lacunas de identidade continuam nas #25–#27.
+demonstrado, não cobertura total, persistência ou atualização periódica. A integração
+persistida é tratada na #25; cobertura e atualização periódica continuam nas #26/#27.
+
+### Decisões da integração institucional — aprovadas em 17/09/2026
+
+Para concluir a Issue #25, o time aprovou o seguinte contrato:
+
+- toda oferta válida do SIGAA é representável, inclusive sem docente ou com múltiplos
+  docentes;
+- professor possui UUID interno e SIAPE quando a fonte o disponibilizar; sem identificador
+  externo, cada ocorrência recebe identidade provisória, explicitamente não confirmada, e
+  homônimos nunca são unidos automaticamente;
+- turma e professor têm relação muitos-para-muitos. A identidade da turma é composta por
+  fonte, unidade, período, componente e código textual da turma; docentes não fazem parte
+  dessa identidade;
+- unidade preserva o identificador público do SIGAA, o código interno e o nome exibido;
+- disciplina preserva UUID interno, identificador público do componente e código acadêmico;
+  conflitos entre essas identidades exigem reconciliação explícita;
+- reimportação sincroniza o retrato da unidade/período: cria, atualiza e marca como inativas
+  as turmas ausentes. Ausências só podem inativar registros quando a coleta completa foi
+  validada; uma coleta parcial ou com erro nunca remove nem inativa dados anteriores;
+- cada unidade é uma transação independente e cada oferta usa savepoint, de modo que uma
+  falha não impeça as demais ofertas ou unidades;
+- `sucesso=true` significa execução integral, sem erro nem divergência. O resultado
+  estruturado é responsabilidade da #25; agendamento, histórico durável e monitoramento são
+  responsabilidade da #26; cobertura de todas as unidades é responsabilidade da #27;
+- a API nunca dispara coleta. A #25 entrega leitura institucional mínima; as Issues #44 e
+  #45 permanecem responsáveis pela experiência de busca no frontend.
+
+Consultas por nome são parciais, sem distinção de maiúsculas/minúsculas ou acentos. Busca
+válida sem correspondência retorna lista vazia; recurso individual inexistente retorna 404;
+homônimos são sempre apresentados separadamente.
 
 ---
 
@@ -315,6 +376,7 @@ e as lacunas de identidade continuam nas #25–#27.
 |---|---|
 | Avaliação de personalidade do professor | Subjetivo demais e com risco de ataque pessoal |
 | Comentários em texto livre e moderação | Release 2 |
+| Atualização periódica automática dos dados do SIGAA (RF18) | Release 2; a Release 1 usa importação manual |
 | Calouro como usuário primário | É matriculado automaticamente, sem escolha; torna-se usuário no 2º semestre |
 | Verificação de que o aluno cursou a disciplina | Dado indisponível publicamente (ver seção 11) |
 

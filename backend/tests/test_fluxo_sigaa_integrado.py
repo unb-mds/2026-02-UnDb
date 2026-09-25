@@ -50,6 +50,8 @@ class FluxoSigaaIntegradoTest(unittest.TestCase):
                 session,
             ).model_dump()
 
+        engine.dispose()
+
         self.assertEqual(resposta["professor"]["nome"], "MARIA EMILIA MACHADO TELLES WALTER")
         self.assertEqual(resposta["disciplina"]["codigo"], "CIC0002")
         self.assertEqual(resposta["total_avaliacoes"], 0)

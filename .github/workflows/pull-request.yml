@@ -92,7 +92,149 @@ jobs:
           alembic downgrade base
           alembic upgrade head
 
+      - name: Verify migration with legacy data
+        run: |
+          alembic downgrade base
+          alembic upgrade 20260911_01
+          python -m tests.migration_legacy_check seed
+          alembic upgrade head
+          python -m tests.migration_legacy_check verify-upgrade
+          alembic check
+          alembic downgrade 20260911_01
+          python -m tests.migration_legacy_check verify-downgrade
+          alembic upgrade head
+
       - name: Build backend image and check packaged migrations
         run: |
           docker build -t g7-backend-ci .
           docker run --rm -e SECRET_KEY -e DEBUG -e DATABASE_URL g7-backend-ci alembic heads
+
+  docker-compose:
+    name: Docker Compose
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ci-only-secret
+      DEBUG: "False"
+      POSTGRES_USER: ci
+      POSTGRES_PASSWORD: ci
+      POSTGRES_DB: ci
+      DATABASE_URL: postgresql+psycopg2://ci:ci@db:5432/ci
+      CORS_ORIGINS: http://localhost:3000
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Start backend and PostgreSQL through Compose
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker compose config --quiet
+          docker compose up --build --wait backend db
+          curl --fail --retry 10 --retry-delay 2 --retry-all-errors \
+            http://127.0.0.1:8000/health
+
+      - name: Verify migrations and named-volume persistence
+        shell: bash
+        run: |
+          set -euo pipefail
+          revision_before="$(
+            docker compose exec -T db \
+              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc \
+              "SELECT version_num FROM alembic_version" | tr -d '[:space:]'
+          )"
+          test -n "$revision_before"
+
+          docker compose down
+          docker compose up -d --wait db
+
+          revision_after="$(
+            docker compose exec -T db \
+              psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc \
+              "SELECT version_num FROM alembic_version" | tr -d '[:space:]'
+          )"
+          test "$revision_after" = "$revision_before"
+
+      - name: Remove Compose resources
+        if: always()
+        run: docker compose down --volumes --remove-orphans
+
+  avaliacao-integrada:
+    name: Evaluation end to end (PostgreSQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      SECRET_KEY: ci-only-secret
+      DATABASE_URL: postgresql+psycopg2://ci:ci@127.0.0.1:5432/ci
+      UNDB_INTEGRATION_TEST: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Prepare real backend and migrated PostgreSQL
+        working-directory: backend
+        run: |
+          pip install -r requirements.txt
+          alembic upgrade head
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+      - name: Verify form, real session, persistence and concurrent upsert
+        working-directory: backend
+        run: |
+          export BROWSER_PATH="$(command -v google-chrome)"
+          python -m tests.integration_avaliacao
+
+  frontend:
+    name: Frontend
+    runs-on: windows-latest
+    env:
+      BROWSER_PATH: C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Test evaluation form logic and HTTP client
+        run: npm test
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Test evaluation form in Edge
+        run: npm run test:browser

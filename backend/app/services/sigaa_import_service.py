@@ -1,34 +1,51 @@
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
+from time import sleep
 from typing import Any
+from urllib.error import URLError
 
 from sqlalchemy.orm import Session
 
 from app.models.disciplina import Disciplina
 from app.models.professor import Professor
 from app.models.turma import Turma
+from app.models.unidade import Unidade
+from app.domain.texto import normalizar_busca
 from app.repositories import (
     disciplina_repository,
     professor_repository,
     turma_repository,
+    unidade_repository,
 )
-from app.scrapers.sigaa_poc import Oferta, coletar_ofertas_reais
+from app.scrapers.sigaa_poc import (
+    Oferta,
+    SigaaRedirecionadoError,
+    coletar_ofertas_reais,
+)
 
 
 class OfertaNaoPersistivelError(ValueError):
-    """A oferta depende de informação que o modelo ainda não representa."""
+    """A oferta contém conflito que exige reconciliação explícita."""
 
 
-def _get_or_create_professor(
-    db: Session, nome: str, departamento: str
-) -> Professor:
-    professor = professor_repository.get_by_nome_e_departamento(
-        db, nome, departamento
+FONTE_SIGAA = "SIGAA"
+
+
+def _identidade_provisoria(
+    oferta: Oferta, unidade: Unidade, nome: str
+) -> str:
+    componente = oferta.componente_id or oferta.componente_codigo
+    return ":".join(
+        (
+            FONTE_SIGAA,
+            unidade.codigo,
+            oferta.periodo,
+            componente,
+            oferta.turma_codigo,
+            normalizar_busca(nome),
+        )
     )
-    if professor is None:
-        professor = professor_repository.create(db, nome, departamento)
-    return professor
 
 
 def _get_or_create_disciplina(
@@ -41,37 +58,85 @@ def _get_or_create_disciplina(
             codigo=oferta.componente_codigo,
             nome=oferta.componente_nome,
             departamento=departamento,
+            identificador_externo=oferta.componente_id,
         )
+    elif (
+        disciplina.identificador_externo is not None
+        and oferta.componente_id is not None
+        and disciplina.identificador_externo != oferta.componente_id
+    ):
+        raise OfertaNaoPersistivelError(
+            "conflito de identidade da disciplina: "
+            f"codigo={oferta.componente_codigo!r}, "
+            f"persistido={disciplina.identificador_externo!r}, "
+            f"recebido={oferta.componente_id!r}"
+        )
+    else:
+        disciplina.nome = oferta.componente_nome
+        disciplina.nome_normalizado = normalizar_busca(oferta.componente_nome)
+        disciplina.departamento = departamento
+        if oferta.componente_id is not None:
+            disciplina.identificador_externo = oferta.componente_id
     return disciplina
 
 
-def salvar_oferta(db: Session, oferta: Oferta, departamento: str) -> Turma:
-    """Persiste uma oferta cujo vínculo cabe no modelo relacional atual.
-
-    Ofertas sem docente ou com múltiplos docentes permanecem pendentes de decisão
-    de modelo na Issue #25 e são recusadas antes de qualquer escrita.
-    """
+def salvar_oferta(
+    db: Session,
+    oferta: Oferta,
+    departamento: str,
+    unidade_nome: str | None = None,
+) -> Turma:
+    """Sincroniza uma oferta e seus zero ou vários vínculos docentes."""
     departamento = departamento.strip()
     if not departamento:
         raise OfertaNaoPersistivelError("A oferta não informa o departamento.")
-    if len(oferta.docentes) != 1 or not oferta.docentes[0].strip():
-        raise OfertaNaoPersistivelError(
-            "A oferta deve possuir exatamente um docente para o modelo atual; "
-            f"turma {oferta.turma_codigo!r} possui {len(oferta.docentes)}."
-        )
 
-    disciplina = _get_or_create_disciplina(db, oferta, departamento)
-    professor = _get_or_create_professor(
-        db, oferta.docentes[0].strip(), departamento
+    unidade = unidade_repository.get_or_create(
+        db,
+        fonte=FONTE_SIGAA,
+        codigo=departamento,
+        nome=(unidade_nome or departamento).strip(),
+        identificador_externo=oferta.unidade_id,
     )
 
-    turma = turma_repository.get_by_disciplina_professor_semestre(
-        db, disciplina.id, professor.id, oferta.periodo
+    disciplina = _get_or_create_disciplina(db, oferta, departamento)
+    turma = turma_repository.get_by_identidade(
+        db,
+        FONTE_SIGAA,
+        unidade.id,
+        disciplina.id,
+        oferta.periodo,
+        oferta.turma_codigo,
     )
     if turma is None:
         turma = turma_repository.create(
-            db, disciplina.id, professor.id, oferta.periodo
+            db,
+            FONTE_SIGAA,
+            unidade.id,
+            disciplina.id,
+            oferta.periodo,
+            oferta.turma_codigo,
         )
+    turma.ativa = True
+    turma.ultima_observacao_em = datetime.now(UTC)
+
+    professores: list[Professor] = []
+    nomes_vistos: set[str] = set()
+    for nome_bruto in oferta.docentes:
+        nome = " ".join(nome_bruto.split())
+        nome_normalizado = normalizar_busca(nome)
+        if not nome_normalizado or nome_normalizado in nomes_vistos:
+            continue
+        nomes_vistos.add(nome_normalizado)
+        professores.append(
+            professor_repository.get_or_create_provisorio(
+                db,
+                nome,
+                departamento,
+                _identidade_provisoria(oferta, unidade, nome),
+            )
+        )
+    turma.professores = professores
     return turma
 
 
@@ -91,11 +156,20 @@ class ResultadoDepartamento:
     ofertas_processadas: int
     erros: tuple[str, ...]
 
+    @property
+    def estado(self) -> str:
+        if self.sucesso:
+            return "sucesso"
+        if self.ofertas_processadas:
+            return "parcial"
+        return "falha"
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "departamento": self.departamento,
             "unidade_sigaa": self.unidade_sigaa,
             "sucesso": self.sucesso,
+            "estado": self.estado,
             "total_reportado": self.total_reportado,
             "ofertas_extraidas": self.ofertas_extraidas,
             "ofertas_processadas": self.ofertas_processadas,
@@ -139,6 +213,42 @@ def _rollback_seguro(db: Session) -> str | None:
     return None
 
 
+def _consolidar_ofertas(ofertas: list[Oferta]) -> list[tuple[Oferta, int]]:
+    agrupadas: dict[
+        tuple[str, str, str, str, str | None, str | None], tuple[Oferta, int]
+    ] = {}
+    for oferta in ofertas:
+        identidade = (
+            oferta.componente_codigo,
+            oferta.componente_nome,
+            oferta.turma_codigo,
+            oferta.periodo,
+            oferta.componente_id,
+            oferta.unidade_id,
+        )
+        anterior = agrupadas.get(identidade)
+        if anterior is None:
+            agrupadas[identidade] = (oferta, 1)
+            continue
+        existente, quantidade = anterior
+        docentes = tuple(dict.fromkeys((*existente.docentes, *oferta.docentes)))
+        agrupadas[identidade] = (replace(existente, docentes=docentes), quantidade + 1)
+    return list(agrupadas.values())
+
+
+def _coletar_com_tentativas(
+    coletor: ColetorOfertas, unidade_sigaa: str, ano: str, periodo: str
+) -> tuple[list[Oferta], int | None]:
+    for tentativa in range(3):
+        try:
+            return coletor(unidade_sigaa, ano, periodo)
+        except (URLError, TimeoutError, SigaaRedirecionadoError):
+            if tentativa == 2:
+                raise
+            sleep(tentativa + 1)
+    raise AssertionError("Tentativas de coleta esgotadas sem resultado.")
+
+
 def _importar_departamento(
     db: Session,
     solicitacao: DepartamentoImportacao,
@@ -160,7 +270,9 @@ def _importar_departamento(
         )
 
     try:
-        ofertas, total_reportado = coletor(unidade_sigaa, ano, periodo)
+        ofertas, total_reportado = _coletar_com_tentativas(
+            coletor, unidade_sigaa, ano, periodo
+        )
     except Exception as erro:
         return ResultadoDepartamento(
             departamento=departamento,
@@ -174,11 +286,18 @@ def _importar_departamento(
 
     erros: list[str] = []
     processadas = 0
-    for oferta in ofertas:
+    ids_observados = set()
+    for oferta, quantidade in _consolidar_ofertas(ofertas):
         try:
             with db.begin_nested():
-                salvar_oferta(db, oferta, departamento)
-            processadas += 1
+                turma = salvar_oferta(
+                    db,
+                    oferta,
+                    departamento,
+                    unidade_nome=unidade_sigaa,
+                )
+                ids_observados.add(turma.id)
+            processadas += quantidade
         except Exception as erro:
             erros.append(
                 f"turma {oferta.turma_codigo!r} de "
@@ -195,6 +314,25 @@ def _importar_departamento(
             "total informado pelo SIGAA diverge da extracao: "
             f"reportado={total_reportado}, extraido={len(ofertas)}"
         )
+
+    if not erros:
+        try:
+            unidade = unidade_repository.get_by_fonte_codigo(
+                db, FONTE_SIGAA, departamento
+            )
+            if unidade is not None:
+                with db.begin_nested():
+                    turma_repository.inativar_ausentes(
+                        db,
+                        FONTE_SIGAA,
+                        unidade.id,
+                        f"{ano}.{periodo}",
+                        ids_observados,
+                    )
+        except Exception as erro:
+            erros.append(
+                "falha ao sincronizar ofertas ausentes: " + _mensagem_erro(erro)
+            )
 
     try:
         db.commit()
