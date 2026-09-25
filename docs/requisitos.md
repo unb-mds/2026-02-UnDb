@@ -125,8 +125,10 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 
 - **[RF16] Importação de professores e disciplinas:** o sistema deve obter dados de
   professores, disciplinas e turmas a partir de páginas públicas do SIGAA.
-- **[RF17] Cobertura de todos os departamentos:** a importação deve cobrir todos os
-  departamentos, e não apenas os cursos de interesse imediato do time. Pré-requisito do RF07.
+- **[RF17] Cobertura de todas as unidades com turmas de graduação:** a importação deve
+  consultar todas as opções de unidade da página pública de turmas do SIGAA e importar
+  as que oferecem turmas de graduação, inclusive departamentos, institutos, faculdades
+  e campi. Não se limita aos cursos de interesse imediato do time. Pré-requisito do RF07.
 - **[RF18] Rotina de atualização:** o sistema deve atualizar os dados importados
   periodicamente.
 - **[RF19] Log de execução:** cada execução de importação deve registrar sucesso ou falha.
@@ -302,7 +304,16 @@ SQLAlchemy síncrono, Alembic, PostgreSQL e driver `psycopg2`.
 |---|---|---|
 | Estratégia de execução/deploy do frontend Next.js (servidor vs export estático) | Configuração definitiva de execução (#36); não bloqueia o scaffold local #29 | Time |
 | Valor de N da métrica de cobertura | Apenas a métrica; mínimo de exibição já definido separadamente | PO |
-| Cobertura e execução da coleta em todas as unidades | RF17–RF19; POC HTTP já demonstrada em uma unidade | Time |
+| Execução e operação da coleta em todas as unidades | RF17–RF19; escopo de graduação definido abaixo | Time |
+
+### Escopo de cobertura definido na validação da Release 1
+
+Em 24/09/2026, ficou definido que RF17 abrange todas as opções da página pública de
+turmas do SIGAA que tenham ofertas no nível `GRADUAÇÃO`, inclusive institutos,
+faculdades e campi. A enumeração deve considerar também opções sem ofertas no período,
+para distinguir ausência de turmas de uma unidade não consultada. Outros níveis de
+ensino ficaram fora desta decisão. A evidência de execução está em
+[`estudos/validacao-release-1-sigaa-2026-09-24.md`](estudos/validacao-release-1-sigaa-2026-09-24.md).
 
 ### Nota — verificação de que o aluno cursou
 

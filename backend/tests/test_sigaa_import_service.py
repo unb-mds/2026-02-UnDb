@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import Base
 from app.models import Disciplina, Professor, Turma, Unidade  # noqa: F401
-from app.scrapers.sigaa_poc import Oferta
+from app.scrapers.sigaa_poc import Oferta, SigaaRedirecionadoError
 from app.services.sigaa_import_service import (
     DepartamentoImportacao,
     executar_importacao,
@@ -140,6 +140,26 @@ class ExecucaoImportacaoTest(unittest.TestCase):
             self.assertTrue(resultado.departamentos[1].sucesso)
             self.assertEqual(db.scalar(select(func.count(Turma.id))), 1)
 
+    @patch("app.services.sigaa_import_service.sleep")
+    def test_repete_redirecionamento_transitorio(self, pausa) -> None:
+        tentativas = 0
+
+        def coletor(*_):
+            nonlocal tentativas
+            tentativas += 1
+            if tentativas < 3:
+                raise SigaaRedirecionadoError("POST redirecionado")
+            return [_oferta("DOCENTE")], 1
+
+        with Session(self.engine) as db:
+            resultado = executar_importacao(
+                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2", coletor
+            )
+
+        self.assertTrue(resultado.sucesso)
+        self.assertEqual(tentativas, 3)
+        self.assertEqual(pausa.call_count, 2)
+
     def test_coleta_completa_inativa_ausentes(self) -> None:
         with Session(self.engine) as db:
             executar_importacao(
@@ -154,6 +174,28 @@ class ExecucaoImportacaoTest(unittest.TestCase):
             )
             turmas = list(db.scalars(select(Turma).order_by(Turma.codigo)).all())
             self.assertEqual([turma.ativa for turma in turmas], [True, False])
+
+    def test_linhas_da_mesma_turma_unem_docentes_sem_preservar_obsoletos(self) -> None:
+        with Session(self.engine) as db:
+            primeira = executar_importacao(
+                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                coletor=lambda *_: (
+                    [_oferta("DOCENTE UM"), _oferta("DOCENTE DOIS")], 2
+                ),
+            )
+            turma = db.scalar(select(Turma))
+            self.assertTrue(primeira.sucesso)
+            self.assertEqual(primeira.departamentos[0].ofertas_processadas, 2)
+            self.assertEqual(db.scalar(select(func.count(Turma.id))), 1)
+            self.assertEqual({p.nome for p in turma.professores}, {"DOCENTE UM", "DOCENTE DOIS"})
+
+            segunda = executar_importacao(
+                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                coletor=lambda *_: ([_oferta("DOCENTE TRES")], 1),
+            )
+            self.assertTrue(segunda.sucesso)
+            db.refresh(turma)
+            self.assertEqual({p.nome for p in turma.professores}, {"DOCENTE TRES"})
 
     def test_coleta_parcial_nunca_inativa_ausentes(self) -> None:
         with Session(self.engine) as db:

@@ -8,7 +8,7 @@ cd "${BACKEND_DIR}"
 
 export PYTHONPATH="${BACKEND_DIR}"
 
-for variavel in DATABASE_URL SECRET_KEY SIGAA_ANO SIGAA_PERIODO SIGAA_DEPARTAMENTOS; do
+for variavel in DATABASE_URL SECRET_KEY SIGAA_ANO SIGAA_PERIODO; do
   if [[ -z "${!variavel:-}" ]]; then
     echo "${variavel} não foi definida." >&2
     exit 1
@@ -25,23 +25,34 @@ if [[ ! "${SIGAA_PERIODO}" =~ ^(1|2)$ ]]; then
   exit 1
 fi
 
-IFS=';' read -r -a departamentos <<< "${SIGAA_DEPARTAMENTOS}"
-argumentos_departamento=()
-
-for departamento in "${departamentos[@]}"; do
-  departamento="${departamento#"${departamento%%[![:space:]]*}"}"
-  departamento="${departamento%"${departamento##*[![:space:]]}"}"
-  if [[ -n "${departamento}" ]]; then
-    argumentos_departamento+=(--departamento "${departamento}")
+if [[ "${SIGAA_TODAS_UNIDADES:-}" == "1" ]]; then
+  if [[ -n "${SIGAA_DEPARTAMENTOS:-}" ]]; then
+    echo "Use SIGAA_TODAS_UNIDADES ou SIGAA_DEPARTAMENTOS, não ambos." >&2
+    exit 1
   fi
-done
+  argumentos_origem=(--todas-unidades)
+else
+  if [[ -z "${SIGAA_DEPARTAMENTOS:-}" ]]; then
+    echo "Defina SIGAA_TODAS_UNIDADES=1 ou SIGAA_DEPARTAMENTOS." >&2
+    exit 1
+  fi
+  IFS=';' read -r -a departamentos <<< "${SIGAA_DEPARTAMENTOS}"
+  argumentos_origem=()
+  for departamento in "${departamentos[@]}"; do
+    departamento="${departamento#"${departamento%%[![:space:]]*}"}"
+    departamento="${departamento%"${departamento##*[![:space:]]}"}"
+    if [[ -n "${departamento}" ]]; then
+      argumentos_origem+=(--departamento "${departamento}")
+    fi
+  done
 
-if (( ${#argumentos_departamento[@]} == 0 )); then
-  echo "SIGAA_DEPARTAMENTOS não contém departamentos válidos." >&2
-  exit 1
+  if (( ${#argumentos_origem[@]} == 0 )); then
+    echo "SIGAA_DEPARTAMENTOS não contém departamentos válidos." >&2
+    exit 1
+  fi
 fi
 
 python -m app.commands.importar_sigaa_agendado \
-  "${argumentos_departamento[@]}" \
+  "${argumentos_origem[@]}" \
   --ano "${SIGAA_ANO}" \
   --periodo "${SIGAA_PERIODO}"

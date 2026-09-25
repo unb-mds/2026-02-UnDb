@@ -20,22 +20,30 @@ para `sucesso` ou `falha`, incluindo timestamps, contadores, erros e o resultado
 
 ## Execução manual
 
-Execute a partir de `backend/`, repetindo `--departamento` para todas as unidades que devem
-ser atualizadas:
+Execute a partir de `backend/`. `--todas-unidades` consulta as opções atuais do formulário
+público e importa as turmas de graduação de cada uma:
 
 ```bash
 DATABASE_URL='postgresql+psycopg2://usuario:senha@host:5432/banco' \
 SECRET_KEY='chave-configurada-no-ambiente' \
 PYTHONPATH=. \
 python -m app.commands.importar_sigaa_agendado \
-  --departamento "CIC=DEPTO CIÊNCIAS DA COMPUTAÇÃO" \
-  --departamento "MAT=DEPTO MATEMÁTICA" \
+  --todas-unidades \
   --ano 2026 \
   --periodo 2
 ```
 
+O ID público de cada unidade é usado como código interno quando ela ainda não existe no
+banco. Se uma importação anterior já associou esse ID a um código como `CIC`, o código
+existente é preservado.
+
+Para uma verificação limitada, substitua `--todas-unidades` por uma ou mais opções
+`--departamento "CODIGO=ROTULO_SIGAA"`. Os dois modos são mutuamente exclusivos.
+
 O comando retorna código `0` somente quando todas as unidades terminam com sucesso. Falhas
 parciais ou totais retornam código `1`, sem impedir que o resultado seja registrado no banco.
+Cada unidade tenta novamente até duas vezes após timeout ou redirecionamento inesperado
+da consulta de turmas; a falha final permanece no histórico se as tentativas se esgotarem.
 
 ## Configuração do script para cron
 
@@ -47,7 +55,10 @@ Variáveis obrigatórias:
 - `DATABASE_URL` e `SECRET_KEY`: configuração do backend;
 - `SIGAA_ANO`: ano com quatro dígitos;
 - `SIGAA_PERIODO`: `1` ou `2`;
-- `SIGAA_DEPARTAMENTOS`: unidades no formato `CODIGO=ROTULO_SIGAA`, separadas por `;`.
+- `SIGAA_TODAS_UNIDADES=1`: enumera todas as opções atuais do formulário; use este modo
+  para a cobertura da Release 1;
+- alternativamente, `SIGAA_DEPARTAMENTOS`: unidades no formato
+  `CODIGO=ROTULO_SIGAA`, separadas por `;`, somente para execução limitada.
 
 Exemplo de arquivo `/etc/undb/sigaa-import.env`:
 
@@ -56,7 +67,7 @@ DATABASE_URL='postgresql+psycopg2://usuario:senha@host:5432/banco'
 SECRET_KEY='chave-configurada-no-ambiente'
 SIGAA_ANO='2026'
 SIGAA_PERIODO='2'
-SIGAA_DEPARTAMENTOS='CIC=DEPTO CIÊNCIAS DA COMPUTAÇÃO;MAT=DEPTO MATEMÁTICA'
+SIGAA_TODAS_UNIDADES='1'
 ```
 
 Proteja o arquivo porque ele contém credenciais:
@@ -90,9 +101,10 @@ Ao trocar de perfil:
 3. execute o comando manualmente uma vez e confirme o novo registro no banco;
 4. verifique no dia seguinte, ou no domingo seguinte, se o cron criou outra execução.
 
-Atualize `SIGAA_ANO`, `SIGAA_PERIODO` e a lista completa de departamentos quando o período
-acadêmico mudar. A enumeração e validação de cobertura das unidades continua rastreada na
-Issue #27.
+Atualize `SIGAA_ANO` e `SIGAA_PERIODO` quando o período acadêmico mudar. No modo
+`SIGAA_TODAS_UNIDADES=1`, a lista de unidades é lida novamente do SIGAA em cada execução;
+uma falha nessa leitura é registrada em `importacao_execucoes`. A verificação de cobertura
+da Release 1 está rastreada na Issue #131.
 
 ## Verificação da execução
 
