@@ -2,11 +2,27 @@ import argparse
 import json
 import sys
 
+from sqlalchemy.orm import Session
+
 from app.commands.importar_sigaa import _departamento
 from app.core.database import SessionLocal
+from app.repositories import unidade_repository
+from app.scrapers.sigaa_poc import listar_unidades_reais
 from app.services.importacao_agendada_service import (
     executar_importacao_agendada,
 )
+from app.services.sigaa_import_service import DepartamentoImportacao, FONTE_SIGAA
+
+
+def _todas_unidades(db: Session) -> list[DepartamentoImportacao]:
+    solicitacoes = []
+    for identificador, nome in listar_unidades_reais():
+        unidade = unidade_repository.get_by_fonte_identificador_externo(
+            db, FONTE_SIGAA, identificador
+        )
+        codigo = unidade.codigo if unidade is not None else identificador
+        solicitacoes.append(DepartamentoImportacao(codigo, nome))
+    return solicitacoes
 
 
 def main() -> None:
@@ -14,12 +30,17 @@ def main() -> None:
         description="Executa a importação agendada do SIGAA e registra o histórico."
     )
 
-    parser.add_argument(
+    origem = parser.add_mutually_exclusive_group(required=True)
+    origem.add_argument(
         "--departamento",
         action="append",
         type=_departamento,
-        required=True,
         help="Formato CODIGO=ROTULO_SIGAA. Pode ser repetido.",
+    )
+    origem.add_argument(
+        "--todas-unidades",
+        action="store_true",
+        help="Consulta todas as unidades do formulário público do SIGAA.",
     )
 
     parser.add_argument("--ano", required=True)
@@ -29,9 +50,13 @@ def main() -> None:
 
     try:
         with SessionLocal() as db:
+            if args.todas_unidades:
+                departamentos = lambda: _todas_unidades(db)
+            else:
+                departamentos = args.departamento
             registro = executar_importacao_agendada(
                 db,
-                args.departamento,
+                departamentos,
                 ano=args.ano,
                 periodo=args.periodo,
             )

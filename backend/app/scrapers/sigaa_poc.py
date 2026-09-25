@@ -25,6 +25,10 @@ TURMAS_PORTAL_URL = f"{TURMAS_URL}?aba=p-ensino"
 USER_AGENT = "G7-SIGAA-POC/1.0 (academic viability check)"
 
 
+class SigaaRedirecionadoError(RuntimeError):
+    """A busca voltou ao portal sem apresentar o resultado solicitado."""
+
+
 @dataclass(frozen=True)
 class Oferta:
     """Campos observados na tabela pública de turmas."""
@@ -156,12 +160,17 @@ class _TurmasParser(HTMLParser):
 
 def _docentes(text: str) -> tuple[str, ...]:
     names = re.findall(r"(.*?)(?:\s*\(\d+h\))(?=\s|$)", text)
-    docentes = tuple(" ".join(name.split()) for name in names if name.strip())
-    if docentes:
+    docentes = tuple(
+        nome
+        for name in names
+        if (nome := " ".join(name.split()))
+        and nome.casefold() != "a definir docente"
+    )
+    if names:
         return docentes
 
     docente = text.strip()
-    return (docente,) if docente else ()
+    return (docente,) if docente and docente.casefold() != "a definir docente" else ()
 
 
 def parse_form(html: str) -> _FormParser:
@@ -170,6 +179,26 @@ def parse_form(html: str) -> _FormParser:
     if "javax.faces.ViewState" not in parser.hidden:
         raise ValueError("O formulário SIGAA não contém javax.faces.ViewState.")
     return parser
+
+
+def listar_unidades(html: str) -> list[tuple[str, str]]:
+    opcoes = parse_form(html).options.get("formTurma:inputDepto")
+    if not opcoes:
+        raise ValueError("O formulário SIGAA não contém unidades.")
+    unidades = [
+        (identificador, nome)
+        for identificador, nome in opcoes
+        if identificador and identificador != "0"
+    ]
+    if len({identificador for identificador, _ in unidades}) != len(unidades):
+        raise ValueError("O formulário SIGAA contém IDs de unidade duplicados.")
+    return unidades
+
+
+def listar_unidades_reais() -> list[tuple[str, str]]:
+    request = Request(TURMAS_PORTAL_URL, headers={"User-Agent": USER_AGENT})
+    with build_opener().open(request, timeout=30) as response:
+        return listar_unidades(_decode(response))
 
 
 def parse_ofertas(html: str) -> tuple[list[Oferta], int | None]:
@@ -238,7 +267,9 @@ def coletar_ofertas_reais(
     )
     response = opener.open(request, timeout=30)
     if response.geturl() != TURMAS_URL:
-        raise RuntimeError(f"POST redirecionado para {response.geturl()}, sem resultado de turmas.")
+        raise SigaaRedirecionadoError(
+            f"POST redirecionado para {response.geturl()}, sem resultado de turmas."
+        )
     ofertas, total = parse_ofertas(_decode(response))
     return [replace(oferta, unidade_id=unidade) for oferta in ofertas], total
 

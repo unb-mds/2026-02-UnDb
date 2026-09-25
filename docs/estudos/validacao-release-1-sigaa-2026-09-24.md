@@ -54,15 +54,36 @@ As respostas válidas reportaram 6.555 linhas de oferta em 69 unidades; 142 opç
 tinham turmas de graduação em 2026.2. O banco terminou com 69 unidades com ofertas,
 3.486 disciplinas e 6.554 turmas ativas. A diferença de uma linha vem do campus
 Ceilândia: o SIGAA lista duas vezes a turma `FCE0794/03`, uma com docente identificada
-e outra com `A DEFINIR DOCENTE`. O importador atual grava somente o docente da última
-linha para essa turma. Além disso, 136 registros de professor no banco de teste têm
+e outra com `A DEFINIR DOCENTE`. O importador daquela execução gravou somente o docente da última
+linha para essa turma. Além disso, 136 registros de professor no banco de teste tinham
 o nome literal `A DEFINIR DOCENTE`. Essas duas falhas de fidelidade precisam de
 correção antes da release.
 
 A execução foi iniciada com uma lista gerada manualmente a partir do formulário. O
-agendador atual exige `SIGAA_DEPARTAMENTOS` configurado explicitamente e não enumera
+agendador daquela versão exigia `SIGAA_DEPARTAMENTOS` configurado explicitamente e não enumerava
 as 211 opções por conta própria. A atualização futura de novas opções da fonte ainda
 depende dessa configuração ou de automação adicional.
+
+## Verificação da correção da Issue #131
+
+Na correção da Issue #131, a rotina passou a enumerar todas as opções do formulário
+ao receber `SIGAA_TODAS_UNIDADES=1`, a consolidar linhas da mesma turma, a ignorar o
+marcador `A DEFINIR DOCENTE` e a repetir até duas vezes consultas com timeout ou
+redirecionamento. O código da unidade já associada ao ID público é preservado.
+
+No banco isolado novo `undb-r1-final`, a primeira execução automática consultou 211
+opções e teve sete falhas transitórias, todas resolvidas em repetição dirigida. A
+reimportação automática completa `c4885b37-0ea5-4c57-a0af-be6813174ffc` terminou
+com `status=sucesso`: 211/211 opções válidas, 69 com ofertas, 142 sem turmas de
+graduação, 6.555 linhas extraídas e processadas. O banco manteve 6.554 turmas
+distintas, pois duas linhas da fonte representam a mesma turma `FCE0794/03`.
+O vínculo dessa turma ficou com a docente identificada, e nenhuma linha da tabela
+`professores` recebeu o nome `A DEFINIR DOCENTE`. A suíte backend passou com 99 testes.
+
+O volume local preexistente `undb_postgres_data` foi consultado somente para leitura:
+continha zero unidades, turmas, professores e execuções de importação. Portanto, não há
+dados institucionais antigos a reconciliar nessa base antes da importação inicial.
+O banco foi parado sem remover seu volume.
 
 ## Atualização periódica
 
@@ -75,8 +96,6 @@ operacionalmente.
 
 ## Limite para promoção
 
-A correção do parser está rastreada na Issue #129 e precisa entrar em `develop` antes
-da branch de release. A consulta a todas as 211 opções foi demonstrada localmente,
-mas a perda de vínculo docente, o marcador tratado como professor, a configuração
-da lista completa para execuções futuras e o agendamento real permanecem pendentes
-antes da promoção para `main`.
+As correções das Issues #129 e #131 precisam entrar em `develop` antes da branch de
+release. A coleta completa e fiel foi demonstrada localmente em banco isolado; o
+agendamento real continua pendente antes da promoção para `main`.

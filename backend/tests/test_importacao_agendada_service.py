@@ -6,7 +6,8 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
 from app.core.database import Base
-from app.models import ImportacaoExecucao  # noqa: F401
+from app.commands.importar_sigaa_agendado import _todas_unidades
+from app.models import ImportacaoExecucao, Unidade  # noqa: F401
 from app.services.importacao_agendada_service import executar_importacao_agendada
 from app.services.sigaa_import_service import (
     DepartamentoImportacao,
@@ -117,6 +118,40 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
             self.assertEqual(persistido.status, "falha")
             self.assertIn("RuntimeError: falha inesperada", persistido.erro)
             self.assertFalse(persistido.resultado_json["sucesso"])
+
+    def test_registra_falha_ao_enumerar_unidades(self) -> None:
+        def enumerar():
+            raise RuntimeError("formulário SIGAA indisponível")
+
+        with Session(self.engine) as db:
+            registro = executar_importacao_agendada(
+                db, enumerar, ano="2026", periodo="2"
+            )
+            registro_id = registro.id
+
+        with Session(self.engine) as db:
+            persistido = db.get(ImportacaoExecucao, registro_id)
+            self.assertEqual(persistido.status, "falha")
+            self.assertIn("formulário SIGAA indisponível", persistido.erro)
+            self.assertEqual(persistido.departamentos, [])
+
+    @patch("app.commands.importar_sigaa_agendado.listar_unidades_reais")
+    def test_enumeracao_reutiliza_codigo_de_unidade_existente(self, listar) -> None:
+        listar.return_value = [
+            ("508", "DEPTO CIÊNCIAS DA COMPUTAÇÃO"),
+            ("672", "CAMPUS CEILÂNDIA"),
+        ]
+        with Session(self.engine) as db:
+            db.add(Unidade(
+                fonte="SIGAA", codigo="CIC", nome="CIC", identificador_externo="508"
+            ))
+            db.commit()
+            solicitacoes = _todas_unidades(db)
+
+        self.assertEqual(
+            [(item.departamento, item.unidade_sigaa) for item in solicitacoes],
+            [("CIC", "DEPTO CIÊNCIAS DA COMPUTAÇÃO"), ("672", "CAMPUS CEILÂNDIA")],
+        )
 
 
 if __name__ == "__main__":

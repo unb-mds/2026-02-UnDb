@@ -64,6 +64,17 @@ class SigaaPocParserTest(unittest.TestCase):
         self.assertEqual(total, 1)
         self.assertEqual(ofertas[0].docentes, ())
 
+    def test_marcador_docente_a_definir_nao_cria_professor(self) -> None:
+        ofertas, total = parse_ofertas("""
+        <table><tbody>
+          <tr class="agrupador"><td><span class="tituloDisciplina">FCE0794 - DISCIPLINA</span></td></tr>
+          <tr class="linhaPar"><td class="turma">03</td><td class="anoPeriodo">2026.2</td><td class="nome">A DEFINIR DOCENTE (60h)</td></tr>
+        </tbody><tfoot><tr><td><b>1 turmas encontrada(s)</b></td></tr></tfoot></table>
+        """)
+
+        self.assertEqual(total, 1)
+        self.assertEqual(ofertas[0].docentes, ())
+
     def test_sem_resultados_explicitos_retorna_total_zero(self) -> None:
         ofertas, total = parse_ofertas(
             "<div class='info'>N&#227;o foram encontrados resultados para a busca "

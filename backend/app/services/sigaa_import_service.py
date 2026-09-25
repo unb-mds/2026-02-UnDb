@@ -1,7 +1,9 @@
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
+from time import sleep
 from typing import Any
+from urllib.error import URLError
 
 from sqlalchemy.orm import Session
 
@@ -16,7 +18,11 @@ from app.repositories import (
     turma_repository,
     unidade_repository,
 )
-from app.scrapers.sigaa_poc import Oferta, coletar_ofertas_reais
+from app.scrapers.sigaa_poc import (
+    Oferta,
+    SigaaRedirecionadoError,
+    coletar_ofertas_reais,
+)
 
 
 class OfertaNaoPersistivelError(ValueError):
@@ -207,6 +213,42 @@ def _rollback_seguro(db: Session) -> str | None:
     return None
 
 
+def _consolidar_ofertas(ofertas: list[Oferta]) -> list[tuple[Oferta, int]]:
+    agrupadas: dict[
+        tuple[str, str, str, str, str | None, str | None], tuple[Oferta, int]
+    ] = {}
+    for oferta in ofertas:
+        identidade = (
+            oferta.componente_codigo,
+            oferta.componente_nome,
+            oferta.turma_codigo,
+            oferta.periodo,
+            oferta.componente_id,
+            oferta.unidade_id,
+        )
+        anterior = agrupadas.get(identidade)
+        if anterior is None:
+            agrupadas[identidade] = (oferta, 1)
+            continue
+        existente, quantidade = anterior
+        docentes = tuple(dict.fromkeys((*existente.docentes, *oferta.docentes)))
+        agrupadas[identidade] = (replace(existente, docentes=docentes), quantidade + 1)
+    return list(agrupadas.values())
+
+
+def _coletar_com_tentativas(
+    coletor: ColetorOfertas, unidade_sigaa: str, ano: str, periodo: str
+) -> tuple[list[Oferta], int | None]:
+    for tentativa in range(3):
+        try:
+            return coletor(unidade_sigaa, ano, periodo)
+        except (URLError, TimeoutError, SigaaRedirecionadoError):
+            if tentativa == 2:
+                raise
+            sleep(tentativa + 1)
+    raise AssertionError("Tentativas de coleta esgotadas sem resultado.")
+
+
 def _importar_departamento(
     db: Session,
     solicitacao: DepartamentoImportacao,
@@ -228,7 +270,9 @@ def _importar_departamento(
         )
 
     try:
-        ofertas, total_reportado = coletor(unidade_sigaa, ano, periodo)
+        ofertas, total_reportado = _coletar_com_tentativas(
+            coletor, unidade_sigaa, ano, periodo
+        )
     except Exception as erro:
         return ResultadoDepartamento(
             departamento=departamento,
@@ -243,7 +287,7 @@ def _importar_departamento(
     erros: list[str] = []
     processadas = 0
     ids_observados = set()
-    for oferta in ofertas:
+    for oferta, quantidade in _consolidar_ofertas(ofertas):
         try:
             with db.begin_nested():
                 turma = salvar_oferta(
@@ -253,7 +297,7 @@ def _importar_departamento(
                     unidade_nome=unidade_sigaa,
                 )
                 ids_observados.add(turma.id)
-            processadas += 1
+            processadas += quantidade
         except Exception as erro:
             erros.append(
                 f"turma {oferta.turma_codigo!r} de "

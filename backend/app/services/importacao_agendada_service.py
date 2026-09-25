@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
@@ -25,7 +25,8 @@ def _resumir_resultado(resultado: ResultadoImportacao) -> tuple[int, int]:
 
 def executar_importacao_agendada(
     db: Session,
-    departamentos: Sequence[DepartamentoImportacao],
+    departamentos: Sequence[DepartamentoImportacao]
+    | Callable[[], Sequence[DepartamentoImportacao]],
     *,
     ano: str,
     periodo: str,
@@ -34,13 +35,7 @@ def executar_importacao_agendada(
         status="em_andamento",
         ano=ano,
         periodo=periodo,
-        departamentos=[
-            {
-                "departamento": item.departamento,
-                "unidade_sigaa": item.unidade_sigaa,
-            }
-            for item in departamentos
-        ],
+        departamentos=[],
         ofertas_extraidas=0,
         ofertas_processadas=0,
         resultado_json={},
@@ -51,9 +46,17 @@ def executar_importacao_agendada(
     db.refresh(registro)
 
     try:
+        solicitacoes = departamentos() if callable(departamentos) else departamentos
+        registro.departamentos = [
+            {
+                "departamento": item.departamento,
+                "unidade_sigaa": item.unidade_sigaa,
+            }
+            for item in solicitacoes
+        ]
         resultado = executar_importacao(
             db,
-            departamentos,
+            solicitacoes,
             ano=ano,
             periodo=periodo,
         )
