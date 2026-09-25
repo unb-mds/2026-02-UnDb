@@ -90,12 +90,14 @@ O banco foi parado sem remover seu volume.
 O script de cron funcionou em execução controlada e gravou o histórico em
 `importacao_execucoes`, incluindo sucessos e falhas. Não há crontab configurado para o
 usuário local (`crontab -l` retornou `no crontab`), portanto **a execução periódica
-automática ainda não foi demonstrada**. A instalação do agendamento local e a
-observação de uma execução disparada no horário são necessárias para validar o RF18
-operacionalmente.
+automática ainda não foi demonstrada**. O PO decidiu usar importação manual na
+Release 1 e deixar o RF18 para a Release 2. A instalação do agendamento local e a
+observação de uma execução disparada no horário serão necessárias para validar o RF18
+naquela release.
 
 ## Limite para promoção
 
-As correções das Issues #129 e #131 precisam entrar em `develop` antes da branch de
-release. A coleta completa e fiel foi demonstrada localmente em banco isolado; o
-agendamento real continua pendente antes da promoção para `main`.
+As correções das Issues #129 e #131 entraram em `develop` pelo merge da PR #130.
+A coleta completa e fiel foi demonstrada localmente em banco isolado. A importação
+manual poderá ser repetida no ambiente de apresentação; o agendamento real pertence
+à Release 2.
