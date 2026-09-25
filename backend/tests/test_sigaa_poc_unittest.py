@@ -1,9 +1,27 @@
 import unittest
 
 from app.scrapers.sigaa_poc import parse_form, parse_ofertas
+from pegar_id import listar_unidades
 
 
 class SigaaPocParserTest(unittest.TestCase):
+    def test_lista_ids_de_todas_as_unidades_do_formulario(self) -> None:
+        html = """
+        <form id="formTurma">
+          <input type="hidden" name="javax.faces.ViewState" value="state-atual">
+          <select name="formTurma:inputDepto">
+            <option value="0">-- SELECIONE --</option>
+            <option value="508">DEPTO CIÊNCIAS DA COMPUTAÇÃO</option>
+            <option value="509">DEPARTAMENTO DE MATEMÁTICA</option>
+          </select>
+        </form>
+        """
+
+        self.assertEqual(listar_unidades(html), [
+            ("508", "DEPTO CIÊNCIAS DA COMPUTAÇÃO"),
+            ("509", "DEPARTAMENTO DE MATEMÁTICA"),
+        ])
+
     def test_form_extracts_jsf_state_options_and_dynamic_submit(self) -> None:
         form = parse_form("""
         <form id="formTurma" action="/sigaa/public/turmas/listar.jsf">
