@@ -49,6 +49,10 @@ são gerenciadas via [Issues](../../issues) e [milestones](../../milestones).
 - **Release 1:** 28/09/2026
 - **Release 2 (final):** 25/11/2026
 
+A Release 1.0.0 usa importação manual dos dados públicos do SIGAA no ambiente local.
+A atualização periódica automática ficou para a Release 2. Consulte as
+[notas da Release 1.0.0](docs/releases/1.0.0.md).
+
 ## Como rodar o projeto localmente
 
 ### Ambiente completo com Docker Compose
@@ -120,6 +124,20 @@ define hospedagem pública, TLS ou operação em produção.
 
 A decisão de persistência e as restrições do modelo estão registradas em
 [`sprints/sprint02/banco-de-dados.md`](sprints/sprint02/banco-de-dados.md).
+
+Para carregar as turmas de graduação de todas as unidades antes de apresentar a
+Release 1, mantenha o Compose ativo e execute:
+
+```bash
+docker compose --env-file backend/.env exec backend \
+  python -m app.commands.importar_sigaa_agendado \
+  --todas-unidades --ano 2026 --periodo 2
+```
+
+Ajuste ano e período para o semestre consultado. O comando retorna sucesso somente
+quando todas as unidades são processadas; o resultado fica registrado no banco.
+As instruções de consulta do registro estão em
+[`docs/operacao-importacao-sigaa.md`](docs/operacao-importacao-sigaa.md).
 
 O procedimento para coletar e persistir dados institucionais do SIGAA, incluindo o contrato
 de resultado consumível pela rotina de atualização, está em

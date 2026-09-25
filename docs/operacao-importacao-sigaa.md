@@ -1,4 +1,4 @@
-# Operação recorrente da importação do SIGAA
+# Operação da importação do SIGAA
 
 ## Decisão operacional vigente
 
@@ -6,7 +6,11 @@ A importação é executada fora da API pelo comando
 `python -m app.commands.importar_sigaa_agendado`. O script
 `scripts/cron/sigaa-import.sh` permite integrá-lo ao cron.
 
-A política aprovada combina dois perfis, sempre no fuso `America/Sao_Paulo`:
+Na Release 1, a importação é iniciada manualmente no ambiente local. A instalação
+de uma rotina periódica (RF18) ficou para a Release 2.
+
+A política de agendamento prevista para a Release 2 combina dois perfis, sempre no
+fuso `America/Sao_Paulo`:
 
 - **durante o período de matrícula:** execução diária às 03:00;
 - **no restante do semestre:** execução semanal, aos domingos às 03:00.
@@ -45,7 +49,7 @@ parciais ou totais retornam código `1`, sem impedir que o resultado seja regist
 Cada unidade tenta novamente até duas vezes após timeout ou redirecionamento inesperado
 da consulta de turmas; a falha final permanece no histórico se as tentativas se esgotarem.
 
-## Configuração do script para cron
+## Configuração do script para cron (Release 2)
 
 O script exige configuração explícita. Isso evita presumir o período acadêmico pelo mês civil
 ou executar silenciosamente apenas para o CIC.

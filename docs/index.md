@@ -50,6 +50,9 @@ SIGAA.
 | **Release 1** | 28/09/2026 | Consulta, comparação, avaliação estruturada e dados do SIGAA |
 | **Release 2** | 25/11/2026 | Comentários, denúncia e moderação |
 
+A [Release 1.0.0](releases/1.0.0.md) usa importação manual dos dados do SIGAA.
+A atualização periódica está prevista para a Release 2.
+
 !!! info "Fonte de verdade"
 
     [`docs/requisitos.md`](requisitos.md) é a fonte de verdade dos requisitos. Esta página
