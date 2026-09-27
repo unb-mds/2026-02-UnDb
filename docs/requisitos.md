@@ -21,7 +21,7 @@ comparável, **independentemente de quantas pessoas ele conheça no curso**.
 
 ## 2. Origem dos requisitos — pesquisa com usuários
 
-Durante o desenvolvimento, nós e nosso grupo identificamos a dificuldade que alunos enfrentam ao tentar acessar conhecimento específico sem depender de contatos pessoais. Isso nos motivou a criar uma solução que democratizasse esse acesso
+Nós percebemos a necessidade de tornar esse conhecimento acessível sem depender de contatos pessoais. Essa motivação guiou o desenvolvimento do produto.
 
 ### 2.1 Situação atual
 
