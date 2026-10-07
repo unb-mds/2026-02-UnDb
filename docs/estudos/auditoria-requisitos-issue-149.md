@@ -14,7 +14,7 @@ A presente auditoria foi executada com o objetivo de identificar lacunas, termos
 
 Foram auditados os seguintes artefatos:
 1. **Fonte de verdade canônica dos requisitos:** [`docs/requisitos.md`](../requisitos.md);
-2. **Especificação técnica de implementação (derivada):** [`specs.md`](../../specs.md);
+2. **Especificação técnica de implementação (derivada):** [`specs.md`](../../../specs.md);
 3. **Documento de Visão do Produto (derivado):** [`docs/visao.md`](../visao.md);
 4. **Documento de Arquitetura (consumidor de requisitos):** [`docs/arquitetura.md`](../arquitetura.md);
 5. **Notas da Release 1.0.0 (evidência de entrega):** [`docs/releases/1.0.0.md`](../releases/1.0.0.md).
