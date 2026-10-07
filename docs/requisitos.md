@@ -386,6 +386,8 @@ homônimos são sempre apresentados separadamente.
 
 - **[Documento de visão](visao.md):** síntese derivada do problema, público, valor, escopo,
   métricas e riscos do produto
+- **[Auditoria de clareza e rastreabilidade (Issue #149)](estudos/auditoria-requisitos-issue-149.md):**
+  auditoria de lacunas, termos vagos, estados pós-Release 1 e decisões pendentes de produto
 - **[Board de requisitos (Figma)](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3o-de-Professores-UnB-):**
   pesquisa, personas, Double Diamond, priorização, story map e fluxos de usuário
 - **Epic:** `[EPIC] Avaliações (Core do Produto)` (#14)
