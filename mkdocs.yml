@@ -1,3 +1,41 @@
   - Releases:
       - Release 1.0.0: releases/1.0.0.md
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
+  - Estudos:
+      - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
+      - Prova de conceito do SIGAA: estudos/sigaa-poc.md
+      - Docker: estudos/docker.md
+      - Auditoria de Clareza dos Requisitos: estudos/auditoria-requisitos-issue-149.md
+  - Processo:
+      - Template de ata de reunião: atas/template-ata-reuniao.md
+
+exclude_docs: |
+  agent-skills.md
+
+plugins:
+  - search:
+      lang: pt
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+copyright: Grupo 7 — MDS 2026/2 — Universidade de Brasília
