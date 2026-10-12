@@ -46,11 +46,13 @@ nav:
       - Operação do SIGAA: operacao-importacao-sigaa.md
   - Releases:
       - Release 1.0.0: releases/1.0.0.md
+      - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
   - Estudos:
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
       - Docker: estudos/docker.md
       - Busca, comparação e avaliação: estudos/observacao-jornada-busca-comparacao-avaliacao.md
+      - Auditoria de Clareza dos Requisitos: estudos/auditoria-requisitos-issue-149.md
   - Processo:
       - Template de ata de reunião: atas/template-ata-reuniao.md
 
