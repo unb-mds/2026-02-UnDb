@@ -1,12 +1,9 @@
-
 site_name: UnDb
 site_description: Documentação de produto, requisitos e arquitetura do UnDb
 site_url: https://unb-mds.github.io/2026-02-UnDb/
 repo_url: https://github.com/unb-mds/2026-02-UnDb
 repo_name: unb-mds/2026-02-UnDb
 edit_uri: edit/develop/docs/
-- Estudos:
-      - Busca, comparação e avaliação: estudos/observacao-jornada-busca-comparacao-avaliacao.md
 
 theme:
   name: material
@@ -53,6 +50,7 @@ nav:
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
       - Docker: estudos/docker.md
+      - Busca, comparação e avaliação: estudos/observacao-jornada-busca-comparacao-avaliacao.md
   - Processo:
       - Template de ata de reunião: atas/template-ata-reuniao.md
 
