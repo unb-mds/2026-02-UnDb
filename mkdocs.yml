@@ -46,6 +46,7 @@ nav:
       - Operação do SIGAA: operacao-importacao-sigaa.md
   - Releases:
       - Release 1.0.0: releases/1.0.0.md
+      - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
   - Estudos:
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
