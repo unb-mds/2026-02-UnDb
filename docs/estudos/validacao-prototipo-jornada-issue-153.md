@@ -96,3 +96,43 @@ Para evitar análises subjetivas pós-teste, definem-se os seguintes critérios 
 - **Ambiente de Teste:** O ambiente de testes com estudantes pode utilizar dados pré-carregados (seed) ou mockados da API, reduzindo a variabilidade de casos reais do SIGAA.
 - **Tamanho da Amostra:** Testes qualitativos de usabilidade em equipes acadêmicas costumam cobrir entre 3 e 5 alunos por ciclo, o que identifica os principais gargalos de navegação, mas não possui significância estatística quantitativa.
 - **Ausência de Dados Fictícios:** Não foram geradas sessões empíricas simuladas neste documento. O protocolo está pronto para aplicação pelos membros da equipe nas próximas sessões de pesquisa de campo da Sprint 06.
+
+
+---
+
+## 4. Registro de Evidências da Avaliação do Protótipo
+
+A avaliação do protótipo e da jornada de usuário sob a ótica dos requisitos e componentes existentes revela evidências concretas sobre as capacidades e limitações do fluxo:
+
+### 4.1 Sessões com Participantes e Declaração de Pendência
+
+Conforme a seção 1 da issue #153 e as diretrizes do `AGENTS.md` e `project-governance`, **não foram criadas sessões de teste ou participantes fictícios**.
+
+> ⚠️ **Registro Explícito de Pendência de Validação Empírica:**  
+> A realização presencial ou remota dos testes com alunos das turmas de graduação da UnB (perfis P1 e P2) está programada para a Sprint 06, sob responsabilidade da equipe executora. Este documento fornece o roteiro neutro, as tarefas padronizadas e a matriz de coleta necessários para a execução dessas sessões.
+
+### 4.2 Evidências Técnicas Observadas na Inspeção de Usabilidade da Jornada
+
+A partir da inspeção minuciosa dos componentes frontend desenvolvidos na Release 1 (`frontend/src/app/*`) e da proposta visual da Release 2, identificam-se os seguintes comportamentos estruturais:
+
+1. **Jornada de Entrada e Descoberta (`/`, `/professores`, `/disciplinas`):**
+   - **Comportamento observado:** A tela inicial exige que o estudante escolha antecipadamente entre "Buscar professor" ou "Buscar disciplina".
+   - **Evidência no código:** O componente [`Home`](file:///home/tiago/MDS-G7/G7-2026-2/frontend/src/app/page.tsx) renderiza dois cards separados direcionando para `/professores` e `/disciplinas`.
+   - **Atrito identificado:** Um aluno sem rede (P1) que deseja avaliar as opções para uma matéria obrigatória pode buscar o nome do professor achando que encontrará a disciplina ou vice-versa, gerando cliques redundantes de navegação.
+
+2. **Diferenciação entre Consulta Pública e Acesso Autenticado:**
+   - **Comportamento observado:** A consulta às páginas de agregação (`/professores/[id]/disciplinas/[disciplinaId]`) e de comparação (`/disciplinas/[id]`) funciona de modo 100% público, sem redirecionamento para login.
+   - **Evidência no código:** O botão "Avaliar este professor na disciplina" permite acesso ao formulário; o aviso de login (`precisaEntrar`) é acionado apenas na submissão ou indicado textualmente no topo do formulário.
+
+3. **Comunicação de Estados Especiais (Vazio, Insuficiente e Conflitante):**
+   - **Vazio:** Na tela de agregação, quando `totalAvaliacoes === 0`, exibe textualmente: *"Ainda não há avaliações para este professor nesta disciplina."*
+   - **Insuficiente:** Quando `dadosSuficientes === false` (menos de 3 avaliações), exibe: *"Dados insuficientes para exibir os critérios — são necessárias pelo menos 3 avaliações para proteger a identidade de quem avaliou. Faltam X."*
+   - **Conflitante:** Para os critérios factuais de chamada e material, o sistema exibe o rótulo explícito `"Conflitante"` quando não há consenso entre as respostas (conforme RF11).
+
+4. **Comparação de Professores na Disciplina (`/disciplinas/[id]`):**
+   - **Comportamento observado:** Lista em grade responsiva todos os professores que ofertam turmas ativas para a disciplina, exibindo dados agregados ou mensagem de insuficiência e ordenando decrescentemente por taxa de recomendação.
+   - **Atrito identificado:** Não há filtros rápidos para alternar critérios (ex.: ordenar por didática ou ver turmas de horário específico), e os cartões ocupam espaço vertical relevante em telas menores (mobile).
+
+5. **Formulário de Avaliação e Critérios Neutros (`.../avaliar`):**
+   - **Comportamento observado:** O formulário possui mensagem destacando: *"Dificuldade e Chamada são informações neutras, sem indicação de bom ou ruim."*
+   - **Atrito identificado:** O controle é composto por `<select>` suspensos individuais. O envio sem estar autenticado gera aviso com link em nova aba para login, o que pode causar perda de contexto ou descontinuidade da sessão.
