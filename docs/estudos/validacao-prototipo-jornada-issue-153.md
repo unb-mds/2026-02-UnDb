@@ -22,7 +22,7 @@ Conforme a governança do projeto (`skills/governance/project-governance/SKILL.m
 
 A investigação de UX da Release 2 desdobra-se em três etapas complementares no épico #144:
 
-1. **Diagnóstico e Observação Preliminar (Issue #148):**  
+1. **Diagnóstico e Observação Preliminar (Issue #148):**
    Mapeou os pontos de atrito identificados na apresentação da Release 1 e nos requisitos RF04–RF14, destacando:
    - Dúvida sobre o ponto de partida da busca (divisão rígida entre professor e disciplina na home);
    - Incerteza entre consulta anônima (aberta) e cadastro obrigatório para avaliar;
@@ -31,10 +31,10 @@ A investigação de UX da Release 2 desdobra-se em três etapas complementares n
    - Falta de contexto na leitura lado a lado e na ordenação por recomendação na tela de disciplina;
    - Ruído no formulário de avaliação quanto à neutralidade dos critérios (Dificuldade e Chamada).
 
-2. **Prototipação da Jornada (Issue #152):**  
+2. **Prototipação da Jornada (Issue #152):**
    Atribuída ao design/prototipação com o objetivo de desenhar a jornada unificada cobrindo entrada, busca, resultados, comparação e formulário de avaliação, sem alterar as regras aprovadas. No momento desta avaliação, o protótipo formal de alta fidelidade na issue #152 ainda se encontra em fase de proposição/elaboração, enquanto a implementação funcional da Release 1 no frontend Next.js serve como base executável inspecionada.
 
-3. **Validação do Protótipo com Alunos (Issue #153 - Este Documento):**  
+3. **Validação do Protótipo com Alunos (Issue #153 - Este Documento):**
    Estrutura o instrumento e o protocolo de teste, analisa a interface e a jornada pretendida frente aos obstáculos conhecidos, encaminha decisões pendentes ao PO e define as pré-condições para execução das sessões presenciais/remotas com estudantes.
 
 ---
@@ -108,7 +108,7 @@ A avaliação do protótipo e da jornada de usuário sob a ótica dos requisitos
 
 Conforme a seção 1 da issue #153 e as diretrizes do `AGENTS.md` e `project-governance`, **não foram criadas sessões de teste ou participantes fictícios**.
 
-> ⚠️ **Registro Explícito de Pendência de Validação Empírica:**  
+> ⚠️ **Registro Explícito de Pendência de Validação Empírica:**
 > A realização presencial ou remota dos testes com alunos das turmas de graduação da UnB (perfis P1 e P2) está programada para a Sprint 06, sob responsabilidade da equipe executora. Este documento fornece o roteiro neutro, as tarefas padronizadas e a matriz de coleta necessários para a execução dessas sessões.
 
 ### 4.2 Evidências Técnicas Observadas na Inspeção de Usabilidade da Jornada
@@ -176,11 +176,11 @@ Os seguintes pontos identificados durante a revisão tocam regras de negócio, r
    - *Situação atual:* O RF13 estabelece que a comparação deve ser ordenada estritamente pelo percentual de recomendação (`recomenda`).
    - *Questão ao PO:* Em turmas onde um professor possui 100% de recomendação com base em apenas 3 avaliações e outro possui 95% de recomendação com base em 50 avaliações, deve haver opção para o aluno ordenar por didática ou ponderar pela quantidade de avaliações?
    - *Impacto:* Requer alteração no RF13 se filtros adicionais de ordenação forem aprovados.
-   
+
 2. **Exibição de Turmas Históricas vs. Turmas Ativas (RF16 / RF17):**
    - *Situação atual:* O sistema exibe na comparação professores com turmas ativas no semestre vigente importadas do SIGAA.
    - *Questão ao PO:* Professores com histórico avaliado, mas que não possuem turma ativa no semestre atual, devem constar na comparação de uma disciplina (com aviso de "sem turma neste semestre") para fins de referência de módulo livre?
-   
+
 3. **Fluxo de Comentários Textuais na R2 (RF20, RF21, RF22):**
    - *Situação atual:* O formulário da R1 é 100% estruturado (sem texto livre). O RF20 introduz comentários em texto na R2.
    - *Questão ao PO:* O comentário será obrigatório ou opcional na submissão da avaliação? O comentário passará por moderação prévia ou denúncia posterior (post-moderation)?
