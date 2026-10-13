@@ -136,3 +136,73 @@ A partir da inspeção minuciosa dos componentes frontend desenvolvidos na Relea
 5. **Formulário de Avaliação e Critérios Neutros (`.../avaliar`):**
    - **Comportamento observado:** O formulário possui mensagem destacando: *"Dificuldade e Chamada são informações neutras, sem indicação de bom ou ruim."*
    - **Atrito identificado:** O controle é composto por `<select>` suspensos individuais. O envio sem estar autenticado gera aviso com link em nova aba para login, o que pode causar perda de contexto ou descontinuidade da sessão.
+
+
+---
+
+## 5. Comparação com o Diagnóstico Anterior
+
+A tabela a seguir confronta os obstáculos priorizados no diagnóstico da issue #148 com as evidências observadas no protótipo e na implementação da jornada, classificando o status da melhora e indicando ajustes sugeridos:
+
+| Obstáculo Original (Issue #148) | Evidência de Origem (Diagnóstico Anterior) | Comportamento Observado no Protótipo / Jornada | Avaliação de Melhora | Ajuste Sugerido e Justificativa |
+|---|---|---|---|---|
+| **1. Confusão na busca inicial entre professor, disciplina e código** | Usuário não sabe se busca professor, código ou matéria; atrito maior em módulo livre (RF05–RF07). | Home ainda divide em dois fluxos estáticos (`/professores` e `/disciplinas`). Ao entrar em um, não é possível buscar o outro diretamente. | **Ausência de melhora** | Propor campo de busca unificado na home (com abas ou resultados agrupados "Professores" e "Disciplinas"). Reduz cliques e atende diretamente a P1. |
+| **2. Percepção ambígua de consulta pública vs. avaliação restrita** | Falta de clareza se é preciso cadastro para consultar as avaliações (RF04, RF14). | Consulta é totalmente aberta e fluida; home possui texto explicativo (*"Consulte avaliações estruturadas sem precisar de rede de contatos"*). O login só é cobrado na submissão. | **Melhora comprovada** | Manter o acesso livre à consulta e reforçar no botão de avaliação a informação prévia *"Exige login @aluno.unb.br"*, evitando surpresa no envio. |
+| **3. Interpretação errônea do estado vazio como avaliação negativa** | Ausência de avaliações pode ser interpretada como nota zero ou reprovação do professor (RF10). | Componente explicita *"Ainda não há avaliações para este professor nesta disciplina"* e não renderiza notas vazias ou estrelas zeradas. | **Melhora comprovada** | Incluir call-to-action encorajando: *"Seja o primeiro a avaliar este docente nesta matéria"*, estimulando a persona P2 a alimentar a base. |
+| **4. Incompreensão do estado de dados insuficientes (< 3 avaliações)** | Usuário não entende por que não vê notas quando já existem 1 ou 2 envios. | Mensagem clara na tela de detalhe: *"Dados insuficientes... são necessárias pelo menos 3 avaliações para proteger a identidade de quem avaliou. Faltam X."* | **Melhora comprovada** | Na tela de comparação de disciplinas (`/disciplinas/[id]`), a mensagem atual diz apenas *"Dados insuficientes para exibir os critérios"*. Recomenda-se unificar o texto explicando o motivo do anonimato também na comparação. |
+| **5. Dificuldade de interpretação do estado "Conflitante"** | Usuário estranha ver "Conflitante" em chamada e material, sem saber como interpretar (RF11). | O rótulo "Conflitante" é exibido textualmente quando não há maioria clara. Falta explicação em tooltip ou legenda contextual sobre o que gerou o conflito estatístico. | **Evidência insuficiente** (requer teste de campo com alunos) | Adicionar microcopy explicativo: *"Respostas divididas entre os estudantes — metade relata que faz chamada e metade relata que não"*. |
+| **6. Leitura e comparabilidade lado a lado** | Comparação em grade pode ficar truncada ou confusa em dispositivos móveis (RF12, RF13). | Em desktop, cards lado a lado exibem dados agregados satisfatoriamente. Em mobile, os cartões empilham-se verticalmente, dificultando a comparação direta simultânea. | **Melhora parcial** | Desenvolver modo de comparação compacto tipo tabela ou visualização condensada com alternância de métricas principais para visualização mobile. |
+| **7. Entendimento de critérios neutros (Dificuldade e Chamada)** | Dificuldade alta pode ser julgada precipitadamente como algo ruim; chamada como perseguição (RF14, RF15). | Aviso em destaque: *"Dificuldade e Chamada são informações neutras, sem indicação de bom ou ruim"*. | **Melhora comprovada** | Manter a legenda e avaliar em testes se a escala textual (Fácil / Médio / Difícil) comunica neutralidade com sucesso. |
+
+---
+
+## 6. Encaminhamentos ao Product Owner (PO)
+
+A análise da jornada e dos requisitos vigentes (`docs/requisitos.md`) permitiu separar claramente o que são **sugestões de design e usabilidade (UX)** do que constitui **mudanças em regras de negócio ou de produto que exigem decisão humana do PO**.
+
+### 6.1 Sugestões de UX e Interface (Trabalho Técnico da Equipe)
+
+Estas melhorias não alteram critérios de agregação, escalas ou regras de negócio, podendo ser incorporadas nas issues de frontend do épico #144 (issues #155, #157, #158):
+
+1. **Unificação da busca na Home:** Permitir buscar simultaneamente professores ou disciplinas em uma barra de pesquisa única na página inicial, com agrupamento claro dos resultados.
+2. **Harmonização do aviso de dados insuficientes:** Exibir a contagem regressiva (*"Faltam X avaliações para proteger o anonimato"*) também nos cards da tela de comparação de professores (`/disciplinas/[id]`).
+3. **Preservação de rascunho de avaliação:** Se o usuário tentar enviar uma avaliação sem autenticação, persistir temporariamente as opções selecionadas em `sessionStorage` para restaurá-las automaticamente após o retorno do login, evitando redigitação.
+
+### 6.2 Pontos Dependentes de Decisão do PO (Regras de Produto)
+
+Os seguintes pontos identificados durante a revisão tocam regras de negócio, restrições e políticas de produto, ficando expressamente encaminhados para validação do PO:
+
+1. **Ordenação na Comparação de Disciplinas (RF13):**
+   - *Situação atual:* O RF13 estabelece que a comparação deve ser ordenada estritamente pelo percentual de recomendação (`recomenda`).
+   - *Questão ao PO:* Em turmas onde um professor possui 100% de recomendação com base em apenas 3 avaliações e outro possui 95% de recomendação com base em 50 avaliações, deve haver opção para o aluno ordenar por didática ou ponderar pela quantidade de avaliações?
+   - *Impacto:* Requer alteração no RF13 se filtros adicionais de ordenação forem aprovados.
+   
+2. **Exibição de Turmas Históricas vs. Turmas Ativas (RF16 / RF17):**
+   - *Situação atual:* O sistema exibe na comparação professores com turmas ativas no semestre vigente importadas do SIGAA.
+   - *Questão ao PO:* Professores com histórico avaliado, mas que não possuem turma ativa no semestre atual, devem constar na comparação de uma disciplina (com aviso de "sem turma neste semestre") para fins de referência de módulo livre?
+   
+3. **Fluxo de Comentários Textuais na R2 (RF20, RF21, RF22):**
+   - *Situação atual:* O formulário da R1 é 100% estruturado (sem texto livre). O RF20 introduz comentários em texto na R2.
+   - *Questão ao PO:* O comentário será obrigatório ou opcional na submissão da avaliação? O comentário passará por moderação prévia ou denúncia posterior (post-moderation)?
+
+---
+
+## 7. Status dos Critérios da Issue #153 e Pendências
+
+Acompanhamento dos critérios de conclusão estabelecidos na Issue [#153](https://github.com/unb-mds/2026-02-UnDb/issues/153):
+
+- [x] **Tarefas, observações e limitações da avaliação registrados:** O documento especifica o roteiro reproduzível de 5 tarefas neutras, a matriz de observações e as limitações técnicas e metodológicas da avaliação.
+- [x] **Principais obstáculos comparados com o diagnóstico anterior:** Tabela comparativa confrontando cada um dos 7 obstáculos da issue #148 com as evidências do protótipo e da implementação atual.
+- [x] **Mudanças que impliquem regras de produto encaminhadas ao PO:** Pontos de decisão de produto (ordenação da comparação, turmas sem oferta ativa e política de comentários da R2) foram catalogados e isolados das sugestões puras de UX.
+- [ ] **Realização das sessões empíricas com alunos:** Registrada explicitamente como **pendência aberta** a ser executada pela equipe nas dinâmicas de teste da Sprint 06.
+
+---
+
+## 8. Referências
+
+- [Issue #153 — [R2][UX] Validar protótipo da jornada com alunos](https://github.com/unb-mds/2026-02-UnDb/issues/153)
+- [Issue #148 — [R2][UX] Observar a jornada de busca, comparação e avaliação com alunos](https://github.com/unb-mds/2026-02-UnDb/issues/148)
+- [Issue #152 — [R2][UX] Prototipar tela inicial, busca, resultados, comparação e formulário](https://github.com/unb-mds/2026-02-UnDb/issues/152)
+- [Épico #144 — [EPIC][R2] Melhorar a jornada do aluno na aplicação](https://github.com/unb-mds/2026-02-UnDb/issues/144)
+- [`docs/requisitos.md`](../requisitos.md) — Fonte de verdade dos requisitos do projeto
+- [`docs/visao.md`](../visao.md) — Documento de visão do produto
