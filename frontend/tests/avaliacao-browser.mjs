@@ -8,6 +8,7 @@ import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { verificarPrototipo } from "./prototipo-browser.mjs";
 
 const navegador = process.env.BROWSER_PATH ?? "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";
 assert.ok(existsSync(navegador), "Informe BROWSER_PATH com o executável Edge/Chromium.");
@@ -280,6 +281,7 @@ try {
   }
   assert.equal(await avaliar('document.querySelectorAll("textarea, [name=historico], [name=comentario]").length'), 0);
   if (!real) await verificarCorrecoesInterface();
+  if (!real) await verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto, socket });
   console.log("Interface aprovada: cinco critérios, escalas, validação local, respostas preservadas, teclado, acesso direto e 6 combinações de tema/largura.");
 } finally {
   if (socket?.readyState === WebSocket.OPEN) {
