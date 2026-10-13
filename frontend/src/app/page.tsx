@@ -28,6 +28,9 @@ export default function Home() {
           <span className="mt-1 block text-sm text-foreground/60">Pelo nome ou pelo código.</span>
         </Link>
       </div>
+      <Link href="/prototipo" className="self-start text-sm font-medium text-accent underline underline-offset-4">
+        Experimentar o protótipo da jornada · dados demonstrativos →
+      </Link>
     </main>
   );
 }
