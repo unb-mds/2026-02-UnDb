@@ -178,20 +178,22 @@ Cada execução do comando agendado registra uma linha na tabela `importacao_exe
    ```bash
    docker compose exec db psql -U g7 -d g7 -c "
    SELECT
+       t.id AS turma_id,
+       t.unidade_id,
        d.codigo AS disciplina,
        t.codigo AS turma,
-       t.periodo,
+       t.semestre,
        t.ativa,
        COUNT(p.id) AS qtd_professores
    FROM turmas t
    JOIN disciplinas d ON d.id = t.disciplina_id
-   LEFT JOIN turma_professores tp ON tp.turma_id = t.id
+   LEFT JOIN turmas_professores tp ON tp.turma_id = t.id
    LEFT JOIN professores p ON p.id = tp.professor_id
-   WHERE t.periodo = '2026.2'
-   GROUP BY d.codigo, t.codigo, t.periodo, t.ativa
+   WHERE t.semestre = '2026.2' AND t.ativa = true
+   GROUP BY t.id, t.unidade_id, d.codigo, t.codigo, t.semestre, t.ativa
    LIMIT 10;
    "
    ```
 
-Ofertas com zero, um ou vários docentes são suportadas pela modelagem relacional (`turma_professores`); erros registrados representam
+Ofertas com zero, um ou vários docentes são suportadas pela modelagem relacional (`turmas_professores`); erros registrados representam
 falhas reais de coleta, validação ou integridade de dados, e não uma restrição a um único docente.

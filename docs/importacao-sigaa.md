@@ -41,7 +41,7 @@ flowchart TD
 | **Orquestração e Histórico** | `app.services.importacao_agendada_service` | Registra e atualiza a auditoria em `importacao_execucoes` (`status`, contadores, erros, JSON). |
 | **Extração e Sincronização** | `app.services.sigaa_import_service` | Orquestra tentativas de requisição HTTP, isolamento transacional por unidade e savepoints por oferta (`salvar_oferta`). |
 | **Scraper HTTP público** | `app.scrapers.sigaa_poc` | Faz requisições HTTP (com `CookieJar`), extrai `javax.faces.ViewState`, submete formulário e faz parse HTML do resultado das turmas (`parse_ofertas`). |
-| **Persistência relacional** | `app.repositories.*` e PostgreSQL | Persiste entidades relacionais (`Unidade`, `Disciplina`, `Turma`, `Professor` e vínculos `turma_professores`) e inativa ofertas ausentes em coletas íntegras. |
+| **Persistência relacional** | `app.repositories.*` e PostgreSQL | Persiste entidades relacionais (`Unidade`, `Disciplina`, `Turma`, `Professor` e vínculos `turmas_professores`) e inativa ofertas ausentes em coletas íntegras. |
 | **Leitura e Exposição** | `app.services.institucional_service` e `app.routers.{professores,disciplinas}` | Disponibiliza listagem e detalhe de professores, disciplinas e turmas ativas sem consultar o SIGAA em tempo real. |
 | **Consumo no Cliente** | `frontend/src/lib/services/{professores,disciplinas}.ts` | Consome a API pública para alimentar páginas de busca, detalhe de professor e comparação de disciplinas. |
 
@@ -101,10 +101,10 @@ interpretar texto livre.
 
 ## Semântica da sincronização e regras de negócio
 
-- **Ofertas sem docente e multidocentes:** ofertas sem docente são persistidas com zero vínculos; ofertas com múltiplos docentes preservam todos os vínculos em `turma_professores`.
+- **Ofertas sem docente e multidocentes:** ofertas sem docente são persistidas com zero vínculos; ofertas com múltiplos docentes preservam todos os vínculos em `turmas_professores`.
 - **Identidades docentes provisórias:** como a página pública não fornece SIAPE, cada docente recebe identidade provisória associada à sua ocorrência de turma (`SIGAA:UNIDADE:PERIODO:COMPONENTE:TURMA:NOME_NORMALIZADO`). Homônimos não são unidos silenciosamente e uma reconciliação futura pode confirmar a identidade definitiva.
 - **Identificação da turma:** a turma é identificada pela combinação de fonte (`SIGAA`), unidade, disciplina, período e código textual da turma. Uma alteração de docente atualiza os vínculos sem duplicar a turma no banco.
-- **Tratamento de turmas ausentes (inativação):** somente uma coleta completa da unidade, com a contagem validada contra o rodapé do SIGAA e sem nenhum erro em ofertas individuais, marca como inativas (`ativa=false`) as turmas ausentes. Execuções parciais ou com falha preservam integralmente o estado anterior das turmas.
+- **Tratamento de turmas ausentes (inativação):** somente uma coleta completa da unidade, com a contagem validada contra o rodapé do SIGAA e sem nenhum erro em ofertas individuais, marca como inativas (`ativa=false`) as turmas ausentes. Em uma execução parcial, as ofertas válidas são persistidas ou atualizadas, inclusive seus vínculos docentes, mas as turmas ausentes não são inativadas. Se o commit da unidade falhar, a transação é desfeita e as alterações dessa unidade não são persistidas.
 - **Isolamento da API:** falhas de importação não afetam a disponibilidade da API HTTP nem interrompem consultas de usuários, pois o processo é completamente desacoplado e executado fora do ciclo de vida dos endpoints.
 
 ## Verificações e exemplo reproduzível
