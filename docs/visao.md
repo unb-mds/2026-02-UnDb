@@ -17,9 +17,7 @@ informal, desigual e pouco comparável. Alunos sem uma rede consolidada — espe
 2º e 3º semestre, os introvertidos e os que cursam módulo livre em outro departamento —
 frequentemente decidem sem base suficiente.
 
-A pesquisa que originou o produto foi composta por conversas abertas com 20 a 30 alunos da
-UnB, de diferentes semestres. Ela identificou a necessidade de tornar esse conhecimento
-acessível sem depender de contatos pessoais.
+Nós percebemos a necessidade de tornar esse conhecimento acessível sem depender de contatos pessoais. Essa motivação guiou o desenvolvimento do produto.
 
 ## 3. Visão do produto
 
