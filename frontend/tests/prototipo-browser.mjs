@@ -3,7 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 // Reutiliza o navegador e o ciclo de vida do runner existente, sem novo framework.
-export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto, socket }) {
+export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto, aguardarValidacaoLocal, socket }) {
   const requisicoesApi = [];
   const observar = ({ data }) => {
     const evento = JSON.parse(data);
@@ -81,11 +81,14 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     assert.equal(await avaliar("document.querySelector('form').checkValidity()"), false);
     assert.equal(await avaliar("!!document.querySelector('textarea')"), false);
     await capturar("05-avaliacao");
+    await aguardarValidacaoLocal("Selecione uma opção válida para Didática.");
     await avaliar("document.querySelector('select').focus()");
     await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
     await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
     assert.equal(await avaliar("document.activeElement.name"), "dificuldade");
     assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle"), "solid");
+    assert.match(await avaliar("getComputedStyle(document.activeElement).boxShadow"), /2px/);
+    assert.equal(await avaliar("getComputedStyle(document.activeElement).getPropertyValue('--tw-ring-color').trim() === getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()"), true);
     await avaliar("Array.from(document.querySelectorAll('select')).forEach(s => { s.value=s.options[1].value; s.dispatchEvent(new Event('change',{bubbles:true})); }); document.querySelector('form').requestSubmit()");
     await aguardarTexto("Prévia conferida.");
     assert.equal(await avaliar("document.querySelector('[name=didatica]').value"), "1");
@@ -136,6 +139,15 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
           assert.equal(await avaliar("document.documentElement.scrollWidth <= window.innerWidth"), true, `${tema}/${largura}/${query}`);
           assert.equal(await avaliar("!!document.querySelector('[aria-current=step]')"), true);
           assert.match(await avaliar("document.querySelector('aside').innerText"), /Dados demonstrativos fictícios/);
+          assert.equal(await avaliar("Array.from(document.querySelectorAll('main a')).every(a => !a.pathname.startsWith('/prototipo') || Array.from(new URL(a.href).searchParams.values()).every(v => v !== ''))"), true, `Parâmetros vazios: ${query}`);
+          if (query.startsWith("etapa=avaliacao")) {
+            await avaliar("document.querySelector('select').focus()");
+            await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+            await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+            assert.equal(await avaliar("document.activeElement.name"), "dificuldade");
+            assert.match(await avaliar("getComputedStyle(document.activeElement).boxShadow"), /2px/);
+            assert.equal(await avaliar("getComputedStyle(document.activeElement).getPropertyValue('--tw-ring-color').trim() === getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()"), true);
+          }
         }
         if (tema === "dark" && largura === 320) {
           await navegar(telas[3][0], telas[3][1]);

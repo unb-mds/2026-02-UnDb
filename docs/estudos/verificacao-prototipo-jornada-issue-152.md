@@ -185,3 +185,44 @@ Sem execução de integração real com FastAPI/PostgreSQL ou validação com al
 - [x] Nenhuma alteração de requisito, arquitetura ou governança.
 
 A descrição acima é uma proposta local; publicação depende da confirmação do usuário.
+
+## Correções após a revisão da PR #179
+
+Preparadas localmente em resposta ao timeout do job Frontend e aos ajustes pedidos
+na revisão técnica. A publicação original ocorreu após autorização do usuário;
+esta rodada de correções aguarda uma nova confirmação antes de push/atualização da PR.
+
+**Causa reproduzida do timeout.** O teste de cadastro aguardava somente a presença
+do campo Nome no HTML e clicava imediatamente no botão. Next.js apresenta HTML
+antes de hidratar os handlers React. Ao reter os scripts do cadastro em uma reprodução
+local, o clique original causou navegação nativa GET, sem executar a validação de nome,
+e terminou com o mesmo `Timeout: Informe seu nome`. O script temporário de diagnóstico
+foi removido. Não há evidência de que a diferença entre Node 22 e 24 seja a causa.
+
+**Correção.** O runner aguarda uma resposta observável da validação local usando
+eventos sintéticos de submit com dados inválidos. Sem hidratação esses eventos não
+provocam navegação; com hidratação a validação produz a mensagem esperada. O mesmo
+procedimento é aplicado aos formulários real e demonstrativo de avaliação. Não foram
+aumentados timeouts nem alteradas regras de cadastro, sessão ou envio.
+
+O cenário de regressão retém scripts até que o HTML esteja disponível, comprova que
+a validação React ainda não funciona, libera os scripts e verifica mensagem/foco,
+permanência em `/cadastro` sem query e zero cadastros enviados para nome em branco.
+Depois verifica que apenas as tentativas válidas de 422/202 chegam à API controlada.
+
+**Revisão visual e navegação.** `CriteriosAvaliacao` remove `outline-none` e adiciona
+`focus-visible:ring-2 focus-visible:ring-accent`. O contorno global já existente
+permanece; o anel de 2 px na cor de destaque agora está explícito no componente.
+O navegador verifica o foco por Tab e seu estilo nos dois temas e nas três larguras.
+`href` omite parâmetros de valor vazio sem remover o contexto preenchido; os testes
+verificam os links das 54 combinações da jornada, incluindo estados alternativos.
+
+**Rastreabilidade da PR.** A descrição remota consultada já possui `Closes #152`
+e referência à Epic #144, sem referência à #32. Não precisou ser corrigida e não
+foi alterada nesta rodada.
+
+**Validação desta rodada.** `npm test` (19 aprovados), `npm run lint`,
+`npm run build` (incluindo TypeScript), `npm run test:browser` (Edge, cenário de
+hidratação controlada, suíte existente e protótipo em 54 combinações) e
+`git diff --check` passaram. Execução local com Node `v24.21.0`; o CI reportou
+Node `v22.23.3`. A nova execução remota só poderá ocorrer após a publicação autorizada.

@@ -20,7 +20,9 @@ const acao = "inline-block rounded-lg bg-accent px-4 py-2.5 text-sm font-medium 
 const cartao = "rounded-xl border border-foreground/10 p-5";
 
 function href(etapa: Etapa, valores: Record<string, string> = {}) {
-  return `/prototipo?${new URLSearchParams({ ...valores, etapa })}`;
+  const parametros = new URLSearchParams(Object.entries(valores).filter(([, valor]) => valor !== ""));
+  parametros.set("etapa", etapa);
+  return `/prototipo?${parametros}`;
 }
 
 function CriteriosDemo({ avaliacao }: { avaliacao: AvaliacaoAgregada }) {

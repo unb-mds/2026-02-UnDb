@@ -17,7 +17,7 @@ export default function CriteriosAvaliacao({ disabled = false, onChange }: {
               defaultValue=""
               onChange={onChange}
               aria-describedby={criterio.nome === "dificuldade" || criterio.nome === "chamada" ? "criterios-neutros" : undefined}
-              className="w-full rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base outline-none focus:border-foreground/50"
+              className="w-full rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base focus:border-foreground/50 focus-visible:ring-2 focus-visible:ring-accent"
             >
               <option value="" disabled>Selecione uma opção</option>
               {criterio.opcoes.map(([valor, rotulo]) => <option key={valor} value={valor}>{rotulo}</option>)}
