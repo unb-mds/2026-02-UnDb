@@ -94,6 +94,9 @@ alimenta a comparação (RF12).
 
 ## 4. Modelo relacional
 
+O modelo abaixo retrata a Release 1. O detalhamento de requisitos da R2 na #154
+não adiciona automaticamente campos, tabelas ou privilégios a este modelo.
+
 ### `usuarios`
 | Campo | Tipo | Observação |
 |---|---|---|
@@ -158,6 +161,21 @@ oferta sincroniza os vínculos sem criar outra turma.
 
 **Constraint:** `UNIQUE(usuario_id, professor_id, disciplina_id)` — implementa o RF03 no
 banco, e não apenas na aplicação.
+
+### Limites para a evolução de RF20–RF22
+
+As regras de produto estão definidas em [`requisitos.md`](requisitos.md), no detalhamento
+de RF20–RF22 e nas decisões R2-DEC-01 a R2-DEC-15. A implementação posterior precisa
+representar versões publicadas e substitutos pendentes sem contornar suspensão, separar
+denúncias autenticadas/anônimas, restringir ações a moderadores designados e preservar
+os cinco critérios. Também deve cumprir a retenção/descarte definidos pela fonte,
+sem transformar registros privados em arquivo permanente de texto ou denúncias encerradas.
+
+Nesta etapa a aprovação de textos novos e substitutos é humana. A lista do filtro é
+pendente e a IA é objetivo futuro condicionado, sem aprovação de tecnologia/provedor.
+Modelo físico, contratos, concessão operacional do papel e execução do descarte serão
+detalhados nas #156/#160/#161, com a aprovação própria para mudanças substanciais.
+Esta seção consome requisitos; não cria ADR, diagrama de dados da R2 ou decisão técnica.
 
 ---
 

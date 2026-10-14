@@ -71,9 +71,17 @@ O objetivo é permitir uma decisão de matrícula mais fundamentada,
 ### Release 2
 
 - atualização periódica dos dados importados do SIGAA;
-- comentários em texto livre;
-- denúncia de conteúdo;
-- fila de moderação.
+- comentário opcional da avaliação estudante/professor/disciplina, com leitura pública
+  sem autoria identificável e aprovação humana prévia nesta etapa;
+- denúncia de comentário por usuários autenticados ou visitantes, com origens separadas
+  e suspensão após 50 contas distintas com denúncia aberta da mesma versão;
+- fila para aprovação, denúncias e suspensões, com moderadores designados pelo PO,
+  impedimentos sobre casos próprios e registros privados de retenção limitada.
+
+Essas regras foram aprovadas pelo solicitante na discussão da #154 e detalhadas em
+`docs/requisitos.md` (RF20–RF22 e R2-DEC-01 a R2-DEC-15). Não afirmam implementação.
+Os cinco critérios e seus agregados permanecem independentes da moderação do texto;
+substitutos passam novamente pela moderação vigente antes de publicar.
 
 ## 7. Limites de escopo da Release 1
 
@@ -112,6 +120,8 @@ com o mínimo de três avaliações já definido para exibição detalhada.
 - ausência de matrícula, CPF e histórico acadêmico no cadastro;
 - ausência de texto livre na Release 1;
 - agregação e desempates conforme as regras registradas em `docs/requisitos.md`.
+- regras de comentários, denúncia, moderação, anonimato público e retenção conforme
+  decisões da #154, sem homologar os RNFs que permanecem propostos.
 
 ### Hipótese não validada
 
@@ -129,6 +139,9 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
   manuais da Release 1 e operacionalizar a atualização periódica na Release 2;
 - definir a estratégia de execução e deploy do frontend;
 - validar os requisitos não-funcionais ainda propostos, exceto o RNF02 já validado.
+- definir a lista do filtro de termos; enquanto isso, manter aprovação humana prévia;
+- avaliar futuramente a moderação por IA sem aprovação humana prévia, sem considerar
+  essa intenção condicional como substituição já aprovada do fluxo inicial.
 
 ## 10. Releases
 
