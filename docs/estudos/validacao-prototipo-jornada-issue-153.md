@@ -120,11 +120,11 @@ Busca unificada, harmonização dos avisos de insuficiência, explicação de co
 
 A preservação de rascunho após autenticação é uma proposta adicional. Seu mecanismo, duração e tratamento de dados precisam ser definidos antes de implementar; este documento não escolhe armazenamento nem presume perda de respostas já observada.
 
-### 6.2 Questões de produto ainda pendentes
+### 6.2 Questões de produto e decisões posteriores
 
 1. **Ordenação (RF13, seções 8 e 11):** o percentual de recomendação é a chave aprovada; quantidade decrescente e nome são desempates. Ordenar por didática ou ponderar notas/volume alteraria a regra vigente. Qualquer proposta depende de decisão explícita do PO e atualização da fonte de requisitos.
 2. **Oferta e semestre (RF12, RF16–RF17):** a [consulta de professores por disciplina](https://github.com/unb-mds/2026-02-UnDb/blob/e320ee710d2bc6ffe6a5c63633822e848f2aad89/backend/app/repositories/professor_repository.py) filtra `Turma.disciplina_id` e `Turma.ativa`, **sem filtro por `Turma.semestre`**. Logo, a comparação pode incluir turmas ativas de semestres diferentes; não há restrição ao semestre vigente nessa consulta. Perguntas ao PO: deve existir restrição explícita por semestre? Devem aparecer professores com histórico avaliado, mas sem qualquer turma ativa na disciplina? Ambas permanecem pendentes; nenhuma filtragem é alterada nesta entrega.
-3. **Comentários na R2 (RF20–RF22):** a R1 mantém avaliação estruturada sem texto livre. Obrigatoriedade de comentário e regras do fluxo de denúncia/moderação não são decididas neste roteiro. Devem ser tratadas nas respectivas issues com o PO antes de compor cenários novos de validação.
+3. **Comentários na R2 (RF20–RF22):** a R1 inspecionada mantém avaliação estruturada sem texto livre. A [fonte de requisitos atualizada pela #154, commit `5360ff4`](https://github.com/unb-mds/2026-02-UnDb/blob/5360ff4/docs/requisitos.md) já define comentário opcional vinculado à avaliação e moderação humana prévia, além das regras de denúncia e revisão. As perguntas anteriores sobre obrigatoriedade e moderação não permanecem abertas. Esse detalhamento documental não comprova implementação no protótipo da #152; cenários de comentários devem seguir a fonte aprovada quando houver artefato correspondente para avaliação.
 
 ## 7. Critérios da issue #153 e pendências
 

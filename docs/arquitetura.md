@@ -94,6 +94,9 @@ alimenta a comparação (RF12).
 
 ## 4. Modelo relacional
 
+O modelo abaixo retrata a Release 1. O detalhamento de requisitos da R2 na #154
+não adiciona automaticamente campos, tabelas ou privilégios a este modelo.
+
 ### `usuarios`
 | Campo | Tipo | Observação |
 |---|---|---|
@@ -159,32 +162,67 @@ oferta sincroniza os vínculos sem criar outra turma.
 **Constraint:** `UNIQUE(usuario_id, professor_id, disciplina_id)` — implementa o RF03 no
 banco, e não apenas na aplicação.
 
+### Limites para a evolução de RF20–RF22
+
+As regras de produto estão definidas em [`requisitos.md`](requisitos.md), no detalhamento
+de RF20–RF22 e nas decisões R2-DEC-01 a R2-DEC-15. A implementação posterior precisa
+representar versões publicadas e substitutos pendentes sem contornar suspensão, separar
+denúncias autenticadas/anônimas, restringir ações a moderadores designados e preservar
+os cinco critérios. Também deve cumprir a retenção/descarte definidos pela fonte,
+sem transformar registros privados em arquivo permanente de texto ou denúncias encerradas.
+
+Nesta etapa a aprovação de textos novos e substitutos é humana. A lista do filtro é
+pendente e a IA é objetivo futuro condicionado, sem aprovação de tecnologia/provedor.
+Modelo físico, contratos, concessão operacional do papel e execução do descarte serão
+detalhados nas #156/#160/#161, com a aprovação própria para mudanças substanciais.
+Esta seção consome requisitos; não cria ADR, diagrama de dados da R2 ou decisão técnica.
+
 ---
 
-## 5. Fluxo de importação
+## 5. Fluxo de importação e ciclo de dados do SIGAA
+
+O fluxo da integração SIGAA é totalmente desacoplado da API: nenhum endpoint realiza requisições ao SIGAA em tempo real (RF19). A coleta é executada em processos independentes (CLI / cron) e persiste dados no PostgreSQL, que são então lidos pelos repositories para servir a API HTTP consumida pelo frontend.
 
 ```mermaid
 sequenceDiagram
-    participant Job as Rotina de atualizacao
-    participant Scraper
+    participant Cron as Cron / Operador
+    participant Cmd as Comando (app.commands)
+    participant Svc as Servico (importacao_service)
+    participant Scraper as Scraper HTTP (sigaa_poc)
     participant SIGAA as SIGAA publico
     participant DB as PostgreSQL
+    participant API as API FastAPI
+    participant Web as Frontend Next.js
 
-    Job->>Scraper: dispara importacao por departamento
-    Scraper->>SIGAA: requisicao com throttling
-    SIGAA-->>Scraper: paginas de turmas
-    Scraper->>Scraper: parse e validacao Pydantic
-    Scraper->>DB: grava professores, disciplinas e turmas
-    Scraper->>Job: registra sucesso ou falha (RF19)
+    Note over Cron,SIGAA: 1. Coleta e Persistencia (Fora da API)
+    Cron->>Cmd: Executa importar_sigaa_agendado
+    Cmd->>Svc: Dispara importacao (ano/periodo)
+    Svc->>DB: Cria registro "em_andamento" em importacao_execucoes
+    Svc->>Scraper: Coleta ofertas por unidade
+    Scraper->>SIGAA: POST com ViewState e cookies JSF (ate 3 tentativas)
+    SIGAA-->>Scraper: HTML com tabela de turmas
+    Scraper->>Scraper: Parse e validacao de contagem
+    Scraper-->>Svc: Lista de ofertas da unidade
+    Svc->>DB: Salva ofertas (transacao por unidade + savepoint)
+    Svc->>DB: Inativa ausentes se coleta 100% integra
+    Svc->>DB: Atualiza status ("sucesso"/"falha") e contadores no historico
+
+    Note over DB,Web: 2. Consulta e Consumo em Producao
+    Web->>API: GET /api/professores ou /api/disciplinas
+    API->>DB: Consulta dados institucionais persistidos
+    DB-->>API: Registros sincronizados
+    API-->>Web: Resposta JSON para interface
 ```
 
-Falha em um departamento não interrompe os demais (RNF07).
+### Regras estruturais da integração
 
-A importação sincroniza um retrato por unidade e período. Cada unidade é uma transação e
-cada oferta usa savepoint. Somente uma coleta cuja contagem esteja completa e sem erros pode
-marcar como inativas as turmas que desapareceram; resultados parciais preservam o retrato
-anterior. Professores sem SIAPE recebem identidade provisória vinculada à ocorrência na
-fonte, impedindo a união silenciosa de homônimos. Reconciliação posterior é explícita.
+- **Isolamento de falhas (RNF07):** falha em um departamento não interrompe o processamento dos demais.
+- **Transacionalidade e savepoints:** cada unidade roda em sua própria transação; cada oferta é isolada por savepoint (`db.begin_nested()`).
+- **Inativação condicional:** turmas ausentes no retrato do período só são marcadas como inativas (`ativa=false`) se a coleta da unidade for 100% íntegra (sem erros e com total validado contra o rodapé do SIGAA). Coletas parciais preservam as turmas anteriores.
+- **Identidade provisória de docentes:** como a página pública não fornece SIAPE, cada docente recebe identidade provisória associada à sua ocorrência de turma (`SIGAA:UNIDADE:PERIODO:COMPONENTE:TURMA:NOME_NORMALIZADO`). Homônimos não são unidos silenciosamente.
+- **Auditoria permanente:** todas as execuções agendadas registram timestamps, contadores, status (`sucesso`/`falha`), mensagens de erro e detalhamento JSON em `importacao_execucoes`.
+
+Para o procedimento detalhado e exemplo reproduzível de teste, consulte [`importacao-sigaa.md`](importacao-sigaa.md). Para a política de agendamento no cron, variáveis de ambiente e consultas de auditoria, consulte [`operacao-importacao-sigaa.md`](operacao-importacao-sigaa.md).
 
 ---
 

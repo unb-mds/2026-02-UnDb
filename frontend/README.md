@@ -33,6 +33,31 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
   No Windows usa o caminho padrão do Edge; em outros ambientes configure `BROWSER_PATH`.
   Esse comando não usa o backend real nem comprova persistência.
 
+## Protótipo da jornada — Issue #152
+
+Com `npm run dev` (ou `npm run start` após o build), abra
+[http://localhost:3000/prototipo](http://localhost:3000/prototipo), também acessível
+pelo link na página inicial. O protótipo funciona sem backend e identifica todos os
+dados como demonstrativos fictícios. O header compartilhado continua levando às
+rotas reais da aplicação, que dependem da API quando aplicável.
+
+Experimente **Buscar disciplina → Algoritmos → Comparação → Ordenar por recomendação
+→ Avaliar Ana → Conferir prévia da avaliação**. A alternativa por professor permite
+buscar “Ana”, selecionar sua disciplina e seguir até o mesmo formulário. “MAT-DEMO”
+encontra Cálculo em outro departamento, com ausência de avaliações. Os resultados
+oferecem links para busca vazia, sem resultados, carregamento e erro com recuperação.
+
+O protótipo não autentica, consulta a API, calcula agregados nem salva avaliações.
+A ordenação alterna entre apresentações preparadas da fixture; a regra real permanece
+no backend. Os cinco campos reutilizam o componente do formulário real e suas escalas.
+Critérios não aparecem abaixo de três avaliações; contagens e insuficiência permanecem visíveis.
+
+`npm run test:browser` também verifica a jornada, os estados, o histórico/recarga,
+as escalas, teclado e 54 combinações de tela/tema/largura (320/768/1280 px).
+Para gerar capturas locais durante essa verificação, configure `PREVIEW_DIR` com um
+diretório de saída. Evidências, limites e prévia da PR estão em
+[`verificacao-prototipo-jornada-issue-152.md`](../docs/estudos/verificacao-prototipo-jornada-issue-152.md).
+
 ## Execução com Docker — Issue #36
 
 Na raiz do repositório, configure `backend/.env` conforme o [README principal](../README.md)
