@@ -161,30 +161,50 @@ banco, e não apenas na aplicação.
 
 ---
 
-## 5. Fluxo de importação
+## 5. Fluxo de importação e ciclo de dados do SIGAA
+
+O fluxo da integração SIGAA é totalmente desacoplado da API: nenhum endpoint realiza requisições ao SIGAA em tempo real (RF19). A coleta é executada em processos independentes (CLI / cron) e persiste dados no PostgreSQL, que são então lidos pelos repositories para servir a API HTTP consumida pelo frontend.
 
 ```mermaid
 sequenceDiagram
-    participant Job as Rotina de atualizacao
-    participant Scraper
+    participant Cron as Cron / Operador
+    participant Cmd as Comando (app.commands)
+    participant Svc as Servico (importacao_service)
+    participant Scraper as Scraper HTTP (sigaa_poc)
     participant SIGAA as SIGAA publico
     participant DB as PostgreSQL
+    participant API as API FastAPI
+    participant Web as Frontend Next.js
 
-    Job->>Scraper: dispara importacao por departamento
-    Scraper->>SIGAA: requisicao com throttling
-    SIGAA-->>Scraper: paginas de turmas
-    Scraper->>Scraper: parse e validacao Pydantic
-    Scraper->>DB: grava professores, disciplinas e turmas
-    Scraper->>Job: registra sucesso ou falha (RF19)
+    Note over Cron,SIGAA: 1. Coleta e Persistencia (Fora da API)
+    Cron->>Cmd: Executa importar_sigaa_agendado
+    Cmd->>Svc: Dispara importacao (ano/periodo)
+    Svc->>DB: Cria registro "em_andamento" em importacao_execucoes
+    Svc->>Scraper: Coleta ofertas por unidade
+    Scraper->>SIGAA: POST com ViewState e cookies JSF (ate 3 tentativas)
+    SIGAA-->>Scraper: HTML com tabela de turmas
+    Scraper->>Scraper: Parse e validacao de contagem
+    Scraper-->>Svc: Lista de ofertas da unidade
+    Svc->>DB: Salva ofertas (transacao por unidade + savepoint)
+    Svc->>DB: Inativa ausentes se coleta 100% integra
+    Svc->>DB: Atualiza status ("sucesso"/"falha") e contadores no historico
+
+    Note over DB,Web: 2. Consulta e Consumo em Producao
+    Web->>API: GET /api/professores ou /api/disciplinas
+    API->>DB: Consulta dados institucionais persistidos
+    DB-->>API: Registros sincronizados
+    API-->>Web: Resposta JSON para interface
 ```
 
-Falha em um departamento não interrompe os demais (RNF07).
+### Regras estruturais da integração
 
-A importação sincroniza um retrato por unidade e período. Cada unidade é uma transação e
-cada oferta usa savepoint. Somente uma coleta cuja contagem esteja completa e sem erros pode
-marcar como inativas as turmas que desapareceram; resultados parciais preservam o retrato
-anterior. Professores sem SIAPE recebem identidade provisória vinculada à ocorrência na
-fonte, impedindo a união silenciosa de homônimos. Reconciliação posterior é explícita.
+- **Isolamento de falhas (RNF07):** falha em um departamento não interrompe o processamento dos demais.
+- **Transacionalidade e savepoints:** cada unidade roda em sua própria transação; cada oferta é isolada por savepoint (`db.begin_nested()`).
+- **Inativação condicional:** turmas ausentes no retrato do período só são marcadas como inativas (`ativa=false`) se a coleta da unidade for 100% íntegra (sem erros e com total validado contra o rodapé do SIGAA). Coletas parciais preservam as turmas anteriores.
+- **Identidade provisória de docentes:** como a página pública não fornece SIAPE, cada docente recebe identidade provisória associada à sua ocorrência de turma (`SIGAA:UNIDADE:PERIODO:COMPONENTE:TURMA:NOME_NORMALIZADO`). Homônimos não são unidos silenciosamente.
+- **Auditoria permanente:** todas as execuções agendadas registram timestamps, contadores, status (`sucesso`/`falha`), mensagens de erro e detalhamento JSON em `importacao_execucoes`.
+
+Para o procedimento detalhado e exemplo reproduzível de teste, consulte [`importacao-sigaa.md`](importacao-sigaa.md). Para a política de agendamento no cron, variáveis de ambiente e consultas de auditoria, consulte [`operacao-importacao-sigaa.md`](operacao-importacao-sigaa.md).
 
 ---
 
