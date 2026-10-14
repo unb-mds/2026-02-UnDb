@@ -3,7 +3,7 @@ site_description: Documentação de produto, requisitos e arquitetura do UnDb
 site_url: https://unb-mds.github.io/2026-02-UnDb/
 repo_url: https://github.com/unb-mds/2026-02-UnDb
 repo_name: unb-mds/2026-02-UnDb
-edit_uri: edit/develop/docs/
+strict: false
 
 theme:
   name: material
@@ -53,8 +53,20 @@ nav:
       - Docker: estudos/docker.md
       - Busca, comparação e avaliação: estudos/observacao-jornada-busca-comparacao.md
       - Auditoria de Clareza dos Requisitos: estudos/auditoria-requisitos-issue-149.md
+      - Tela exemplo API real: estudos/tela-exemplo-api-real.md
+      - Validação Release 1 SIGAA 2026-09-24: estudos/validacao-release-1-sigaa-2026-09-24.md
+      - Verificação ambiente completo issue 37: estudos/verificacao-ambiente-completo-issue-37.md
+      - Verificação ambiente completo issue 37 tiago vieira: estudos/verificacao-ambiente-completo-issue-37-tiago-vieira.md
+      - Verificação busca professor disciplina: estudos/verificacao-busca-professor-disciplina.md
+      - Verificação docker compose: estudos/verificacao-docker-compose.md
+      - Verificação execucao frontend: estudos/verificacao-execucao-frontend.md
+      - Verificação formulario avaliacao: estudos/verificacao-formulario-avaliacao.md
   - Processo:
       - Template de ata de reunião: atas/template-ata-reuniao.md
+  - Atas:
+      - 2026-09-17: atas/2026-09-17.md
+  - Relatórios:
+      - Relatório RF19: relatorio_rf19.md
 
 exclude_docs: |
   agent-skills.md

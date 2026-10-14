@@ -9,7 +9,7 @@ O objetivo da [Issue #148](https://github.com/unb-mds/2026-02-UnDb/issues/148) �
 Em estrito cumprimento às diretrizes de governança do projeto (`skills/governance/project-governance/SKILL.md` e `AGENTS.md`):
 - **Não são inventados resultados, participantes ou métricas presumidas.**
 - As hipóteses preliminares e o diagnóstico derivado do feedback da apresentação da Release 1 são mantidos explicitamente separados de resultados empíricos coletados em campo.
-- Os critérios que dependem da execução física das sessões com estudantes permanecem registrados como pendências abertas.
+- Esta entrega configura uma **entrega parcial** de escopo (protocolo, personas, rastreabilidade e diagnóstico preliminar), mantendo a [Issue #148](https://github.com/unb-mds/2026-02-UnDb/issues/148) aberta até a realização e registro das sessões com discentes.
 
 ---
 
@@ -17,29 +17,34 @@ Em estrito cumprimento às diretrizes de governança do projeto (`skills/governa
 
 ### 2.1 Apresentação presencial da Release 1 (24/09/2026)
 
-A fonte inicial que motivou a abertura do épico #144 e da issue #148 foi o feedback recebido durante a demonstração presencial da Release 1.0.0, realizada em 24/09/2026 com docentes e discentes da disciplina de Métodos de Desenvolvimento de Software.
+A motivação inicial para a abertura do [Épico #144](https://github.com/unb-mds/2026-02-UnDb/issues/144) e da [Issue #148](https://github.com/unb-mds/2026-02-UnDb/issues/148) decorre dos apontamentos colhidos durante a demonstração presencial da Release 1.0.0, realizada em 24/09/2026 com docentes e discentes da disciplina de Métodos de Desenvolvimento de Software (contextualizada operacionalmente em [`docs/releases/1.0.0.md`](../releases/1.0.0.md#operacao-local-da-demonstracao)).
+
+> ⚠️ **Limitação metodológica e rastreabilidade da fonte:**  
+> Os apontamentos a seguir originaram-se de manifestações orais e observações informais registradas pela equipe durante a dinâmica de apresentação local da versão 1.0.0. Eles **não constituem registros de sessões formais de teste de usabilidade** com matriz preenchida por participante. Por essa razão, conforme `skills/governance/project-governance/SKILL.md`, essas impressões são catalogadas estritamente como **hipóteses e diagnóstico preliminar**, que orientam a investigação, mas não substituem os registros de observação empírica de campo exigidos para a conclusão integral da Issue #148.
 
 Durante a interação com o produto demonstrado localmente, foram apontados os seguintes pontos críticos de hesitação e atrito:
 
 1. **Ambiguidade na entrada da busca:** A tela inicial exigia que o aluno escolhesse antecipadamente se desejava buscar professor ou disciplina, gerando confusão em casos onde o estudante só lembrava parte do nome ou o código da matéria (ex.: módulo livre).
-2. **Separação entre consulta pública e avaliação autenticada:** Usuários questionaram se era necessário efetuar login para apenas consultar e comparar professores, revelando falta de clareza visual de que a navegação é totalmente pública e anônima.
-3. **Interpretação do estado vazio (zero avaliações):** A ausência de avaliações em um professor/disciplina gerou a impressão de avaliação negativa ou nota zero, por falta de mensagem contextual encorajadora.
+2. **Separação entre consulta pública e avaliação autenticada:** Usuários questionaram se era necessário efetuar login para apenas consultar e comparar professores, revelando falta de clareza visual de que a navegação é totalmente pública e anônima (RF04).
+3. **Interpretação do estado vazio (zero avaliações):** A ausência de avaliações em um professor/disciplina gerou a impressão de avaliação negativa ou nota zero, por falta de mensagem contextual encorajadora (RF10).
 4. **Compreensão dos estados insuficiente e conflitante:**
-   - O limiar de 3 avaliações (RF08) para proteção da identidade do avaliador não era compreendido imediatamente, deixando dúvidas sobre por que notas parciais não apareciam.
-   - O rótulo "Conflitante" em critérios factuais (chamada e material) gerava estranheza sem uma explicação textual de apoio.
-5. **Legibilidade da comparação lado a lado:** A visualização comparativa de múltiplos docentes em telas menores (smartphones) empilhava os cartões, prejudicando a leitura comparativa simultânea.
+   - O limiar de 3 avaliações para proteção contra identificação indireta (RNF02), aliado à regra de exibição agregada (RF08) e transparência estatística da contagem (RF09), não era compreendido imediatamente, deixando dúvidas sobre por que notas parciais não apareciam.
+   - O rótulo "Conflitante" em critérios factuais (chamada e material) gerava estranheza sem uma explicação textual de apoio (RF11).
+5. **Legibilidade da comparação lado a lado:** A visualização comparativa de múltiplos docentes em telas menores (smartphones) empilhava os cartões, prejudicando a leitura comparativa simultânea (RF12, RF13).
 6. **Percepção de critérios neutros:** O critério "Dificuldade" e o critério "Faz chamada" foram por vezes interpretados precipitadamente como aspectos negativos, quando na verdade são indicadores factuais neutros (RF14, RF15).
 
 ### 2.2 Base normativa de requisitos
 
-Os pontos de atenção foram confrontados com os requisitos funcionais vigentes em [`docs/requisitos.md`](../requisitos.md):
+Os pontos de atenção foram confrontados com os requisitos aprovados e vigentes em [`docs/requisitos.md`](../requisitos.md):
 - **RF01 e RF02:** Acesso e autenticação com e-mail institucional `@aluno.unb.br`.
 - **RF04:** Consulta pública sem exigência de login.
 - **RF05 a RF07:** Mecanismos de busca por professor, disciplina e código.
-- **RF08 e RF09:** Agregação de critérios com mínimo de 3 avaliações para exibição pública.
-- **RF10 e RF11:** Tratamento explícito de estados especiais (sem avaliações, dados insuficientes e conflitante).
+- **RF08:** Exibição agregada dos cinco critérios já consolidados para um professor em uma disciplina, e não a lista de avaliações individuais.
+- **RF09:** Transparência estatística, exigindo informar a quantidade de avaliações que sustentam todo resultado agregado.
+- **RNF02:** Proteção contra identificação indireta, que define a regra de produto de só exibir critérios agregados a partir de três avaliações por professor e disciplina, informando quantidade e insuficiência de dados abaixo desse patamar.
+- **RF10 e RF11:** Tratamento explícito de estados especiais (sem avaliações e estado conflitante).
 - **RF12 e RF13:** Comparação entre professores da mesma disciplina e ordenação por índice de recomendação.
-- **RF14 e RF15:** Formulário estruturado de avaliação e apresentação neutra de critérios.
+- **RF14 e RF15:** Formulário estruturado de avaliação e agregação por natureza do critério (apresentação neutra).
 
 ---
 

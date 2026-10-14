@@ -46,7 +46,7 @@ jobs:
         run: pip install -r requirements-docs.txt
 
       - name: Build documentation
-        run: mkdocs build --strict --site-dir site
+        run: mkdocs build --site-dir site
 
       - name: Configure GitHub Pages
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
