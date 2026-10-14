@@ -6,6 +6,16 @@
 **Epic:** [#146 — [EPIC][R2] Clareza dos requisitos e da arquitetura SIGAA](https://github.com/unb-mds/2026-02-UnDb/issues/146)  
 **Governança aplicável:** `skills/process/ambiguity-removal/SKILL.md`, `skills/process/requirements/SKILL.md` e `skills/governance/project-governance/SKILL.md`.
 
+!!! info "Evolução dos achados AMB-002, AMB-003 e AMB-004 na Issue #154"
+
+    Este relatório preserva o diagnóstico e as sugestões de 07/10/2026. As decisões
+    humanas posteriores estão em [`requisitos.md`](../requisitos.md), no detalhamento
+    de RF20–RF22 e no registro R2-DEC-01 a R2-DEC-15. O limite de 500 caracteres foi
+    escolhido explicitamente; o limiar aprovado é **50 contas autenticadas distintas**,
+    não as cinco denúncias sugeridas aqui. A moderação inicial é humana, a lista do
+    filtro continua pendente e IA é objetivo futuro condicionado. Modelo físico e
+    contratos seguem para as issues dependentes; sugestões desta auditoria não os aprovam.
+
 ---
 
 ## 1. Escopo e Fontes Auditadas
