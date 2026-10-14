@@ -51,6 +51,7 @@ nav:
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
       - Docker: estudos/docker.md
+      - Busca, comparação e avaliação: estudos/observacao-jornada-busca-comparacao.md
       - Auditoria de Clareza dos Requisitos: estudos/auditoria-requisitos-issue-149.md
   - Processo:
       - Template de ata de reunião: atas/template-ata-reuniao.md
