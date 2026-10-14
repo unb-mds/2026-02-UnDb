@@ -1,208 +1,146 @@
-# [R2][UX] Validação do Protótipo da Jornada com Alunos
+# [R2][UX] Preparação da validação da jornada com alunos
 
-**Estado:** Documento de validação e roteiro de pesquisa elaborado para a issue [#153](https://github.com/unb-mds/2026-02-UnDb/issues/153), vinculada ao épico [#144](https://github.com/unb-mds/2026-02-UnDb/issues/144) (Melhorar a jornada do aluno na aplicação).
+**Estado:** roteiro proposto e inspeção documental/técnica para a [issue #153](https://github.com/unb-mds/2026-02-UnDb/issues/153), vinculada ao [épico #144](https://github.com/unb-mds/2026-02-UnDb/issues/144). **Validação com alunos não realizada nos registros consultados; redução de obstáculos não demonstrada.** Revisão documental em 14/10/2026.
 
----
+## 1. Objetivo e limites da entrega
 
-## 1. Objetivo e Contexto
+A issue #153 pede verificar, com alunos, se o protótipo reduz os obstáculos identificados no diagnóstico anterior antes de implementar as telas. Este documento prepara tarefas, coleta e comparação, registra capacidades verificáveis da implementação anterior e encaminha questões de produto ao PO.
 
-O objetivo desta atividade é verificar se o protótipo da jornada do aluno reduz os obstáculos identificados no diagnóstico anterior (levantados após a Release 1 e consolidados na issue [#148](https://github.com/unb-mds/2026-02-UnDb/issues/148)), registrando:
+O roteiro e a existência de mensagens na interface não demonstram compreensão pelos estudantes. Não foram apresentados registros de sessões, participantes recrutados ou resultados antes/depois. Esses dados não são substituídos por testes automatizados, inspeção de código ou dados demonstrativos do protótipo.
 
-1. Roteiro estruturado de tarefas, observações e critérios de avaliação;
-2. Limitações da amostra, do ambiente e da maturidade do protótipo;
-3. Comparação sistemática dos obstáculos mapeados antes e depois da prototipação;
-4. Encaminhamentos ao Product Owner (PO) para decisões de produto pendentes;
-5. Pendências explícitas para a realização de testes empíricos com participantes reais.
+As regras vigentes são as de [requisitos](../requisitos.md), especialmente RF04–RF15, RNF02 e seções 6, 8 e 11. Conforme `project-governance`, propostas de UX e questões de produto permanecem separadas de decisões aprovadas.
 
-Conforme a governança do projeto (`skills/governance/project-governance/SKILL.md` e `skills/process/requirements/SKILL.md`), **esta tarefa não cria participantes, sessões ou dados empíricos fictícios**, preserva as regras de negócio vigentes em [`docs/requisitos.md`](../requisitos.md) e separa categoricamente sugestões de interface de mudanças em regras de produto.
+## 2. Fontes e versões dos artefatos
 
----
+| Artefato | Versão e localização verificáveis | Uso e limite nesta entrega |
+|---|---|---|
+| Diagnóstico da issue #148 | [Observação da jornada, commit `838e443`](https://github.com/unb-mds/2026-02-UnDb/blob/838e4435122136a008df630b89606ad10aeab077/docs/estudos/observacao-jornada-busca-comparacao.md), entregue na [PR #176](https://github.com/unb-mds/2026-02-UnDb/pull/176) | Seção 5: sete obstáculos preliminares. O próprio documento mantém a coleta com alunos e a frequência observada pendentes. Seus relatos e prioridades não são tratados aqui como pesquisa empírica concluída. |
+| Interface anterior inspecionada na PR #178 | [Frontend, commit `e320ee7`](https://github.com/unb-mds/2026-02-UnDb/tree/e320ee710d2bc6ffe6a5c63633822e848f2aad89/frontend/src/app) | Inspeção estática das rotas reais de busca, consulta, comparação e avaliação oriundas da R1. Não é uma sessão de uso nem comprovação do comportamento da release implantada. |
+| Protótipo da R2, issue #152 | [Relatório, capturas e reprodução, commit `d5bd200`](https://github.com/unb-mds/2026-02-UnDb/blob/d5bd2008d8a0daf125d74bd7cc87f94a98e1a2d0/docs/estudos/verificacao-prototipo-jornada-issue-152.md), entregue na [PR #179](https://github.com/unb-mds/2026-02-UnDb/pull/179) | Protótipo navegável identificado em `/prototipo`, com dados demonstrativos e prévia sem envio. Disponível para preparar a avaliação; não foi avaliado com alunos nesta entrega. |
 
-## 2. Relação com o Diagnóstico Anterior e Estado dos Artefatos
+O protótipo da R2 já possui artefato identificado; a descrição anterior de que estava apenas em elaboração foi substituída pelas referências acima. Para reproduzi-lo, utilizar a versão indicada e as instruções do relatório da #152: em `frontend/`, `npm ci`, `npm run dev` e acesso a `http://localhost:3000/prototipo`. Ele não exige backend.
 
-A investigação de UX da Release 2 desdobra-se em três etapas complementares no épico #144:
+A seção 4 descreve exclusivamente a interface real no commit `e320ee7`. A seção 5 confronta essa inspeção com o diagnóstico preliminar; não constitui comparação de resultados de alunos entre R1 e R2. A versão efetivamente apresentada aos participantes deverá constar no registro de cada sessão.
 
-1. **Diagnóstico e Observação Preliminar (Issue #148):**
-   Mapeou os pontos de atrito identificados na apresentação da Release 1 e nos requisitos RF04–RF14, destacando:
-   - Dúvida sobre o ponto de partida da busca (divisão rígida entre professor e disciplina na home);
-   - Incerteza entre consulta anônima (aberta) e cadastro obrigatório para avaliar;
-   - Risco de interpretar o estado vazio (sem avaliações) ou dados insuficientes (< 3 avaliações) como avaliação negativa;
-   - Dificuldade de compreensão do estado "conflitante" em critérios factuais (chamada e material);
-   - Falta de contexto na leitura lado a lado e na ordenação por recomendação na tela de disciplina;
-   - Ruído no formulário de avaliação quanto à neutralidade dos critérios (Dificuldade e Chamada).
+O diagnóstico da #148 também contém descrições normativas imprecisas: Dificuldade é **opinião**, não fato, e o mínimo de três avaliações decorre de **RNF02**, não de RF08/RF09. Esta entrega utiliza os requisitos como fonte para essas regras; não modifica o diagnóstico de outra issue.
 
-2. **Prototipação da Jornada (Issue #152):**
-   Atribuída ao design/prototipação com o objetivo de desenhar a jornada unificada cobrindo entrada, busca, resultados, comparação e formulário de avaliação, sem alterar as regras aprovadas. No momento desta avaliação, o protótipo formal de alta fidelidade na issue #152 ainda se encontra em fase de proposição/elaboração, enquanto a implementação funcional da Release 1 no frontend Next.js serve como base executável inspecionada.
+## 3. Roteiro proposto para avaliação
 
-3. **Validação do Protótipo com Alunos (Issue #153 - Este Documento):**
-   Estrutura o instrumento e o protocolo de teste, analisa a interface e a jornada pretendida frente aos obstáculos conhecidos, encaminha decisões pendentes ao PO e define as pré-condições para execução das sessões presenciais/remotas com estudantes.
+### 3.1 Perfis de recrutamento
 
----
+P1 e P2 são personas de referência da seção 3 dos requisitos, **não participantes já recrutados ou observados**:
 
-## 3. Roteiro Reproduzível de Avaliação da Jornada
+- **P1 — Aluno sem rede:** estudante de 2º/3º semestre, introvertido ou cursando módulo livre, que consulta informações para decidir matrícula.
+- **P2 — Veterano que já se queimou:** estudante de 5º semestre em diante, com repertório para consultar e contribuir com avaliações.
 
-### 3.1 Perfil dos Participantes (Anonimizado)
+Antes da sessão, obter consentimento e atribuir um código anônimo, como `ALUNO-01`. Não publicar nome, matrícula, CPF, e-mail real ou outros dados que identifiquem o participante. Registrar somente o perfil necessário à análise.
 
-O recrutamento foca nas personas descritas na seção 3 de [`docs/requisitos.md`](../requisitos.md):
+### 3.2 Tarefas e preparação dos cenários
 
-- **P1 — Aluno sem rede:** Estudante de 2º ou 3º semestre, introvertido ou matriculado em disciplina de módulo livre (fora do seu departamento de origem), que precisa decidir matrícula sem recorrer a grupos informais.
-- **P2 — Veterano com histórico:** Estudante de 5º semestre em diante, com rede formada, que possui repertório para avaliar professores e validar a clareza da agregação.
+As instruções abaixo são propostas para aplicação moderada. No protótipo `d5bd200`, Ana e Algoritmos são exemplos fictícios da interface, não alunos, professores ou avaliações reais. Preparar os mesmos objetivos na interface anterior com dados controlados e registrar diferenças de ambiente e conteúdo.
 
-**Princípios éticos e privacidade:**
-- Consentimento livre e esclarecido obtido antes do início da sessão.
-- Nenhum dado pessoal identificável (nome completo, matrícula, CPF ou e-mail real) é registrado na documentação pública.
-- Os participantes são identificados internamente apenas por códigos anônimos (ex.: `ALUNO-01`, `ALUNO-02`), indicando apenas perfil (`P1` ou `P2`) e semestre relativo.
-
-### 3.2 Tarefas Realistas e Neutras
-
-As tarefas representam metas concretas de um estudante durante o período de matrícula. As instruções são passadas de forma estritamente neutra, sem induzir o percurso de navegação ou antecipar o vocabulário das telas.
-
-| ID | Cenário / Objetivo do Aluno | Instrução Neutra ao Participante | Funcionalidade Esperada |
+| ID | Objetivo | Instrução ao participante | Preparação do facilitador |
 |---|---|---|---|
-| **T1** | Localizar um professor específico para verificar sua reputação. | *"Imagine que você ouviu falar da professora Maria Emilia e quer saber como são as aulas dela. Mostre como você pesquisaria isso no sistema."* | Busca por nome parcial de professor (`/professores`). |
-| **T2** | Escolher professor para uma matéria obrigatória. | *"Você precisa cursar 'Cálculo 1' no próximo semestre e quer ver quais professores estão oferecendo turmas e como estão avaliados. Mostre como você faria."* | Busca de disciplina por código/nome (`/disciplinas`) e visualização da comparação (`/disciplinas/[id]`). |
-| **T3** | Interpretar o resumo estatístico de um docente. | *"Olhando para a página deste professor nesta disciplina, explique o que as informações apresentadas significam para você."* | Leitura de critérios consolidados, quantidade de avaliações e alertas de dados insuficientes ou conflitantes (`/professores/[id]/disciplinas/[disciplinaId]`). |
-| **T4** | Comparar duas opções de turmas. | *"Entre os professores disponíveis para esta matéria, qual você escolheria com base nas informações apresentadas? Por quê?"* | Interpretação da ordenação por recomendação e comparação lateral. |
-| **T5** | Contribuir com uma avaliação após cursar a matéria. | *"Você cursou a matéria com este professor e deseja registrar sua experiência para ajudar outros alunos. Mostre como procederia."* | Localização do botão de avaliar, preenchimento dos 5 critérios e compreensão do aviso de autenticação/e-mail (`.../avaliar`). |
+| **T1** | Buscar professor por nome parcial | “Você ouviu falar da professora Ana e quer consultar as informações sobre ela. Mostre como faria.” | Garantir um resultado correspondente; registrar o termo usado e o percurso. |
+| **T2** | Buscar disciplina por nome/código, inclusive de outro departamento | “Você pretende cursar Algoritmos e quer consultar as opções de professores. Mostre como faria.” | Repetir com o código e uma disciplina de outro departamento, sem indicar onde clicar. Não presumir oferta no próximo semestre. |
+| **T3** | Interpretar resultados e estados especiais | “Explique o que estas informações permitem concluir sobre este professor nesta disciplina.” | Apresentar casos com zero avaliações, duas avaliações e dados suficientes com conflito em Chamada/Material. Registrar cada caso separadamente, sem antecipar sua explicação. |
+| **T4** | Comparar professores da mesma disciplina | “Qual destas opções você escolheria com as informações disponíveis? Por quê?” | Registrar entendimento da recomendação, contagem e neutralidade; repetir em tela compacta e registrar a largura. |
+| **T5** | Localizar e preencher avaliação | “Você cursou a matéria e quer compartilhar sua experiência. Mostre como procederia.” | No protótipo, concluir apenas a prévia; no sistema real, usar ambiente e contas de teste. Registrar a interpretação do acesso autenticado e do e-mail confirmado. |
 
-### 3.3 Protocolo de Registro de Observações
+### 3.3 Registro a preencher em cada sessão real
 
-Durante a sessão (observação direta ou teste de usabilidade moderado), o facilitador registra em tempo real:
+Nenhuma linha de resultado foi preenchida. O facilitador deverá registrar:
 
-| Campo | Descrição |
+| Campo | Informação necessária |
 |---|---|
-| **Participante** | Identificador anônimo (`ALUNO-XX`). |
-| **Perfil** | `P1` ou `P2`, acrescido do semestre aproximado. |
-| **Tarefa** | `T1`, `T2`, `T3`, `T4` ou `T5`. |
-| **Conclusão** | Concluída com sucesso / Concluída com dificuldade / Abandonada. |
-| **Tempo Estimado** | Tempo aproximado até atingir o objetivo ou desistir. |
-| **Hesitações e Dúvidas** | Momentos em que o participante parou, releu ou expressou confusão em voz alta (*Think Aloud*). |
-| **Desvios de Navegação** | Caminhos incorretos tentados antes de achar a tela correta (ex.: tentar buscar professor na página de disciplinas). |
-| **Compreensão de Rótulos** | Como o participante interpretou termos como "Dados insuficientes", "Conflitante", "Didática", "Dificuldade" e "Chamada". |
-| **Feedback Espontâneo** | Citações diretas e impressões gerais verbalizadas voluntariamente. |
+| Sessão | Data, facilitador e código anônimo do participante; perfil P1/P2 quando aplicável. |
+| Artefato | Interface anterior ou protótipo; commit, rota/URL, dados preparados e estado apresentado. |
+| Ambiente | Dispositivo, largura de tela, navegador e limitações de acesso/rede. |
+| Tarefa e caso | T1–T5; em T3, distinguir vazio, insuficiente e conflitante. |
+| Resultado | Concluída com autonomia, concluída com ajuda/dificuldade ou não concluída; registrar intervenção. |
+| Observação | Hesitação, desvio, erro, interpretação expressa e tempo, se medido; separar descrição de inferência. |
+| Fala | Citação real, quando houver consentimento e sem identificação pessoal. |
+| Evidência | Referência ao registro anonimizado, trecho ou captura autorizada que sustenta a observação. |
+| Comparação | Obstáculo do diagnóstico, ocorrência em cada versão e limitações de comparabilidade. |
 
-### 3.4 Critérios de Avaliação Definidos a Priori
+### 3.4 Aspectos a observar, sem novos critérios de aceite
 
-Para evitar análises subjetivas pós-teste, definem-se os seguintes critérios de sucesso da jornada:
+Não foi localizada aprovação dos percentuais de 80%, 100% ou 75% apresentados na versão anterior. Eles foram retirados; este roteiro não institui metas quantitativas nem redefine os critérios da issue.
 
-1. **Eficácia (Conclusão de Tarefa):** Pelo menos 80% dos participantes devem concluir as tarefas de busca (T1/T2) e localização de avaliação (T3) sem intervenção do facilitador.
-2. **Clareza dos Estados Especiais:** 100% dos participantes devem compreender que "Dados insuficientes" não significa nota zero ou professor reprovado.
-3. **Compreensão de Critérios Neutros:** Pelo menos 75% dos participantes devem reconhecer que os critérios "Dificuldade" e "Faz chamada" são descritivos e factuais, não notas de mérito.
-4. **Percepção de Acesso:** Os participantes devem identificar claramente que navegar e comparar é público, mas registrar avaliação requer login institucional `@aluno.unb.br`.
+Observar e registrar:
 
-### 3.5 Limitações Conhecidas
+1. Conclusão de T1/T2 e acesso à leitura dos resultados em T3, com ou sem intervenção.
+2. Compreensão de que zero avaliações não significa avaliação negativa e de que RNF02 oculta critérios abaixo de três avaliações.
+3. Interpretação de “Conflitante” como empate nas respostas factuais de Chamada ou disponibilidade de Material, conforme seção 11 dos requisitos.
+4. Ausência de direção boa/ruim em Dificuldade e Chamada. **Dificuldade é opinião agregada por moda; Chamada é fato agregado por maioria.** Neutralidade visual não altera essa natureza.
+5. Compreensão de que consultar/comparar é público e registrar avaliação exige conta autenticada com e-mail confirmado, nos termos de RF04/RF14.
 
-- **Maturidade dos Artefatos:** A prototipação visual dedicada da R2 (issue #152) ainda está em processo de alinhamento com os novos fluxos de comentários da R2; a jornada atual reflete a implementação consolidada da Release 1.
-- **Ambiente de Teste:** O ambiente de testes com estudantes pode utilizar dados pré-carregados (seed) ou mockados da API, reduzindo a variabilidade de casos reais do SIGAA.
-- **Tamanho da Amostra:** Testes qualitativos de usabilidade em equipes acadêmicas costumam cobrir entre 3 e 5 alunos por ciclo, o que identifica os principais gargalos de navegação, mas não possui significância estatística quantitativa.
-- **Ausência de Dados Fictícios:** Não foram geradas sessões empíricas simuladas neste documento. O protocolo está pronto para aplicação pelos membros da equipe nas próximas sessões de pesquisa de campo da Sprint 06.
+### 3.5 Limitações e comparação futura
 
+O tamanho da amostra, recrutamento, responsáveis e datas das sessões ainda precisam ser registrados pela equipe. A issue sugere Sprint 6; isso não comprova agendamento ou execução de pesquisa.
 
----
+O protótipo utiliza exemplos fixos e não realiza consulta à API, autenticação ou envio real. Suas fixtures permitem explorar estados visuais, mas não comprovam integração, oferta atual de turmas ou sucesso de envio. Alterações de dados, largura de tela e intervenção do facilitador devem ser registradas para não atribuir ao design diferenças causadas pelo ambiente.
 
-## 4. Registro de Evidências da Avaliação do Protótipo
+Para avaliar redução de obstáculos, registrar as mesmas tarefas e casos nas versões identificadas, indicando ordem de apresentação e possível aprendizado pela repetição. Consolidar ocorrências com denominador e limitações; não transformar ausência de observação em comprovação de melhora.
 
-A avaliação do protótipo e da jornada de usuário sob a ótica dos requisitos e componentes existentes revela evidências concretas sobre as capacidades e limitações do fluxo:
+## 4. Inspeção técnica da interface anterior
 
-### 4.1 Sessões com Participantes e Declaração de Pendência
+As evidências abaixo são de código no commit `e320ee7`, sem sessões com estudantes e sem execução de navegação nesta revisão.
 
-Conforme a seção 1 da issue #153 e as diretrizes do `AGENTS.md` e `project-governance`, **não foram criadas sessões de teste ou participantes fictícios**.
+| Parte da jornada | Capacidade verificada no código | Hipótese ou limite a observar com alunos |
+|---|---|---|
+| Entrada e busca | [Home](https://github.com/unb-mds/2026-02-UnDb/blob/e320ee710d2bc6ffe6a5c63633822e848f2aad89/frontend/src/app/page.tsx) oferece dois cards, “Buscar professor” e “Buscar disciplina”, com rotas distintas. | A escolha inicial pode gerar hesitação; sua ocorrência não foi medida nesta entrega. |
+| Consulta e acesso à avaliação | [Consulta agregada](https://github.com/unb-mds/2026-02-UnDb/blob/e320ee710d2bc6ffe6a5c63633822e848f2aad89/frontend/src/app/professores/%5Bid%5D/disciplinas/%5BdisciplinaId%5D/page.tsx) permite chegar ao formulário. O [formulário](https://github.com/unb-mds/2026-02-UnDb/blob/e320ee710d2bc6ffe6a5c63633822e848f2aad89/frontend/src/app/professores/%5Bid%5D/disciplinas/%5BdisciplinaId%5D/avaliar/avaliacao-form.tsx) informa conta/e-mail confirmado e consulta a sessão no envio; em 401, oferece login em nova aba. | Verificar se o estudante distingue consulta pública e envio autenticado e se o retorno da nova aba causa perda de contexto. |
+| Vazio e insuficiência | A consulta agregada informa ausência de avaliações, contagem e mínimo de três. “Faltam X” aparece somente quando há uma ou duas avaliações. Os critérios não são renderizados quando `dadosSuficientes` é falso. | A presença do aviso não comprova que o estudante entende o limiar ou evita leitura negativa. RNF02 define um mínimo inicial, sem garantia empírica de anonimato. |
+| Conflito | A consulta agregada renderiza “Conflitante” para Chamada e disponibilidade de Material. | Verificar a compreensão do empate factual; não confundir com opinião sobre qualidade de material. |
+| Comparação | A [tela de disciplina](https://github.com/unb-mds/2026-02-UnDb/blob/e320ee710d2bc6ffe6a5c63633822e848f2aad89/frontend/src/app/disciplinas/%5Bid%5D/page.tsx) usa grade de uma coluna abaixo do breakpoint `sm` e duas acima, com contagem e avisos. O [serviço](https://github.com/unb-mds/2026-02-UnDb/blob/e320ee710d2bc6ffe6a5c63633822e848f2aad89/backend/app/services/avaliacao_service.py) ordena por recomendação decrescente, depois quantidade e nome; resultados insuficientes ficam no final. | O layout e a ordenação estão no código; legibilidade e compreensão não foram verificadas com participantes. |
+| Critérios neutros | O formulário contém “Dificuldade e Chamada são informações neutras, sem indicação de bom ou ruim” e cinco selects nas escalas da R1. | Verificar a interpretação das escalas e da neutralidade, sem classificar Dificuldade como fato. |
 
-> ⚠️ **Registro Explícito de Pendência de Validação Empírica:**
-> A realização presencial ou remota dos testes com alunos das turmas de graduação da UnB (perfis P1 e P2) está programada para a Sprint 06, sob responsabilidade da equipe executora. Este documento fornece o roteiro neutro, as tarefas padronizadas e a matriz de coleta necessários para a execução dessas sessões.
+## 5. Confronto preliminar com o diagnóstico da #148
 
-### 4.2 Evidências Técnicas Observadas na Inspeção de Usabilidade da Jornada
+Os identificadores abaixo preservam a ordem dos sete obstáculos da seção 5 do diagnóstico no commit `838e443`. A coluna de implementação refere-se ao commit `e320ee7`, **não ao protótipo R2**. Em todos os casos, a redução do obstáculo permanece **não avaliada com alunos**.
 
-A partir da inspeção minuciosa dos componentes frontend desenvolvidos na Release 1 (`frontend/src/app/*`) e da proposta visual da Release 2, identificam-se os seguintes comportamentos estruturais:
+| Obstáculo da #148 | Implementação anterior verificável | Hipótese para avaliação / proposta de UX |
+|---|---|---|
+| **1. Ambiguidade na busca inicial** (RF05–RF07) | Dois caminhos separados na home. | Observar escolha inicial e desvios; avaliar proposta de busca unificada, sem presumir menos cliques ou maior sucesso. |
+| **2. Interpretação do estado vazio** (RF10) | Mensagem de ausência de avaliações; sem valores dos critérios quando insuficientes. | Verificar se a ausência é distinguida de avaliação negativa; considerar convite para avaliar. |
+| **3. Incompreensão do limiar** (RNF02; RF09) | Detalhe informa mínimo e avaliações faltantes; comparação mostra contagem e aviso mais curto. | Verificar interpretação de uma/duas avaliações e considerar harmonização das mensagens. |
+| **4. Dificuldade no estado conflitante** (RF11) | Rótulo factual presente; sem legenda explicativa no detalhe. | Avaliar explicação de empate entre respostas, sem inventar novos resultados ou fórmula. |
+| **5. Comparação em telas compactas** (RF12–RF13) | Grade passa a uma coluna em tela pequena. | Observar leitura e alternância entre cartões; considerar apresentação compacta. Não há melhora de legibilidade demonstrada. |
+| **6. Percepção da barreira de autenticação** (RF04, RF14) | Consulta sem exigência de sessão nas telas inspecionadas; aviso de conta/e-mail no formulário. | Verificar se o participante entende os diferentes acessos antes do envio. |
+| **7. Neutralidade dos critérios** (seções 6 e 8; RF14–RF15) | Legenda de neutralidade em consulta/formulário. | Avaliar se o estudante atribui mérito automaticamente a Dificuldade/Chamada, preservando a diferença entre opinião e fato. |
 
-1. **Jornada de Entrada e Descoberta (`/`, `/professores`, `/disciplinas`):**
-   - **Comportamento observado:** A tela inicial exige que o estudante escolha antecipadamente entre "Buscar professor" ou "Buscar disciplina".
-   - **Evidência no código:** O componente [`Home`](file:///home/tiago/MDS-G7/G7-2026-2/frontend/src/app/page.tsx) renderiza dois cards separados direcionando para `/professores` e `/disciplinas`.
-   - **Atrito identificado:** Um aluno sem rede (P1) que deseja avaliar as opções para uma matéria obrigatória pode buscar o nome do professor achando que encontrará a disciplina ou vice-versa, gerando cliques redundantes de navegação.
+Após as sessões reais, complementar cada linha com versão anterior, versão do protótipo, referências às observações, ocorrências e limitações. Até então, nenhum obstáculo é classificado como “melhora comprovada”, “melhora parcial” ou “ausência de melhora”.
 
-2. **Diferenciação entre Consulta Pública e Acesso Autenticado:**
-   - **Comportamento observado:** A consulta às páginas de agregação (`/professores/[id]/disciplinas/[disciplinaId]`) e de comparação (`/disciplinas/[id]`) funciona de modo 100% público, sem redirecionamento para login.
-   - **Evidência no código:** O botão "Avaliar este professor na disciplina" permite acesso ao formulário; o aviso de login (`precisaEntrar`) é acionado apenas na submissão ou indicado textualmente no topo do formulário.
+## 6. Encaminhamentos ao PO e à equipe
 
-3. **Comunicação de Estados Especiais (Vazio, Insuficiente e Conflitante):**
-   - **Vazio:** Na tela de agregação, quando `totalAvaliacoes === 0`, exibe textualmente: *"Ainda não há avaliações para este professor nesta disciplina."*
-   - **Insuficiente:** Quando `dadosSuficientes === false` (menos de 3 avaliações), exibe: *"Dados insuficientes para exibir os critérios — são necessárias pelo menos 3 avaliações para proteger a identidade de quem avaliou. Faltam X."*
-   - **Conflitante:** Para os critérios factuais de chamada e material, o sistema exibe o rótulo explícito `"Conflitante"` quando não há consenso entre as respostas (conforme RF11).
+### 6.1 Propostas de UX para discussão
 
-4. **Comparação de Professores na Disciplina (`/disciplinas/[id]`):**
-   - **Comportamento observado:** Lista em grade responsiva todos os professores que ofertam turmas ativas para a disciplina, exibindo dados agregados ou mensagem de insuficiência e ordenando decrescentemente por taxa de recomendação.
-   - **Atrito identificado:** Não há filtros rápidos para alternar critérios (ex.: ordenar por didática ou ver turmas de horário específico), e os cartões ocupam espaço vertical relevante em telas menores (mobile).
+Busca unificada, harmonização dos avisos de insuficiência, explicação de conflito e comparação compacta são sugestões a confrontar com os resultados das sessões. Não são defeitos obrigatórios nem autorizações de implementação.
 
-5. **Formulário de Avaliação e Critérios Neutros (`.../avaliar`):**
-   - **Comportamento observado:** O formulário possui mensagem destacando: *"Dificuldade e Chamada são informações neutras, sem indicação de bom ou ruim."*
-   - **Atrito identificado:** O controle é composto por `<select>` suspensos individuais. O envio sem estar autenticado gera aviso com link em nova aba para login, o que pode causar perda de contexto ou descontinuidade da sessão.
+A preservação de rascunho após autenticação é uma proposta adicional. Seu mecanismo, duração e tratamento de dados precisam ser definidos antes de implementar; este documento não escolhe armazenamento nem presume perda de respostas já observada.
 
+### 6.2 Questões de produto ainda pendentes
 
----
+1. **Ordenação (RF13, seções 8 e 11):** o percentual de recomendação é a chave aprovada; quantidade decrescente e nome são desempates. Ordenar por didática ou ponderar notas/volume alteraria a regra vigente. Qualquer proposta depende de decisão explícita do PO e atualização da fonte de requisitos.
+2. **Oferta e semestre (RF12, RF16–RF17):** a [consulta de professores por disciplina](https://github.com/unb-mds/2026-02-UnDb/blob/e320ee710d2bc6ffe6a5c63633822e848f2aad89/backend/app/repositories/professor_repository.py) filtra `Turma.disciplina_id` e `Turma.ativa`, **sem filtro por `Turma.semestre`**. Logo, a comparação pode incluir turmas ativas de semestres diferentes; não há restrição ao semestre vigente nessa consulta. Perguntas ao PO: deve existir restrição explícita por semestre? Devem aparecer professores com histórico avaliado, mas sem qualquer turma ativa na disciplina? Ambas permanecem pendentes; nenhuma filtragem é alterada nesta entrega.
+3. **Comentários na R2 (RF20–RF22):** a R1 mantém avaliação estruturada sem texto livre. Obrigatoriedade de comentário e regras do fluxo de denúncia/moderação não são decididas neste roteiro. Devem ser tratadas nas respectivas issues com o PO antes de compor cenários novos de validação.
 
-## 5. Comparação com o Diagnóstico Anterior
+## 7. Critérios da issue #153 e pendências
 
-A tabela a seguir confronta os obstáculos priorizados no diagnóstico da issue #148 com as evidências observadas no protótipo e na implementação da jornada, classificando o status da melhora e indicando ajustes sugeridos:
+Os três critérios da issue são preservados, sem substituir pesquisa por preparação documental:
 
-| Obstáculo Original (Issue #148) | Evidência de Origem (Diagnóstico Anterior) | Comportamento Observado no Protótipo / Jornada | Avaliação de Melhora | Ajuste Sugerido e Justificativa |
-|---|---|---|---|---|
-| **1. Confusão na busca inicial entre professor, disciplina e código** | Usuário não sabe se busca professor, código ou matéria; atrito maior em módulo livre (RF05–RF07). | Home ainda divide em dois fluxos estáticos (`/professores` e `/disciplinas`). Ao entrar em um, não é possível buscar o outro diretamente. | **Ausência de melhora** | Propor campo de busca unificado na home (com abas ou resultados agrupados "Professores" e "Disciplinas"). Reduz cliques e atende diretamente a P1. |
-| **2. Percepção ambígua de consulta pública vs. avaliação restrita** | Falta de clareza se é preciso cadastro para consultar as avaliações (RF04, RF14). | Consulta é totalmente aberta e fluida; home possui texto explicativo (*"Consulte avaliações estruturadas sem precisar de rede de contatos"*). O login só é cobrado na submissão. | **Melhora comprovada** | Manter o acesso livre à consulta e reforçar no botão de avaliação a informação prévia *"Exige login @aluno.unb.br"*, evitando surpresa no envio. |
-| **3. Interpretação errônea do estado vazio como avaliação negativa** | Ausência de avaliações pode ser interpretada como nota zero ou reprovação do professor (RF10). | Componente explicita *"Ainda não há avaliações para este professor nesta disciplina"* e não renderiza notas vazias ou estrelas zeradas. | **Melhora comprovada** | Incluir call-to-action encorajando: *"Seja o primeiro a avaliar este docente nesta matéria"*, estimulando a persona P2 a alimentar a base. |
-| **4. Incompreensão do estado de dados insuficientes (< 3 avaliações)** | Usuário não entende por que não vê notas quando já existem 1 ou 2 envios. | Mensagem clara na tela de detalhe: *"Dados insuficientes... são necessárias pelo menos 3 avaliações para proteger a identidade de quem avaliou. Faltam X."* | **Melhora comprovada** | Na tela de comparação de disciplinas (`/disciplinas/[id]`), a mensagem atual diz apenas *"Dados insuficientes para exibir os critérios"*. Recomenda-se unificar o texto explicando o motivo do anonimato também na comparação. |
-| **5. Dificuldade de interpretação do estado "Conflitante"** | Usuário estranha ver "Conflitante" em chamada e material, sem saber como interpretar (RF11). | O rótulo "Conflitante" é exibido textualmente quando não há maioria clara. Falta explicação em tooltip ou legenda contextual sobre o que gerou o conflito estatístico. | **Evidência insuficiente** (requer teste de campo com alunos) | Adicionar microcopy explicativo: *"Respostas divididas entre os estudantes — metade relata que faz chamada e metade relata que não"*. |
-| **6. Leitura e comparabilidade lado a lado** | Comparação em grade pode ficar truncada ou confusa em dispositivos móveis (RF12, RF13). | Em desktop, cards lado a lado exibem dados agregados satisfatoriamente. Em mobile, os cartões empilham-se verticalmente, dificultando a comparação direta simultânea. | **Melhora parcial** | Desenvolver modo de comparação compacto tipo tabela ou visualização condensada com alternância de métricas principais para visualização mobile. |
-| **7. Entendimento de critérios neutros (Dificuldade e Chamada)** | Dificuldade alta pode ser julgada precipitadamente como algo ruim; chamada como perseguição (RF14, RF15). | Aviso em destaque: *"Dificuldade e Chamada são informações neutras, sem indicação de bom ou ruim"*. | **Melhora comprovada** | Manter a legenda e avaliar em testes se a escala textual (Fácil / Médio / Difícil) comunica neutralidade com sucesso. |
+- [ ] **Registrar tarefas, observações e limitações da avaliação.** Roteiro e campos de coleta preparados; faltam registros reais de participantes, execução e observações do protótipo identificado.
+- [ ] **Comparar os principais obstáculos com o diagnóstico anterior.** Confronto documental/técnico preparado; faltam dados antes/depois que permitam avaliar redução dos obstáculos.
+- [x] **Encaminhar mudanças que impliquem regra de produto ao PO.** Questões registradas na seção 6.2; respostas e decisões não são presumidas. O registro não comprova discussão ou aprovação pelo PO.
 
----
-
-## 6. Encaminhamentos ao Product Owner (PO)
-
-A análise da jornada e dos requisitos vigentes (`docs/requisitos.md`) permitiu separar claramente o que são **sugestões de design e usabilidade (UX)** do que constitui **mudanças em regras de negócio ou de produto que exigem decisão humana do PO**.
-
-### 6.1 Sugestões de UX e Interface (Trabalho Técnico da Equipe)
-
-Estas melhorias não alteram critérios de agregação, escalas ou regras de negócio, podendo ser incorporadas nas issues de frontend do épico #144 (issues #155, #157, #158):
-
-1. **Unificação da busca na Home:** Permitir buscar simultaneamente professores ou disciplinas em uma barra de pesquisa única na página inicial, com agrupamento claro dos resultados.
-2. **Harmonização do aviso de dados insuficientes:** Exibir a contagem regressiva (*"Faltam X avaliações para proteger o anonimato"*) também nos cards da tela de comparação de professores (`/disciplinas/[id]`).
-3. **Preservação de rascunho de avaliação:** Se o usuário tentar enviar uma avaliação sem autenticação, persistir temporariamente as opções selecionadas em `sessionStorage` para restaurá-las automaticamente após o retorno do login, evitando redigitação.
-
-### 6.2 Pontos Dependentes de Decisão do PO (Regras de Produto)
-
-Os seguintes pontos identificados durante a revisão tocam regras de negócio, restrições e políticas de produto, ficando expressamente encaminhados para validação do PO:
-
-1. **Ordenação na Comparação de Disciplinas (RF13):**
-   - *Situação atual:* O RF13 estabelece que a comparação deve ser ordenada estritamente pelo percentual de recomendação (`recomenda`).
-   - *Questão ao PO:* Em turmas onde um professor possui 100% de recomendação com base em apenas 3 avaliações e outro possui 95% de recomendação com base em 50 avaliações, deve haver opção para o aluno ordenar por didática ou ponderar pela quantidade de avaliações?
-   - *Impacto:* Requer alteração no RF13 se filtros adicionais de ordenação forem aprovados.
-
-2. **Exibição de Turmas Históricas vs. Turmas Ativas (RF16 / RF17):**
-   - *Situação atual:* O sistema exibe na comparação professores com turmas ativas no semestre vigente importadas do SIGAA.
-   - *Questão ao PO:* Professores com histórico avaliado, mas que não possuem turma ativa no semestre atual, devem constar na comparação de uma disciplina (com aviso de "sem turma neste semestre") para fins de referência de módulo livre?
-
-3. **Fluxo de Comentários Textuais na R2 (RF20, RF21, RF22):**
-   - *Situação atual:* O formulário da R1 é 100% estruturado (sem texto livre). O RF20 introduz comentários em texto na R2.
-   - *Questão ao PO:* O comentário será obrigatório ou opcional na submissão da avaliação? O comentário passará por moderação prévia ou denúncia posterior (post-moderation)?
-
----
-
-## 7. Status dos Critérios da Issue #153 e Pendências
-
-Acompanhamento dos critérios de conclusão estabelecidos na Issue [#153](https://github.com/unb-mds/2026-02-UnDb/issues/153):
-
-- [x] **Tarefas, observações e limitações da avaliação registrados:** O documento especifica o roteiro reproduzível de 5 tarefas neutras, a matriz de observações e as limitações técnicas e metodológicas da avaliação.
-- [x] **Principais obstáculos comparados com o diagnóstico anterior:** Tabela comparativa confrontando cada um dos 7 obstáculos da issue #148 com as evidências do protótipo e da implementação atual.
-- [x] **Mudanças que impliquem regras de produto encaminhadas ao PO:** Pontos de decisão de produto (ordenação da comparação, turmas sem oferta ativa e política de comentários da R2) foram catalogados e isolados das sugestões puras de UX.
-- [ ] **Realização das sessões empíricas com alunos:** Registrada explicitamente como **pendência aberta** a ser executada pela equipe nas dinâmicas de teste da Sprint 06.
-
----
+A equipe deverá registrar participantes e sessões consentidas, preencher a matriz da seção 3.3, comparar os resultados e suas limitações, e então reavaliar os critérios. **Esta entrega não conclui a validação com alunos nem autoriza fechar a #153.**
 
 ## 8. Referências
 
-- [Issue #153 — [R2][UX] Validar protótipo da jornada com alunos](https://github.com/unb-mds/2026-02-UnDb/issues/153)
-- [Issue #148 — [R2][UX] Observar a jornada de busca, comparação e avaliação com alunos](https://github.com/unb-mds/2026-02-UnDb/issues/148)
-- [Issue #152 — [R2][UX] Prototipar tela inicial, busca, resultados, comparação e formulário](https://github.com/unb-mds/2026-02-UnDb/issues/152)
-- [Épico #144 — [EPIC][R2] Melhorar a jornada do aluno na aplicação](https://github.com/unb-mds/2026-02-UnDb/issues/144)
-- [`docs/requisitos.md`](../requisitos.md) — Fonte de verdade dos requisitos do projeto
-- [`docs/visao.md`](../visao.md) — Documento de visão do produto
+- [Issue #153 — Validar protótipo da jornada com alunos](https://github.com/unb-mds/2026-02-UnDb/issues/153)
+- [Issue #148 — Observar a jornada com alunos](https://github.com/unb-mds/2026-02-UnDb/issues/148) e [PR #176 — diagnóstico preliminar](https://github.com/unb-mds/2026-02-UnDb/pull/176)
+- [Issue #152 — Prototipar telas principais](https://github.com/unb-mds/2026-02-UnDb/issues/152) e [PR #179 — protótipo navegável](https://github.com/unb-mds/2026-02-UnDb/pull/179)
+- [Épico #144 — Melhorar a jornada do aluno](https://github.com/unb-mds/2026-02-UnDb/issues/144)
+- [Requisitos](../requisitos.md) — fonte de verdade das regras utilizadas
+- [Visão do produto](../visao.md)
