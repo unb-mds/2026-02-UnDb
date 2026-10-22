@@ -3,7 +3,7 @@ site_description: Documentação de produto, requisitos e arquitetura do UnDb
 site_url: https://unb-mds.github.io/2026-02-UnDb/
 repo_url: https://github.com/unb-mds/2026-02-UnDb
 repo_name: unb-mds/2026-02-UnDb
-strict: false
+edit_uri: edit/develop/docs/
 
 theme:
   name: material
@@ -53,6 +53,8 @@ nav:
       - Docker: estudos/docker.md
       - Busca, comparação e avaliação: estudos/observacao-jornada-busca-comparacao.md
       - Auditoria de Clareza dos Requisitos: estudos/auditoria-requisitos-issue-149.md
+      - Relato de uso — aluno externo: estudos/relato-usabilidade-aluno-01-issue-148.md
+      - Relato de uso — aluno da UnB: estudos/relato-usabilidade-aluno-02-issue-148.md
       - Tela exemplo API real: estudos/tela-exemplo-api-real.md
       - Validação Release 1 SIGAA 2026-09-24: estudos/validacao-release-1-sigaa-2026-09-24.md
       - Verificação ambiente completo issue 37: estudos/verificacao-ambiente-completo-issue-37.md
