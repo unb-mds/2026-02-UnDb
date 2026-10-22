@@ -51,6 +51,10 @@ Ordinalidade aprovada para desempate de moda:
 
 ## 3. Modelo de dados
 
+Esta seção descreve o modelo da Release 1. As regras aprovadas de RF20–RF22 para a R2
+estão na seção 12; seu modelo físico e contratos ainda devem ser preparados nas issues
+#156/#160/#161. Este documento não aprova novas tabelas, colunas ou migrations.
+
 ### `usuarios`
 | Campo | Tipo | Regra |
 |---|---|---|
@@ -131,7 +135,9 @@ pode ter zero ou vários docentes.
 **Constraint obrigatória:** `UNIQUE(usuario_id, professor_id, disciplina_id)`.
 Implementar no banco, via migração — não apenas na aplicação.
 
-**Não criar** campo de nota geral, índice composto, ranking persistido ou campo de comentário.
+**Não criar** campo de nota geral, índice composto ou ranking persistido. Na Release 1,
+não criar campo de comentário; o detalhamento de RF20 para a R2 não autoriza alterar
+o schema sem o processo próprio das issues dependentes.
 
 ---
 
@@ -315,6 +321,9 @@ Não implementar nem inventar valor para os itens abaixo.
 | Item | Situação |
 |---|---|
 | Estratégia de povoamento inicial da base | Não decidido |
+| Lista de termos do filtro de comentários | Solicitante definirá depois; moderação humana até então |
+| IA sem aprovação humana prévia | Objetivo futuro condicionado, sem mecanismo/provedor aprovado; não substituir moderação humana nesta etapa |
+| Dados e contratos de RF20–RF22 | Requisitos aprovados na #154; modelo físico, rotas, códigos HTTP, concessão operacional de papel e descarte programado a detalhar nas #156/#160/#161 |
 
 ---
 
@@ -327,3 +336,70 @@ Não implementar nem inventar valor para os itens abaixo.
 - Não armazenar dado acadêmico identificável do avaliador.
 - Não introduzir campo de texto livre antes do Release 2.
 - Não alterar schema fora de migração Alembic.
+
+---
+
+## 12. Comentários, denúncia e moderação — Release 2
+
+**Fonte:** detalhamento de RF20–RF22 e decisões R2-DEC-01 a R2-DEC-15 em
+[`docs/requisitos.md`](docs/requisitos.md), definidos nas respostas humanas da #154.
+Este resumo não substitui as tabelas de estados, retenção, erros e critérios AC20/21/22
+da fonte. O restante deste documento mantém os contratos entregues na R1.
+
+### Escrita, consulta e substituição de comentário
+
+- Comentário opcional da avaliação única estudante/professor/disciplina. Escrita e retirada
+  pertencem ao autor autenticado com e-mail confirmado; ausência de novo texto no reenvio
+  mantém o existente. Texto informado: 1–500 caracteres, desconsiderando espaços nas extremidades.
+- Leitura pública do texto publicado, sem nome/e-mail/identificador do autor ou vínculo
+  público com a conta. A consulta não expõe os cinco critérios individuais; RNF02 continua
+  protegendo os critérios agregados abaixo de três avaliações.
+- Novos textos e substitutos exigem moderação vigente. Nesta etapa, aprovação humana
+  antes de publicar; não ativar filtro enquanto a lista não estiver definida. IA é evolução
+  condicionada, não mecanismo atual. Crítica acadêmica negativa não é motivo de rejeição.
+- Critérios válidos são registrados normalmente; moderação do texto não os modifica.
+  Versão anterior aprovada permanece enquanto o substituto é analisado, se não suspensa
+  ou removida. Rejeitar o substituto mantém o estado anterior e descarta o texto rejeitado.
+- Aprovar substituto descarta texto anterior e encerra suas denúncias como `versão substituída`,
+  sem transferência. Retirada explícita cancela substituto pendente e encerra denúncias
+  como `conteúdo retirado`, sem julgar procedência e sem remover as notas.
+
+### Denúncias e suspensão
+
+- Apenas texto é denunciável. Conta autenticada confirmada ou não e visitante sem login
+  podem denunciar. Motivos fechados obrigatórios: ofensa pessoal, xingamento, palavrão,
+  ameaça, discriminação, exposição de dados pessoais ou spam; sem justificativa livre.
+- No máximo uma denúncia aberta por conta/versão para autenticados. Visitantes podem
+  repetir; a fila agrupa por comentário/versão e separa as origens e suas contagens.
+  Denúncia autenticada não implica automaticamente procedência.
+- **50 contas autenticadas distintas com denúncia aberta da mesma versão publicada**
+  suspendem o texto e o encaminham à revisão humana. Contas não confirmadas contam;
+  anônimas, duplicadas e encerradas não contam. Suspensão não é remoção definitiva.
+- Denunciantes recebem confirmação, sem acompanhamento posterior em tempo real. Na
+  suspensão pelo limiar ou remoção humana de denunciado, autenticados relacionados recebem
+  agradecimento na aplicação, disponível até primeira exibição e apagado depois.
+
+### Permissão, ações e dados privados
+
+- PO concede/retira papel a membros da equipe com conta autenticada e confirmada. Não
+  permitir decisão sem permissão ou sobre comentário/denúncia próprios; sem outro moderador
+  elegível o caso permanece pendente. Denúncia anônima não oferece vínculo de conta para
+  garantir detecção automática de todo impedimento pessoal.
+- Ações: aprovar/rejeitar pendente, manter/remover denunciado, restaurar/remover suspenso.
+  Não restaurar texto retirado pelo autor ou descartado. Não modificar os cinco critérios.
+- Denúncias e decisões têm registros privados: versão, data/hora, ator interno quando
+  existir, transição e motivo; decisões exigem motivo. Moderador autorizado pode consultar
+  nome/e-mail dos usuários envolvidos. Autor acompanha estado próprio, não os registros
+  privados de denunciantes ou de outros comentários.
+- Rejeitados e substituídos: não conservar o texto. Retirados pelo autor ou removidos pelo
+  moderador: texto privado por sete dias após o evento. Denúncias encerradas: não conservar.
+  Decisões: registros privados por sete dias após decisão. Não copiar texto descartado nos
+  registros. Suspensos permanecem disponíveis internamente para revisão.
+
+### Contratos ainda não definidos
+
+As APIs e migrations das #156/#160/#161 devem preservar os cenários AC20-01 a AC22-06
+da fonte, incluindo falta de sessão/confirmação, alvo inexistente/obsoleto, motivo inválido,
+duplicidade, acesso alheio, impedimento e transição incompatível. Não inventar endpoints,
+formatos de payload ou códigos HTTP aqui. A escolha técnica deve manter versão pública
+e substituto pendente distinguíveis e cumprir o descarte aprovado.
