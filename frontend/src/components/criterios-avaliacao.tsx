@@ -1,15 +1,16 @@
 import { criteriosAvaliacao } from "@/lib/avaliacao-formulario";
 
-export default function CriteriosAvaliacao({ disabled = false, onChange, rotulosExplicitos = false }: {
+export default function CriteriosAvaliacao({ disabled = false, onChange, rotulosExplicitos = false, ocultarDidatica = false }: {
   disabled?: boolean;
   onChange?: () => void;
   rotulosExplicitos?: boolean;
+  ocultarDidatica?: boolean;
 }) {
   return (
     <>
       <fieldset disabled={disabled} className="flex min-w-0 flex-col gap-4">
         <legend className="sr-only">Critérios da avaliação</legend>
-        {criteriosAvaliacao.map((criterio) => (
+        {criteriosAvaliacao.filter((criterio) => !ocultarDidatica || criterio.nome !== "didatica").map((criterio) => (
           <label key={criterio.nome} className="flex min-w-0 flex-col gap-2">
             <span className="text-sm font-medium">{rotulosExplicitos && criterio.nome === "chamada" ? "O professor faz chamada?" : criterio.rotulo}</span>
             <select

@@ -4,6 +4,7 @@ import { apresentacoesDemo, comparacoesDemo, correspondeBusca, disciplinasDemo, 
 import FormularioDemo from "./formulario-demo";
 import AcessoDemo from "./acesso-demo";
 import { AcessoParaAvaliar } from "./conta-demo";
+import OrganizarResultadosDemo from "./organizar-resultados-demo";
 import type { AvaliacaoAgregada } from "@/lib/types/avaliacao";
 import type { DisciplinaInstitucional, ProfessorInstitucional } from "@/lib/types/institucional";
 
@@ -33,6 +34,7 @@ function BuscaDemo({ contexto }: { contexto: Contexto }) {
   return (
     <Form action="/prototipo" className={`${cartao} flex flex-col gap-4 bg-foreground/[0.02]`}>
       <input type="hidden" name="etapa" value="resultados" />
+      <input type="hidden" name="ordemBusca" value={contexto.ordemBusca} />
       <fieldset className="flex flex-wrap gap-4"><legend className="mb-2 text-sm font-medium">Buscar por</legend>
         <label className="flex items-center gap-2"><input type="radio" name="tipo" value="professor" defaultChecked={contexto.tipo === "professor"} />Professor</label>
         <label className="flex items-center gap-2"><input type="radio" name="tipo" value="disciplina" defaultChecked={contexto.tipo === "disciplina"} />Disciplina</label>
@@ -42,21 +44,14 @@ function BuscaDemo({ contexto }: { contexto: Contexto }) {
           className="w-full rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base" />
       </label>
       <p id="ajuda-busca" className="text-sm text-foreground/70">Informe ao menos 2 caracteres. Você pode buscar em qualquer departamento.</p>
-      <div className="flex flex-wrap items-end gap-3">
-        <label className="flex min-w-0 flex-1 flex-col gap-2"><span className="text-sm font-medium">Organizar resultados por</span>
-          <select name="ordemBusca" defaultValue={contexto.ordemBusca} className="w-full rounded-lg border border-foreground/20 bg-background px-4 py-2.5">
-            <option value="nome">Nome</option><option value="departamento">Departamento e nome</option>
-          </select>
-        </label>
-        <button type="submit" className={acao}>Buscar</button>
-      </div>
+      <button type="submit" className={`${acao} self-start`}>Buscar</button>
     </Form>
   );
 }
 
 function ContextoDisciplina({ disciplina }: { disciplina: DisciplinaInstitucional }) {
   return <div className="min-w-0">
-    <p className="text-sm font-medium text-accent">Departamento: {disciplina.departamento}</p>
+    <p className="text-sm font-medium text-accent">Unidade acadêmica: {disciplina.departamento}</p>
     <p className="mt-1 text-lg font-semibold">{disciplina.nome}</p>
     <p className="mt-1 text-sm text-foreground/70">Código da disciplina: <span className="font-mono">{disciplina.codigo}</span></p>
   </div>;
@@ -141,12 +136,12 @@ export default async function PrototipoPage({ searchParams }: {
         <p className="mt-1 text-foreground/70">Dados demonstrativos fictícios. Experimente a navegação; nenhuma avaliação é enviada ou salva.</p>
         <Link href="/" className="mt-2 inline-block underline underline-offset-4">Voltar ao sistema</Link>
       </aside>
-      <nav aria-label="Etapas da jornada"><ol className="flex flex-wrap gap-2 text-sm">
+      {etapa !== "acesso" && <nav aria-label="Etapas da jornada"><ol className="flex flex-wrap gap-2 text-sm">
         {["Busque", "Escolha a disciplina", "Consulte ou avalie"].map((nome, indice) => <li key={nome} aria-current={passo === indice ? "step" : undefined}
           className={passo === indice ? "rounded-lg bg-accent px-3 py-2 font-medium text-on-accent" : "rounded-lg bg-foreground/[0.03] px-3 py-2 text-foreground/70"}>
           {indice + 1}. {nome}
         </li>)}
-      </ol></nav>
+      </ol></nav>}
       <div><h1 className="text-2xl font-semibold">{titulos[etapa]}</h1>
         <p className="mt-2 text-sm text-foreground/70">Consultar e comparar é público. Para enviar uma avaliação no sistema real, entre com sua conta de e-mail confirmado.</p>
       </div>
@@ -170,7 +165,7 @@ export default async function PrototipoPage({ searchParams }: {
         {selecionandoDisciplina ? <>
           <Link href={href("resultados", contexto)} className={voltar}>← Voltar aos resultados da pesquisa “{termo}”</Link>
           <article className={`${cartao} max-w-2xl`}>
-            <p className="text-sm font-medium text-accent">Departamento: {professor.departamento}</p>
+            <p className="text-sm font-medium text-accent">Unidade acadêmica: {professor.departamento}</p>
             <h2 className="mt-1 text-xl font-semibold">Disciplinas de {professor.nome}</h2>
             <p className="mt-2 text-sm text-foreground/70">Escolha a matéria abaixo. Você pode avaliar diretamente ou comparar os professores antes.</p>
             <DisciplinasProfessor professor={professor} contexto={contexto} />
@@ -184,16 +179,17 @@ export default async function PrototipoPage({ searchParams }: {
           </div> : resultados.length === 0 ? <div className={cartao}><h2 className="font-medium">Nenhum resultado encontrado</h2>
             <p className="mt-2 text-sm text-foreground/70">Nenhum resultado para “{termo}” nos dados demonstrativos. Confira a grafia ou tente outro nome ou código.</p>
           </div> : <>
-            <p role="status" className="text-sm text-foreground/70">{resultados.length} resultado(s) para “{termo}”. {tipo === "professor" ? "As disciplinas estão agrupadas por professor. Confira o departamento antes de escolher." : "Escolha uma disciplina para comparar professores."}</p>
+            <p role="status" className="text-sm text-foreground/70">{resultados.length} resultado(s) para “{termo}”. {tipo === "professor" ? "As disciplinas estão agrupadas por professor. Confira a unidade acadêmica antes de escolher." : "Escolha uma disciplina para comparar professores."}</p>
+            <OrganizarResultadosDemo ordem={contexto.ordemBusca} tipo={tipo} />
             {tipo === "professor" && resultados.some((item, indice) => resultados.some((outro, outroIndice) => indice !== outroIndice && item.nome === outro.nome)) &&
-              <p className="rounded-lg bg-accent/5 p-4 text-sm text-foreground/70">Há professores com o mesmo nome neste exemplo. São registros distintos: confira o departamento e as disciplinas. Nomes iguais não identificam necessariamente a mesma pessoa.</p>}
+              <p className="rounded-lg bg-accent/5 p-4 text-sm text-foreground/70">Há professores com o mesmo nome neste exemplo. São registros distintos: confira a unidade acadêmica e as disciplinas. Nomes iguais não identificam necessariamente a mesma pessoa.</p>}
             <ul className="grid gap-4 sm:grid-cols-2" aria-label="Lista de resultados">{resultados.map((item) => <li key={item.id}>
               <article className={`${cartao} h-full`}>
                 {"codigo" in item ? <>
                   <ContextoDisciplina disciplina={item} />
                   <Link href={href("comparacao", { ...contexto, disciplina: item.id })} className={`${acao} mt-4`}>Ver professores de {item.nome} →</Link>
                 </> : <>
-                  <p className="text-sm font-medium text-accent">Departamento: {item.departamento}</p>
+                  <p className="text-sm font-medium text-accent">Unidade acadêmica: {item.departamento}</p>
                   <h2 className="mt-1 text-xl font-semibold">{item.nome}</h2>
                   <Link href={href("resultados", { ...contexto, professor: item.id })} className={`${voltar} mt-2 inline-block`}>Ver disciplinas de {item.nome}</Link>
                   <DisciplinasProfessor professor={item} contexto={contexto} />
@@ -221,7 +217,7 @@ export default async function PrototipoPage({ searchParams }: {
           <p role="status" className="text-sm text-foreground/70">{ordenada ? "Recomendação decrescente; desempate por quantidade e nome. Resultados insuficientes ao final, sem percentual artificial." : "Ordem de apresentação demonstrativa. Use a ordenação por recomendação para comparar."}</p>
           {comparacao.every((item) => !item.dadosSuficientes) && <p className={`${cartao} text-sm text-foreground/70`}>Não há dados suficientes para comparar os critérios. A ausência de avaliações não permite uma conclusão sobre o professor.</p>}
           <ul className="grid gap-4 sm:grid-cols-2" aria-label="Professores nesta disciplina">{apresentacao.map((item) => <li key={item.professorId} className={`${cartao} flex flex-col`}>
-            <p className="text-sm font-medium text-accent">Departamento: {item.professor.departamento}</p>
+            <p className="text-sm font-medium text-accent">Unidade acadêmica: {item.professor.departamento}</p>
             <h3 className="mt-1 text-lg font-semibold">{item.professor.nome}</h3>
             <p className="mt-1 text-sm text-foreground/70">{item.totalAvaliacoes} {item.totalAvaliacoes === 1 ? "avaliação" : "avaliações"} nesta disciplina</p>
             <Link href={href("avaliacao", { ...contexto, disciplina: disciplina.id, professor: item.professorId, origem: "comparacao" })} className={`${acao} mt-4`}>Avaliar {item.professor.nome} nesta disciplina →</Link>
@@ -231,10 +227,13 @@ export default async function PrototipoPage({ searchParams }: {
       </>}
 
       {etapa === "acesso" && <div className="flex flex-col gap-6">
-        {avaliacao && <section className={`${cartao} border-accent/30 bg-accent/5`} aria-label="Destino da avaliação">
+        {avaliacao && <details className={`${cartao} max-w-2xl border-accent/30 bg-accent/5`}>
+          <summary className="cursor-pointer text-sm font-medium">Avaliação selecionada: {avaliacao.disciplina.nome} · {avaliacao.professor.nome}</summary>
+          <div className="mt-3" aria-label="Destino da avaliação">
           <ContextoDisciplina disciplina={avaliacao.disciplina} />
           <p className="mt-3 text-base">Professor: <strong>{avaliacao.professor.nome}</strong></p>
-        </section>}
+          </div>
+        </details>}
         <AcessoDemo retorno={retornoConta} temAvaliacao={!!avaliacao && retornoEtapa === "avaliacao"} />
       </div>}
 

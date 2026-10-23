@@ -89,12 +89,13 @@ oferece Cálculo. Elas permanecem registros separados.
 A alternativa por disciplina permite buscar “Algoritmos”, comparar e ordenar por
 recomendação antes de avaliar. “MAT-DEMO” encontra Cálculo, com ausência de avaliações.
 Nome, departamento e código são identificados por rótulos; busca e organização dos
-resultados permanecem na URL durante a navegação e o retorno. A opção de organizar
-resultados por departamento/nome é uma proposta demonstrativa, não altera o ranking
+resultados permanecem na URL durante a navegação e o retorno. A ordenação por nome ou unidade acadêmica fica na própria lista e se atualiza ao
+trocar a opção, sem nova busca. É uma proposta demonstrativa, não altera o ranking
 da comparação nem os serviços reais.
 
 No formulário, “Entrar ou criar conta para avaliar” abre a mesma área de conta do
-cabeçalho. Ela reúne entrada e cadastro, Mostrar/Ocultar senha, estado do e-mail e saída.
+cabeçalho. Essa área não mostra as etapas de pesquisa; o destino da avaliação fica
+recolhido e pode ser consultado. Ela reúne entrada e cadastro, Mostrar/Ocultar senha, estado do e-mail e saída.
 Simular entrada representa uma conta já confirmada; simular cadastro apresenta e-mail
 pendente, e a confirmação demonstrativa permite continuar. Entrada e confirmação
 retornam ao ponto de origem, mantendo professor, disciplina e busca quando selecionados.
@@ -108,8 +109,9 @@ com recuperação. A proposta não inclui fotos do SIGAA ou novos dados de local
 
 O protótipo não autentica, consulta a API, calcula agregados nem salva avaliações.
 A comparação alterna entre apresentações preparadas da fixture; a regra real permanece
-no backend. Os cinco campos reutilizam o componente do formulário real e suas escalas;
-os rótulos explicativos são ativados somente no protótipo.
+no backend. Didática usa botões de 1 a 5 sem nota pré-selecionada; os outros quatro
+campos reutilizam o componente do formulário real. Todos preservam suas escalas e
+validação; os rótulos explicativos são ativados somente no protótipo.
 Critérios não aparecem abaixo de três avaliações; contagens e insuficiência permanecem visíveis.
 
 `npm run test:browser` também verifica a jornada, os estados, o histórico/recarga,
@@ -121,6 +123,8 @@ diretório de saída. Evidências, limites e prévia da PR estão em
 [`verificacao-prototipo-jornada-issue-152.md`](../docs/estudos/verificacao-prototipo-jornada-issue-152.md).
 O mapeamento desta adaptação aos relatos e o roteiro para registrar a próxima rodada
 estão em [`ajustes-prototipo-jornada-issue-153.md`](../docs/estudos/ajustes-prototipo-jornada-issue-153.md).
+O retorno recebido, a comparação com a #148 e as ideias para continuidade estão em
+[`resultados-reteste-jornada-issue-153.md`](../docs/estudos/resultados-reteste-jornada-issue-153.md).
 
 ## Execução com Docker — Issue #36
 

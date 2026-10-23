@@ -2,6 +2,8 @@
 
 **Estado:** roteiro proposto e inspeção documental/técnica para a [issue #153](https://github.com/unb-mds/2026-02-UnDb/issues/153), vinculada ao [épico #144](https://github.com/unb-mds/2026-02-UnDb/issues/144). **Validação com alunos não realizada nos registros consultados; redução de obstáculos não demonstrada.** Revisão documental em 14/10/2026.
 
+**Atualização em 22/10/2026:** este documento preserva a preparação histórica de 14/10. O [relatório de resultados do reteste](resultados-reteste-jornada-issue-153.md) registra o retorno recebido depois, compara obstáculos e atualiza a avaliação dos critérios da #153. As afirmações de ausência de resultados abaixo descrevem o estado histórico da preparação.
+
 ## 1. Objetivo e limites da entrega
 
 **Atualização de preparação em 22/10/2026:** os relatos da #148 motivaram uma [adaptação do protótipo e um roteiro para a próxima rodada](ajustes-prototipo-jornada-issue-153.md). Esse material complementa o roteiro histórico abaixo e ainda não apresenta resultados de teste do protótipo com alunos.

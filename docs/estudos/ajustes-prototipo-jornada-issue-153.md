@@ -1,6 +1,6 @@
 # Protótipo adaptado aos relatos de uso — preparação da #153
 
-**Estado:** proposta implementada para nova avaliação com alunos. Não há resultados dessa rodada registrados neste documento; a #153 permanece pendente.
+**Estado:** proposta implementada e retorno qualitativo recebido. Os [resultados do reteste e encaminhamentos](resultados-reteste-jornada-issue-153.md) registram melhora percebida, dificuldades e limites; ajustes posteriores ao relato aguardam eventual nova avaliação. Entrega da #153 em revisão na PR #182.
 
 **Data da preparação:** 22/10/2026. **Base:** `develop`, commit `741083cebe7cbb1d5ea0b3c2f4ac83cf362f8fa1`. As alterações estão na branch `feature/153-ajustes-prototipo`; registrar o SHA publicado da PR em cada sessão para identificar a versão efetivamente apresentada.
 
@@ -8,7 +8,7 @@
 
 Adaptar `/prototipo` aos obstáculos encaminhados por Nicolas nos relatos de [ALUNO-01](relato-usabilidade-aluno-01-issue-148.md) e [ALUNO-02](relato-usabilidade-aluno-02-issue-148.md), para então verificar se a proposta melhora a compreensão da busca, da relação professor/disciplina e do caminho até avaliar.
 
-A coleta dos relatos foi consolidada na [#148](observacao-jornada-busca-comparacao.md). A criação desta proposta não demonstra redução de obstáculos; esse resultado depende do uso pelos participantes na [#153](https://github.com/unb-mds/2026-02-UnDb/issues/153).
+A coleta dos relatos foi consolidada na [#148](observacao-jornada-busca-comparacao.md). A comparação qualitativa do retorno recebido está no relatório do reteste, com limites explícitos, para revisão da [#153](https://github.com/unb-mds/2026-02-UnDb/issues/153).
 
 ## 2. O que mudou
 
@@ -18,9 +18,11 @@ A coleta dos relatos foi consolidada na [#148](observacao-jornada-busca-comparac
 | OBS-02/06, A02-02/03 | Botão de avaliação por disciplina diretamente nos resultados e na página do professor; comparação é uma alternativa disponível. Professor e disciplina aparecem em destaque acima do formulário. | Encontra o caminho para avaliar e identifica quem está avaliando em qual matéria? |
 | OBS-03 | Termo, tipo de busca e organização dos resultados são preservados nos parâmetros de URL e nos links de retorno. | Ao voltar pelo navegador ou pela interface, consegue continuar a busca sem redigitá-la? |
 | OBS-04/10 | Nome e departamento ganham destaque; códigos aparecem com o rótulo “Código da disciplina”. | Compreende o significado do código e o contexto da unidade? O número relatado anteriormente ainda precisa ser identificado na versão real. |
-| OBS-05/08 | Entrada única “Entrar / Criar conta” no cabeçalho, seguida de “Minha conta”; demonstra visitante, e-mail pendente/confirmado, saída e retorno à avaliação. Inclui Mostrar/Ocultar senha. | Distingue consulta pública de envio autenticado, encontra a área de acesso e reconhece a necessidade de confirmar o e-mail? |
+| OBS-05/08 | Entrada única “Entrar / Criar conta” no cabeçalho, seguida de “Minha conta”; demonstra visitante, e-mail pendente/confirmado, saída e retorno à avaliação. Inclui Mostrar/Ocultar senha; a área de conta não exibe as etapas de pesquisa e recolhe o destino da avaliação. | Distingue consulta pública de envio autenticado, encontra a área de acesso e reconhece a necessidade de confirmar o e-mail? |
 | OBS-07 | Rótulos completos para Faz chamada/Não faz chamada e Recomenda/Não recomenda a matéria; a consulta agregada mantém percentuais e conflito. | Interpreta as respostas sem alterar a neutralidade da Chamada ou confundir percentual com avaliação individual? |
-| OBS-09 | Organização demonstrativa dos resultados por nome ou departamento/nome, escolhida na busca. | Em qual contexto a opção ajuda? Essa experiência não aprova uma nova regra de ordenação do produto. |
+| OBS-09 | Organização demonstrativa dos resultados por nome ou departamento/nome, escolhida na própria listagem, com atualização ao trocar a opção e explicação de unidade acadêmica. | Em qual contexto a opção ajuda? Essa experiência não aprova uma nova regra de ordenação do produto. |
+
+Após o reteste, Didática passou a botões de 1 a 5, sem nota pré-selecionada, com texto da seleção e navegação por teclado; a escala original foi preservada. As ideias adicionais e seus encaminhamentos estão no relatório de resultados.
 
 O caminho visual foi resumido a três referências: buscar, escolher a disciplina e consultar/avaliar. A busca já está disponível na entrada. Estados de erro e carregamento ficam em uma seção expansível para não competir com as ações principais.
 
@@ -55,9 +57,9 @@ A área de conta é acessível mesmo sem professor ou matéria selecionados. Nes
 
 O facilitador pode adaptar a redação ao participante, preservando o objetivo e registrando a ajuda dada. Não há meta nova de cliques, tempo ou taxa de sucesso.
 
-## 5. Registro dos resultados — a preencher após o uso
+## 5. Registro dos resultados e continuidade
 
-Não há linhas de resultados preenchidas antecipadamente. Para cada tarefa, registrar:
+O [relatório do reteste](resultados-reteste-jornada-issue-153.md) registra o retorno recebido em 22/10/2026, a comparação com a #148 e as informações ausentes. O modelo abaixo permanece para sessões futuras:
 
 | Campo | Informação a coletar |
 |---|---|
@@ -80,14 +82,14 @@ As verificações automatizadas cobrem comportamento da proposta e regressões d
 | `npm test` | 19 testes aprovados, incluindo preservação de respostas Não e contratos existentes. |
 | `npm run lint` | Aprovado. |
 | `npm run build -- --webpack` | Aprovado, com TypeScript e todas as rotas. |
-| `npm run test:browser` | Aprovado no Brave/Chromium com perfil temporário; runner existente, respostas controladas e nenhuma chamada à API pelo protótipo. |
+| `npm run test:browser` | Aprovado no Brave/Chromium com perfil temporário; runner existente, respostas controladas, notas em botões por mouse/teclado, ordenação dinâmica, conta sem etapas de pesquisa e nenhuma chamada à API pelo protótipo. |
 | Temas e larguras | 12 telas/estados × 2 temas × 3 larguras (320/768/1280 px): 72 combinações sem rolagem horizontal, incluindo conta com/sem contexto; cenários visitante, pendente e confirmado, saída e retorno à avaliação também aprovados. |
 | Inspeção visual | Capturas de entrada, formulário, resultados agrupados em desktop/celular, acesso móvel escuro e conta confirmada/pendente em desktop inspecionadas. |
 | Documentação | `mkdocs build --strict` e `git diff --check` aprovados. |
 
 Ambiente: macOS, Node 24.19.0, Next.js 16.3.5 e dependências do lockfile, sem alteração de versões. O npm foi disponibilizado temporariamente a partir do runtime local. A primeira tentativa de build não conseguiu baixar as fontes; a tentativa com acesso de rede encontrou uma restrição de porta/processo no Turbopack. O build foi verificado com a opção Webpack já oferecida pelo Next.js, sem alterar o script ou a configuração do projeto. O build padrão com Turbopack permanece não verificado neste ambiente; não foi declarado como aprovado.
 
-As capturas locais de conferência foram geradas em `/private/tmp/undb-prototipo153-capturas`, fora do conjunto de arquivos para versionamento. A suíte também passou nas regressões do formulário real com respostas controladas; não houve integração com FastAPI/PostgreSQL reais nem teste com alunos nesta preparação.
+As capturas locais de conferência foram geradas em `/private/tmp/undb-prototipo153-capturas`, fora do conjunto de arquivos para versionamento. A suíte também passou nas regressões do formulário real com respostas controladas; não houve integração com FastAPI/PostgreSQL reais nem teste pelo participante dos ajustes posteriores ao relato. O retorno qualitativo recebido refere-se à versão anterior desses ajustes.
 
 ## 7. Referências
 
