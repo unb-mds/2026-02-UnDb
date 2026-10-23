@@ -1,16 +1,18 @@
 import { criteriosAvaliacao } from "@/lib/avaliacao-formulario";
 
-export default function CriteriosAvaliacao({ disabled = false, onChange }: {
+export default function CriteriosAvaliacao({ disabled = false, onChange, rotulosExplicitos = false, ocultarDidatica = false }: {
   disabled?: boolean;
   onChange?: () => void;
+  rotulosExplicitos?: boolean;
+  ocultarDidatica?: boolean;
 }) {
   return (
     <>
       <fieldset disabled={disabled} className="flex min-w-0 flex-col gap-4">
         <legend className="sr-only">Critérios da avaliação</legend>
-        {criteriosAvaliacao.map((criterio) => (
+        {criteriosAvaliacao.filter((criterio) => !ocultarDidatica || criterio.nome !== "didatica").map((criterio) => (
           <label key={criterio.nome} className="flex min-w-0 flex-col gap-2">
-            <span className="text-sm font-medium">{criterio.rotulo}</span>
+            <span className="text-sm font-medium">{rotulosExplicitos && criterio.nome === "chamada" ? "O professor faz chamada?" : criterio.rotulo}</span>
             <select
               name={criterio.nome}
               required
@@ -20,7 +22,13 @@ export default function CriteriosAvaliacao({ disabled = false, onChange }: {
               className="w-full rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base focus:border-foreground/50 focus-visible:ring-2 focus-visible:ring-accent"
             >
               <option value="" disabled>Selecione uma opção</option>
-              {criterio.opcoes.map(([valor, rotulo]) => <option key={valor} value={valor}>{rotulo}</option>)}
+              {criterio.opcoes.map(([valor, rotulo]) => <option key={valor} value={valor}>
+                {rotulosExplicitos && criterio.nome === "chamada"
+                  ? valor === "true" ? "Faz chamada" : "Não faz chamada"
+                  : rotulosExplicitos && criterio.nome === "recomenda"
+                    ? valor === "true" ? "Recomenda a matéria" : "Não recomenda a matéria"
+                    : rotulo}
+              </option>)}
             </select>
           </label>
         ))}

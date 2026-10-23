@@ -276,8 +276,9 @@ try {
   await cdp("Page.navigate", { url: `http://localhost:3100${caminho}/avaliar` });
   await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 5'), "formulário direto");
   assert.equal(await avaliar('document.querySelector("form").reportValidity()'), false);
-  await avaliar('document.querySelector("form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
-  await aguardarTexto("Selecione uma opção válida para Didática.");
+  // Assim como na entrada por link, aguarda a hidratação com dados inválidos.
+  // Um único evento antes do React estar pronto pode ser perdido no acesso direto.
+  await aguardarValidacaoLocal("Selecione uma opção válida para Didática.");
   await avaliar('document.querySelector("[name=didatica]").focus()');
   await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
   await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });

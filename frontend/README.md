@@ -35,28 +35,96 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 
 ## Protótipo da jornada — Issue #152
 
+### Testar com a base simulada pronta
+
+O protótipo já inclui uma base fictícia em `src/app/prototipo/dados.ts`, carregada
+automaticamente. Não é necessário criar banco, importar o SIGAA ou configurar `.env`.
+
+| Dados disponíveis | Exemplos para testar |
+|---|---|
+| 6 professores fictícios | Ana de Computação, Ana de Matemática, Bruno, Carla, Daniel e Elisa. |
+| 3 disciplinas fictícias | Algoritmos (`CIC-DEMO`), Estruturas de dados (`CIC-DEMO-2`) e Cálculo (`MAT-DEMO`). |
+| Estados de avaliação | Dados suficientes com recomendação, conflito em critérios factuais, duas avaliações e ausência de avaliações. |
+| Conta demonstrativa | Visitante, cadastro pendente de confirmação, conta confirmada e saída. Use `exemplo@aluno.unb.br` e uma senha fictícia de pelo menos 8 caracteres. |
+
+Com Node.js 22 ou superior e npm, a partir da raiz do repositório:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Como alternativa, com Docker aberto, execute **na raiz do repositório**:
+
+```bash
+docker compose up --build --no-deps frontend
+```
+
+Abra **http://localhost:3000/prototipo**. O comando Docker inicia somente o frontend,
+sem API ou PostgreSQL; as páginas reais que dependem desses serviços não fazem parte
+desse modo de teste. O build precisa de internet. Para parar esse modo Docker, use
+Ctrl+C no terminal e `docker compose stop frontend`, se necessário.
+
+Não existe login real de teste nem gravação em banco neste modo. Os exemplos já
+estão disponíveis na busca. A conta simulada reinicia ao recarregar e a prévia da
+avaliação não salva respostas. Para a rodada com alunos, registre o commit usado e
+as observações conforme o roteiro da #153.
+
+### Navegação e limites
+
 Com `npm run dev` (ou `npm run start` após o build), abra
 [http://localhost:3000/prototipo](http://localhost:3000/prototipo), também acessível
 pelo link na página inicial. O protótipo funciona sem backend e identifica todos os
-dados como demonstrativos fictícios. O header compartilhado continua levando às
-rotas reais da aplicação, que dependem da API quando aplicável.
+dados como demonstrativos fictícios. O cabeçalho do protótipo oferece busca e uma
+entrada única “Entrar / Criar conta”, que vira “Minha conta” nos cenários simulados.
+“Voltar ao sistema” leva às rotas reais, que dependem da API quando aplicável.
 
-Experimente **Buscar disciplina → Algoritmos → Comparação → Ordenar por recomendação
-→ Avaliar Ana → Conferir prévia da avaliação**. A alternativa por professor permite
-buscar “Ana”, selecionar sua disciplina e seguir até o mesmo formulário. “MAT-DEMO”
-encontra Cálculo em outro departamento, com ausência de avaliações. Os resultados
-oferecem links para busca vazia, sem resultados, carregamento e erro com recuperação.
+Na rodada de preparação da #153, experimente **Buscar professor → Ana → Avaliar nesta
+disciplina → Conferir prévia da avaliação**. Os resultados já mostram as disciplinas
+agrupadas por professor, com acesso direto à avaliação. As duas Anas fictícias têm
+departamentos diferentes; uma oferece Algoritmos e Estruturas de dados, e a outra
+oferece Cálculo. Elas permanecem registros separados.
+
+A alternativa por disciplina permite buscar “Algoritmos”, comparar e ordenar por
+recomendação antes de avaliar. “MAT-DEMO” encontra Cálculo, com ausência de avaliações.
+Nome, departamento e código são identificados por rótulos; busca e organização dos
+resultados permanecem na URL durante a navegação e o retorno. A ordenação por nome ou unidade acadêmica fica na própria lista e se atualiza ao
+trocar a opção, sem nova busca. É uma proposta demonstrativa, não altera o ranking
+da comparação nem os serviços reais.
+
+No formulário, “Entrar ou criar conta para avaliar” abre a mesma área de conta do
+cabeçalho. Essa área não mostra as etapas de pesquisa; o destino da avaliação fica
+recolhido e pode ser consultado. Ela reúne entrada e cadastro, Mostrar/Ocultar senha, estado do e-mail e saída.
+Simular entrada representa uma conta já confirmada; simular cadastro apresenta e-mail
+pendente, e a confirmação demonstrativa permite continuar. Entrada e confirmação
+retornam ao ponto de origem, mantendo professor, disciplina e busca quando selecionados.
+Use dados fictícios: não há criação de conta ou sessão real. O cenário de conta fica
+somente em memória, é preservado na navegação interna e reinicia ao recarregar;
+respostas do formulário de avaliação não são persistidas entre etapas. O protótipo
+usa rótulos completos para Chamada e Recomendação, preservando os valores e escalas.
+
+“Explorar estados de busca” reúne busca vazia, sem resultados, carregamento e erro
+com recuperação. A proposta não inclui fotos do SIGAA ou novos dados de localização.
 
 O protótipo não autentica, consulta a API, calcula agregados nem salva avaliações.
-A ordenação alterna entre apresentações preparadas da fixture; a regra real permanece
-no backend. Os cinco campos reutilizam o componente do formulário real e suas escalas.
+A comparação alterna entre apresentações preparadas da fixture; a regra real permanece
+no backend. Didática usa botões de 1 a 5 sem nota pré-selecionada; os outros quatro
+campos reutilizam o componente do formulário real. Todos preservam suas escalas e
+validação; os rótulos explicativos são ativados somente no protótipo.
 Critérios não aparecem abaixo de três avaliações; contagens e insuficiência permanecem visíveis.
 
 `npm run test:browser` também verifica a jornada, os estados, o histórico/recarga,
-as escalas, teclado e 54 combinações de tela/tema/largura (320/768/1280 px).
+as escalas, teclado e 72 combinações de tela/tema/largura (320/768/1280 px), incluindo
+resultados com homônimos e a área de conta com/sem avaliação selecionada. Também verifica
+os cenários visitante, e-mail pendente, e-mail confirmado, saída e retorno à avaliação.
 Para gerar capturas locais durante essa verificação, configure `PREVIEW_DIR` com um
 diretório de saída. Evidências, limites e prévia da PR estão em
 [`verificacao-prototipo-jornada-issue-152.md`](../docs/estudos/verificacao-prototipo-jornada-issue-152.md).
+O mapeamento desta adaptação aos relatos e o roteiro para registrar a próxima rodada
+estão em [`ajustes-prototipo-jornada-issue-153.md`](../docs/estudos/ajustes-prototipo-jornada-issue-153.md).
+O retorno recebido, a comparação com a #148 e as ideias para continuidade estão em
+[`resultados-reteste-jornada-issue-153.md`](../docs/estudos/resultados-reteste-jornada-issue-153.md).
 
 ## Execução com Docker — Issue #36
 
@@ -103,7 +171,9 @@ Components por requisição. Por isso a entrega mantém servidor Next.js e não 
 Base implementada nesta entrega para orientar as próximas telas. A solicitação de
 implementação da [Issue #31](https://github.com/unb-mds/2026-02-UnDb/issues/31) é a origem
 deste trabalho; este registro não afirma aprovação coletiva nem fechamento da issue.
-Os valores ficam centralizados em `src/app/globals.css` e o header em `src/app/layout.tsx`.
+Os valores ficam centralizados em `src/app/globals.css`. O layout raiz usa
+`src/components/cabecalho.tsx` para a navegação real; `/prototipo` herda um layout
+próprio com a navegação e o estado de conta exclusivamente demonstrativos.
 
 ### Referência pesquisada
 
