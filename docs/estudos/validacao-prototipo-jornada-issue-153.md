@@ -4,6 +4,8 @@
 
 ## 1. Objetivo e limites da entrega
 
+**Atualização de preparação em 22/10/2026:** os relatos da #148 motivaram uma [adaptação do protótipo e um roteiro para a próxima rodada](ajustes-prototipo-jornada-issue-153.md). Esse material complementa o roteiro histórico abaixo e ainda não apresenta resultados de teste do protótipo com alunos.
+
 A issue #153 pede verificar, com alunos, se o protótipo reduz os obstáculos identificados no diagnóstico anterior antes de implementar as telas. Este documento prepara tarefas, coleta e comparação, registra capacidades verificáveis da implementação anterior e encaminha questões de produto ao PO.
 
 O roteiro e a existência de mensagens na interface não demonstram compreensão pelos estudantes. Não foram apresentados registros de sessões, participantes recrutados ou resultados antes/depois. Esses dados não são substituídos por testes automatizados, inspeção de código ou dados demonstrativos do protótipo.

@@ -23,10 +23,9 @@ export default function FormularioDemo({ professorId, disciplinaId }: {
   return (
     <form onSubmit={revisar} className="flex flex-col gap-6">
       <p className="text-sm text-foreground/70">
-        Experimente os cinco critérios. Esta demonstração não envia nem salva respostas.
-        Na aplicação, é necessário entrar na conta e confirmar o e-mail @aluno.unb.br para enviar.
+        Preencha os cinco critérios sobre a disciplina indicada acima.
       </p>
-      <CriteriosAvaliacao onChange={() => setMensagem(null)} />
+      <CriteriosAvaliacao rotulosExplicitos onChange={() => setMensagem(null)} />
       <button type="submit" className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent hover:opacity-90">
         Conferir prévia da avaliação
       </button>
