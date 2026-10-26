@@ -97,7 +97,7 @@ export default function BuscaProfessoresPage() {
                   className="block rounded-lg border border-foreground/10 px-4 py-3 transition hover:border-foreground/30 hover:bg-foreground/[0.03]"
                 >
                   <span className="font-medium">{professor.nome}</span>
-                  <span className="block text-sm text-foreground/60">{professor.departamento}</span>
+                  <span className="block text-sm text-foreground/70">Unidade acadêmica: {professor.departamento}</span>
                 </Link>
               </li>
             ))}
