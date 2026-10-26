@@ -25,7 +25,6 @@ export function salvarRetornoAvaliacao(valor: string | null): void {
   const retorno = retornoAvaliacaoSeguro(valor);
   try {
     if (retorno) window.localStorage.setItem(CHAVE_RETORNO_AVALIACAO, retorno);
-    else window.localStorage.removeItem(CHAVE_RETORNO_AVALIACAO);
   } catch {
     // O retorno é um refinamento; restrições do navegador não podem bloquear autenticação.
   }

@@ -404,6 +404,7 @@ async function verificarCorrecoesInterface() {
   await aguardarTexto("Revise os dados do cadastro");
   assert.equal(await avaliar('document.querySelector("[name=email]").value'), "TESTE@ALUNO.UNB.BR");
   statusCadastro = 202;
+  await aguardar(async () => !(await avaliar('document.querySelector("button[type=submit]").disabled')), "cadastro liberado após rejeição");
   await enviar();
   await aguardarTexto("Se o endereço informado estiver disponível");
   assert.equal(cadastrosRecebidos, 2, "Apenas as tentativas válidas de 422 e 202 chegam à API");
@@ -442,13 +443,31 @@ async function verificarCorrecoesInterface() {
   await aguardar(async () => await avaliar('location.pathname === ' + JSON.stringify(destino)), "retorno da autenticação para avaliação");
   assert.match(await texto(), /Professor de teste/);
 
+  autenticado = false;
   await cdp("Page.navigate", {url:`http://localhost:3100/cadastro?returnTo=${encodeURIComponent(destino)}`});
   await aguardar(async () => await avaliar('localStorage.getItem("undb:retorno-avaliacao") === ' + JSON.stringify(destino)), "guardar destino da avaliação no cadastro");
+  // A navegação comum da área de conta não pode apagar a avaliação pendente.
+  await avaliar('document.querySelector(\'header a[href="/login"]\').click()');
+  await aguardarTexto("E-mail institucional");
+  assert.equal(await avaliar('localStorage.getItem("undb:retorno-avaliacao")'), destino);
+  await avaliar('document.querySelector(\'header a[href="/cadastro"]\').click()');
+  await aguardarTexto("Nome");
+  assert.equal(await avaliar('localStorage.getItem("undb:retorno-avaliacao")'), destino);
   statusConfirmacao = 200;
   await cdp("Page.navigate", {url:"http://localhost:3100/confirmar-email?token=valido"});
   await aguardarTexto("E-mail confirmado.");
   await aguardar(async () => await avaliar('Array.from(document.querySelectorAll("a")).some(a => a.textContent.includes("Continuar para a avaliação"))'), "ação para retomar a avaliação após confirmação");
   await avaliar('Array.from(document.querySelectorAll("a")).find(a => a.textContent.includes("Continuar para a avaliação")).click()');
+  await aguardar(async () => await avaliar('location.pathname === "/login" && !!document.querySelector("[name=senha]")'), "login obrigatório da conta recém-confirmada");
+  assert.equal(await avaliar('new URLSearchParams(location.search).get("returnTo")'), destino);
+  assert.equal(await avaliar('localStorage.getItem("undb:retorno-avaliacao")'), destino);
+  await avaliar('document.querySelector("[name=email]").value="estudante@aluno.unb.br"; document.querySelector("[name=senha]").value="senha-teste-local"; document.querySelector("form").requestSubmit()');
   await aguardar(async () => await avaliar('location.pathname === ' + JSON.stringify(destino)), "retorno após confirmação de e-mail");
+  assert.equal(await avaliar('localStorage.getItem("undb:retorno-avaliacao")'), destino);
+  assert.equal(await avaliar('document.querySelector("[name=didatica]:checked")'), null);
+  await avaliar(`document.querySelector('[name="didatica"][value="5"]').click(); Object.entries({dificuldade:"MEDIO", chamada:"false", material:"BOM", recomenda:"false"}).forEach(([nome, valor]) => { const campo = document.querySelector('[name="'+nome+'"]'); campo.value = valor; campo.dispatchEvent(new Event("change", {bubbles:true})); })`);
+  await enviar();
+  await aguardarTexto("Avaliação registrada com sucesso");
+  assert.equal(await avaliar('localStorage.getItem("undb:retorno-avaliacao")'), null);
   console.log("Regressões de interface: IDs malformados, indisponibilidade e recuperação, cadastro com hidratação atrasada sem navegação/envio indevido, domínio maiúsculo, nome em branco, 422, confirmação transitória/token inválido e contraste claro/escuro.");
 }

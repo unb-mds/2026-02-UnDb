@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { confirmarEmail } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
-import { limparRetornoAvaliacaoSalvo, lerRetornoAvaliacaoSalvo } from "@/lib/retorno-avaliacao";
+import { lerRetornoAvaliacaoSalvo } from "@/lib/retorno-avaliacao";
 
 export function ConfirmationClient({ token }: { token?: string }) {
   const [tentativa, setTentativa] = useState(0);
@@ -66,8 +66,7 @@ export function ConfirmationClient({ token }: { token?: string }) {
         <div className="flex flex-col items-center gap-3">
           {estado === "sucesso" && retorno && (
             <Link
-              href={retorno}
-              onClick={limparRetornoAvaliacaoSalvo}
+              href={`/login?returnTo=${encodeURIComponent(retorno)}`}
               className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               Continuar para a avaliação

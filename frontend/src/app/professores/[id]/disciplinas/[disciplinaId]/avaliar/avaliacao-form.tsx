@@ -7,7 +7,7 @@ import { criarEntradaAvaliacao, mensagemErroAvaliacao } from "@/lib/avaliacao-fo
 import { consultarSessao } from "@/lib/services/auth";
 import { enviarAvaliacao } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
-import { caminhoAvaliacao } from "@/lib/retorno-avaliacao";
+import { caminhoAvaliacao, lerRetornoAvaliacaoSalvo, limparRetornoAvaliacaoSalvo } from "@/lib/retorno-avaliacao";
 
 export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }: {
   professorId: string;
@@ -43,6 +43,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
         throw new ApiError("É necessário autenticar-se para registrar uma avaliação.", 401);
       }
       await enviarAvaliacao(dados);
+      if (lerRetornoAvaliacaoSalvo() === retornoHref) limparRetornoAvaliacaoSalvo();
       setSucesso(true);
     } catch (falha) {
       setPrecisaEntrar(falha instanceof ApiError && falha.status === 401);

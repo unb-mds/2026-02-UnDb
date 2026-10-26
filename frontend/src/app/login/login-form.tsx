@@ -5,10 +5,11 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { consultarSessao, entrar, sair } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
-import { salvarRetornoAvaliacao } from "@/lib/retorno-avaliacao";
+import { lerRetornoAvaliacaoSalvo, salvarRetornoAvaliacao } from "@/lib/retorno-avaliacao";
 
 export default function LoginForm({ retorno }: { retorno: string | null }) {
   const router = useRouter();
+  const [retornoEfetivo, setRetornoEfetivo] = useState(retorno);
   const [carregando, setCarregando] = useState(false);
   const [sessaoCarregada, setSessaoCarregada] = useState(false);
   const [autenticado, setAutenticado] = useState(false);
@@ -18,15 +19,22 @@ export default function LoginForm({ retorno }: { retorno: string | null }) {
   useEffect(() => {
     let ativo = true;
     salvarRetornoAvaliacao(retorno);
+    const destino = retorno ?? lerRetornoAvaliacaoSalvo();
 
     consultarSessao()
       .then((sessao) => {
         if (!ativo) return;
+        setRetornoEfetivo(destino);
         setAutenticado(sessao.autenticado);
-        if (sessao.autenticado && retorno) router.replace(retorno);
+        if (sessao.autenticado && destino) {
+          router.replace(destino);
+        }
       })
       .catch(() => {
-        if (ativo) setErro("Não foi possível verificar a sessão agora.");
+        if (ativo) {
+          setRetornoEfetivo(destino);
+          setErro("Não foi possível verificar a sessão agora.");
+        }
       })
       .finally(() => {
         if (ativo) setSessaoCarregada(true);
@@ -50,8 +58,8 @@ export default function LoginForm({ retorno }: { retorno: string | null }) {
         senha: String(formulario.get("senha") ?? ""),
       });
       setAutenticado(true);
-      if (retorno) {
-        router.replace(retorno);
+      if (retornoEfetivo) {
+        router.replace(retornoEfetivo);
         return;
       }
       setMensagem(resposta.message);
@@ -148,7 +156,7 @@ export default function LoginForm({ retorno }: { retorno: string | null }) {
 
       <p className="text-sm text-foreground/70">
         Ainda não possui conta?{" "}
-        <Link href={retorno ? `/cadastro?returnTo=${encodeURIComponent(retorno)}` : "/cadastro"} className="font-medium text-accent hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+        <Link href={retornoEfetivo ? `/cadastro?returnTo=${encodeURIComponent(retornoEfetivo)}` : "/cadastro"} className="font-medium text-accent hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
           Criar conta
         </Link>
       </p>
