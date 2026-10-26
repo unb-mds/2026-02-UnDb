@@ -93,9 +93,9 @@ export default function BuscaDisciplinasPage() {
                   href={`/disciplinas/${disciplina.id}`}
                   className="block rounded-lg border border-foreground/10 px-4 py-3 transition hover:border-foreground/30 hover:bg-foreground/[0.03]"
                 >
-                  <span className="font-mono text-xs text-foreground/60">{disciplina.codigo}</span>
                   <span className="block font-medium">{disciplina.nome}</span>
-                  <span className="block text-sm text-foreground/60">{disciplina.departamento}</span>
+                  <span className="mt-1 block text-sm text-foreground/70">Código da disciplina: <span className="font-mono">{disciplina.codigo}</span></span>
+                  <span className="block text-sm text-foreground/70">Unidade acadêmica: {disciplina.departamento}</span>
                 </Link>
               </li>
             ))}

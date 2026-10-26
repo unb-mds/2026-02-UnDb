@@ -44,9 +44,11 @@ export default async function AvaliacaoAgregadaPage({
       </Link>
 
       <div>
-        <span className="font-mono text-sm text-foreground/60">{avaliacao.disciplina.codigo}</span>
         <h1 className="text-2xl font-semibold">{avaliacao.professor.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">{avaliacao.disciplina.nome}</p>
+        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica do professor: {avaliacao.professor.departamento}</p>
+        <p className="mt-3 font-medium">{avaliacao.disciplina.nome}</p>
+        <p className="text-sm text-foreground/70">Código da disciplina: <span className="font-mono">{avaliacao.disciplina.codigo}</span></p>
+        <p className="text-sm text-foreground/70">Unidade acadêmica: {avaliacao.disciplina.departamento}</p>
       </div>
 
       <p className="text-sm text-foreground/70">
@@ -104,6 +106,12 @@ export default async function AvaliacaoAgregadaPage({
         className="self-start rounded-lg bg-accent px-4 py-2.5 font-medium text-white transition hover:opacity-90"
       >
         Avaliar este professor na disciplina
+      </Link>
+      <Link
+        href={`/disciplinas/${disciplinaId}`}
+        className="self-start text-sm text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        Comparar professores desta disciplina
       </Link>
     </main>
   );

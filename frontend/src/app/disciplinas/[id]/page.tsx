@@ -91,9 +91,9 @@ export default async function DetalheDisciplinaPage({
       </Link>
 
       <div>
-        <span className="font-mono text-sm text-foreground/60">{disciplina.codigo}</span>
         <h1 className="text-2xl font-semibold">{disciplina.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">{disciplina.departamento}</p>
+        <p className="mt-1 text-sm text-foreground/70">Código da disciplina: <span className="font-mono">{disciplina.codigo}</span></p>
+        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {disciplina.departamento}</p>
       </div>
 
       <div>
@@ -112,7 +112,7 @@ export default async function DetalheDisciplinaPage({
                     {avaliacao.professor.nome}
                   </Link>
                 </h3>
-                <p className="text-sm text-foreground/60">{avaliacao.professor.departamento}</p>
+                <p className="text-sm text-foreground/70">Unidade acadêmica: {avaliacao.professor.departamento}</p>
                 {avaliacao.dadosSuficientes ? (
                   <CriteriosAgregados avaliacao={avaliacao} />
                 ) : (
@@ -123,6 +123,20 @@ export default async function DetalheDisciplinaPage({
                   </p>
                 )}
                 <p className="mt-3 text-xs text-foreground/60">{rotuloTotalAvaliacoes(avaliacao.totalAvaliacoes)}</p>
+                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                  <Link
+                    className="text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    href={`/professores/${avaliacao.professorId}`}
+                  >
+                    Ver disciplinas do professor
+                  </Link>
+                  <Link
+                    className="font-medium text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    href={`/professores/${avaliacao.professorId}/disciplinas/${id}/avaliar`}
+                  >
+                    Avaliar nesta disciplina
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
