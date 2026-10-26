@@ -30,7 +30,7 @@ export default async function DetalheProfessorPage({
 
       <div>
         <h1 className="text-2xl font-semibold">{professor.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">{professor.departamento}</p>
+        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {professor.departamento}</p>
       </div>
 
       <div>
@@ -47,14 +47,23 @@ export default async function DetalheProfessorPage({
                 className="rounded-lg border border-foreground/10 px-4 py-3 transition hover:border-foreground/30 hover:bg-foreground/[0.03]"
               >
                 <Link href={`/professores/${id}/disciplinas/${disciplina.id}`} className="block">
-                  <span className="font-mono text-xs text-foreground/60">{disciplina.codigo}</span>
                   <span className="block font-medium">{disciplina.nome}</span>
+                  <span className="mt-1 block text-sm text-foreground/70">
+                    Código da disciplina: <span className="font-mono">{disciplina.codigo}</span>
+                  </span>
+                  <span className="mt-1 block text-xs text-foreground/60">Unidade acadêmica: {disciplina.departamento}</span>
                 </Link>
                 <Link
                   href={`/disciplinas/${disciplina.id}`}
-                  className="mt-1 inline-block text-xs text-foreground/60 underline underline-offset-2 hover:text-foreground"
+                  className="mt-3 inline-block text-sm text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                 >
-                  Ver outros professores desta disciplina →
+                  Comparar professores desta disciplina →
+                </Link>
+                <Link
+                  href={`/professores/${id}/disciplinas/${disciplina.id}/avaliar`}
+                  className="ml-4 inline-block text-sm font-medium text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  Avaliar
                 </Link>
               </li>
             ))}
