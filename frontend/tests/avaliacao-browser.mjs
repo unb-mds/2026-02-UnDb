@@ -193,7 +193,7 @@ try {
   await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("select").length === 4'), "formulário");
   assert.match(await texto(), /Professor de teste/);
   assert.match(await texto(), /Disciplina de teste/);
-  assert.match(await texto(), /Código da disciplina: CIC0001/);
+  assert.ok((await texto()).includes(`Código da disciplina: ${real?.disciplinaCodigo ?? "CIC0001"}`));
   assert.equal(await avaliar('document.querySelector("[name=didatica]:checked") === null'), true);
   assert.equal(await avaliar('document.querySelector("[name=didatica][type=radio]")?.required'), true);
   assert.equal(await avaliar(`document.querySelector('a[href^="/login?returnTo="]')?.target`), "");
@@ -364,7 +364,13 @@ async function verificarCorrecoesInterface() {
     const evento = JSON.parse(data);
     if (evento.method !== "Fetch.requestPaused") return;
     const liberacao = permitirScripts
-      .then(() => cdp("Fetch.continueRequest", { requestId: evento.params.requestId }));
+      .then(() => cdp("Fetch.continueRequest", { requestId: evento.params.requestId }))
+      .catch((erro) => {
+        // Uma navegação pode cancelar o request pausado antes de liberarmos os scripts.
+        // Só ignoramos esse ID obsoleto; falhas de hidratação continuam cobertas abaixo.
+        if (/Invalid InterceptionId/i.test(erro.message)) return null;
+        throw erro;
+      });
     // Retém a falha para a verificação, sem rejeição não tratada no listener.
     scriptsAtrasados.push(liberacao.catch((erro) => erro));
   };
