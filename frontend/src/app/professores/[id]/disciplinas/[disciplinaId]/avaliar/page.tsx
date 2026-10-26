@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { identificadorValido } from "@/lib/identificador";
 import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
+import { caminhoAvaliacao } from "@/lib/retorno-avaliacao";
 import AvaliacaoForm from "./avaliacao-form";
 
 export default async function AvaliarPage({ params }: {
@@ -11,6 +12,7 @@ export default async function AvaliarPage({ params }: {
   const { id, disciplinaId } = await params;
   if (!identificadorValido(id) || !identificadorValido(disciplinaId)) notFound();
   const consultaHref = `/professores/${id}/disciplinas/${disciplinaId}`;
+  const retornoHref = caminhoAvaliacao(id, disciplinaId);
   const avaliacao = await consultarAvaliacaoAgregada(id, disciplinaId).catch((erro) => {
     if (erro instanceof ApiError && erro.naoEncontrado) notFound();
     return null;
@@ -21,20 +23,32 @@ export default async function AvaliarPage({ params }: {
       <Link href={consultaHref} className="text-sm text-foreground/60 hover:text-foreground">
         ← Voltar para a consulta
       </Link>
-      <h1 className="text-2xl font-semibold">Avaliar professor na disciplina</h1>
+      <div>
+        <h1 className="text-2xl font-semibold">Avaliar professor na disciplina</h1>
+        <p className="mt-1 text-sm text-foreground/70">Confira o contexto e responda aos cinco critérios.</p>
+      </div>
       {avaliacao ? (
         <>
           <dl className="flex flex-col gap-3 rounded-lg border border-foreground/10 px-4 py-3">
             <div>
               <dt className="text-sm text-foreground/70">Professor</dt>
-              <dd className="font-medium">{avaliacao.professor.nome}</dd>
+              <dd className="font-semibold">{avaliacao.professor.nome}</dd>
             </div>
             <div>
               <dt className="text-sm text-foreground/70">Disciplina</dt>
-              <dd><span className="font-mono text-sm">{avaliacao.disciplina.codigo}</span> — {avaliacao.disciplina.nome}</dd>
+              <dd className="font-medium">
+                <span className="block">{avaliacao.disciplina.nome}</span>
+                <span className="mt-1 block text-sm font-normal text-foreground/70">
+                  Código da disciplina: <span className="font-mono">{avaliacao.disciplina.codigo}</span>
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-foreground/70">Unidade acadêmica</dt>
+              <dd className="font-medium">{avaliacao.disciplina.departamento}</dd>
             </div>
           </dl>
-          <AvaliacaoForm professorId={avaliacao.professorId} disciplinaId={avaliacao.disciplinaId} />
+          <AvaliacaoForm professorId={avaliacao.professorId} disciplinaId={avaliacao.disciplinaId} retornoHref={retornoHref} />
         </>
       ) : (
         <p role="alert" className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">
