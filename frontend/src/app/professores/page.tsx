@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import { listarProfessores } from "@/lib/services/professores";
 import type { ProfessorDetalhe } from "@/lib/types/institucional";
+import ProfessorResultado from "./professor-resultado";
 
 const TAMANHO_MINIMO_BUSCA = 2;
 
@@ -91,15 +91,7 @@ export default function BuscaProfessoresPage() {
         {buscaValida && !carregando && !erro && resultados.length > 0 && (
           <ul className="flex flex-col gap-2">
             {resultados.map((professor) => (
-              <li key={professor.id}>
-                <Link
-                  href={`/professores/${professor.id}`}
-                  className="block rounded-lg border border-foreground/10 px-4 py-3 transition hover:border-foreground/30 hover:bg-foreground/[0.03]"
-                >
-                  <span className="font-medium">{professor.nome}</span>
-                  <span className="block text-sm text-foreground/70">Unidade acadêmica: {professor.departamento}</span>
-                </Link>
-              </li>
+              <ProfessorResultado key={professor.id} professor={professor} />
             ))}
           </ul>
         )}
