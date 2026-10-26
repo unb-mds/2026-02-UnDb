@@ -76,7 +76,7 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     await aguardarTexto("Conferir prévia da avaliação");
     await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 4'), "didática em botões e quatro seletores");
     assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('select')).map(s => Array.from(s.options).slice(1).map(o => o.textContent))"), [
-      ["Fácil", "Médio", "Difícil"], ["Faz chamada", "Não faz chamada"], ["Não disponibiliza", "Ruim", "Médio", "Bom"], ["Recomenda a matéria", "Não recomenda a matéria"],
+      ["Fácil", "Médio", "Difícil"], ["Faz chamada", "Não faz chamada"], ["Não disponibiliza", "Ruim", "Médio", "Bom"], ["Recomendo", "Não recomendo"],
     ]);
     assert.equal(await avaliar("document.querySelector('form').checkValidity()"), false);
     assert.equal(await avaliar("!!document.querySelector('textarea')"), false);
