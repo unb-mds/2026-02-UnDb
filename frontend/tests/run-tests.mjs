@@ -13,6 +13,7 @@ try {
     "--target", "ES2022", "--module", "commonjs", "--moduleResolution", "node",
     "--strict", "--skipLibCheck", "--esModuleInterop",
     "src/lib/avaliacao-formulario.ts", "src/lib/services/avaliacoes.ts", "src/lib/services/auth.ts",
+    "src/lib/retorno-avaliacao.ts",
   ], { cwd: frontend, stdio: "inherit" });
   if (compilacao.error) throw compilacao.error;
   if (compilacao.status !== 0) {

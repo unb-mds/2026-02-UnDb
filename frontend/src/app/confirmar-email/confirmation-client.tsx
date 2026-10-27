@@ -4,12 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { confirmarEmail } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
-import { lerRetornoAvaliacaoSalvo } from "@/lib/retorno-avaliacao";
 
-export function ConfirmationClient({ token }: { token?: string }) {
+export function ConfirmationClient({ token, retorno }: { token?: string; retorno: string | null }) {
   const [tentativa, setTentativa] = useState(0);
   const [podeTentar, setPodeTentar] = useState(false);
-  const [retorno, setRetorno] = useState<string | null>(null);
   const [estado, setEstado] = useState<"carregando" | "sucesso" | "erro">(
     token ? "carregando" : "erro",
   );
@@ -26,7 +24,6 @@ export function ConfirmationClient({ token }: { token?: string }) {
         if (!cancelado) {
           setEstado("sucesso");
           setMensagem(resposta.message);
-          setRetorno(lerRetornoAvaliacaoSalvo());
         }
       })
       .catch((falha: unknown) => {

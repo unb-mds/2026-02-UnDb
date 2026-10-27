@@ -1,20 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { cadastrarUsuario } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
-import { salvarRetornoAvaliacao } from "@/lib/retorno-avaliacao";
 
 export default function CadastroForm({ retorno }: { retorno: string | null }) {
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [erroNome, setErroNome] = useState(false);
-
-  useEffect(() => {
-    salvarRetornoAvaliacao(retorno);
-  }, [retorno]);
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -36,6 +31,7 @@ export default function CadastroForm({ retorno }: { retorno: string | null }) {
         nome,
         email: String(formulario.get("email") ?? "").trim().toLowerCase(),
         senha: String(formulario.get("senha") ?? ""),
+        ...(retorno ? { return_to: retorno } : {}),
       });
       setMensagem(resposta.message);
       elementoFormulario.reset();
@@ -126,7 +122,7 @@ export default function CadastroForm({ retorno }: { retorno: string | null }) {
       </p>
 
       <div aria-live="polite">
-        {mensagem && <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-4 text-sm">{mensagem} Depois de confirmar o e-mail, você poderá continuar para a avaliação selecionada.</p>}
+        {mensagem && <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-4 text-sm">{mensagem} {retorno ? "O link de confirmação permitirá retomar esta avaliação." : "Depois de confirmar o e-mail, entre na conta para avaliar."}</p>}
         {erro && <p className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">{erro}</p>}
       </div>
     </main>
