@@ -17,7 +17,7 @@ Corrigir a perda/troca do retorno à avaliação entre abas e verificar pelas te
 reais o percurso cadastro → confirmação → login → avaliação, conforme a
 [issue #158](https://github.com/unb-mds/2026-02-UnDb/issues/158), RF01/RF02/RF14
 em [requisitos](../requisitos.md), ADR 03 em [arquitetura](../arquitetura.md) e
-o contrato de autenticação em [specs.md](../../specs.md).
+o contrato de autenticação em [specs.md](https://github.com/unb-mds/2026-02-UnDb/blob/fa92a818a61c68e65ea2c9440e8e7aaa82e8f2d7/specs.md).
 
 A chave única `undb:retorno-avaliacao` de `localStorage` permitia que outra aba
 apagasse ou substituísse o destino de uma confirmação em andamento. A correção
@@ -54,7 +54,7 @@ diretamente e não substituiu respostas HTTP.
 |---|---|
 | `npm run lint` | Passou. |
 | `npm test` | 20 testes passaram, incluindo retorno interno válido e rejeição de destinos inválidos. |
-| `python -m unittest discover -s tests -q` | 101 testes passaram; incluem validação do destino e link real do serviço sem criação automática de sessão. |
+| `python -m unittest discover -s tests -q` | 103 testes passaram; incluem validação do destino, link real do serviço sem criação automática de sessão e verificação de porta da integração serial. |
 | `npm run build` | Falhou no ambiente local: Turbopack não conseguiu iniciar o processo de CSS. |
 | `npm run build -- --webpack` | Passou, incluindo TypeScript e geração das rotas. |
 | `node tests/acesso-browser.mjs` | Passou: jornada real completa, dois contextos independentes, persistência e 36 combinações visuais. |
@@ -147,3 +147,11 @@ O workflow existente `Evaluation end to end (PostgreSQL)` passa a executar
 alteração será exercitada remotamente quando publicada. A limpeza local foi
 verificada com usuários/avaliações vazios; os containers, rede e volume
 descartáveis `undb-pr184` foram removidos após a coleta das evidências.
+
+Ao validar a integração com `develop`, a primeira execução serial no CI encontrou
+`Address already in use` na sondagem por `bind`, após encerrar a suíte anterior.
+A sondagem passou a verificar a existência de um listener por conexão, permitindo
+que o Uvicorn reutilize a porta após conexões encerradas e recusando servidores
+que ainda estejam ativos. Dois testes com sockets reais cobrem esses casos. O link
+para `specs.md`, que fica fora da pasta publicada pelo MkDocs, também foi convertido
+para uma referência versionada no GitHub para atender ao build estrito.

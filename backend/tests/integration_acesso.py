@@ -80,6 +80,16 @@ def limpar(fixture):
         db.commit()
 
 
+def verificar_porta_api(porta=8000):
+    # Depois da suíte anterior, conexões encerradas podem ficar em TIME_WAIT.
+    # Um bind de sondagem acusa ocupação nesse estado, mesmo sem servidor ativo.
+    # Recusamos um listener existente; o Uvicorn faz o bind real com reutilização.
+    with socket.socket() as conexao:
+        conexao.settimeout(1)
+        if conexao.connect_ex(("127.0.0.1", porta)) == 0:
+            raise RuntimeError(f"A porta {porta} já possui um serviço em execução.")
+
+
 def main():
     assert os.environ.get("UNDB_INTEGRATION_TEST") == "1", "Use banco isolado de testes."
     assert engine.dialect.name == "postgresql", "A integração exige PostgreSQL real."
@@ -93,8 +103,7 @@ def main():
     if "--prepare" in sys.argv:
         print(json.dumps(preparar()))
         return
-    with socket.socket() as reserva:
-        reserva.bind(("127.0.0.1", 8000))
+    verificar_porta_api()
     fixture = preparar()
     api = None
     try:
