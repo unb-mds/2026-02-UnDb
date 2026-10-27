@@ -49,6 +49,24 @@ adaptador `console` de e-mail. Cria dados sintéticos próprios e os remove no f
 Resultados, limites e evidências estão no
 [relatório da #158](../docs/estudos/verificacao-acesso-avaliacao-issue-158.md).
 
+## Resultados reais — Issue #157
+
+A busca por professor apresenta suas disciplinas ativas no próprio resultado, com
+nome, código identificado, unidade acadêmica e atalhos para consulta, comparação e
+avaliação. Homônimos permanecem separados pelo ID. A lista de disciplinas é
+compartilhada com o detalhe do professor. Uma falha ao consultar disciplinas mantém
+o professor visível e informa a indisponibilidade, sem afirmar que ele não tem turmas.
+
+O teste `node tests/resultados-browser.mjs` usa FastAPI e PostgreSQL reais, dados
+sintéticos persistidos em banco isolado, Node 22+ e Edge/Chromium. Não usa a rota
+`/prototipo` nem substitui respostas HTTP. Exige build prévio, API em `localhost:8000`,
+CORS para `http://localhost:3100` e portas 3100/9224 livres. Configure
+`RESULTADOS_FIXTURE_FILE` com o JSON produzido por `python -m tests.seed_resultados`
+no backend de testes e `PREVIEW_DIR` com o diretório das capturas.
+
+Preparação, comandos, resultados e limites estão no
+[relatório da #157](../docs/estudos/verificacao-resultados-comparacao-issue-157.md).
+
 ## Protótipo da jornada — Issue #152
 
 ### Testar com a base simulada pronta
