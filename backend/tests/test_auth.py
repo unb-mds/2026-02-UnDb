@@ -1,6 +1,7 @@
 import os
 import unittest
 from datetime import datetime, timedelta, timezone
+from urllib.parse import parse_qs, urlsplit
 
 from fastapi import HTTPException
 from pydantic import ValidationError
@@ -46,6 +47,17 @@ class FakeEmailSender:
 
 
 class AuthSchemaTest(unittest.TestCase):
+    def test_retorno_opcional_aceita_somente_rota_interna_de_avaliacao(self) -> None:
+        dados = dict(nome="Maria", email="maria@aluno.unb.br", senha="senha de teste")
+        destino = "/professores/11111111-1111-4111-8111-111111111111/disciplinas/22222222-2222-4222-8222-222222222222/avaliar"
+        self.assertIsNone(CadastroRequest(**dados).return_to)
+        self.assertEqual(CadastroRequest(**dados, return_to=destino).return_to, destino)
+        for valor in ("", "https://outro.example" + destino, "//outro.example" + destino,
+                      destino + "?x=1", destino + "#x", destino + "\n", destino + "/",
+                      destino.replace("11111111-", "invalido-"), "javascript:alert(1)"):
+            with self.subTest(valor=valor), self.assertRaises(ValidationError):
+                CadastroRequest(**dados, return_to=valor)
+
     def test_normaliza_nome_e_email_institucional(self) -> None:
         dados = CadastroRequest(
             nome="  Maria da Silva  ",
@@ -148,6 +160,19 @@ class AuthServiceTest(unittest.TestCase):
         self.assertEqual(usuario.nome, "Maria")
         self.assertEqual(usuario.password_hash, hash_original)
         self.assertEqual(segundo_sender.envios, [])
+
+    def test_link_transporta_destino_do_cadastro_sem_alterar_confirmacao_ou_sessao(self) -> None:
+        destino = "/professores/11111111-1111-4111-8111-111111111111/disciplinas/22222222-2222-4222-8222-222222222222/avaliar"
+        dados = self.dados.model_copy(update={"return_to": destino})
+        sender = FakeEmailSender()
+        auth_service.cadastrar(self.db, dados, sender)
+        parametros = parse_qs(urlsplit(sender.envios[0][1]).query)
+        self.assertEqual(parametros["returnTo"], [destino])
+        self.assertFalse(self.db.scalar(select(Usuario)).email_confirmado)
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(SessaoUsuario)), 0)
+        auth_service.confirmar_email(self.db, parametros["token"][0])
+        self.assertTrue(self.db.scalar(select(Usuario)).email_confirmado)
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(SessaoUsuario)), 0)
 
     def test_confirma_token_valido_e_rejeita_reuso(self) -> None:
         sender = FakeEmailSender()

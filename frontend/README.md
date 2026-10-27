@@ -33,6 +33,22 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
   No Windows usa o caminho padrão do Edge; em outros ambientes configure `BROWSER_PATH`.
   Esse comando não usa o backend real nem comprova persistência.
 
+## Acesso e retorno à avaliação — Issue #158
+
+Os links de login/cadastro preservam `returnTo`. O cadastro envia o destino
+opcional `return_to` à API, que o inclui no link de confirmação. Somente a rota
+interna de avaliação com UUIDs válidos é aceita. Cada link mantém seu contexto
+entre abas; login e confirmação continuam sujeitos às regras reais da API.
+
+Para verificar as telas com FastAPI/PostgreSQL reais, aplique as migrations em
+banco de testes e gere o build do frontend. Em `backend/`, com
+`UNDB_INTEGRATION_TEST=1`, execute `python -m tests.integration_acesso`. O runner
+usa Node 22+, Edge/Chromium (`BROWSER_PATH`), portas 8000/3100/9225 livres e o
+adaptador `console` de e-mail. Cria dados sintéticos próprios e os remove no final.
+`PREVIEW_DIR` permite salvar capturas e o resultado estruturado, sem tokens/senhas.
+Resultados, limites e evidências estão no
+[relatório da #158](../docs/estudos/verificacao-acesso-avaliacao-issue-158.md).
+
 ## Resultados reais — Issue #157
 
 A busca por professor apresenta suas disciplinas ativas no próprio resultado, com

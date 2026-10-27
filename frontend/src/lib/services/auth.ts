@@ -4,6 +4,7 @@ export type CadastroInput = {
   nome: string;
   email: string;
   senha: string;
+  return_to?: string;
 };
 
 export type LoginInput = {
