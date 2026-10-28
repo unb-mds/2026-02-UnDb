@@ -1,3 +1,4 @@
+import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { identificadorValido } from "@/lib/identificador";
@@ -65,10 +66,13 @@ function CriteriosAgregados({ avaliacao }: { avaliacao: AvaliacaoAgregadaSuficie
 
 export default async function DetalheDisciplinaPage({
   params,
+  searchParams,
 }: {
+  searchParams: Promise<ParametrosBusca>;
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const contexto = lerContextoBusca(await searchParams);
   if (!identificadorValido(id)) notFound();
 
   // Sequencial, não Promise.all: mesmo motivo de professores/[id]/page.tsx —
@@ -86,8 +90,8 @@ export default async function DetalheDisciplinaPage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
-      <Link href="/disciplinas" className="text-sm text-foreground/60 hover:text-foreground">
-        ← Buscar outra disciplina
+      <Link href={contexto ? urlBusca(contexto) : "/disciplinas"} className="text-sm text-foreground/60 hover:text-foreground">
+        {contexto ? "← Voltar aos resultados da busca" : "← Buscar outra disciplina"}
       </Link>
 
       <div>
@@ -108,7 +112,7 @@ export default async function DetalheDisciplinaPage({
             {comparacao.professores.map((avaliacao) => (
               <li key={avaliacao.professorId} className="rounded-lg border border-foreground/10 p-4">
                 <h3 className="font-medium">
-                  <Link className="underline-offset-4 hover:underline" href={`/professores/${avaliacao.professorId}`}>
+                  <Link className="underline-offset-4 hover:underline" href={comContextoBusca(`/professores/${avaliacao.professorId}`, contexto)}>
                     {avaliacao.professor.nome}
                   </Link>
                 </h3>
@@ -126,13 +130,13 @@ export default async function DetalheDisciplinaPage({
                 <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
                   <Link
                     className="text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                    href={`/professores/${avaliacao.professorId}`}
+                    href={comContextoBusca(`/professores/${avaliacao.professorId}`, contexto)}
                   >
                     Ver disciplinas do professor
                   </Link>
                   <Link
                     className="font-medium text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                    href={`/professores/${avaliacao.professorId}/disciplinas/${id}/avaliar`}
+                    href={comContextoBusca(`/professores/${avaliacao.professorId}/disciplinas/${id}/avaliar`, contexto)}
                   >
                     Avaliar nesta disciplina
                   </Link>

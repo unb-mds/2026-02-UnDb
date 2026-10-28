@@ -1,3 +1,4 @@
+import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { identificadorValido } from "@/lib/identificador";
@@ -6,13 +7,15 @@ import { ApiError } from "@/lib/services/http-error";
 import { caminhoAvaliacao } from "@/lib/retorno-avaliacao";
 import AvaliacaoForm from "./avaliacao-form";
 
-export default async function AvaliarPage({ params }: {
+export default async function AvaliarPage({ params, searchParams }: {
+  searchParams: Promise<ParametrosBusca>;
   params: Promise<{ id: string; disciplinaId: string }>;
 }) {
   const { id, disciplinaId } = await params;
+  const contexto = lerContextoBusca(await searchParams);
   if (!identificadorValido(id) || !identificadorValido(disciplinaId)) notFound();
-  const consultaHref = `/professores/${id}/disciplinas/${disciplinaId}`;
-  const retornoHref = caminhoAvaliacao(id, disciplinaId);
+  const consultaHref = comContextoBusca(`/professores/${id}/disciplinas/${disciplinaId}`, contexto);
+  const retornoHref = comContextoBusca(caminhoAvaliacao(id, disciplinaId), contexto);
   const avaliacao = await consultarAvaliacaoAgregada(id, disciplinaId).catch((erro) => {
     if (erro instanceof ApiError && erro.naoEncontrado) notFound();
     return null;
@@ -20,6 +23,7 @@ export default async function AvaliarPage({ params }: {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+      {contexto && <Link href={urlBusca(contexto)} className="text-sm text-accent underline underline-offset-4">← Voltar aos resultados da busca</Link>}
       <Link href={consultaHref} className="text-sm text-foreground/60 hover:text-foreground">
         ← Voltar para a consulta
       </Link>

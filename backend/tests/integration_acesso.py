@@ -18,6 +18,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.core.database import engine
+from app.domain.texto import normalizar_busca
 from app.models.avaliacao import Avaliacao
 from app.models.disciplina import Disciplina
 from app.models.professor import Professor
@@ -36,10 +37,12 @@ def preparar():
                    emails=[f"acesso.{suffix}.{i}@aluno.unb.br" for i in range(2)],
                    senha="senha-local-integracao", codigo=f"A{suffix}")
     with Session(engine) as db:
-        professores = [Professor(id=UUID(pid), nome=f"Professor de acesso {i + 1}", departamento="CIC")
+        professores = [Professor(id=UUID(pid), nome=f"Professor de acesso {i + 1}",
+                                nome_normalizado=normalizar_busca(f"Professor de acesso {i + 1}"), departamento="CIC")
                        for i, pid in enumerate(fixture["professores"])]
         disciplina = Disciplina(id=UUID(fixture["disciplinaId"]), codigo=fixture["codigo"],
-                                nome="Disciplina de acesso e confirmação", departamento="CIC")
+                                nome="Disciplina de acesso e confirmação",
+                                nome_normalizado=normalizar_busca("Disciplina de acesso e confirmação"), departamento="CIC")
         unidade = Unidade(id=UUID(fixture["unidadeId"]), codigo=suffix, nome="Unidade sintética de acesso")
         db.add_all([*professores, disciplina, unidade])
         for i, professor in enumerate(professores):

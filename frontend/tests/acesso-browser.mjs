@@ -16,7 +16,11 @@ const navegador = process.env.BROWSER_PATH ?? "C:/Program Files (x86)/Microsoft/
 assert.ok(existsSync(navegador), "Informe BROWSER_PATH com Edge/Chromium.");
 assert.ok(process.env.E2E_ACESSO_CONTAINER || process.env.E2E_EMAIL_LOG_FILE, "Informe o log do adaptador console real.");
 const base = "http://localhost:3100";
-const destinos = fixture.professores.map((p) => `/professores/${p}/disciplinas/${fixture.disciplinaId}/avaliar`);
+const contextos = [
+  { busca: "professores", q: "Professor de acesso", ordem: "unidade" },
+  { busca: "disciplinas", q: fixture.codigo, ordem: "nome" },
+];
+const destinos = fixture.professores.map((p, i) => `/professores/${p}/disciplinas/${fixture.disciplinaId}/avaliar?${new URLSearchParams(contextos[i])}`);
 const perfil = mkdtempSync(join(tmpdir(), "undb-acesso-browser-"));
 const evidencias = [];
 const clientes = [];
@@ -161,6 +165,16 @@ try {
   const { targetId } = await a.cdp("Target.createTarget", { url: "about:blank" });
   const b = await conectar(targetId);
   for (const [i, tab] of [a, b].entries()) {
+    const contexto = contextos[i];
+    const lista = `/${contexto.busca}?${new URLSearchParams({ q: contexto.q, ordem: contexto.ordem })}`;
+    await navegar(tab, lista, "resultado(s)");
+    await matriz(tab, `busca-${contexto.busca}`);
+    if (i === 1) await clicar(tab, `main a[href^="/disciplinas/${fixture.disciplinaId}?"]`, "Comparação de professores");
+    await clicar(tab, `main a[href="${destinos[i]}"]`, "Avaliar professor na disciplina");
+    // O mesmo contexto acompanha o atalho direto da #157 e a entrada de conta.
+    assert.equal(await tab.avaliar("new URL(document.querySelector('header a[aria-label=\"Conta: entrar ou criar conta\"]').href).searchParams.get('returnTo')"), destinos[i]);
+    await clicar(tab, 'main a[href*="?q="]', "resultado(s)");
+    assert.equal(await tab.avaliar("location.pathname + location.search"), lista);
     await navegar(tab, destinos[i], "Avaliar professor na disciplina");
     await clicar(tab, 'a[href^="/login?returnTo="]', "Entrar");
     await aguardar(async () => await tab.avaliar("!!document.querySelector('[name=email]')"), "login visitante");
@@ -187,7 +201,7 @@ try {
   assert.ok(banco().usuarios.every((u) => u.sessoes === 0));
   await preencher(a, { email: fixture.emails[0], senha: fixture.senha });
   await enviar(a, "Avaliar professor na disciplina");
-  assert.equal(await a.avaliar("location.pathname"), destinos[0]);
+  assert.equal(await a.avaliar("location.pathname + location.search"), destinos[0]);
   const cookies = await a.cdp("Network.getCookies", { urls: ["http://localhost:8000"] });
   assert.ok(cookies.cookies.some((c) => c.name === "undb_session" && c.httpOnly && c.sameSite === "Lax"));
   await preencherAvaliacao(a);
@@ -203,7 +217,7 @@ try {
   assert.equal(dados.usuarios.find((u) => u.email === fixture.emails[0]).confirmado, true);
   assert.equal(dados.usuarios.find((u) => u.email === fixture.emails[1]).confirmado, false);
   await a.avaliar("document.querySelector('a[href^=\"/login?returnTo=\"]').click()");
-  await aguardar(async () => await a.avaliar(`location.pathname === ${JSON.stringify(destinos[0])}`), "confirmação retoma A com sessão ativa");
+  await aguardar(async () => await a.avaliar(`location.pathname + location.search === ${JSON.stringify(destinos[0])}`), "confirmação retoma A com sessão ativa e busca");
   await esperarTexto(a, "Avaliar professor na disciplina");
   await preencherAvaliacao(a);
   await matriz(a, "formulario");
@@ -211,7 +225,7 @@ try {
   await matriz(a, "sucesso");
   // A sessão existente faz o login retornar sem solicitar novamente a senha.
   await a.cdp("Page.navigate", { url: `${base}/login?returnTo=${encodeURIComponent(destinos[0])}` });
-  await aguardar(async () => await a.avaliar(`location.pathname === ${JSON.stringify(destinos[0])}`), "retorno com sessão ativa");
+  await aguardar(async () => await a.avaliar(`location.pathname + location.search === ${JSON.stringify(destinos[0])}`), "retorno com sessão ativa");
   await esperarTexto(a, "Avaliar professor na disciplina");
   await navegar(a, "/login", "Sua sessão está ativa");
   await clicar(a, "main button", "Sessão encerrada");
@@ -221,7 +235,7 @@ try {
   await aguardar(async () => await b.avaliar("!!document.querySelector('[name=email]')"), "login B");
   await preencher(b, { email: fixture.emails[1], senha: fixture.senha });
   await enviar(b, "Avaliar professor na disciplina");
-  assert.equal(await b.avaliar("location.pathname"), destinos[1]);
+  assert.equal(await b.avaliar("location.pathname + location.search"), destinos[1]);
   await preencherAvaliacao(b);
   await enviar(b, "Avaliação registrada com sucesso");
   dados = banco();
@@ -235,10 +249,14 @@ try {
     assert.equal(avaliacao.recomenda, false);
     assert.equal(avaliacao.disponibilizaMaterial, false);
   }
+  await clicar(b, 'main a[href*="?q="]', "resultado(s)");
+  assert.equal(await b.avaliar("location.pathname"), "/disciplinas");
+  assert.equal(await b.avaliar("new URLSearchParams(location.search).get('q')"), fixture.codigo);
+  assert.equal(await b.avaliar("document.querySelector('select').value"), "nome");
   await navegar(a, linkEmail(fixture.emails[0]), "Este link é inválido ou expirou");
   assert.equal(await a.avaliar("!!document.querySelector('a[href^=\"/login?returnTo=\"]')"), false);
   const resumo = { origem: "Telas reais → FastAPI → adaptador console → PostgreSQL", combinacoes: evidencias.length,
-    cenarios: ["dois cadastros e confirmações em abas distintas", "login genérico não altera retorno", "credenciais inválidas sem sessão", "e-mail pendente bloqueia escrita e mantém respostas", "cookie HttpOnly/SameSite", "retorno da sessão ativa", "logout", "token de uso único", "duas avaliações nos destinos corretos com respostas negativas", "teclado e foco"], evidencias };
+    cenarios: ["busca real e atalho direto da #157", "termo/tipo/ordem após autenticação e confirmação", "dois cadastros e confirmações em abas distintas", "login genérico não altera retorno", "credenciais inválidas sem sessão", "e-mail pendente bloqueia escrita e mantém respostas", "cookie HttpOnly/SameSite", "retorno da sessão ativa", "logout", "token de uso único", "duas avaliações nos destinos corretos com respostas negativas", "retorno aos resultados após envio", "teclado e foco"], evidencias };
   if (process.env.PREVIEW_DIR) await writeFile(join(process.env.PREVIEW_DIR, "resultado.json"), JSON.stringify(resumo, null, 2) + "\n");
   console.log(`Acesso real aprovado: cadastro, confirmação, login, retorno independente entre abas e persistência; ${evidencias.length} combinações de tela/tema/largura.`);
 } finally {
