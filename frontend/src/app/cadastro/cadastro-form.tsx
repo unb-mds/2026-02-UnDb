@@ -1,13 +1,14 @@
 "use client";
 
 import CampoSenha from "@/components/campo-senha";
+import OpcoesAcesso from "@/components/opcoes-acesso";
 
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { cadastrarUsuario } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
 
-export default function CadastroForm({ retorno }: { retorno: string | null }) {
+export default function CadastroForm({ retorno, contexto }: { retorno: string | null; contexto?: ReactNode }) {
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -55,63 +56,67 @@ export default function CadastroForm({ retorno }: { retorno: string | null }) {
         </p>
       </div>
 
-      <form onSubmit={enviar} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium">Nome</span>
-          <input
-            name="nome"
-            type="text"
-            autoComplete="name"
-            required
-            maxLength={100}
-            aria-invalid={erroNome}
-            aria-describedby={erroNome ? "nome-erro" : undefined}
-            onChange={() => setErroNome(false)}
-            className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
-          />
-          {erroNome && <span id="nome-erro" role="alert" className="text-sm text-red-600 dark:text-red-400">Informe seu nome; ele não pode conter apenas espaços.</span>}
-        </label>
+      {contexto}
+      <section className="flex flex-col gap-5 rounded-xl border border-foreground/10 p-5" aria-label="Cadastro de conta">
+        <OpcoesAcesso atual="cadastro" retorno={retorno} />
+        <form onSubmit={enviar} className="flex flex-col gap-4">
+          <label className="flex flex-col gap-2">
+            <span className="text-sm font-medium">Nome</span>
+            <input
+              name="nome"
+              type="text"
+              autoComplete="name"
+              required
+              maxLength={100}
+              aria-invalid={erroNome}
+              aria-describedby={erroNome ? "nome-erro" : undefined}
+              onChange={() => setErroNome(false)}
+              className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
+            />
+            {erroNome && <span id="nome-erro" role="alert" className="text-sm text-red-600 dark:text-red-400">Informe seu nome; ele não pode conter apenas espaços.</span>}
+          </label>
 
-        <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium">E-mail institucional</span>
-          <input
-            name="email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            required
-            maxLength={150}
-            pattern="[^@]+@[aA][lL][uU][nN][oO][.][uU][nN][bB][.][bB][rR]"
-            placeholder="seu-email@aluno.unb.br"
-            className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
-          />
-        </label>
+          <label className="flex flex-col gap-2">
+            <span className="text-sm font-medium">E-mail institucional</span>
+            <input
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              required
+              maxLength={150}
+              pattern="[^@]+@[aA][lL][uU][nN][oO][.][uU][nN][bB][.][bB][rR]"
+              placeholder="seu-email@aluno.unb.br"
+              className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
+            />
+          </label>
 
-        <CampoSenha cadastro />
+          <CampoSenha cadastro />
 
-        <button
-          type="submit"
-          disabled={carregando}
-          className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {carregando ? "Enviando…" : "Criar conta"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={carregando}
+            className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {carregando ? "Enviando…" : "Criar conta"}
+          </button>
+        </form>
 
-      <p className="text-sm text-foreground/70">
-        Já possui uma conta?{" "}
-        <Link
-          href={retorno ? `/login?returnTo=${encodeURIComponent(retorno)}` : "/login"}
-          className="font-medium text-accent underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          Entrar
-        </Link>
-      </p>
+        <p className="text-sm text-foreground/70">
+          Já possui uma conta?{" "}
+          <Link
+            href={retorno ? `/login?returnTo=${encodeURIComponent(retorno)}` : "/login"}
+            className="font-medium text-accent underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            Entrar
+          </Link>
+        </p>
 
-      <div aria-live="polite">
-        {mensagem && <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-4 text-sm">{mensagem} {retorno ? "O link de confirmação permitirá retomar esta avaliação." : "Depois de confirmar o e-mail, entre na conta para avaliar."}</p>}
-        {erro && <p className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">{erro}</p>}
-      </div>
+        <div aria-live="polite">
+          {mensagem && <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-4 text-sm">{mensagem} {retorno ? "O link de confirmação permitirá retomar esta avaliação." : "Depois de confirmar o e-mail, entre na conta para avaliar."}</p>}
+          {erro && <p className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">{erro}</p>}
+        </div>
+      </section>
     </main>
   );
 }

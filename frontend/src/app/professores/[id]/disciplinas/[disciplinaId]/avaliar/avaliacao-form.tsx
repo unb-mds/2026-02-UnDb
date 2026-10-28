@@ -53,8 +53,8 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
   }
 
   return (
-    <form onSubmit={enviar} className="flex flex-col gap-6" aria-busy={enviando}>
-      <div className="flex flex-col items-start gap-2">
+    <form onSubmit={enviar} className="flex flex-col gap-6 rounded-xl border border-foreground/10 p-5" aria-busy={enviando}>
+      <div className="flex flex-col items-start gap-3 rounded-lg bg-foreground/[0.03] p-4">
         <p className="text-sm text-foreground/70">
           Você pode entrar antes de preencher. Para enviar, é necessário ter uma sessão ativa e confirmar seu e-mail institucional.
         </p>
@@ -65,7 +65,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
           Entrar ou criar conta antes de avaliar
         </Link>
       </div>
-      <CriteriosAvaliacao rotulosExplicitos disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
+      <CriteriosAvaliacao rotulosExplicitos destacarDidatica disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
       <button
         type="submit"
         disabled={enviando}
