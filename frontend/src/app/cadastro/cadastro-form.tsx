@@ -1,5 +1,7 @@
 "use client";
 
+import CampoSenha from "@/components/campo-senha";
+
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { cadastrarUsuario } from "@/lib/services/auth";
@@ -85,22 +87,7 @@ export default function CadastroForm({ retorno }: { retorno: string | null }) {
           />
         </label>
 
-        <label className="flex flex-col gap-2">
-          <span className="text-sm font-medium">Senha</span>
-          <input
-            name="senha"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            maxLength={128}
-            aria-describedby="senha-ajuda"
-            className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
-          />
-          <span id="senha-ajuda" className="text-xs text-foreground/60">
-            Use entre 8 e 128 caracteres.
-          </span>
-        </label>
+        <CampoSenha cadastro />
 
         <button
           type="submit"

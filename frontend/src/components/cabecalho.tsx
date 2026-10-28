@@ -1,7 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { retornoAvaliacaoSeguro } from "@/lib/retorno-avaliacao";
+
+function LinkConta({ destino = "/login" }: { destino?: string }) {
+  return <Link href={destino} aria-label="Conta: entrar ou criar conta" className="rounded-lg border border-foreground/20 px-3 py-2 text-accent hover:underline underline-offset-4">Entrar / Criar conta</Link>;
+}
+
+function ContaComRetorno() {
+  const caminho = usePathname();
+  const parametros = useSearchParams();
+  const retorno = ((caminho === "/login" || caminho === "/cadastro") ? retornoAvaliacaoSeguro(parametros.get("returnTo")) : null)
+    ?? retornoAvaliacaoSeguro(`${caminho}${parametros.size ? `?${parametros}` : ""}`);
+  return <LinkConta destino={retorno ? `/login?returnTo=${encodeURIComponent(retorno)}` : "/login"} />;
+}
 
 export default function Cabecalho() {
   const caminho = usePathname();
@@ -19,12 +33,7 @@ export default function Cabecalho() {
           <Link href="/disciplinas" className="py-2 hover:text-accent hover:underline underline-offset-4">
             Disciplinas
           </Link>
-          <Link href="/login" className="py-2 hover:text-accent hover:underline underline-offset-4">
-            Entrar
-          </Link>
-          <Link href="/cadastro" className="py-2 hover:text-accent hover:underline underline-offset-4">
-            Criar conta
-          </Link>
+          <Suspense fallback={<LinkConta />}><ContaComRetorno /></Suspense>
         </nav>
       </div>
     </header>

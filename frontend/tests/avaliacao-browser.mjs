@@ -9,6 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { verificarPrototipo } from "./prototipo-browser.mjs";
+import { criarCenarioBusca } from "./busca-browser.mjs";
 
 const navegador = process.env.BROWSER_PATH ?? "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";
 assert.ok(existsSync(navegador), "Informe BROWSER_PATH com o executável Edge/Chromium.");
@@ -40,6 +41,7 @@ let falhaComplementar = false;
 let consultaInterrompida = false;
 const professor = { id: professorId, nome: "Professor de teste", departamento: "CIC", siape: null, identidade_confirmada: true };
 const disciplina = { id: disciplinaId, codigo: "CIC0001", nome: "Disciplina de teste", departamento: "CIC", creditos: null, identificador_externo: null };
+const cenarioBusca = criarCenarioBusca(professor, disciplina);
 const envios = [];
 const fixture = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3100");
@@ -48,6 +50,7 @@ const fixture = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Content-Type", "application/json");
   if (req.method === "OPTIONS") { res.writeHead(204).end(); return; }
+  if (await cenarioBusca.responder(req, res)) return;
   const institucional = req.url.startsWith("/api/professores/") || req.url.startsWith("/api/disciplinas/");
   if (institucional && consultaInterrompida) { req.socket.destroy(); return; }
   if (institucional && statusConsulta !== 200) { res.writeHead(statusConsulta).end(JSON.stringify({detail:"Serviço indisponível"})); return; }
@@ -305,6 +308,7 @@ try {
     }
   }
   assert.equal(await avaliar('document.querySelectorAll("textarea, [name=historico], [name=comentario]").length'), 0);
+  if (!real) await cenarioBusca.verificar({ cdp, avaliar, aguardar, aguardarTexto });
   if (!real) await verificarCorrecoesInterface();
   if (!real) await verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto, aguardarValidacaoLocal, socket });
   console.log("Interface aprovada: cinco critérios, escalas, validação local, respostas preservadas, teclado, acesso direto e 6 combinações de tema/largura.");
@@ -355,6 +359,8 @@ async function verificarCorrecoesInterface() {
   await cdp("Page.navigate", {url:`http://localhost:3100${caminho}`});
   await aguardarTexto("Avaliar este professor na disciplina");
   // Regressão do CI: atrasa scripts para exercer HTML visível antes da hidratação.
+  await cdp("Page.navigate", { url: "about:blank" });
+  await aguardar(async () => await avaliar('location.href === "about:blank"'), "navegação anterior finalizada");
   await cdp("Network.setCacheDisabled", { cacheDisabled: true });
   await cdp("Fetch.enable", { patterns: [{ resourceType: "Script", requestStage: "Request" }] });
   const scriptsAtrasados = [];
@@ -448,9 +454,9 @@ async function verificarCorrecoesInterface() {
   await aguardar(async () => await avaliar('!!document.querySelector("[name=nome]")'), "cadastro com destino de retorno");
   assert.equal(await avaliar('new URL(document.querySelector(\'a[href^="/login?returnTo="]\').href).searchParams.get("returnTo")'), destino);
   // Visitas genéricas não interferem no contexto do link de confirmação.
-  await avaliar('document.querySelector(\'header a[href="/login"]\').click()');
+  await cdp("Page.navigate", {url:"http://localhost:3100/login"});
   await aguardarTexto("E-mail institucional");
-  await avaliar('document.querySelector(\'header a[href="/cadastro"]\').click()');
+  await avaliar('Array.from(document.querySelectorAll("main a")).find(a => a.textContent.includes("Criar conta")).click()');
   await aguardarTexto("Nome");
   statusConfirmacao = 200;
   await cdp("Page.navigate", {url:`http://localhost:3100/confirmar-email?token=valido&returnTo=${encodeURIComponent(destino)}`});

@@ -274,8 +274,12 @@ Nenhuma busca filtra por curso ou departamento do usuário (RF07).
 Nenhum endpoint dispara importação do SIGAA em tempo real.
 
 Para o retorno à avaliação da #158, `POST /auth/cadastro` aceita o campo opcional
-`return_to`: somente `/professores/{UUID}/disciplinas/{UUID}/avaliar`, sem origem,
-query ou fragmento. O backend inclui esse destino em `returnTo` no link de
+`return_to`: `/professores/{UUID}/disciplinas/{UUID}/avaliar`, sem origem ou
+fragmento, com até 2.048 caracteres. Conforme autorização da #155 registrada nos
+requisitos, pode conter a query completa `busca=professores|disciplinas`, `q=<termo>`
+e `ordem=nome|unidade`. As três chaves devem aparecer exatamente uma vez; chaves
+extras, controles e escapes percentuais inválidos são rejeitados. A rota sem query
+continua aceita. O backend inclui esse destino em `returnTo` no link de
 confirmação enviado por e-mail. O frontend valida o destino novamente e o mantém
 nos links de login/cadastro. Cada link carrega seu próprio contexto, inclusive
 entre abas; não há armazenamento global do destino no navegador nem persistência

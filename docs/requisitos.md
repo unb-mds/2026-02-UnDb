@@ -547,6 +547,19 @@ não aprova automaticamente ADRs, não altera as escalas/agregação e não comp
 de aplicação. As issues dependentes #156/#159/#160/#161/#162/#163 devem consumir estas
 decisões; mudanças substanciais de dados/arquitetura mantêm sua aprovação própria.
 
+### Continuidade da busca no acesso — Issue #155
+
+Na reavaliação de 27–28/10/2026, o solicitante autorizou nesta tarefa a ampliação restrita do destino
+de retorno já entregue na #158: a rota interna de avaliação pode carregar também
+tipo de busca, termo e ordenação. O contexto deve permanecer independente em cada
+link de cadastro/confirmação, inclusive entre abas, sem guardar credenciais ou
+respostas do formulário. Destinos antigos sem contexto continuam válidos.
+
+O contrato aprovado permite somente `busca`, `q` e `ordem` na query de `return_to`,
+com até 2.048 caracteres no destino completo e validação no frontend e no backend.
+Não autoriza URLs externas, fragmentos, chaves extras/duplicadas, novas regras de
+sessão ou preservação de rascunho. RF01/RF02/RF14 e as escalas permanecem vigentes.
+
 ### Demais decisões pendentes
 
 O modelo de execução do banco foi definido durante a revisão do PR #55, em 11/09/2026:

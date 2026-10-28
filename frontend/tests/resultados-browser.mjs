@@ -63,6 +63,10 @@ async function buscar(rota, termo, trecho) {
   await esperarTexto(trecho);
   await aguardar(async () => !(await texto()).includes("Carregando disciplinas"), "disciplinas carregadas");
 }
+function seletorRota(caminho) {
+  return `a[href="${caminho}"], a[href^="${caminho}?"]`;
+}
+
 async function api(path) {
   const resposta = await fetch("http://localhost:8000" + path);
   assert.equal(resposta.status, 200, path);
@@ -120,10 +124,10 @@ try {
   const telas = [
     { nome: "busca-professores", abrir: () => buscar("/professores", fixture.termo, "Sem turma"), verificar: async () => {
       assert.equal(await avaliar("document.querySelectorAll('main h2').length"), 7, "Homônimos não são unidos");
-      assert.equal(await avaliar(`document.querySelector('a[href="/professores/${p0}"]').closest('li').querySelectorAll('ul > li').length`), 2);
-      assert.equal(await avaliar(`document.querySelector('a[href="/professores/${p1}"]').closest('li').querySelectorAll('ul > li').length`), 1);
+      assert.equal(await avaliar(`document.querySelector(${JSON.stringify(seletorRota(`/professores/${p0}`))}).closest('li').querySelectorAll('ul > li').length`), 2);
+      assert.equal(await avaliar(`document.querySelector(${JSON.stringify(seletorRota(`/professores/${p1}`))}).closest('li').querySelectorAll('ul > li').length`), 1);
       assert.ok((await texto()).includes("Nenhuma turma ativa registrada"));
-      for (const id of [p0, p1]) assert.ok(await avaliar(`!!document.querySelector('a[href="/professores/${id}/disciplinas/${d0.id}/avaliar"]')`));
+      for (const id of [p0, p1]) assert.ok(await avaliar(`!!document.querySelector(${JSON.stringify(seletorRota(`/professores/${id}/disciplinas/${d0.id}/avaliar`))})`));
     } },
     { nome: "busca-disciplinas", abrir: () => buscar("/disciplinas", "REV183", d1.nome), verificar: async () => {
       assert.equal(await avaliar("document.querySelectorAll('main ul > li').length"), 2);
@@ -158,11 +162,11 @@ try {
         const alvo = tela.nome === "busca-professores" || tela.nome === "detalhe-professor"
           ? `/professores/${p0}/disciplinas/${d0.id}/avaliar` : null;
         if (alvo) {
-          const seletor = `a[href="${alvo}"]`;
+          const seletor = seletorRota(alvo);
           await avaliar(`document.querySelector(${JSON.stringify(seletor)}).previousElementSibling.focus()`);
           await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
           await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
-          assert.equal(await avaliar(`document.activeElement.getAttribute('href') === ${JSON.stringify(alvo)} && document.activeElement.matches(':focus-visible') && getComputedStyle(document.activeElement).outlineStyle !== 'none'`), true, "Foco de Avaliar");
+          assert.equal(await avaliar(`document.activeElement.pathname === ${JSON.stringify(alvo)} && document.activeElement.matches(':focus-visible') && getComputedStyle(document.activeElement).outlineStyle !== 'none'`), true, "Foco de Avaliar");
           await avaliar("document.activeElement.blur(); window.scrollTo(0, 0)");
         }
         let captura;
@@ -180,19 +184,19 @@ try {
   // e não transforma indisponibilidade em lista vazia nem afeta os outros cartões.
   await cdp("Network.setBlockedURLs", { urls: [`*api/professores/${p0}/disciplinas`] });
   await buscar("/professores", fixture.termo, "Não foi possível carregar as disciplinas");
-  assert.ok(await avaliar(`!!document.querySelector('a[href="/professores/${p0}"]')`));
-  assert.ok(await avaliar(`!!document.querySelector('a[href="/professores/${p1}/disciplinas/${d0.id}/avaliar"]')`));
+  assert.ok(await avaliar(`!!document.querySelector(${JSON.stringify(seletorRota(`/professores/${p0}`))})`));
+  assert.ok(await avaliar(`!!document.querySelector(${JSON.stringify(seletorRota(`/professores/${p1}/disciplinas/${d0.id}/avaliar`))})`));
   await cdp("Network.setBlockedURLs", { urls: [] });
-  await buscar("/professores", "Professor inexistente PR183", "Nenhum professor encontrado");
+  await buscar("/professores", "Professor inexistente PR183", "Nenhum resultado");
   // Navega pelos atalhos reais com identidade professor/disciplina.
   await buscar("/professores", fixture.termo, "Sem turma");
-  await avaliar(`document.querySelector('a[href="/professores/${p1}/disciplinas/${d0.id}/avaliar"]').click()`);
+  await avaliar(`document.querySelector(${JSON.stringify(seletorRota(`/professores/${p1}/disciplinas/${d0.id}/avaliar`))}).click()`);
   await esperarTexto("Avaliar professor na disciplina");
   assert.equal(await avaliar("location.pathname"), `/professores/${p1}/disciplinas/${d0.id}/avaliar`);
   assert.ok((await texto()).includes("Ana " + fixture.termo));
   assert.ok((await texto()).includes(d0.nome));
   await buscar("/professores", fixture.termo, "Sem turma");
-  await avaliar(`document.querySelector('a[href="/disciplinas/${d0.id}"]').click()`);
+  await avaliar(`document.querySelector(${JSON.stringify(seletorRota(`/disciplinas/${d0.id}`))}).click()`);
   await esperarTexto("Comparação de professores");
   assert.equal(await avaliar("location.pathname"), `/disciplinas/${d0.id}`);
   assert.deepEqual(errosPagina, [], "Exceções do navegador");

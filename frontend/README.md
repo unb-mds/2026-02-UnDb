@@ -26,7 +26,7 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 - `npm run lint`: executa o ESLint.
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
-- `npm test`: compila os módulos do formulário com TypeScript em diretório temporário e
+- `npm test`: compila os módulos de formulário, busca e retorno com TypeScript em diretório temporário e
   executa testes com o runner nativo do Node, sem novas dependências.
 - `npm run test:browser`: verifica o formulário no Edge/Chromium headless com respostas
   controladas de teste; exige build padrão prévio, Node 22+ e portas 8000, 3100 e 9223 livres.
@@ -37,7 +37,9 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 
 Os links de login/cadastro preservam `returnTo`. O cadastro envia o destino
 opcional `return_to` à API, que o inclui no link de confirmação. Somente a rota
-interna de avaliação com UUIDs válidos é aceita. Cada link mantém seu contexto
+interna de avaliação com UUIDs válidos é aceita. Na #155, a ampliação autorizada
+permite somente os parâmetros de busca `busca`, `q` e `ordem`, com até 2.048 caracteres
+no destino completo e validação nos dois lados. Cada link mantém seu contexto
 entre abas; login e confirmação continuam sujeitos às regras reais da API.
 
 Para verificar as telas com FastAPI/PostgreSQL reais, aplique as migrations em
@@ -66,6 +68,32 @@ no backend de testes e `PREVIEW_DIR` com o diretório das capturas.
 
 Preparação, comandos, resultados e limites estão no
 [relatório da #157](../docs/estudos/verificacao-resultados-comparacao-issue-157.md).
+
+## Navegação, busca e ordenação — Issue #155
+
+As rotas `/professores` e `/disciplinas` mantêm o termo em `q` e a ordenação em
+`ordem=nome|unidade`. A modalidade é identificada pela rota; os links para detalhes,
+comparação e avaliação propagam também `busca=professores|disciplinas`. Retornar pela
+interface, pelo histórico ou após autenticação recupera esse contexto. Recarregar
+refaz a mesma consulta, podendo refletir atualizações dos dados institucionais.
+
+A ordenação fica na própria lista e muda sem outra chamada HTTP. Os contratos atuais
+retornam listas completas: a busca de disciplinas ordena depois da união por ID das
+consultas por código/nome. Uma API paginada futura exigirá ordenação antes de paginar;
+não se deve ordenar só uma página e apresentar isso como ordem global.
+
+`ProfessorResultado` e `DisciplinasProfessor` da #157 são reutilizados; os links da
+#158 mantêm a busca até a confirmação/autenticação. O cabeçalho tem uma entrada de
+conta identificável e os formulários permitem mostrar/ocultar senha por teclado,
+sem mudar serviços, limites de senha ou regras de sessão.
+
+`npm run test:browser` cobre estados, recuperação, histórico e teclado em
+320/768/1280 px nos dois temas com HTTP controlado. O driver real
+`python -m tests.integration_acesso` foi ampliado para iniciar pela busca e conferir
+o contexto em duas abas até a gravação no PostgreSQL. A regressão de apresentação
+continua no runner `resultados-browser.mjs` da #157.
+
+[Matriz, resultados e evidências da #155](../docs/estudos/implementacao-navegacao-issue-155.md).
 
 ## Protótipo da jornada — Issue #152
 

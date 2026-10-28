@@ -1,5 +1,7 @@
 "use client";
 
+import CampoSenha from "@/components/campo-senha";
+
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -107,17 +109,7 @@ export default function LoginForm({ retorno }: { retorno: string | null }) {
             />
           </label>
 
-          <label className="flex flex-col gap-2">
-            <span className="text-sm font-medium">Senha</span>
-            <input
-              name="senha"
-              type="password"
-              autoComplete="current-password"
-              required
-              maxLength={128}
-              className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
-            />
-          </label>
+          <CampoSenha />
 
           <button
             type="submit"

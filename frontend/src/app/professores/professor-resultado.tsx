@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import DisciplinasProfessor from "@/components/disciplinas-professor";
 import { listarDisciplinasDoProfessor } from "@/lib/services/professores";
 import type { DisciplinaDetalhe, ProfessorDetalhe } from "@/lib/types/institucional";
+import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
 
 type ConsultaDisciplinas =
   | { estado: "carregando" }
@@ -12,7 +13,7 @@ type ConsultaDisciplinas =
   | { estado: "erro" };
 
 // O resultado é montado com key=professor.id, inclusive para nomes iguais.
-export default function ProfessorResultado({ professor }: { professor: ProfessorDetalhe }) {
+export default function ProfessorResultado({ professor, contexto = null }: { professor: ProfessorDetalhe; contexto?: ContextoBusca | null }) {
   const [consulta, setConsulta] = useState<ConsultaDisciplinas>({ estado: "carregando" });
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function ProfessorResultado({ professor }: { professor: Professor
   return (
     <li className="min-w-0 rounded-lg border border-foreground/10 p-4 break-words">
       <h2 className="font-semibold">
-        <Link href={`/professores/${professor.id}`} className="text-accent underline underline-offset-2 hover:text-foreground">
+        <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="text-accent underline underline-offset-2 hover:text-foreground">
           {professor.nome}
         </Link>
       </h2>
@@ -42,7 +43,7 @@ export default function ProfessorResultado({ professor }: { professor: Professor
           Não foi possível carregar as disciplinas deste professor. Tente abrir o perfil novamente em instantes.
         </p>
       )}
-      {consulta.estado === "sucesso" && <DisciplinasProfessor professorId={professor.id} disciplinas={consulta.disciplinas} />}
+      {consulta.estado === "sucesso" && <DisciplinasProfessor professorId={professor.id} disciplinas={consulta.disciplinas} contexto={contexto} />}
     </li>
   );
 }

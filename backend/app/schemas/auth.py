@@ -1,4 +1,5 @@
 import re
+from urllib.parse import parse_qsl
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -16,13 +17,31 @@ class CadastroRequest(BaseModel):
     nome: str
     email: str = Field(max_length=150)
     senha: str = Field(min_length=8, max_length=128)
-    return_to: str | None = Field(default=None, max_length=200)
+    return_to: str | None = Field(default=None, max_length=2048)
 
     @field_validator("return_to")
     @classmethod
     def validar_retorno(cls, valor: str | None) -> str | None:
-        if valor is not None and not RETORNO_AVALIACAO.fullmatch(valor):
-            raise ValueError("return_to deve ser uma rota interna de avaliação com UUIDs válidos")
+        if valor is None:
+            return valor
+        caminho, separador, query = valor.partition("?")
+        invalido = (
+            not RETORNO_AVALIACAO.fullmatch(caminho)
+            or "#" in valor
+            or re.search(r"[\x00-\x1f\x7f]|%(?![\da-fA-F]{2})", valor)
+        )
+        if separador and not invalido:
+            pares = parse_qsl(query, keep_blank_values=True)
+            parametros = dict(pares)
+            invalido = (
+                len(pares) != 3
+                or set(parametros) != {"busca", "q", "ordem"}
+                or parametros.get("busca") not in {"professores", "disciplinas"}
+                or parametros.get("ordem") not in {"nome", "unidade"}
+                or re.search(r"[\x00-\x1f\x7f]", parametros.get("q", ""))
+            )
+        if invalido:
+            raise ValueError("return_to deve ser uma rota interna de avaliação com UUIDs válidos e contexto de busca permitido")
         return valor
 
     @field_validator("nome")

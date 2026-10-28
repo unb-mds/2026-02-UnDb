@@ -7,7 +7,6 @@ import { criarEntradaAvaliacao, mensagemErroAvaliacao } from "@/lib/avaliacao-fo
 import { consultarSessao } from "@/lib/services/auth";
 import { enviarAvaliacao } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
-import { caminhoAvaliacao } from "@/lib/retorno-avaliacao";
 
 export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }: {
   professorId: string;
@@ -84,7 +83,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
           <div role="alert" className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">
             <p>{erro}</p>
             {precisaEntrar && (
-              <Link href={`/login?returnTo=${encodeURIComponent(caminhoAvaliacao(professorId, disciplinaId))}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block font-medium text-accent underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+              <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block font-medium text-accent underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
                 Entrar na conta (nova aba)
               </Link>
             )}
