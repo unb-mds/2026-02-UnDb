@@ -167,7 +167,15 @@ try {
   for (const [i, tab] of [a, b].entries()) {
     const contexto = contextos[i];
     const lista = `/${contexto.busca}?${new URLSearchParams({ q: contexto.q, ordem: contexto.ordem })}`;
-    await navegar(tab, lista, "resultado(s)");
+    await navegar(tab, "/", "Encontre professores e disciplinas");
+    if (i === 0) await matriz(tab, "entrada");
+    await aguardar(async () => await tab.avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "busca inicial hidratada");
+    await tab.avaliar(`document.querySelector('input[type=radio][value="${contexto.busca}"]').click(); document.querySelector('[name=q]').value=${JSON.stringify(contexto.q)}`);
+    await aguardar(async () => await tab.avaliar(`document.querySelector('form').getAttribute('action') === '/${contexto.busca}'`), "modalidade escolhida");
+    await tab.avaliar("document.querySelector('form').requestSubmit()");
+    await esperarTexto(tab, "resultado(s)");
+    await tab.avaliar(`const s=document.querySelector('select'); s.value=${JSON.stringify(contexto.ordem)}; s.dispatchEvent(new Event('change',{bubbles:true}))`);
+    await aguardar(async () => await tab.avaliar(`location.pathname + location.search === ${JSON.stringify(lista)}`), "lista com contexto da entrada");
     await matriz(tab, `busca-${contexto.busca}`);
     if (i === 1) await clicar(tab, `main a[href^="/disciplinas/${fixture.disciplinaId}?"]`, "Comparação de professores");
     await clicar(tab, `main a[href="${destinos[i]}"]`, "Avaliar professor na disciplina");
@@ -178,6 +186,12 @@ try {
     await navegar(tab, destinos[i], "Avaliar professor na disciplina");
     await clicar(tab, 'a[href^="/login?returnTo="]', "Entrar");
     await aguardar(async () => await tab.avaliar("!!document.querySelector('[name=email]')"), "login visitante");
+    await esperarTexto(tab, "Avaliação selecionada");
+    assert.equal(await tab.avaliar("document.querySelector('main details').open"), false);
+    await tab.avaliar("document.querySelector('main summary').click()");
+    await esperarTexto(tab, "Disciplina de acesso e confirmação");
+    assert.equal(await tab.avaliar("document.querySelector('[aria-label=\"Etapas da jornada\"]') === null"), true);
+    await tab.avaliar("document.querySelector('main summary').click()");
     if (i === 0) await matriz(tab, "login");
     await clicar(tab, 'a[href^="/cadastro?returnTo="]', "Criar conta");
     if (i === 0) await matriz(tab, "cadastro");

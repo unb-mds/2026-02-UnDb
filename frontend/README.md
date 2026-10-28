@@ -228,6 +228,27 @@ Components por requisição. Por isso a entrega mantém servidor Next.js e não 
 `output: 'export'`. A análise e o estado da decisão estão no
 [ADR 08](../docs/arquitetura.md#adr-08--execução-e-containerização-do-frontend).
 
+## Jornada visual integrada — Issue #186
+
+A rota `/` oferece a busca inicial por professor ou disciplina e conduz às buscas
+reais. A orientação “Busque → Escolha a disciplina → Consulte ou avalie” acompanha
+a jornada, ficando fora de login, cadastro e confirmação. Não é necessário visitar
+`/prototipo`; essa demonstração continua disponível em uma seção secundária da entrada.
+
+Resultados usam uma coluna no celular e duas a partir de `sm`, com disciplinas
+agrupadas e avaliação direta. Consulta e comparação compartilham a apresentação dos
+critérios agregados, calculados pelo backend. O formulário real mantém os grupos e
+controles da #158, com contexto e Didática destacados. Login/cadastro permanecem
+separados e mostram o destino válido em seção recolhida; uma falha nessa informação
+auxiliar não impede a autenticação. Busca e retorno mantêm os contratos da #155.
+
+O [comparativo aprovado, rastreabilidade, testes e capturas](../docs/estudos/integracao-visual-jornada-issue-186.md)
+identifica a referência histórica `91ecb79`, a base real e os limites de validação.
+`npm run test:browser` inclui a nova entrada e regressões controladas. As suítes
+`tests/acesso-browser.mjs` e `tests/resultados-browser.mjs` usam API/PostgreSQL reais;
+`tests/referencia-browser.mjs` captura uma cópia histórica compilada e confere seus
+fontes contra o commit de referência. Não usa fixtures no produto normal.
+
 ## Padrão visual básico — Issue #31
 
 Base implementada nesta entrega para orientar as próximas telas. A solicitação de
@@ -270,7 +291,7 @@ já são carregadas por `next/font` no layout raiz, sem nova dependência.
 
 | Papel | Classes | Tamanho / entrelinha |
 |---|---|---|
-| Título da página inicial | `text-3xl font-semibold` | 30 / 36 px |
+| Título da página inicial (jornada #186) | `text-2xl font-semibold` | 24 / 32 px |
 | Título das demais páginas | `text-2xl font-semibold` | 24 / 32 px |
 | Marca no header | `text-xl font-semibold` | 20 / 28 px |
 | Título de cartão de entrada | `text-lg font-medium` | 18 / 28 px |
@@ -297,10 +318,12 @@ Em telas estreitas, navegação e cartões quebram em linhas.
 
 - Header compartilhado em todas as rotas: marca ligada a `/`, navegação para
   `/professores` e `/disciplinas`, borda inferior, `px-4 py-3`, sem altura fixa.
-- Buscas e detalhes: `mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10`.
-  A largura máxima é 42 rem (672 px com raiz de 16 px).
+- Buscas: `max-w-5xl`, com controles limitados a `max-w-2xl` e resultados em
+  `grid gap-4 sm:grid-cols-2`. Detalhes de professor e avaliação mantêm
+  `mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10` (672 px).
 - Comparação de professores: `max-w-5xl` (64 rem / 1024 px) e grade responsiva existente.
-- Início: `max-w-2xl`, `gap-8 py-16`, cartões em uma coluna e duas a partir de `sm`.
+- Início: `max-w-5xl`, `gap-6 py-10`, busca e cartões de apoio em `max-w-2xl`;
+  cartões em uma coluna e duas a partir de `sm`.
   Página não encontrada: mesma largura, `gap-3 py-16`.
 - Espaçamentos: 4, 8, 12, 16, 24, 32, 40 e 64 px, correspondendo às unidades
   Tailwind 1, 2, 3, 4, 6, 8, 10 e 16. Cartões de entrada usam `p-5` (20 px).
