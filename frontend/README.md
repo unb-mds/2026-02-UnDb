@@ -231,7 +231,9 @@ Components por requisição. Por isso a entrega mantém servidor Next.js e não 
 ## Jornada visual integrada — Issue #186
 
 A rota `/` oferece a busca inicial por professor ou disciplina e conduz às buscas
-reais. A orientação “Busque → Escolha a disciplina → Consulte ou avalie” acompanha
+reais. O formulário envia a modalidade à rota `/busca`, que encaminha no servidor
+para a listagem correspondente, preservando termo e ordem mesmo antes da hidratação.
+A orientação “Busque → Escolha a disciplina → Consulte ou avalie” acompanha
 a jornada, ficando fora de login, cadastro e confirmação. Não é necessário visitar
 `/prototipo`; essa demonstração continua disponível em uma seção secundária da entrada.
 
@@ -244,7 +246,8 @@ auxiliar não impede a autenticação. Busca e retorno mantêm os contratos da #
 
 O [comparativo aprovado, rastreabilidade, testes e capturas](../docs/estudos/integracao-visual-jornada-issue-186.md)
 identifica a referência histórica `91ecb79`, a base real e os limites de validação.
-`npm run test:browser` inclui a nova entrada e regressões controladas. As suítes
+`npm run test:browser` inclui a nova entrada, o envio nas duas modalidades com
+scripts bloqueados e regressões controladas. As suítes
 `tests/acesso-browser.mjs` e `tests/resultados-browser.mjs` usam API/PostgreSQL reais;
 `tests/referencia-browser.mjs` captura uma cópia histórica compilada e confere seus
 fontes contra o commit de referência. Não usa fixtures no produto normal.

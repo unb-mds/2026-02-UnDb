@@ -86,6 +86,27 @@ export function criarCenarioBusca(professor, disciplina) {
     };
     const semTransbordar = async () => assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true);
     try {
+      // A escolha nativa precisa encaminhar a busca enquanto os scripts não chegam.
+      const termoAntesDaHidratacao = "Teste & CIC";
+      for (const tipo of ["professores", "disciplinas"]) {
+        await cdp("Page.navigate", { url: "about:blank" });
+        await aguardar(async () => await avaliar("location.href === 'about:blank'"), "documento anterior finalizado");
+        await cdp("Network.setCacheDisabled", { cacheDisabled: true });
+        await cdp("Network.setBlockedURLs", { urls: ["*.js*"] });
+        try {
+          await cdp("Page.navigate", { url: "http://localhost:3100/" });
+          await aguardar(async () => await avaliar("!!document.querySelector('form input[name=q]')"), "formulário HTML da entrada");
+          assert.equal(await avaliar("Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), false, "O envio deve ocorrer antes da hidratação");
+          await avaliar(`document.querySelector('input[type=radio][value="${tipo}"]').click(); document.querySelector('[name=q]').value=${JSON.stringify(termoAntesDaHidratacao)}; document.querySelector('form').requestSubmit()`);
+          await aguardar(async () => await avaliar(`location.pathname === '/${tipo}' && new URLSearchParams(location.search).get('q') === ${JSON.stringify(termoAntesDaHidratacao)} && new URLSearchParams(location.search).get('ordem') === 'nome'`), "modalidade e termo preservados sem scripts");
+        } finally {
+          await cdp("Network.setBlockedURLs", { urls: [] });
+          await cdp("Network.setCacheDisabled", { cacheDisabled: false });
+        }
+        await cdp("Page.reload");
+        await aguardarTexto("3 resultado(s)");
+        await contexto(tipo, termoAntesDaHidratacao, "nome", true);
+      }
       for (const width of [320, 768, 1280]) {
         await cdp("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: width === 320 });
         for (const tema of ["light", "dark"]) {
@@ -101,7 +122,7 @@ export function criarCenarioBusca(professor, disciplina) {
             await navegar("/", "Encontre professores e disciplinas");
             await aguardar(async () => await avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
             await avaliar(`document.querySelector('input[type=radio][value="${tipo}"]').click()`);
-            await aguardar(async () => await avaliar(`document.querySelector('form').getAttribute('action') === '/${tipo}'`), "modalidade da entrada");
+            assert.equal(await avaliar("new FormData(document.querySelector('form')).get('busca')"), tipo);
             await avaliar("document.querySelector('input[type=search]').focus()");
             await cdp("Input.insertText", { text: "Teste" });
             await avaliar("document.querySelector('form').requestSubmit()");

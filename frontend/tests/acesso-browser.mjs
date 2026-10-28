@@ -171,7 +171,7 @@ try {
     if (i === 0) await matriz(tab, "entrada");
     await aguardar(async () => await tab.avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "busca inicial hidratada");
     await tab.avaliar(`document.querySelector('input[type=radio][value="${contexto.busca}"]').click(); document.querySelector('[name=q]').value=${JSON.stringify(contexto.q)}`);
-    await aguardar(async () => await tab.avaliar(`document.querySelector('form').getAttribute('action') === '/${contexto.busca}'`), "modalidade escolhida");
+    assert.equal(await tab.avaliar("new FormData(document.querySelector('form')).get('busca')"), contexto.busca);
     await tab.avaliar("document.querySelector('form').requestSubmit()");
     await esperarTexto(tab, "resultado(s)");
     await tab.avaliar(`const s=document.querySelector('select'); s.value=${JSON.stringify(contexto.ordem)}; s.dispatchEvent(new Event('change',{bubbles:true}))`);
