@@ -6,6 +6,7 @@ import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
 import { caminhoAvaliacao } from "@/lib/retorno-avaliacao";
 import AvaliacaoForm from "./avaliacao-form";
+import EtapasJornada from "@/components/etapas-jornada";
 
 export default async function AvaliarPage({ params, searchParams }: {
   searchParams: Promise<ParametrosBusca>;
@@ -23,8 +24,9 @@ export default async function AvaliarPage({ params, searchParams }: {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+      <EtapasJornada atual={2} />
       {contexto && <Link href={urlBusca(contexto)} className="text-sm text-accent underline underline-offset-4">← Voltar aos resultados da busca</Link>}
-      <Link href={consultaHref} className="text-sm text-foreground/60 hover:text-foreground">
+      <Link href={consultaHref} className="self-start text-sm text-accent underline underline-offset-4">
         ← Voltar para a consulta
       </Link>
       <div>
@@ -33,7 +35,7 @@ export default async function AvaliarPage({ params, searchParams }: {
       </div>
       {avaliacao ? (
         <>
-          <dl className="flex flex-col gap-3 rounded-lg border border-foreground/10 px-4 py-3">
+          <dl className="flex flex-col gap-3 break-words rounded-xl border border-accent/30 bg-accent/5 p-5">
             <div>
               <dt className="text-sm text-foreground/70">Professor</dt>
               <dd className="font-semibold">{avaliacao.professor.nome}</dd>

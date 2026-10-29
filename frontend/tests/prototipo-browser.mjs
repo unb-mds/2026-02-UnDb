@@ -33,8 +33,11 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     await cdp("Emulation.setDeviceMetricsOverride", { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "light" }] });
     await cdp("Page.navigate", { url: "http://localhost:3100" });
+    await aguardarTexto("Encontre professores e disciplinas");
+    await avaliar("document.querySelector('main details summary').click()");
     await aguardarTexto("Experimentar o protótipo");
     await clicar("Experimentar o protótipo");
+    await aguardarTexto("Protótipo navegável");
     await aguardarTexto("Encontre professores e disciplinas");
     await capturar("01-entrada");
     await clicar("Buscar disciplina");

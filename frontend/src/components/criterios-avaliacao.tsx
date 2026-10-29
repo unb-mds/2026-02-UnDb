@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { criteriosAvaliacao } from "@/lib/avaliacao-formulario";
 
-export default function CriteriosAvaliacao({ disabled = false, onChange, rotulosExplicitos = false, ocultarDidatica = false }: {
+export default function CriteriosAvaliacao({ disabled = false, onChange, rotulosExplicitos = false, ocultarDidatica = false, destacarDidatica = false }: {
   disabled?: boolean;
   onChange?: () => void;
   rotulosExplicitos?: boolean;
   ocultarDidatica?: boolean;
+  destacarDidatica?: boolean;
 }) {
   const [didatica, setDidatica] = useState("");
   const criterioDidatica = criteriosAvaliacao[0];
@@ -24,7 +25,7 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
         <legend className="text-lg font-semibold">Sobre as aulas</legend>
 
         {!ocultarDidatica && (
-          <fieldset className="flex min-w-0 flex-col gap-2">
+          <fieldset className={destacarDidatica ? "flex min-w-0 flex-col gap-2 rounded-lg bg-accent/5 p-4" : "flex min-w-0 flex-col gap-2"}>
             <legend className="text-sm font-medium">Didática</legend>
             <div className="flex flex-wrap gap-2" aria-label="Nota de Didática">
               {criterioDidatica.opcoes.map(([valor, rotulo]) => (

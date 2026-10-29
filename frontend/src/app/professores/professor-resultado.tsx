@@ -29,13 +29,13 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
   }, [professor.id]);
 
   return (
-    <li className="min-w-0 rounded-lg border border-foreground/10 p-4 break-words">
-      <h2 className="font-semibold">
+    <li className="min-w-0 rounded-xl border border-foreground/10 p-5 break-words">
+      <p className="text-sm font-medium text-accent">Unidade acadêmica: {professor.departamento}</p>
+      <h2 className="mt-1 text-xl font-semibold">
         <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="text-accent underline underline-offset-2 hover:text-foreground">
           {professor.nome}
         </Link>
       </h2>
-      <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {professor.departamento}</p>
       <h3 className="mt-4 text-sm font-medium text-foreground/70">Disciplinas lecionadas</h3>
       {consulta.estado === "carregando" && <p className="mt-2 text-sm text-foreground/60">Carregando disciplinas…</p>}
       {consulta.estado === "erro" && (

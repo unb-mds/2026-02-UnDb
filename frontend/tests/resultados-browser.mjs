@@ -87,6 +87,7 @@ try {
     await new Promise((r) => reserva.close(r));
   }
   await mkdir(destino, { recursive: true });
+  await aguardar(async () => { try { return (await fetch("http://localhost:8000/health")).ok; } catch { return false; } }, "API pronta");
   const comparacao = await api(`/api/disciplinas/${d0.id}/professores?ordenar_por=recomendacao`);
   assert.deepEqual(comparacao.professores.map((p) => p.professor_id), [p0, p1, p2, p3, p4, p5]);
   assert.deepEqual(comparacao.professores.map((p) => p.total_avaliacoes), [4, 3, 3, 4, 2, 0]);
@@ -122,6 +123,24 @@ try {
   await cdp("Runtime.enable");
   await cdp("Network.enable");
   const telas = [
+    { nome: "busca-inicial", abrir: () => navegar("/professores", "Digite ao menos 2 letras") },
+    { nome: "busca-vazia", abrir: () => buscar("/professores", "Professor inexistente PR183", "Nenhum resultado") },
+    { nome: "busca-erro", abrir: async () => {
+      await cdp("Network.setBlockedURLs", { urls: ["*localhost:8000/api/professores*"] });
+      await buscar("/professores", fixture.termo, "Não foi possível buscar");
+    }, verificar: async () => {
+      assert.doesNotMatch(await texto(), /Nenhum resultado/);
+      assert.ok((await texto()).includes("Tentar novamente"));
+    } },
+    { nome: "busca-carregando", abrir: async () => {
+      await navegar("/professores", "Digite ao menos 2 letras");
+      await aguardar(async () => await avaliar("!!document.querySelector('input[type=search]') && Object.keys(document.querySelector('input[type=search]')).some(k => k.startsWith('__reactProps'))"), "busca hidratada");
+      // Latência induzida, sem substituir a resposta da API real.
+      await cdp("Network.emulateNetworkConditions", { offline: false, latency: 2000, downloadThroughput: -1, uploadThroughput: -1 });
+      await avaliar("document.querySelector('input[type=search]').focus()");
+      await cdp("Input.insertText", { text: fixture.termo });
+      await esperarTexto("Buscando…");
+    } },
     { nome: "busca-professores", abrir: () => buscar("/professores", fixture.termo, "Sem turma"), verificar: async () => {
       assert.equal(await avaliar("document.querySelectorAll('main h2').length"), 7, "Homônimos não são unidos");
       assert.equal(await avaliar(`document.querySelector(${JSON.stringify(seletorRota(`/professores/${p0}`))}).closest('li').querySelectorAll('ul > li').length`), 2);
@@ -152,6 +171,8 @@ try {
     for (const largura of [320, 768, 1280]) {
       await cdp("Emulation.setDeviceMetricsOverride", { width: largura, height: 900, deviceScaleFactor: 1, mobile: largura === 320 });
       for (const tela of telas) {
+        await cdp("Network.setBlockedURLs", { urls: [] });
+        await cdp("Network.emulateNetworkConditions", { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
         await tela.abrir();
         await tela.verificar?.();
         await avaliar("document.fonts.ready.then(() => true)");
@@ -163,7 +184,7 @@ try {
           ? `/professores/${p0}/disciplinas/${d0.id}/avaliar` : null;
         if (alvo) {
           const seletor = seletorRota(alvo);
-          await avaliar(`document.querySelector(${JSON.stringify(seletor)}).previousElementSibling.focus()`);
+          await avaliar(`document.querySelector(${JSON.stringify(seletor)}).closest('li').querySelector('a').focus()`);
           await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
           await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
           assert.equal(await avaliar(`document.activeElement.pathname === ${JSON.stringify(alvo)} && document.activeElement.matches(':focus-visible') && getComputedStyle(document.activeElement).outlineStyle !== 'none'`), true, "Foco de Avaliar");
@@ -180,6 +201,13 @@ try {
       }
     }
   }
+  await cdp("Network.emulateNetworkConditions", { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+  // A falha de transporte não é sucesso; recuperar refaz a consulta real.
+  await cdp("Network.setBlockedURLs", { urls: ["*localhost:8000/api/professores*"] });
+  await buscar("/professores", fixture.termo, "Não foi possível buscar");
+  await cdp("Network.setBlockedURLs", { urls: [] });
+  await avaliar("Array.from(document.querySelectorAll('main button')).find(b => b.textContent.includes('Tentar novamente')).click()");
+  await esperarTexto("7 resultado(s)");
   // Falha real de transporte em uma consulta complementar: preserva o professor
   // e não transforma indisponibilidade em lista vazia nem afeta os outros cartões.
   await cdp("Network.setBlockedURLs", { urls: [`*api/professores/${p0}/disciplinas`] });

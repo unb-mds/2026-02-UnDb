@@ -1,0 +1,227 @@
+{
+  "dataUTC": "2026-10-28T16:09:56.841481+00:00",
+  "commitBase": "dcff008eb820c094db9506b3b6d988b0053177c6",
+  "branch": "feature/186-integracao-visual",
+  "estado": "working tree; sem commit da implementacao",
+  "referencia": "91ecb79efc1c473624e0adeb358d57eab835da98",
+  "fontesSha256": "bdeda8a0861d2cf357b9cec2d37de8e543c49056c34e8f47015df3cd0ad9ff73",
+  "normalizacao": "CRLF para LF em ts/tsx/css; binarios intactos",
+  "ambiente": {
+    "node": "24.21.0",
+    "next": "16.3.5",
+    "react": "19.2.8",
+    "edge": "156.0.4314.50",
+    "pythonBackend": "3.12.15",
+    "postgresql": "16.15",
+    "dados": "sinteticos persistidos em PostgreSQL isolado",
+    "email": "adaptador console real",
+    "viewport": "320/768/1280 emulado; temas claro/escuro"
+  },
+  "arquivos": [
+    {
+      "arquivo": "frontend/src/app/cadastro/cadastro-form.tsx",
+      "sha256": "5dc6d6693004453989d0e1f6ed16e4c6269ee9a5a830e923864aeffb23dee323"
+    },
+    {
+      "arquivo": "frontend/src/app/cadastro/page.tsx",
+      "sha256": "656f14913564cb6cc126d757abd13c4a7643fcb9a44ce959f9a85b47b5108c75"
+    },
+    {
+      "arquivo": "frontend/src/app/confirmar-email/confirmation-client.tsx",
+      "sha256": "6e949b232faeb00c617831e364f0955093b2d87727eb220747d68d79d7553df4"
+    },
+    {
+      "arquivo": "frontend/src/app/confirmar-email/page.tsx",
+      "sha256": "095f02924adb512ff1fba845a3a140a6698870862af032c95bf0f3818c65cb36"
+    },
+    {
+      "arquivo": "frontend/src/app/disciplinas/[id]/page.tsx",
+      "sha256": "72a3317d77a0f0391e0226f86c1414e3964a7980754450de8237a9d38388b09f"
+    },
+    {
+      "arquivo": "frontend/src/app/disciplinas/page.tsx",
+      "sha256": "063b520b18676a0edfb7f81c5deeb2e209c58fc76a301ba5dba51e9848cc498d"
+    },
+    {
+      "arquivo": "frontend/src/app/error.tsx",
+      "sha256": "b5c296072620463278887db1cb5cd79f0bfec3cfdcaabf8c2ea6d695802e218b"
+    },
+    {
+      "arquivo": "frontend/src/app/favicon.ico",
+      "sha256": "2b8ad2d33455a8f736fc3a8ebf8f0bdea8848ad4c0db48a2833bd0f9cd775932"
+    },
+    {
+      "arquivo": "frontend/src/app/globals.css",
+      "sha256": "6c5c9dab5761f8c748f37f5ea594f38bb10aab33c78d8a9ada3a0c5a6896ad73"
+    },
+    {
+      "arquivo": "frontend/src/app/layout.tsx",
+      "sha256": "5f79bc47f6c4bd762220826375895e227d400db1ff2a2ead74ce267c99d65206"
+    },
+    {
+      "arquivo": "frontend/src/app/login/login-form.tsx",
+      "sha256": "30e4d33a4fc0b5c150f416ada34677844857bb8ace835bea23280167fd620cbf"
+    },
+    {
+      "arquivo": "frontend/src/app/login/page.tsx",
+      "sha256": "cef22fc099ed5140d313039b89970b80000dd29e4bb39391d2fc093765d95037"
+    },
+    {
+      "arquivo": "frontend/src/app/not-found.tsx",
+      "sha256": "a573cbe96719f8461d115b4bc1f0bb3187a72dd589e36839c208976f9f924128"
+    },
+    {
+      "arquivo": "frontend/src/app/page.tsx",
+      "sha256": "6ef4fa47ef3cb0feaed9728ac6026cf10c5c991b72adbaa036b3f7ad3f80b6de"
+    },
+    {
+      "arquivo": "frontend/src/app/professores/[id]/disciplinas/[disciplinaId]/avaliar/avaliacao-form.tsx",
+      "sha256": "7da9d858367d8d79e43426a1373a48633d39c1f4b3cc94c95b6c277c0d868c18"
+    },
+    {
+      "arquivo": "frontend/src/app/professores/[id]/disciplinas/[disciplinaId]/avaliar/page.tsx",
+      "sha256": "a22db46ed6b626f3327aab4db0d5ca32b1b5c1140d417509b7d6db982fc4fcc1"
+    },
+    {
+      "arquivo": "frontend/src/app/professores/[id]/disciplinas/[disciplinaId]/page.tsx",
+      "sha256": "1be3652d7708a5fe77db7f60c99a3d7f2459524f87a42b245ae4352e0e847832"
+    },
+    {
+      "arquivo": "frontend/src/app/professores/[id]/page.tsx",
+      "sha256": "baed0d988e3872f312b46e6c090af621caf47809896178799ae24411471c499d"
+    },
+    {
+      "arquivo": "frontend/src/app/professores/page.tsx",
+      "sha256": "5be1783d62b81b50e57dad7e374a288ed4700d6d9eb85d5884951c7c76107e5f"
+    },
+    {
+      "arquivo": "frontend/src/app/professores/professor-resultado.tsx",
+      "sha256": "bf8962f744349587512d50a58917c90fd25d3783531f86b2bc33e2ebe74321e4"
+    },
+    {
+      "arquivo": "frontend/src/app/prototipo/acesso-demo.tsx",
+      "sha256": "a69ffda3074460e05452e1f6979597e175021cea8904b05c4e8d6b9b25f14ddd"
+    },
+    {
+      "arquivo": "frontend/src/app/prototipo/conta-demo.tsx",
+      "sha256": "8ccb9cdbdb7f88cb4b03e73360c56e439ecf0cb988c84a7079ca20c498a62630"
+    },
+    {
+      "arquivo": "frontend/src/app/prototipo/dados.ts",
+      "sha256": "4dd25f3e313153d8b393e79ab620794ec296abbd3174660664cc618d91344d98"
+    },
+    {
+      "arquivo": "frontend/src/app/prototipo/formulario-demo.tsx",
+      "sha256": "59f3fe01a1203b8e3df5c0400dffcd57f5725ebbf053523598b830c4968bc960"
+    },
+    {
+      "arquivo": "frontend/src/app/prototipo/layout.tsx",
+      "sha256": "aa95517c34a907c664adb199a781c8b8bb9fd2aa69cba730a617f6866a4bc7a5"
+    },
+    {
+      "arquivo": "frontend/src/app/prototipo/organizar-resultados-demo.tsx",
+      "sha256": "8f6da642d895c53617b02a5ebeac53355f0ae62d44f462553893efb3d75b563b"
+    },
+    {
+      "arquivo": "frontend/src/app/prototipo/page.tsx",
+      "sha256": "4ba1475ecbab4b94d52a28ad2dc5fab1447c59a4d7373ea0da7d7c16cdf2cb46"
+    },
+    {
+      "arquivo": "frontend/src/components/busca-entrada.tsx",
+      "sha256": "e0425fbe2088ed718c98fb1b54e919b3d7bd01985e1cd457f8915f6cc579e917"
+    },
+    {
+      "arquivo": "frontend/src/components/busca-institucional.tsx",
+      "sha256": "39ff82e296c067323a2a3fa5aa53ba92af666689099582fc45ae6d2983206cf0"
+    },
+    {
+      "arquivo": "frontend/src/components/cabecalho.tsx",
+      "sha256": "4c097d919974cd2c88a0a2f63c17acdcb1f35332558b944472200a92b9dd1ed6"
+    },
+    {
+      "arquivo": "frontend/src/components/campo-senha.tsx",
+      "sha256": "230faa5e61da3e41415f1f30d0d8ac71040a0b13bfadf58104044579946f40cf"
+    },
+    {
+      "arquivo": "frontend/src/components/criterios-agregados.tsx",
+      "sha256": "e36f9123bfd47ab8c0082b33e4ab939f5132c9803ec58f4100524dcd824d84a3"
+    },
+    {
+      "arquivo": "frontend/src/components/criterios-avaliacao.tsx",
+      "sha256": "393e66620c03aa0dd22f875dbfb519e2695415d9c4ca7ea61996b3e1c5dde161"
+    },
+    {
+      "arquivo": "frontend/src/components/destino-avaliacao.tsx",
+      "sha256": "ea3f85372a7db6829ce20d09490ee41a1ca0184444296257bafc7964f6a1b801"
+    },
+    {
+      "arquivo": "frontend/src/components/disciplinas-professor.tsx",
+      "sha256": "5e2c780679a87c8329e88122e7401a2bafe0709c7c4a87a417cec592b7e4bd33"
+    },
+    {
+      "arquivo": "frontend/src/components/etapas-jornada.tsx",
+      "sha256": "e154330b5bd7860adb2637479a0c9a7adb9268b99729f79f9f846a48659394dd"
+    },
+    {
+      "arquivo": "frontend/src/components/opcoes-acesso.tsx",
+      "sha256": "b73c3f7431ab576a943b212808b5631d76bdbeb5927efc610369a3fab1702412"
+    },
+    {
+      "arquivo": "frontend/src/lib/avaliacao-formulario.ts",
+      "sha256": "5f68c022c696a66f0c891bd503596a20c8153d8973eae062e62ccd5969ba7584"
+    },
+    {
+      "arquivo": "frontend/src/lib/contexto-busca.ts",
+      "sha256": "4b0753cf297c00f5aa4830be372732b1bd2cc857d71711dbdfcc7d7dee5b7be9"
+    },
+    {
+      "arquivo": "frontend/src/lib/hooks/useDebouncedValue.ts",
+      "sha256": "983cc373ff70c818fe36d42f93452fa07bf2223aaffdcc33f0ac492a064cd53c"
+    },
+    {
+      "arquivo": "frontend/src/lib/identificador.ts",
+      "sha256": "49a54d588499e9e405ece7b3f94d47d0480f1bae2f8e5d6881325552c23feab0"
+    },
+    {
+      "arquivo": "frontend/src/lib/retorno-avaliacao.ts",
+      "sha256": "2ba626a90f26a6c72a037888746cb46a504e9908d4972a4745cb5419977949e2"
+    },
+    {
+      "arquivo": "frontend/src/lib/services/api-client.ts",
+      "sha256": "a5f6696d47b9582592491433dbc447194edc52f67a475b5740d11be91580ebcb"
+    },
+    {
+      "arquivo": "frontend/src/lib/services/auth.ts",
+      "sha256": "12fbdbbf6201299d57124268fefd99c83bed0cc5e53584f312abd06054138e13"
+    },
+    {
+      "arquivo": "frontend/src/lib/services/avaliacoes.ts",
+      "sha256": "fa026f1ab759a39a067c62b9847c1e539acb44a4e5f70d700e0982208c401a01"
+    },
+    {
+      "arquivo": "frontend/src/lib/services/disciplinas.ts",
+      "sha256": "1cb9542d60ab59d18f11492cd9f11c4b457a700b20f828ab494eae59ce0cb2e5"
+    },
+    {
+      "arquivo": "frontend/src/lib/services/http-error.ts",
+      "sha256": "9cc320107d5dea52fab805dedb6f3f033dd9eb567e467e43f4ee4bae58449069"
+    },
+    {
+      "arquivo": "frontend/src/lib/services/professores.ts",
+      "sha256": "44ec6e66d814344a12d76b312d1ee391df32d4e62601ff75b30c0bee3357479e"
+    },
+    {
+      "arquivo": "frontend/src/lib/types/avaliacao.ts",
+      "sha256": "9df96652c91b1859b21944903653fbe00cf4dbcabdeee8a0ed2f8cac6cc86a2c"
+    },
+    {
+      "arquivo": "frontend/src/lib/types/institucional.ts",
+      "sha256": "10f6755b13dae6be226ca5af80127f3a3e0cdaa710da84ea0f7e8b3d3af1f5d8"
+    }
+  ],
+  "commitsImplementacao": [
+    "e249d0909ea54a0fd200a2535f15b6221fc9b597",
+    "97a32159601bf3159426cad8df431f4ca4bd9483"
+  ],
+  "fontesConferidosNoCommit": "97a32159601bf3159426cad8df431f4ca4bd9483"
+}

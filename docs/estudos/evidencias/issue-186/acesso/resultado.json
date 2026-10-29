@@ -1,0 +1,363 @@
+{
+  "origem": "Telas reais → FastAPI → adaptador console → PostgreSQL",
+  "combinacoes": 54,
+  "cenarios": [
+    "busca real e atalho direto da #157",
+    "termo/tipo/ordem após autenticação e confirmação",
+    "dois cadastros e confirmações em abas distintas",
+    "login genérico não altera retorno",
+    "credenciais inválidas sem sessão",
+    "e-mail pendente bloqueia escrita e mantém respostas",
+    "cookie HttpOnly/SameSite",
+    "retorno da sessão ativa",
+    "logout",
+    "token de uso único",
+    "duas avaliações nos destinos corretos com respostas negativas",
+    "retorno aos resultados após envio",
+    "teclado e foco"
+  ],
+  "evidencias": [
+    {
+      "tela": "entrada",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "entrada",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "entrada",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "entrada-light-1280.png"
+    },
+    {
+      "tela": "entrada",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "entrada-dark-320.png"
+    },
+    {
+      "tela": "entrada",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "entrada",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "busca-professores-light-1280.png"
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "busca-professores-dark-320.png"
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "login",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "login",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "login",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "login-light-1280.png"
+    },
+    {
+      "tela": "login",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "login-dark-320.png"
+    },
+    {
+      "tela": "login",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "login",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "cadastro",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "cadastro",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "cadastro",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "cadastro-light-1280.png"
+    },
+    {
+      "tela": "cadastro",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "cadastro-dark-320.png"
+    },
+    {
+      "tela": "cadastro",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "cadastro",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "busca-disciplinas-light-1280.png"
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "busca-disciplinas-dark-320.png"
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "email-pendente",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "email-pendente",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "email-pendente",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "email-pendente-light-1280.png"
+    },
+    {
+      "tela": "email-pendente",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "email-pendente-dark-320.png"
+    },
+    {
+      "tela": "email-pendente",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "email-pendente",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "confirmacao",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "confirmacao",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "confirmacao",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "confirmacao-light-1280.png"
+    },
+    {
+      "tela": "confirmacao",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "confirmacao-dark-320.png"
+    },
+    {
+      "tela": "confirmacao",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "confirmacao",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "formulario",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "formulario",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "formulario",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "formulario-light-1280.png"
+    },
+    {
+      "tela": "formulario",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "formulario-dark-320.png"
+    },
+    {
+      "tela": "formulario",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "formulario",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "sucesso",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "sucesso",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "sucesso",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "sucesso-light-1280.png"
+    },
+    {
+      "tela": "sucesso",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "sucesso-dark-320.png"
+    },
+    {
+      "tela": "sucesso",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "sucesso",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    }
+  ]
+}

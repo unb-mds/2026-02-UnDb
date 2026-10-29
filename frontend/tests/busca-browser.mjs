@@ -6,6 +6,7 @@ import { join } from "node:path";
 export function criarCenarioBusca(professor, disciplina) {
   let ativo = false;
   let falhar = false;
+  let falharContexto = false;
   let sessao = false;
   let consultas = 0;
   let logins = 0;
@@ -43,7 +44,7 @@ export function criarCenarioBusca(professor, disciplina) {
     } else if (url.pathname === `/api/professores/${professor.id}`) enviar(professor);
     else if (url.pathname === `/api/professores/${professor.id}/disciplinas`) enviar([disciplina]);
     else if (/^\/api\/professores\/[^/]+\/disciplinas$/.test(url.pathname)) enviar([]);
-    else if (url.pathname === `/api/professores/${professor.id}/disciplinas/${disciplina.id}`) enviar(agregado);
+    else if (url.pathname === `/api/professores/${professor.id}/disciplinas/${disciplina.id}`) enviar(falharContexto ? { detail: "Falha auxiliar controlada" } : agregado, falharContexto ? 503 : 200);
     else if (url.pathname === `/api/disciplinas/${disciplina.id}`) enviar(disciplina);
     else if (url.pathname === `/api/disciplinas/${disciplina.id}/turmas`) enviar([]);
     else if (url.pathname === `/api/disciplinas/${disciplina.id}/professores`) {
@@ -60,6 +61,7 @@ export function criarCenarioBusca(professor, disciplina) {
     ativo = true;
     const navegar = async (rota, texto) => {
       await cdp("Page.navigate", { url: `http://localhost:3100${rota}` });
+      await aguardar(async () => await avaliar(`location.pathname + location.search === ${JSON.stringify(rota)} && document.readyState === 'complete'`), "documento da rota carregado");
       await aguardarTexto(texto);
     };
     const clicar = (trecho) => avaliar(`Array.from(document.querySelectorAll('main a, main button')).find(e => e.textContent.includes(${JSON.stringify(trecho)})).click()`);
@@ -68,7 +70,7 @@ export function criarCenarioBusca(professor, disciplina) {
       await avaliar(`const s = document.querySelector('select'); s.value=${JSON.stringify(ordem)}; s.dispatchEvent(new Event('change', {bubbles:true}));`);
       await aguardar(async () => await avaliar(`new URL(location.href).searchParams.get('ordem') === ${JSON.stringify(ordem)}`), "ordem na URL");
     };
-    const itens = () => avaliar("Array.from(document.querySelectorAll('section[aria-label=\"Resultados da busca\"] > ul > li')).map(e => (e.querySelector('h2 a') ?? e.querySelector('a .font-medium')).textContent)");
+    const itens = () => avaliar("Array.from(document.querySelectorAll('section[aria-label=\"Resultados da busca\"] > ul > li')).map(e => e.querySelector('h2').textContent)");
     const contexto = async (tipo, termo, ordem, lista = false) => {
       const atual = await avaliar("({caminho:location.pathname, q:new URL(location.href).searchParams.get('q'), ordem:new URL(location.href).searchParams.get('ordem'), busca:new URL(location.href).searchParams.get('busca')})");
       assert.equal(atual.q, termo);
@@ -84,10 +86,51 @@ export function criarCenarioBusca(professor, disciplina) {
     };
     const semTransbordar = async () => assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true);
     try {
+      // A escolha nativa precisa encaminhar a busca enquanto os scripts não chegam.
+      const termoAntesDaHidratacao = "Teste & CIC";
+      for (const tipo of ["professores", "disciplinas"]) {
+        await cdp("Page.navigate", { url: "about:blank" });
+        await aguardar(async () => await avaliar("location.href === 'about:blank'"), "documento anterior finalizado");
+        await cdp("Network.setCacheDisabled", { cacheDisabled: true });
+        await cdp("Network.setBlockedURLs", { urls: ["*.js*"] });
+        try {
+          await cdp("Page.navigate", { url: "http://localhost:3100/" });
+          await aguardar(async () => await avaliar("!!document.querySelector('form input[name=q]')"), "formulário HTML da entrada");
+          assert.equal(await avaliar("Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), false, "O envio deve ocorrer antes da hidratação");
+          await avaliar(`document.querySelector('input[type=radio][value="${tipo}"]').click(); document.querySelector('[name=q]').value=${JSON.stringify(termoAntesDaHidratacao)}; document.querySelector('form').requestSubmit()`);
+          await aguardar(async () => await avaliar(`location.pathname === '/${tipo}' && new URLSearchParams(location.search).get('q') === ${JSON.stringify(termoAntesDaHidratacao)} && new URLSearchParams(location.search).get('ordem') === 'nome'`), "modalidade e termo preservados sem scripts");
+        } finally {
+          await cdp("Network.setBlockedURLs", { urls: [] });
+          await cdp("Network.setCacheDisabled", { cacheDisabled: false });
+        }
+        await cdp("Page.reload");
+        await aguardarTexto("3 resultado(s)");
+        await contexto(tipo, termoAntesDaHidratacao, "nome", true);
+      }
       for (const width of [320, 768, 1280]) {
         await cdp("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: width === 320 });
         for (const tema of ["light", "dark"]) {
           await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
+          await navegar("/", "Encontre professores e disciplinas");
+          await aguardar(async () => await avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
+          assert.equal(await avaliar("document.querySelectorAll('main h1').length"), 1);
+          assert.equal(await avaliar("document.querySelector('[aria-current=step]').textContent.includes('Busque')"), true);
+          assert.equal(await avaliar("document.querySelector('form').checkValidity()"), false);
+          await semTransbordar();
+          if (width === 320 || width === 1280) await capturar(`entrada-${width}-${tema}`);
+          for (const tipo of ["professores", "disciplinas"]) {
+            await navegar("/", "Encontre professores e disciplinas");
+            await aguardar(async () => await avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
+            await avaliar(`document.querySelector('input[type=radio][value="${tipo}"]').click()`);
+            assert.equal(await avaliar("new FormData(document.querySelector('form')).get('busca')"), tipo);
+            await avaliar("document.querySelector('input[type=search]').focus()");
+            await cdp("Input.insertText", { text: "Teste" });
+            await avaliar("document.querySelector('form').requestSubmit()");
+            await aguardar(async () => await avaliar(`location.pathname === '/${tipo}' && new URLSearchParams(location.search).get('q') === 'Teste'`), "busca inicial encaminhada");
+            await aguardarTexto("3 resultado(s)");
+            await contexto(tipo, "Teste", "nome", true);
+            assert.equal(await avaliar("document.querySelector('[aria-current=step]').textContent.includes('Escolha')"), true);
+          }
           for (const tipo of ["professores", "disciplinas"]) {
             await navegar(`/${tipo}`, "Digite ao menos 2 letras");
             await semTransbordar();
@@ -105,6 +148,7 @@ export function criarCenarioBusca(professor, disciplina) {
             assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle !== 'none'"), true);
             assert.equal(await avaliar("document.querySelector('select').labels[0].textContent.includes('Ordenar resultados')"), true);
             assert.deepEqual(await itens(), tipo === "professores" ? ["Álvaro Teste", "Ana Teste", "Zélia Teste"] : ["Álgebra Teste", "Biologia Teste", "Zoologia Teste"]);
+            assert.equal(await avaliar("getComputedStyle(document.querySelector('section[aria-label=\"Resultados da busca\"] > ul')).gridTemplateColumns.split(' ').length"), width < 640 ? 1 : 2);
             const total = consultas;
             await ordenar("unidade");
             assert.equal(consultas, total, "Trocar ordem não refaz a busca");
@@ -136,6 +180,7 @@ export function criarCenarioBusca(professor, disciplina) {
             await preencher("vazio");
             await aguardarTexto("Nenhum resultado");
             await semTransbordar();
+            if (width === 320 || width === 1280) await capturar(`${tipo}-vazio-${width}-${tema}`);
             falhar = true;
             await preencher("falha");
             await aguardarTexto("Não foi possível buscar");
@@ -171,6 +216,8 @@ export function criarCenarioBusca(professor, disciplina) {
             assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle !== 'none'"), true);
             assert.equal(await avaliar("!!document.querySelector('label[for=\"'+document.querySelector('[name=senha]').id+'\"]')"), true);
             await semTransbordar();
+            // Capturas não devem conter senha, mesmo sendo credencial sintética.
+            await avaliar("document.querySelector('[name=senha]').value=''");
             if (width === 320 || width === 1280) await capturar(`${rota.slice(1)}-${width}-${tema}`);
           }
         }
@@ -203,6 +250,14 @@ export function criarCenarioBusca(professor, disciplina) {
       await aguardarTexto("3 resultado(s)");
       await contexto("disciplinas", "Teste", "unidade", true);
 
+      falharContexto = true;
+      const retorno = `/professores/${professor.id}/disciplinas/${disciplina.id}/avaliar?busca=disciplinas&q=Teste&ordem=unidade`;
+      await navegar(`/login?returnTo=${encodeURIComponent(retorno)}`, "Use sua conta institucional");
+      await aguardar(async () => await avaliar("!!document.querySelector('[name=email]') && !!document.querySelector('main details')"), "acesso disponível apesar de falha auxiliar");
+      await avaliar("document.querySelector('main summary').click()");
+      await aguardarTexto("Não foi possível carregar seus detalhes agora");
+      assert.equal(await avaliar("new URL(document.querySelector('main a[href^=\"/cadastro?returnTo=\"]').href).searchParams.get('returnTo')"), retorno);
+      falharContexto = false;
       await navegar("/login", "Use sua conta institucional");
       await aguardar(async () => await avaliar("!!document.querySelector('[name=email]')"), "formulário de entrada");
       await avaliar("document.querySelector('[name=email]').value='teste@aluno.unb.br'; document.querySelector('[name=senha]').value='senha-apenas-teste'; document.querySelector('button[type=submit]').click()");

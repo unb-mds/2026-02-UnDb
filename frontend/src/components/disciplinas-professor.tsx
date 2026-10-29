@@ -16,28 +16,28 @@ export default function DisciplinasProfessor({ professorId, disciplinas, context
   }
 
   return (
-    <ul className="mt-2 flex min-w-0 flex-col gap-2">
+    <ul className="mt-4 flex min-w-0 flex-col gap-3">
       {disciplinas.map((disciplina) => (
-        <li key={disciplina.id} className="min-w-0 rounded-lg border border-foreground/10 px-4 py-3 break-words">
+        <li key={disciplina.id} className="min-w-0 rounded-lg bg-foreground/[0.03] p-4 break-words">
           <Link href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}`, contexto)} className="block hover:text-accent">
-            <span className="block font-medium">{disciplina.nome}</span>
+            <span className="block text-lg font-semibold">{disciplina.nome}</span>
             <span className="mt-1 block text-sm text-foreground/70">
               Código da disciplina: <span className="font-mono">{disciplina.codigo}</span>
             </span>
-            <span className="mt-1 block text-xs text-foreground/60">Unidade acadêmica: {disciplina.departamento}</span>
+            <span className="mt-1 block text-sm text-foreground/70">Unidade acadêmica: {disciplina.departamento}</span>
           </Link>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-            <Link
-              href={comContextoBusca(`/disciplinas/${disciplina.id}`, contexto)}
-              className="text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              Comparar professores desta disciplina →
-            </Link>
+          <div className="mt-3 flex flex-wrap gap-3 text-sm">
             <Link
               href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}/avaliar`, contexto)}
-              className="font-medium text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="rounded-lg bg-accent px-4 py-2.5 text-center font-medium text-on-accent hover:opacity-90"
             >
-              Avaliar
+              Avaliar nesta disciplina →
+            </Link>
+            <Link
+              href={comContextoBusca(`/disciplinas/${disciplina.id}`, contexto)}
+              className="rounded-lg border border-accent/30 px-4 py-2.5 text-center font-medium text-accent hover:bg-accent/5"
+            >
+              Comparar professores desta disciplina →
             </Link>
           </div>
         </li>
