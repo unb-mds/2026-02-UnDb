@@ -15,6 +15,8 @@ from app.schemas.institucional import (
     DisciplinaDetalheResponse,
     ProfessorDetalheResponse,
 )
+from app.schemas.comentario import ComentarioPublicoResponse
+from app.services import comentario_service as comentario_svc
 from app.services import institucional_service
 
 
@@ -101,3 +103,24 @@ def consultar_avaliacoes_professor_disciplina(
         qualidade_material=consulta.criterios.qualidade_material,
         recomenda=consulta.criterios.recomenda,
     )
+
+
+@router.get(
+    "/{professor_id}/disciplinas/{disciplina_id}/comentarios",
+    response_model=list[ComentarioPublicoResponse],
+)
+def listar_comentarios_publicados(
+    professor_id: UUID,
+    disciplina_id: UUID,
+    session: Annotated[Session, Depends(get_db)],
+) -> list[ComentarioPublicoResponse]:
+    """Lista comentarios publicados (visitante, sem necessidade de sessao)."""
+    try:
+        return comentario_svc.listar_publicados(
+            session, professor_id, disciplina_id
+        )
+    except comentario_svc.RecursoNaoEncontradoError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(erro),
+        ) from erro

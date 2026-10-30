@@ -2,7 +2,14 @@ from datetime import datetime
 from typing import Literal, Self
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictBool,
+    field_validator,
+    model_validator,
+)
 
 from app.models.enums import Dificuldade, QualidadeMaterial
 from app.schemas.institucional import (
@@ -48,7 +55,23 @@ class AvaliacaoBase(BaseModel):
 
 
 class AvaliacaoCreate(AvaliacaoBase):
-    pass
+    comentario: str | None = Field(
+        default=None,
+        description=(
+            "Texto opcional do comentário (1 a 500 caracteres após "
+            "desconsiderar espaços iniciais e finais)"
+        ),
+    )
+
+    @field_validator("comentario")
+    @classmethod
+    def normalizar_comentario(cls, valor: str | None) -> str | None:
+        if valor is not None:
+            texto = valor.strip()
+            if not 1 <= len(texto) <= 500:
+                return None
+            return texto
+        return valor
 
 
 class AvaliacaoResponse(AvaliacaoBase):
