@@ -35,7 +35,7 @@ def retirar_comentario(
     usuario: Annotated[Usuario, Depends(obter_usuario_confirmado)],
     session: Annotated[Session, Depends(get_db)],
 ) -> ComentarioDoAutorResponse:
-    """Retira um comentario pelo autor (PUBLICADO ou PENDENTE)."""
+    """Retira um comentario pelo autor (PUBLICADO, PENDENTE ou SUSPENSO)."""
     try:
         return comentario_service.retirar(session, comentario_id, usuario)
     except comentario_service.RecursoNaoEncontradoError as erro:

@@ -389,9 +389,39 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         comentario = self.db.get(ComentarioVersao, comentario_id)
         self.assertEqual(comentario.estado, EstadoComentario.RETIRADO)
 
-    def test_ac20_05_retirada_cancela_substituto_pendente(self) -> None:
+    def test_ac20_05_autor_retira_comentario_suspenso(self) -> None:
         avaliacao = self._criar_avaliacao_com_comentario(
-            self.usuario, "texto publicado", EstadoComentario.PUBLICADO
+            self.usuario, "texto suspenso", EstadoComentario.SUSPENSO
+        )
+        comentario_id = self._obter_comentario(avaliacao.id).id
+        criterios = (avaliacao.didatica, avaliacao.dificuldade, avaliacao.chamada,
+                     avaliacao.disponibiliza_material, avaliacao.qualidade_material,
+                     avaliacao.recomenda)
+
+        status_code, resposta = asyncio.run(
+            self._request(
+                "PATCH", f"/api/comentarios/{comentario_id}/retirar", token=self.token
+            )
+        )
+
+        self.assertEqual(status_code, 200)
+        self.assertEqual(resposta["estado"], "RETIRADO")
+        self.db.expire_all()
+        self.assertEqual(self.db.get(ComentarioVersao, comentario_id).estado,
+                         EstadoComentario.RETIRADO)
+        self.assertEqual((avaliacao.didatica, avaliacao.dificuldade, avaliacao.chamada,
+                          avaliacao.disponibiliza_material, avaliacao.qualidade_material,
+                          avaliacao.recomenda), criterios)
+
+    def test_ac20_05_retirada_de_suspenso_cancela_substituto_pendente(self) -> None:
+        self._verificar_retirada_cancela_substituto(EstadoComentario.SUSPENSO)
+
+    def test_ac20_05_retirada_cancela_substituto_pendente(self) -> None:
+        self._verificar_retirada_cancela_substituto(EstadoComentario.PUBLICADO)
+
+    def _verificar_retirada_cancela_substituto(self, estado: EstadoComentario) -> None:
+        avaliacao = self._criar_avaliacao_com_comentario(
+            self.usuario, "texto anterior", estado
         )
         self.db.expire_all()
         publicado = self._obter_comentario(avaliacao.id)

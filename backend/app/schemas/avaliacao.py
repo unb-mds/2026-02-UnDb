@@ -6,8 +6,8 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    PrivateAttr,
     StrictBool,
-    field_validator,
     model_validator,
 )
 
@@ -55,6 +55,8 @@ class AvaliacaoBase(BaseModel):
 
 
 class AvaliacaoCreate(AvaliacaoBase):
+    _comentario_erro: str | None = PrivateAttr(default=None)
+
     comentario: str | None = Field(
         default=None,
         description=(
@@ -63,15 +65,21 @@ class AvaliacaoCreate(AvaliacaoBase):
         ),
     )
 
-    @field_validator("comentario")
-    @classmethod
-    def normalizar_comentario(cls, valor: str | None) -> str | None:
-        if valor is not None:
-            texto = valor.strip()
+    @property
+    def comentario_erro(self) -> str | None:
+        return self._comentario_erro
+
+    @model_validator(mode="after")
+    def normalizar_comentario(self) -> Self:
+        if self.comentario is not None:
+            texto = self.comentario.strip()
             if not 1 <= len(texto) <= 500:
-                return None
-            return texto
-        return valor
+                self._comentario_erro = "comentario deve conter entre 1 e 500 caracteres"
+                self.comentario = None
+            else:
+                self._comentario_erro = None
+                self.comentario = texto
+        return self
 
 
 class AvaliacaoResponse(AvaliacaoBase):
@@ -80,6 +88,10 @@ class AvaliacaoResponse(AvaliacaoBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+    comentario_erro: str | None = Field(
+        default=None,
+        description="Motivo do descarte de um comentario invalido; os criterios foram salvos",
+    )
 
 
 class AvaliacaoAgregadaBaseResponse(BaseModel):

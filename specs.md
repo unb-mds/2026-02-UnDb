@@ -441,7 +441,9 @@ da fonte. O restante deste documento mantém os contratos entregues na R1.
 | `/api/avaliacoes` | POST | confirmado | `AvaliacaoCreate` + `comentario?: str` | 200 | 401 (sem sessão), 403 (e-mail não confirmado), 404 (professor/disciplina/vínculo) |
 
 - Texto de **1–500** caracteres (após strip) → cria versão `PENDENTE`.
-- Texto vazio, só-espaços ou >500 → comentário omitido; avaliação persiste normalmente.
+- Texto vazio, só-espaços ou >500 → comentário omitido; avaliação persiste normalmente
+  e a resposta 200 informa o motivo em `comentario_erro`. Esse campo é `null` para
+  texto válido ou comentário ausente; comentário inválido não altera texto existente.
 - Reenvio com novo texto: remove `PENDENTE` anterior, cria nova apontando ao
   `PUBLICADO` atual (se houver) via `substitui_id`.
 - Reenvio sem texto: mantém comentário existente.
@@ -469,7 +471,7 @@ Retorna `id`, `texto`, `created_at`, `updated_at`, `estado`, `avaliacao_id`,
 |---|---|---|---|---|
 | `/api/comentarios/{comentario_id}/retirar` | PATCH | confirmado | 200 → `ComentarioDoAutorResponse` | 401 (sem sessão), 403 (e-mail não confirmado, alheio ou estado bloqueado), 404 (comentário inexistente) |
 
-- Só pode retirar `PENDENTE` ou `PUBLICADO`.
+- Só pode retirar `PENDENTE`, `PUBLICADO` ou `SUSPENSO`.
 - Cancela evento `PENDENTE` que substitui este comentário (deleta-o).
 - Preserva os cinco critérios estruturados da avaliação.
 

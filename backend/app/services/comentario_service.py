@@ -43,7 +43,7 @@ def listar_do_autor(db: Session, usuario: Usuario):
 
 
 def retirar(db: Session, comentario_id: UUID, usuario: Usuario):
-    """Retira um comentario pelo autor (PUBLICADO ou PENDENTE)."""
+    """Retira um comentario pelo autor (PUBLICADO, PENDENTE ou SUSPENSO)."""
     comentario = comentario_repository.obter_por_id(db, comentario_id)
     if comentario is None:
         raise RecursoNaoEncontradoError("comentario nao encontrado")
@@ -57,6 +57,7 @@ def retirar(db: Session, comentario_id: UUID, usuario: Usuario):
     if comentario.estado not in (
         EstadoComentario.PENDENTE,
         EstadoComentario.PUBLICADO,
+        EstadoComentario.SUSPENSO,
     ):
         raise ComentarioNaoAutorizadoError(
             "nao e possivel retirar este comentario"
