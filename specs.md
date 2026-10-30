@@ -42,6 +42,14 @@ class QualidadeMaterial(str, Enum):
     RUIM = "RUIM"
     MEDIO = "MEDIO"
     BOM = "BOM"
+
+class EstadoComentario(str, Enum):
+    PENDENTE = "PENDENTE"
+    PUBLICADO = "PUBLICADO"
+    SUSPENSO = "SUSPENSO"
+    REMOVIDO = "REMOVIDO"
+    RETIRADO = "RETIRADO"
+    SUBSTITUIDO = "SUBSTITUIDO"
 ```
 
 Ordinalidade aprovada para desempate de moda:
@@ -51,9 +59,9 @@ Ordinalidade aprovada para desempate de moda:
 
 ## 3. Modelo de dados
 
-Esta seção descreve o modelo da Release 1. As regras aprovadas de RF20–RF22 para a R2
-estão na seção 12; seu modelo físico e contratos ainda devem ser preparados nas issues
-#156/#160/#161. Este documento não aprova novas tabelas, colunas ou migrations.
+Esta seção descreve o modelo da Release 1 e da Release 2 (RF20). As regras de RF21 e
+RF22 (denúncia e moderação) ainda dependem das issues #160/#161; seus modelos
+físicos e contratos não estão definidos aqui.
 
 ### `usuarios`
 | Campo | Tipo | Regra |
@@ -138,6 +146,21 @@ Implementar no banco, via migração — não apenas na aplicação.
 **Não criar** campo de nota geral, índice composto ou ranking persistido. Na Release 1,
 não criar campo de comentário; o detalhamento de RF20 para a R2 não autoriza alterar
 o schema sem o processo próprio das issues dependentes.
+
+### `comentario_versoes`
+| Campo | Tipo | Regra |
+|---|---|---|
+| `id` | UUID | PK, default `uuid4` |
+| `avaliacao_id` | FK → `avaliacoes` | obrigatório |
+| `substitui_id` | FK → `comentario_versoes.id` | opcional; aponta para a versão anterior quando este texto substitui outro |
+| `texto` | VARCHAR(500) | obrigatório, 1–500 caracteres |
+| `estado` | ENUM EstadoComentario | obrigatório, default `PENDENTE` |
+| `created_at` | TIMESTAMPTZ | default now |
+| `updated_at` | TIMESTAMPTZ | default now, atualizado em cada modificação |
+
+**Constraint:** `CK(texto)` — `length(texto) BETWEEN 1 AND 500`.
+Cada avaliação tem **zero ou um** comentário pendente e **zero ou um** publicado;
+a criação de uma nova versão pendente remove a pendência anterior.
 
 ---
 
@@ -337,7 +360,9 @@ Não implementar nem inventar valor para os itens abaixo.
 | Estratégia de povoamento inicial da base | Não decidido |
 | Lista de termos do filtro de comentários | Solicitante definirá depois; moderação humana até então |
 | IA sem aprovação humana prévia | Objetivo futuro condicionado, sem mecanismo/provedor aprovado; não substituir moderação humana nesta etapa |
-| Dados e contratos de RF20–RF22 | Requisitos aprovados na #154; modelo físico, rotas, códigos HTTP, concessão operacional de papel e descarte programado a detalhar nas #156/#160/#161 |
+| Dados e contratos de RF20–RF22 | RF20 implementado em #156: migration `comentario_versoes`, endpoints de
+  leitura pública, acompanhamento do autor e retirada. RF21/RF22 ainda dependem
+  de #160/#161 — modelos e contratos de denúncia e moderação não definidos. |
 
 ---
 
@@ -410,10 +435,63 @@ da fonte. O restante deste documento mantém os contratos entregues na R1.
   Decisões: registros privados por sete dias após decisão. Não copiar texto descartado nos
   registros. Suspensos permanecem disponíveis internamente para revisão.
 
-### Contratos ainda não definidos
+### Contratos definidos em #156 (RF20)
 
-As APIs e migrations das #156/#160/#161 devem preservar os cenários AC20-01 a AC22-06
-da fonte, incluindo falta de sessão/confirmação, alvo inexistente/obsoleto, motivo inválido,
-duplicidade, acesso alheio, impedimento e transição incompatível. Não inventar endpoints,
-formatos de payload ou códigos HTTP aqui. A escolha técnica deve manter versão pública
-e substituto pendente distinguíveis e cumprir o descarte aprovado.
+> Implementação limitada à RF20. RF21 (denúncia) e RF22 (moderação) permanecem
+> em #160/#161; seus contratos não são definidos aqui.
+
+#### Migration
+
+- `20261024_01_create_comentario_versoes.py` — cria a tabela `comentario_versoes`
+  com colunas, constraint de tamanho (`CK length(texto) BETWEEN 1 AND 500`),
+  FK para `avaliacoes` e auto-referência `substitui_id`, e o ENUM
+  `estado_comentario` (`PENDENTE`, `PUBLICADO`, `SUSPENSO`, `REMOVIDO`,
+  `RETIRADO`, `SUBSTITUIDO`). Reversível (drop table + drop type).
+
+#### Escrita de comentário (via avaliação)
+
+| Endpoint | Método | Auth | Request body | Sucesso | Erros |
+|---|---|---|---|---|---|
+| `/api/avaliacoes` | POST | confirmado | `AvaliacaoCreate` + `comentario?: str` | 200 | 401 (sem sessão), 403 (e-mail não confirmado), 404 (professor/disciplina/vínculo) |
+
+- Texto de **1–500** caracteres (após strip) → cria versão `PENDENTE`.
+- Texto vazio, só-espaços ou >500 → comentário omitido; avaliação persiste normalmente
+  e a resposta 200 informa o motivo em `comentario_erro`. Esse campo é `null` para
+  texto válido ou comentário ausente; comentário inválido não altera texto existente.
+- Reenvio com novo texto: remove `PENDENTE` anterior, cria nova apontando ao
+  `PUBLICADO` atual (se houver) via `substitui_id`.
+- Reenvio sem texto: mantém comentário existente.
+
+#### Leitura pública (visitante)
+
+| Endpoint | Método | Auth | Sucesso | Erros |
+|---|---|---|---|---|
+| `/api/professores/{professor_id}/disciplinas/{disciplina_id}/comentarios` | GET | nenhuma | 200 → `list[ComentarioPublicoResponse]` | 404 (professor ou disciplina inexistente, ou sem vínculo) |
+
+Retorna apenas `id`, `texto`, `created_at` — sem identidade do autor.
+
+#### Acompanhamento pelo autor
+
+| Endpoint | Método | Auth | Sucesso | Erros |
+|---|---|---|---|---|
+| `/api/comentarios/meu` | GET | confirmado | 200 → `list[ComentarioDoAutorResponse]` | 401 (sem sessão), 403 (e-mail não confirmado) |
+
+Retorna `id`, `texto`, `created_at`, `updated_at`, `estado`, `avaliacao_id`,
+`substitui_id` — apenas comentários da avaliação cujo autor é o usuário autenticado.
+
+#### Retirada pelo autor
+
+| Endpoint | Método | Auth | Sucesso | Erros |
+|---|---|---|---|---|
+| `/api/comentarios/{comentario_id}/retirar` | PATCH | confirmado | 200 → `ComentarioDoAutorResponse` | 401 (sem sessão), 403 (e-mail não confirmado, alheio ou estado bloqueado), 404 (comentário inexistente) |
+
+- Só pode retirar `PENDENTE`, `PUBLICADO` ou `SUSPENSO`.
+- Cancela evento `PENDENTE` que substitui este comentário (deleta-o).
+- Preserva os cinco critérios estruturados da avaliação.
+
+#### Contratos ainda não definidos (restam para #160/#161)
+
+As APIs de **denúncia** (#160, RF21) e **moderação** (#161, RF22) devem ainda
+preservar os cenários AC21-01 a AC22-06, incluindo falta de sessão/confirmação,
+alvo inexistente/obsoleto, motivo inválido, duplicidade, acesso alheio, impedimento
+e transição incompatível.

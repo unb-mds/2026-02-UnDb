@@ -23,7 +23,9 @@ from sqlalchemy.orm import Session
 from app.core.database import engine
 from app.core.security import gerar_hash_senha, gerar_hash_token
 from app.models.avaliacao import Avaliacao
+from app.models.comentario_versao import ComentarioVersao
 from app.models.disciplina import Disciplina
+from app.models.enums import EstadoComentario
 from app.models.professor import Professor
 from app.models.sessao_usuario import SessaoUsuario
 from app.models.token_confirmacao_email import TokenConfirmacaoEmail
@@ -59,6 +61,14 @@ def requisicao(path, payload=None, cookie=None):
         return response.status, json.load(response), response.headers
 
 
+def limpar_avaliacoes(db, fixture):
+    avaliacoes = select(Avaliacao.id).where(
+        Avaliacao.professor_id == UUID(fixture["professorId"])
+    )
+    db.execute(delete(ComentarioVersao).where(ComentarioVersao.avaliacao_id.in_(avaliacoes)))
+    db.execute(delete(Avaliacao).where(Avaliacao.professor_id == UUID(fixture["professorId"])))
+
+
 def verificar_api(fixture):
     payload = dict(professor_id=fixture["professorId"], disciplina_id=fixture["disciplinaId"],
                    didatica=4, dificuldade="MEDIO", chamada=True,
@@ -72,7 +82,7 @@ def verificar_api(fixture):
     with Session(engine) as db:
         db.get(Usuario, UUID(fixture["usuarioId"])).email_confirmado = True
         db.commit()
-    for changes in ({"usuario_id": fixture["usuarioId"]}, {"comentario": "texto"},
+    for changes in ({"usuario_id": fixture["usuarioId"]},
                     {"didatica": 6}, {"didatica": "3"}, {"chamada": "false"},
                     {"dificuldade": "INVALIDA"}, {"qualidade_material": None}):
         assert requisicao("/api/avaliacoes", {**payload, **changes}, cookie)[0] == 422
@@ -106,10 +116,31 @@ def verificar_api(fixture):
     assert segunda[0]["updated_at"] >= primeira[0]["updated_at"]
     for field in ("didatica", "dificuldade", "chamada", "disponibiliza_material", "qualidade_material", "recomenda"):
         assert segunda[0][field] == replacement[field]
-    print("API/PostgreSQL: rejeições 401/403/422 sem escrita; 8 inserções concorrentes = 1 ID/linha; substituição integral preserva ID e criação.", flush=True)
+
+    for texto in ("x", "x" * 500):
+        status, resposta, _ = requisicao("/api/avaliacoes", {**replacement, "comentario": texto}, cookie)
+        assert status == 200 and resposta["comentario_erro"] is None
+        with Session(engine) as db:
+            comentario = db.scalars(select(ComentarioVersao).where(
+                ComentarioVersao.avaliacao_id == UUID(resposta["id"]))).one()
+            assert comentario.texto == texto and comentario.estado == EstadoComentario.PENDENTE
+            comentario_id = comentario.id
+
+    for texto in ("", "   ", "x" * 501):
+        status, resposta, _ = requisicao("/api/avaliacoes", {**payload, "comentario": texto}, cookie)
+        assert status == 200 and "1 e 500" in resposta["comentario_erro"]
+        with Session(engine) as db:
+            comentario = db.scalars(select(ComentarioVersao).where(
+                ComentarioVersao.avaliacao_id == UUID(resposta["id"]))).one()
+            assert comentario.id == comentario_id and comentario.texto == "x" * 500
+            assert db.get(Avaliacao, UUID(resposta["id"])).didatica == payload["didatica"]
+
+    status, resposta, _ = requisicao("/api/avaliacoes", replacement, cookie)
+    assert status == 200 and resposta["comentario_erro"] is None
+    print("API/PostgreSQL: rejeições 401/403/422 sem escrita; 8 inserções concorrentes = 1 ID/linha; substituição integral; comentário pendente e aviso de texto inválido sem perda dos critérios.", flush=True)
     # Prepara a mesma fixture vazia/não confirmada para o fluxo do navegador.
     with Session(engine) as db:
-        db.execute(delete(Avaliacao).where(Avaliacao.professor_id == UUID(fixture["professorId"])))
+        limpar_avaliacoes(db, fixture)
         db.get(Usuario, UUID(fixture["usuarioId"])).email_confirmado = False
         db.commit()
 
@@ -166,7 +197,7 @@ def main():
             api.terminate()
             api.wait(timeout=15)
         with Session(engine) as db:
-            db.execute(delete(Avaliacao).where(Avaliacao.professor_id == UUID(fixture["professorId"])))
+            limpar_avaliacoes(db, fixture)
             db.execute(delete(SessaoUsuario).where(SessaoUsuario.usuario_id == UUID(fixture["usuarioId"])))
             db.execute(delete(TokenConfirmacaoEmail).where(TokenConfirmacaoEmail.usuario_id == UUID(fixture["usuarioId"])))
             db.execute(delete(turmas_professores).where(turmas_professores.c.turma_id == UUID(fixture["turmaId"])))

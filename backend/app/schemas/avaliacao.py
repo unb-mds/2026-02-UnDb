@@ -2,7 +2,14 @@ from datetime import datetime
 from typing import Literal, Self
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    PrivateAttr,
+    StrictBool,
+    model_validator,
+)
 
 from app.models.enums import Dificuldade, QualidadeMaterial
 from app.schemas.institucional import (
@@ -48,7 +55,31 @@ class AvaliacaoBase(BaseModel):
 
 
 class AvaliacaoCreate(AvaliacaoBase):
-    pass
+    _comentario_erro: str | None = PrivateAttr(default=None)
+
+    comentario: str | None = Field(
+        default=None,
+        description=(
+            "Texto opcional do comentário (1 a 500 caracteres após "
+            "desconsiderar espaços iniciais e finais)"
+        ),
+    )
+
+    @property
+    def comentario_erro(self) -> str | None:
+        return self._comentario_erro
+
+    @model_validator(mode="after")
+    def normalizar_comentario(self) -> Self:
+        if self.comentario is not None:
+            texto = self.comentario.strip()
+            if not 1 <= len(texto) <= 500:
+                self._comentario_erro = "comentario deve conter entre 1 e 500 caracteres"
+                self.comentario = None
+            else:
+                self._comentario_erro = None
+                self.comentario = texto
+        return self
 
 
 class AvaliacaoResponse(AvaliacaoBase):
@@ -57,6 +88,10 @@ class AvaliacaoResponse(AvaliacaoBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+    comentario_erro: str | None = Field(
+        default=None,
+        description="Motivo do descarte de um comentario invalido; os criterios foram salvos",
+    )
 
 
 class AvaliacaoAgregadaBaseResponse(BaseModel):
