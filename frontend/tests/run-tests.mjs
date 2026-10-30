@@ -13,12 +13,14 @@ try {
     "--target", "ES2022", "--module", "commonjs", "--moduleResolution", "node",
     "--strict", "--skipLibCheck", "--esModuleInterop",
     "src/lib/avaliacao-formulario.ts", "src/lib/services/avaliacoes.ts", "src/lib/services/auth.ts",
+    "src/lib/retorno-avaliacao.ts",
+    "src/lib/contexto-busca.ts", "src/lib/services/disciplinas.ts", "src/lib/services/professores.ts",
   ], { cwd: frontend, stdio: "inherit" });
   if (compilacao.error) throw compilacao.error;
   if (compilacao.status !== 0) {
     process.exitCode = compilacao.status ?? 1;
   } else {
-    const testes = spawnSync(process.execPath, ["--test", "tests/avaliacao.test.mjs"], {
+    const testes = spawnSync(process.execPath, ["--test", "tests/avaliacao.test.mjs", "tests/busca.test.mjs"], {
       cwd: frontend,
       stdio: "inherit",
       env: { ...process.env, AVALIACAO_TEST_BUILD: destino },

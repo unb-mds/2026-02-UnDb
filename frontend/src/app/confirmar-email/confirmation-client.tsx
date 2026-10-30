@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { confirmarEmail } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
 
-export function ConfirmationClient({ token }: { token?: string }) {
+export function ConfirmationClient({ token, retorno }: { token?: string; retorno: string | null }) {
   const [tentativa, setTentativa] = useState(0);
   const [podeTentar, setPodeTentar] = useState(false);
   const [estado, setEstado] = useState<"carregando" | "sucesso" | "erro">(
@@ -60,9 +60,19 @@ export function ConfirmationClient({ token }: { token?: string }) {
         }}>Tentar novamente</button>
       )}
       {estado !== "carregando" && (
-        <Link href="/" className="font-medium text-accent hover:underline">
-          Voltar ao início
-        </Link>
+        <div className="flex flex-col items-center gap-3">
+          {estado === "sucesso" && retorno && (
+            <Link
+              href={`/login?returnTo=${encodeURIComponent(retorno)}`}
+              className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Continuar para a avaliação
+            </Link>
+          )}
+          <Link href="/" className="font-medium text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+            Voltar ao início
+          </Link>
+        </div>
       )}
     </main>
   );

@@ -204,6 +204,7 @@ jobs:
         run: |
           export BROWSER_PATH="$(command -v google-chrome)"
           python -m tests.integration_avaliacao
+          python -m tests.integration_acesso
 
   frontend:
     name: Frontend

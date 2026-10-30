@@ -5,6 +5,7 @@ import type { DisciplinaInstitucional, ProfessorInstitucional } from "@/lib/type
 export const disciplinasDemo: DisciplinaInstitucional[] = [
   { id: "algoritmos-demo", codigo: "CIC-DEMO", nome: "Algoritmos (exemplo)", departamento: "Computação (exemplo)" },
   { id: "calculo-demo", codigo: "MAT-DEMO", nome: "Cálculo (exemplo)", departamento: "Matemática (exemplo)" },
+  { id: "estruturas-demo", codigo: "CIC-DEMO-2", nome: "Estruturas de dados (exemplo)", departamento: "Computação (exemplo)" },
 ];
 
 export const professoresDemo: ProfessorInstitucional[] = [
@@ -13,10 +14,11 @@ export const professoresDemo: ProfessorInstitucional[] = [
   { id: "carla-demo", nome: "Carla (exemplo)", departamento: "Computação (exemplo)" },
   { id: "daniel-demo", nome: "Daniel (exemplo)", departamento: "Computação (exemplo)" },
   { id: "elisa-demo", nome: "Elisa (exemplo)", departamento: "Matemática (exemplo)" },
+  { id: "ana-matematica-demo", nome: "Ana (exemplo)", departamento: "Matemática (exemplo)" },
 ];
 
-const [algoritmos, calculo] = disciplinasDemo;
-const [ana, bruno, carla, daniel, elisa] = professoresDemo;
+const [algoritmos, calculo, estruturas] = disciplinasDemo;
+const [ana, bruno, carla, daniel, elisa, anaMatematica] = professoresDemo;
 
 // Retratos agregados preparados, sem calcular média, moda ou percentual no frontend.
 // Ordem de recomendação preparada segundo a seção 11 dos requisitos: 75%, 50%, insuficientes.
@@ -36,6 +38,12 @@ export const comparacoesDemo: Record<string, AvaliacaoAgregada[]> = {
   [calculo.id]: [
     { professorId: elisa.id, disciplinaId: calculo.id, professor: elisa, disciplina: calculo,
       totalAvaliacoes: 0, dadosSuficientes: false },
+    { professorId: anaMatematica.id, disciplinaId: calculo.id, professor: anaMatematica, disciplina: calculo,
+      totalAvaliacoes: 0, dadosSuficientes: false },
+  ],
+  [estruturas.id]: [
+    { professorId: ana.id, disciplinaId: estruturas.id, professor: ana, disciplina: estruturas,
+      totalAvaliacoes: 0, dadosSuficientes: false },
   ],
 };
 
@@ -43,6 +51,7 @@ export const comparacoesDemo: Record<string, AvaliacaoAgregada[]> = {
 export const apresentacoesDemo: Record<string, AvaliacaoAgregada[]> = {
   [algoritmos.id]: [comparacoesDemo[algoritmos.id][1], comparacoesDemo[algoritmos.id][0], ...comparacoesDemo[algoritmos.id].slice(2)],
   [calculo.id]: comparacoesDemo[calculo.id],
+  [estruturas.id]: comparacoesDemo[estruturas.id],
 };
 
 export function correspondeBusca(texto: string, termo: string): boolean {

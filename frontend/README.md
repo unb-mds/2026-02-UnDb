@@ -26,37 +26,167 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 - `npm run lint`: executa o ESLint.
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
-- `npm test`: compila os módulos do formulário com TypeScript em diretório temporário e
+- `npm test`: compila os módulos de formulário, busca e retorno com TypeScript em diretório temporário e
   executa testes com o runner nativo do Node, sem novas dependências.
 - `npm run test:browser`: verifica o formulário no Edge/Chromium headless com respostas
   controladas de teste; exige build padrão prévio, Node 22+ e portas 8000, 3100 e 9223 livres.
   No Windows usa o caminho padrão do Edge; em outros ambientes configure `BROWSER_PATH`.
   Esse comando não usa o backend real nem comprova persistência.
 
+## Acesso e retorno à avaliação — Issue #158
+
+Os links de login/cadastro preservam `returnTo`. O cadastro envia o destino
+opcional `return_to` à API, que o inclui no link de confirmação. Somente a rota
+interna de avaliação com UUIDs válidos é aceita. Na #155, a ampliação autorizada
+permite somente os parâmetros de busca `busca`, `q` e `ordem`, com até 2.048 caracteres
+no destino completo e validação nos dois lados. Cada link mantém seu contexto
+entre abas; login e confirmação continuam sujeitos às regras reais da API.
+
+Para verificar as telas com FastAPI/PostgreSQL reais, aplique as migrations em
+banco de testes e gere o build do frontend. Em `backend/`, com
+`UNDB_INTEGRATION_TEST=1`, execute `python -m tests.integration_acesso`. O runner
+usa Node 22+, Edge/Chromium (`BROWSER_PATH`), portas 8000/3100/9225 livres e o
+adaptador `console` de e-mail. Cria dados sintéticos próprios e os remove no final.
+`PREVIEW_DIR` permite salvar capturas e o resultado estruturado, sem tokens/senhas.
+Resultados, limites e evidências estão no
+[relatório da #158](../docs/estudos/verificacao-acesso-avaliacao-issue-158.md).
+
+## Resultados reais — Issue #157
+
+A busca por professor apresenta suas disciplinas ativas no próprio resultado, com
+nome, código identificado, unidade acadêmica e atalhos para consulta, comparação e
+avaliação. Homônimos permanecem separados pelo ID. A lista de disciplinas é
+compartilhada com o detalhe do professor. Uma falha ao consultar disciplinas mantém
+o professor visível e informa a indisponibilidade, sem afirmar que ele não tem turmas.
+
+O teste `node tests/resultados-browser.mjs` usa FastAPI e PostgreSQL reais, dados
+sintéticos persistidos em banco isolado, Node 22+ e Edge/Chromium. Não usa a rota
+`/prototipo` nem substitui respostas HTTP. Exige build prévio, API em `localhost:8000`,
+CORS para `http://localhost:3100` e portas 3100/9224 livres. Configure
+`RESULTADOS_FIXTURE_FILE` com o JSON produzido por `python -m tests.seed_resultados`
+no backend de testes e `PREVIEW_DIR` com o diretório das capturas.
+
+Preparação, comandos, resultados e limites estão no
+[relatório da #157](../docs/estudos/verificacao-resultados-comparacao-issue-157.md).
+
+## Navegação, busca e ordenação — Issue #155
+
+As rotas `/professores` e `/disciplinas` mantêm o termo em `q` e a ordenação em
+`ordem=nome|unidade`. A modalidade é identificada pela rota; os links para detalhes,
+comparação e avaliação propagam também `busca=professores|disciplinas`. Retornar pela
+interface, pelo histórico ou após autenticação recupera esse contexto. Recarregar
+refaz a mesma consulta, podendo refletir atualizações dos dados institucionais.
+
+A ordenação fica na própria lista e muda sem outra chamada HTTP. Os contratos atuais
+retornam listas completas: a busca de disciplinas ordena depois da união por ID das
+consultas por código/nome. Uma API paginada futura exigirá ordenação antes de paginar;
+não se deve ordenar só uma página e apresentar isso como ordem global.
+
+`ProfessorResultado` e `DisciplinasProfessor` da #157 são reutilizados; os links da
+#158 mantêm a busca até a confirmação/autenticação. O cabeçalho tem uma entrada de
+conta identificável e os formulários permitem mostrar/ocultar senha por teclado,
+sem mudar serviços, limites de senha ou regras de sessão.
+
+`npm run test:browser` cobre estados, recuperação, histórico e teclado em
+320/768/1280 px nos dois temas com HTTP controlado. O driver real
+`python -m tests.integration_acesso` foi ampliado para iniciar pela busca e conferir
+o contexto em duas abas até a gravação no PostgreSQL. A regressão de apresentação
+continua no runner `resultados-browser.mjs` da #157.
+
+[Matriz, resultados e evidências da #155](../docs/estudos/implementacao-navegacao-issue-155.md).
+
 ## Protótipo da jornada — Issue #152
+
+### Testar com a base simulada pronta
+
+O protótipo já inclui uma base fictícia em `src/app/prototipo/dados.ts`, carregada
+automaticamente. Não é necessário criar banco, importar o SIGAA ou configurar `.env`.
+
+| Dados disponíveis | Exemplos para testar |
+|---|---|
+| 6 professores fictícios | Ana de Computação, Ana de Matemática, Bruno, Carla, Daniel e Elisa. |
+| 3 disciplinas fictícias | Algoritmos (`CIC-DEMO`), Estruturas de dados (`CIC-DEMO-2`) e Cálculo (`MAT-DEMO`). |
+| Estados de avaliação | Dados suficientes com recomendação, conflito em critérios factuais, duas avaliações e ausência de avaliações. |
+| Conta demonstrativa | Visitante, cadastro pendente de confirmação, conta confirmada e saída. Use `exemplo@aluno.unb.br` e uma senha fictícia de pelo menos 8 caracteres. |
+
+Com Node.js 22 ou superior e npm, a partir da raiz do repositório:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Como alternativa, com Docker aberto, execute **na raiz do repositório**:
+
+```bash
+docker compose up --build --no-deps frontend
+```
+
+Abra **http://localhost:3000/prototipo**. O comando Docker inicia somente o frontend,
+sem API ou PostgreSQL; as páginas reais que dependem desses serviços não fazem parte
+desse modo de teste. O build precisa de internet. Para parar esse modo Docker, use
+Ctrl+C no terminal e `docker compose stop frontend`, se necessário.
+
+Não existe login real de teste nem gravação em banco neste modo. Os exemplos já
+estão disponíveis na busca. A conta simulada reinicia ao recarregar e a prévia da
+avaliação não salva respostas. Para a rodada com alunos, registre o commit usado e
+as observações conforme o roteiro da #153.
+
+### Navegação e limites
 
 Com `npm run dev` (ou `npm run start` após o build), abra
 [http://localhost:3000/prototipo](http://localhost:3000/prototipo), também acessível
 pelo link na página inicial. O protótipo funciona sem backend e identifica todos os
-dados como demonstrativos fictícios. O header compartilhado continua levando às
-rotas reais da aplicação, que dependem da API quando aplicável.
+dados como demonstrativos fictícios. O cabeçalho do protótipo oferece busca e uma
+entrada única “Entrar / Criar conta”, que vira “Minha conta” nos cenários simulados.
+“Voltar ao sistema” leva às rotas reais, que dependem da API quando aplicável.
 
-Experimente **Buscar disciplina → Algoritmos → Comparação → Ordenar por recomendação
-→ Avaliar Ana → Conferir prévia da avaliação**. A alternativa por professor permite
-buscar “Ana”, selecionar sua disciplina e seguir até o mesmo formulário. “MAT-DEMO”
-encontra Cálculo em outro departamento, com ausência de avaliações. Os resultados
-oferecem links para busca vazia, sem resultados, carregamento e erro com recuperação.
+Na rodada de preparação da #153, experimente **Buscar professor → Ana → Avaliar nesta
+disciplina → Conferir prévia da avaliação**. Os resultados já mostram as disciplinas
+agrupadas por professor, com acesso direto à avaliação. As duas Anas fictícias têm
+departamentos diferentes; uma oferece Algoritmos e Estruturas de dados, e a outra
+oferece Cálculo. Elas permanecem registros separados.
+
+A alternativa por disciplina permite buscar “Algoritmos”, comparar e ordenar por
+recomendação antes de avaliar. “MAT-DEMO” encontra Cálculo, com ausência de avaliações.
+Nome, departamento e código são identificados por rótulos; busca e organização dos
+resultados permanecem na URL durante a navegação e o retorno. A ordenação por nome ou unidade acadêmica fica na própria lista e se atualiza ao
+trocar a opção, sem nova busca. É uma proposta demonstrativa, não altera o ranking
+da comparação nem os serviços reais.
+
+No formulário, “Entrar ou criar conta para avaliar” abre a mesma área de conta do
+cabeçalho. Essa área não mostra as etapas de pesquisa; o destino da avaliação fica
+recolhido e pode ser consultado. Ela reúne entrada e cadastro, Mostrar/Ocultar senha, estado do e-mail e saída.
+Simular entrada representa uma conta já confirmada; simular cadastro apresenta e-mail
+pendente, e a confirmação demonstrativa permite continuar. Entrada e confirmação
+retornam ao ponto de origem, mantendo professor, disciplina e busca quando selecionados.
+Use dados fictícios: não há criação de conta ou sessão real. O cenário de conta fica
+somente em memória, é preservado na navegação interna e reinicia ao recarregar;
+respostas do formulário de avaliação não são persistidas entre etapas. O protótipo
+usa rótulos completos para Chamada e Recomendação, preservando os valores e escalas.
+
+“Explorar estados de busca” reúne busca vazia, sem resultados, carregamento e erro
+com recuperação. A proposta não inclui fotos do SIGAA ou novos dados de localização.
 
 O protótipo não autentica, consulta a API, calcula agregados nem salva avaliações.
-A ordenação alterna entre apresentações preparadas da fixture; a regra real permanece
-no backend. Os cinco campos reutilizam o componente do formulário real e suas escalas.
+A comparação alterna entre apresentações preparadas da fixture; a regra real permanece
+no backend. Didática usa botões de 1 a 5 sem nota pré-selecionada; os outros quatro
+campos reutilizam o componente do formulário real. Todos preservam suas escalas e
+validação; os rótulos explicativos são ativados somente no protótipo.
 Critérios não aparecem abaixo de três avaliações; contagens e insuficiência permanecem visíveis.
 
 `npm run test:browser` também verifica a jornada, os estados, o histórico/recarga,
-as escalas, teclado e 54 combinações de tela/tema/largura (320/768/1280 px).
+as escalas, teclado e 72 combinações de tela/tema/largura (320/768/1280 px), incluindo
+resultados com homônimos e a área de conta com/sem avaliação selecionada. Também verifica
+os cenários visitante, e-mail pendente, e-mail confirmado, saída e retorno à avaliação.
 Para gerar capturas locais durante essa verificação, configure `PREVIEW_DIR` com um
 diretório de saída. Evidências, limites e prévia da PR estão em
 [`verificacao-prototipo-jornada-issue-152.md`](../docs/estudos/verificacao-prototipo-jornada-issue-152.md).
+O mapeamento desta adaptação aos relatos e o roteiro para registrar a próxima rodada
+estão em [`ajustes-prototipo-jornada-issue-153.md`](../docs/estudos/ajustes-prototipo-jornada-issue-153.md).
+O retorno recebido, a comparação com a #148 e as ideias para continuidade estão em
+[`resultados-reteste-jornada-issue-153.md`](../docs/estudos/resultados-reteste-jornada-issue-153.md).
 
 ## Execução com Docker — Issue #36
 
@@ -98,12 +228,38 @@ Components por requisição. Por isso a entrega mantém servidor Next.js e não 
 `output: 'export'`. A análise e o estado da decisão estão no
 [ADR 08](../docs/arquitetura.md#adr-08--execução-e-containerização-do-frontend).
 
+## Jornada visual integrada — Issue #186
+
+A rota `/` oferece a busca inicial por professor ou disciplina e conduz às buscas
+reais. O formulário envia a modalidade à rota `/busca`, que encaminha no servidor
+para a listagem correspondente, preservando termo e ordem mesmo antes da hidratação.
+A orientação “Busque → Escolha a disciplina → Consulte ou avalie” acompanha
+a jornada, ficando fora de login, cadastro e confirmação. Não é necessário visitar
+`/prototipo`; essa demonstração continua disponível em uma seção secundária da entrada.
+
+Resultados usam uma coluna no celular e duas a partir de `sm`, com disciplinas
+agrupadas e avaliação direta. Consulta e comparação compartilham a apresentação dos
+critérios agregados, calculados pelo backend. O formulário real mantém os grupos e
+controles da #158, com contexto e Didática destacados. Login/cadastro permanecem
+separados e mostram o destino válido em seção recolhida; uma falha nessa informação
+auxiliar não impede a autenticação. Busca e retorno mantêm os contratos da #155.
+
+O [comparativo aprovado, rastreabilidade, testes e capturas](../docs/estudos/integracao-visual-jornada-issue-186.md)
+identifica a referência histórica `91ecb79`, a base real e os limites de validação.
+`npm run test:browser` inclui a nova entrada, o envio nas duas modalidades com
+scripts bloqueados e regressões controladas. As suítes
+`tests/acesso-browser.mjs` e `tests/resultados-browser.mjs` usam API/PostgreSQL reais;
+`tests/referencia-browser.mjs` captura uma cópia histórica compilada e confere seus
+fontes contra o commit de referência. Não usa fixtures no produto normal.
+
 ## Padrão visual básico — Issue #31
 
 Base implementada nesta entrega para orientar as próximas telas. A solicitação de
 implementação da [Issue #31](https://github.com/unb-mds/2026-02-UnDb/issues/31) é a origem
 deste trabalho; este registro não afirma aprovação coletiva nem fechamento da issue.
-Os valores ficam centralizados em `src/app/globals.css` e o header em `src/app/layout.tsx`.
+Os valores ficam centralizados em `src/app/globals.css`. O layout raiz usa
+`src/components/cabecalho.tsx` para a navegação real; `/prototipo` herda um layout
+próprio com a navegação e o estado de conta exclusivamente demonstrativos.
 
 ### Referência pesquisada
 
@@ -138,7 +294,7 @@ já são carregadas por `next/font` no layout raiz, sem nova dependência.
 
 | Papel | Classes | Tamanho / entrelinha |
 |---|---|---|
-| Título da página inicial | `text-3xl font-semibold` | 30 / 36 px |
+| Título da página inicial (jornada #186) | `text-2xl font-semibold` | 24 / 32 px |
 | Título das demais páginas | `text-2xl font-semibold` | 24 / 32 px |
 | Marca no header | `text-xl font-semibold` | 20 / 28 px |
 | Título de cartão de entrada | `text-lg font-medium` | 18 / 28 px |
@@ -165,10 +321,12 @@ Em telas estreitas, navegação e cartões quebram em linhas.
 
 - Header compartilhado em todas as rotas: marca ligada a `/`, navegação para
   `/professores` e `/disciplinas`, borda inferior, `px-4 py-3`, sem altura fixa.
-- Buscas e detalhes: `mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10`.
-  A largura máxima é 42 rem (672 px com raiz de 16 px).
+- Buscas: `max-w-5xl`, com controles limitados a `max-w-2xl` e resultados em
+  `grid gap-4 sm:grid-cols-2`. Detalhes de professor e avaliação mantêm
+  `mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10` (672 px).
 - Comparação de professores: `max-w-5xl` (64 rem / 1024 px) e grade responsiva existente.
-- Início: `max-w-2xl`, `gap-8 py-16`, cartões em uma coluna e duas a partir de `sm`.
+- Início: `max-w-5xl`, `gap-6 py-10`, busca e cartões de apoio em `max-w-2xl`;
+  cartões em uma coluna e duas a partir de `sm`.
   Página não encontrada: mesma largura, `gap-3 py-16`.
 - Espaçamentos: 4, 8, 12, 16, 24, 32, 40 e 64 px, correspondendo às unidades
   Tailwind 1, 2, 3, 4, 6, 8, 10 e 16. Cartões de entrada usam `p-5` (20 px).

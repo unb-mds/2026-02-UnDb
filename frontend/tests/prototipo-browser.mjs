@@ -33,9 +33,12 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     await cdp("Emulation.setDeviceMetricsOverride", { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "light" }] });
     await cdp("Page.navigate", { url: "http://localhost:3100" });
+    await aguardarTexto("Encontre professores e disciplinas");
+    await avaliar("document.querySelector('main details summary').click()");
     await aguardarTexto("Experimentar o protótipo");
     await clicar("Experimentar o protótipo");
-    await aguardarTexto("Escolha sua próxima disciplina");
+    await aguardarTexto("Protótipo navegável");
+    await aguardarTexto("Encontre professores e disciplinas");
     await capturar("01-entrada");
     await clicar("Buscar disciplina");
     await aguardarTexto("O que você quer encontrar?");
@@ -74,24 +77,33 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     await capturar("04-comparacao");
     await clicar("Avaliar Ana");
     await aguardarTexto("Conferir prévia da avaliação");
-    await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 5'), "cinco critérios");
+    await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 4'), "didática em botões e quatro seletores");
     assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('select')).map(s => Array.from(s.options).slice(1).map(o => o.textContent))"), [
-      ["1", "2", "3", "4", "5"], ["Fácil", "Médio", "Difícil"], ["Sim", "Não"], ["Não disponibiliza", "Ruim", "Médio", "Bom"], ["Sim", "Não"],
+      ["Fácil", "Médio", "Difícil"], ["Faz chamada", "Não faz chamada"], ["Não disponibiliza", "Ruim", "Médio", "Bom"], ["Recomendo", "Não recomendo"],
     ]);
     assert.equal(await avaliar("document.querySelector('form').checkValidity()"), false);
     assert.equal(await avaliar("!!document.querySelector('textarea')"), false);
+    assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('[name=didatica]')).map(r => r.value)"), ["1", "2", "3", "4", "5"]);
+    assert.equal(await avaliar("document.querySelector('[name=didatica]:checked')"), null);
     await capturar("05-avaliacao");
     await aguardarValidacaoLocal("Selecione uma opção válida para Didática.");
-    await avaliar("document.querySelector('select').focus()");
+    await avaliar("document.querySelector('[name=didatica][value=\"1\"]').focus()");
     await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
     await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
     assert.equal(await avaliar("document.activeElement.name"), "dificuldade");
     assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle"), "solid");
     assert.match(await avaliar("getComputedStyle(document.activeElement).boxShadow"), /2px/);
     assert.equal(await avaliar("getComputedStyle(document.activeElement).getPropertyValue('--tw-ring-color').trim() === getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()"), true);
-    await avaliar("Array.from(document.querySelectorAll('select')).forEach(s => { s.value=s.options[1].value; s.dispatchEvent(new Event('change',{bubbles:true})); }); document.querySelector('form').requestSubmit()");
+    await avaliar("document.querySelector('[name=didatica][value=\"1\"]').click(); Array.from(document.querySelectorAll('select')).forEach(s => { s.value=s.options[1].value; s.dispatchEvent(new Event('change',{bubbles:true})); }); document.querySelector('form').requestSubmit()");
     await aguardarTexto("Prévia conferida.");
-    assert.equal(await avaliar("document.querySelector('[name=didatica]').value"), "1");
+    assert.equal(await avaliar("document.querySelector('[name=didatica]:checked').value"), "1");
+    await avaliar("document.querySelector('[name=didatica][value=\"3\"]').focus(); document.querySelector('[name=didatica][value=\"3\"]').click()");
+    await aguardarTexto("Nota selecionada: 3 de 5.");
+    await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "ArrowRight", code: "ArrowRight", windowsVirtualKeyCode: 39 });
+    await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "ArrowRight", code: "ArrowRight", windowsVirtualKeyCode: 39 });
+    await aguardarTexto("Nota selecionada: 4 de 5.");
+    assert.equal(await avaliar("new FormData(document.querySelector('form')).get('didatica')"), "4");
+    await capturar("13-nota-selecionada");
     await clicar("Voltar à comparação");
     await aguardarTexto("Comparação de professores");
     await clicar("Avaliar Carla");
@@ -99,10 +111,15 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     assert.match(await avaliar("document.querySelector('main').innerText"), /Carla \(exemplo\)/);
     await navegar("etapa=busca&tipo=professor", "O que você quer encontrar?");
     await buscar("an");
-    await aguardarTexto("2 resultado(s)");
+    await aguardarTexto("3 resultado(s)");
+    assert.deepEqual(await avaliar("Array.from(document.querySelector('[aria-label=\"Lista de resultados\"]').children).map(li => li.querySelector('h2').textContent)"), ["Ana (exemplo)", "Ana (exemplo)", "Daniel (exemplo)"]);
+    await avaliar("document.querySelector('[name=ordemResultados]').value='departamento'; document.querySelector('[name=ordemResultados]').dispatchEvent(new Event('change',{bubbles:true}))");
+    await aguardar(async () => await avaliar("new URL(location.href).searchParams.get('ordemBusca') === 'departamento' && !document.querySelector('[name=ordemResultados]').disabled"), "ordenação dinâmica sem nova busca");
+    assert.deepEqual(await avaliar("Array.from(document.querySelector('[aria-label=\"Lista de resultados\"]').children).map(li => li.querySelector('h2').textContent)"), ["Ana (exemplo)", "Daniel (exemplo)", "Ana (exemplo)"]);
+    assert.equal(await avaliar("new URL(location.href).searchParams.get('q')"), "an");
     await clicar("Ana (exemplo)");
     await aguardarTexto("Disciplinas de Ana");
-    await clicar("Algoritmos (exemplo)");
+    await clicar("Comparar professores");
     await aguardarTexto("Comparação de professores");
     await navegar("etapa=busca", "O que você quer encontrar?");
     await buscar("mat-demo");
@@ -118,12 +135,85 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     await aguardarTexto("1 resultado(s)");
     await navegar("etapa=comparacao&disciplina=invalida", "Escolha uma disciplina nos resultados");
     await navegar("etapa=avaliacao&disciplina=calculo-demo&professor=ana-demo", "Escolha um professor na comparação");
+    // Relatos #148: contexto, homônimos e acesso direto sem exigir comparação.
+    await navegar("etapa=busca&tipo=professor&q=Ana&ordemBusca=departamento", "O que você quer encontrar?");
+    assert.equal(await avaliar("document.querySelector('[name=q]').value"), "Ana");
+    assert.equal(await avaliar("document.querySelector('[name=ordemBusca]').value"), "departamento");
+    await buscar("Ana");
+    await aguardarTexto("2 resultado(s)");
+    const grupos = await avaliar("Array.from(document.querySelector('[aria-label=\"Lista de resultados\"]').children).map(li => ({texto:li.innerText, destinos:Array.from(li.querySelectorAll('a')).map(a => a.href)}))");
+    assert.equal(grupos.length, 2);
+    assert.match(grupos[0].texto, /Computação.*Algoritmos.*Estruturas de dados/s);
+    assert.match(grupos[1].texto, /Matemática.*Cálculo/s);
+    assert.equal(grupos[0].destinos.some(url => new URL(url).searchParams.get("professor") === "ana-matematica-demo"), false);
+    assert.equal(grupos[1].destinos.some(url => new URL(url).searchParams.get("professor") === "ana-demo"), false);
+    await aguardarTexto("Há professores com o mesmo nome");
+    await avaliar("document.querySelector('a[aria-label=\"Avaliar Ana (exemplo) em Estruturas de dados (exemplo) — Computação (exemplo)\"]').click()");
+    await aguardarTexto("Conferir prévia da avaliação");
+    assert.match(await avaliar("document.querySelector('[aria-label=\"Destino da avaliação\"]').innerText"), /Computação.*Estruturas de dados.*Código da disciplina.*Ana/s);
+    assert.equal(await avaliar("new URL(location.href).searchParams.get('q')"), "Ana");
+    await cdp("Page.reload");
+    await aguardarTexto("Conferir prévia da avaliação");
+    await clicar("Entrar ou criar conta para avaliar");
+    await aguardarTexto("Minha conta");
+    await aguardar(async () => {
+      await avaliar("document.querySelector('[aria-controls=senha-demo]').click()");
+      return await avaliar("document.querySelector('#senha-demo').type === 'text'");
+    }, "mostrar senha após hidratação");
+    assert.equal(await avaliar("document.querySelector('[aria-controls=senha-demo]').getAttribute('aria-pressed')"), "true");
+    await avaliar("document.querySelector('#senha-demo').value='senha-ficticia'; document.querySelector('[aria-controls=senha-demo]').click()");
+    assert.equal(await avaliar("document.querySelector('#senha-demo').type"), "password");
+    assert.equal(await avaliar("document.querySelector('#senha-demo').value"), "senha-ficticia");
+    assert.equal(await avaliar("document.querySelector('main form')"), null, "Acesso demonstrativo não permite envio nativo, inclusive antes da hidratação");
+    assert.equal(await avaliar("document.querySelector('[aria-label=\"Etapas da jornada\"]')"), null);
+    assert.equal(await avaliar("document.querySelector('main details').open"), false);
+    await capturar("07-acesso");
+    await avaliar("document.querySelector('[name=email-demo]').value='exemplo@aluno.unb.br'; Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Simular entrada').click()");
+    await aguardarTexto("Conferir prévia da avaliação");
+    assert.equal(await avaliar("document.querySelector('[aria-label=\"Conta do protótipo\"]').textContent"), "Minha conta");
+    assert.equal(await avaliar("document.querySelectorAll('header').length"), 1);
+    assert.equal(await avaliar("document.querySelector('header a[href=\"/login\"]')"), null);
+    await avaliar("document.querySelector('[aria-label=\"Conta do protótipo\"]').click()");
+    await aguardarTexto("Seu acesso");
+    await capturar("11-conta-confirmada");
+    await avaliar("Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Sair da conta demonstrativa').click()");
+    await aguardarTexto("Você saiu da conta demonstrativa");
+    assert.equal(await avaliar("document.querySelector('[aria-label=\"Conta do protótipo\"]').textContent"), "Entrar / Criar conta");
+    await avaliar("Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Criar conta').click()");
+    await aguardar(async () => await avaliar("!!document.querySelector('[name=nome-demo]')"), "campos do cadastro demonstrativo");
+    await avaliar("document.querySelector('[name=nome-demo]').value='Estudante exemplo'; document.querySelector('[name=email-demo]').value='exemplo@aluno.unb.br'; document.querySelector('#senha-demo').value='senha-ficticia'; Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Simular criação de conta').click()");
+    await aguardarTexto("Ainda não confirmado");
+    assert.equal(await avaliar("new URL(location.href).searchParams.get('etapa')"), "acesso");
+    await capturar("12-conta-pendente");
+    await avaliar("Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Simular confirmação do e-mail')).click()");
+    await aguardarTexto("Conferir prévia da avaliação");
+    assert.match(await avaliar("document.querySelector('[aria-label=\"Destino da avaliação\"]').innerText"), /Estruturas de dados/);
+    await clicar("Voltar às disciplinas do professor");
+    await aguardarTexto("Disciplinas de Ana");
+    await clicar("Voltar aos resultados da pesquisa");
+    await aguardarTexto("2 resultado(s)");
+    await clicar("Alterar busca");
+    await aguardarTexto("O que você quer encontrar?");
+    assert.equal(await avaliar("document.querySelector('[name=q]').value"), "Ana");
+    assert.equal(await avaliar("document.querySelector('[name=ordemBusca]').value"), "departamento");
+    await buscar("Ana");
+    await aguardarTexto("2 resultado(s)");
+    assert.equal(await avaliar("document.querySelector('[aria-label=\"Conta do protótipo\"]').textContent"), "Minha conta", "Busca interna preserva o cenário de conta");
+    await clicar("Alterar busca");
+    await aguardarTexto("O que você quer encontrar?");
+    await cdp("Page.reload");
+    await aguardarTexto("O que você quer encontrar?");
+    assert.equal(await avaliar("document.querySelector('[name=q]').value"), "Ana");
+    assert.equal(await avaliar("document.querySelector('[aria-label=\"Conta do protótipo\"]').textContent"), "Entrar / Criar conta", "Recarregar reinicia a simulação");
     const telas = [
-      ["", "Escolha sua próxima disciplina"],
+      ["", "Encontre professores e disciplinas"],
       ["etapa=busca", "O que você quer encontrar?"],
       ["etapa=resultados&q=algoritmos", "1 resultado(s)"],
       ["etapa=comparacao&disciplina=algoritmos-demo&ordem=recomendacao", "Recomendação decrescente"],
       ["etapa=avaliacao&disciplina=algoritmos-demo&professor=ana-demo", "Conferir prévia da avaliação"],
+      ["etapa=resultados&tipo=professor&q=Ana", "2 resultado(s)"],
+      ["etapa=acesso&disciplina=estruturas-demo&professor=ana-demo", "Minha conta"],
+      ["etapa=acesso", "Entre na sua conta"],
       ["etapa=resultados", "Informe sua busca"],
       ["etapa=resultados&q=inexistente", "Nenhum resultado encontrado"],
       ["etapa=resultados&estado=erro", "Não foi possível buscar agora"],
@@ -137,11 +227,18 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
           await navegar(query, titulo);
           assert.equal(await avaliar("document.querySelectorAll('h1').length"), 1);
           assert.equal(await avaliar("document.documentElement.scrollWidth <= window.innerWidth"), true, `${tema}/${largura}/${query}`);
-          assert.equal(await avaliar("!!document.querySelector('[aria-current=step]')"), true);
+          assert.equal(await avaliar("!!document.querySelector('[aria-current=step]')"), !query.startsWith("etapa=acesso"));
           assert.match(await avaliar("document.querySelector('aside').innerText"), /Dados demonstrativos fictícios/);
           assert.equal(await avaliar("Array.from(document.querySelectorAll('main a')).every(a => !a.pathname.startsWith('/prototipo') || Array.from(new URL(a.href).searchParams.values()).every(v => v !== ''))"), true, `Parâmetros vazios: ${query}`);
+          if (query === "etapa=resultados&tipo=professor&q=Ana" && tema === "light") {
+            if (largura === 1280) await capturar("08-professores-agrupados");
+            if (largura === 320) await capturar("09-professores-mobile");
+          }
+          if (query.startsWith("etapa=acesso") && tema === "dark" && largura === 320) {
+            await capturar("10-acesso-mobile-escuro");
+          }
           if (query.startsWith("etapa=avaliacao")) {
-            await avaliar("document.querySelector('select').focus()");
+            await avaliar("document.querySelector('[name=didatica][value=\"1\"]').focus()");
             await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
             await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
             assert.equal(await avaliar("document.activeElement.name"), "dificuldade");
@@ -156,7 +253,7 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
       }
     }
     assert.deepEqual(requisicoesApi, [], "O protótipo não consulta nem envia dados à API");
-    console.log("Protótipo #152: duas jornadas completas, escalas, vazio, conflito, insuficiência, erro/recuperação, teclado, zero chamadas à API e 54 combinações de tela/tema/largura.");
+    console.log("Protótipo #153: jornadas, acesso direto, homônimos, contexto e histórico, senha demonstrativa, escalas, estados, teclado, zero chamadas à API e 72 combinações de tela/tema/largura; conta visitante/pendente/confirmada, saída e retorno à avaliação.");
   } finally {
     socket.removeEventListener("message", observar);
   }

@@ -1,3 +1,4 @@
+import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { identificadorValido } from "@/lib/identificador";
@@ -7,68 +8,18 @@ import {
   obterDisciplina,
 } from "@/lib/services/disciplinas";
 import { ApiError } from "@/lib/services/http-error";
-import type { AvaliacaoAgregadaSuficiente } from "@/lib/types/avaliacao";
-
-const ROTULOS_ENUM = {
-  FACIL: "Fácil",
-  MEDIO: "Médio",
-  DIFICIL: "Difícil",
-  RUIM: "Ruim",
-  BOM: "Bom",
-} as const;
-
-function rotuloEnum(valor: keyof typeof ROTULOS_ENUM): string {
-  return ROTULOS_ENUM[valor];
-}
-
-function rotuloResposta(valor: boolean | "CONFLITANTE"): string {
-  if (valor === "CONFLITANTE") return "Conflitante";
-  return valor ? "Sim" : "Não";
-}
-
-function rotuloTotalAvaliacoes(total: number): string {
-  return `${total} ${total === 1 ? "avaliação" : "avaliações"} no total`;
-}
-
-function CriteriosAgregados({ avaliacao }: { avaliacao: AvaliacaoAgregadaSuficiente }) {
-  return (
-    <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-      <div>
-        <dt className="text-foreground/60">Didática</dt>
-        <dd className="font-medium">{avaliacao.didatica.toFixed(1)} / 5</dd>
-      </div>
-      <div>
-        <dt className="text-foreground/60">Recomendação</dt>
-        <dd className="font-medium">{avaliacao.recomenda}%</dd>
-      </div>
-      <div>
-        <dt className="text-foreground/60">Dificuldade</dt>
-        <dd className="font-medium">{rotuloEnum(avaliacao.dificuldade)}</dd>
-      </div>
-      <div>
-        <dt className="text-foreground/60">Faz chamada</dt>
-        <dd className="font-medium">{rotuloResposta(avaliacao.chamada)}</dd>
-      </div>
-      <div>
-        <dt className="text-foreground/60">Disponibiliza material</dt>
-        <dd className="font-medium">{rotuloResposta(avaliacao.disponibilizaMaterial)}</dd>
-      </div>
-      <div>
-        <dt className="text-foreground/60">Qualidade do material</dt>
-        <dd className="font-medium">
-          {avaliacao.qualidadeMaterial ? rotuloEnum(avaliacao.qualidadeMaterial) : "Não se aplica"}
-        </dd>
-      </div>
-    </dl>
-  );
-}
+import CriteriosAgregados from "@/components/criterios-agregados";
+import EtapasJornada from "@/components/etapas-jornada";
 
 export default async function DetalheDisciplinaPage({
   params,
+  searchParams,
 }: {
+  searchParams: Promise<ParametrosBusca>;
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const contexto = lerContextoBusca(await searchParams);
   if (!identificadorValido(id)) notFound();
 
   // Sequencial, não Promise.all: mesmo motivo de professores/[id]/page.tsx —
@@ -86,33 +37,34 @@ export default async function DetalheDisciplinaPage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
-      <Link href="/disciplinas" className="text-sm text-foreground/60 hover:text-foreground">
-        ← Buscar outra disciplina
+      <EtapasJornada atual={2} />
+      <Link href={contexto ? urlBusca(contexto) : "/disciplinas"} className="self-start text-sm text-accent underline underline-offset-4">
+        {contexto ? "← Voltar aos resultados da busca" : "← Buscar outra disciplina"}
       </Link>
 
-      <div>
-        <span className="font-mono text-sm text-foreground/60">{disciplina.codigo}</span>
+      <div className="rounded-xl border border-accent/30 bg-accent/5 p-5 break-words">
         <h1 className="text-2xl font-semibold">{disciplina.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">{disciplina.departamento}</p>
+        <p className="mt-1 text-sm text-foreground/70">Código da disciplina: <span className="font-mono">{disciplina.codigo}</span></p>
+        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {disciplina.departamento}</p>
       </div>
 
       <div>
         <h2 className="text-lg font-semibold">Comparação de professores</h2>
-        <p className="mt-1 text-sm text-foreground/60">Ordenada pelo percentual de recomendação.</p>
+        <p className="mt-1 text-sm text-foreground/70">Ordenada pelo percentual de recomendação; desempate por quantidade de avaliações e nome. Dificuldade e Chamada são informações neutras.</p>
         {comparacao.professores.length === 0 ? (
           <p className="mt-2 text-sm text-foreground/60">
             Nenhum professor com turma ativa registrada para esta disciplina no momento.
           </p>
         ) : (
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
             {comparacao.professores.map((avaliacao) => (
-              <li key={avaliacao.professorId} className="rounded-lg border border-foreground/10 p-4">
-                <h3 className="font-medium">
-                  <Link className="underline-offset-4 hover:underline" href={`/professores/${avaliacao.professorId}`}>
+              <li key={avaliacao.professorId} className="min-w-0 rounded-xl border border-foreground/10 p-5 break-words">
+                <h3 className="text-lg font-semibold">
+                  <Link className="underline-offset-4 hover:underline" href={comContextoBusca(`/professores/${avaliacao.professorId}`, contexto)}>
                     {avaliacao.professor.nome}
                   </Link>
                 </h3>
-                <p className="text-sm text-foreground/60">{avaliacao.professor.departamento}</p>
+                <p className="text-sm text-foreground/70">Unidade acadêmica: {avaliacao.professor.departamento}</p>
                 {avaliacao.dadosSuficientes ? (
                   <CriteriosAgregados avaliacao={avaliacao} />
                 ) : (
@@ -122,7 +74,21 @@ export default async function DetalheDisciplinaPage({
                       : "Dados insuficientes para exibir os critérios."}
                   </p>
                 )}
-                <p className="mt-3 text-xs text-foreground/60">{rotuloTotalAvaliacoes(avaliacao.totalAvaliacoes)}</p>
+                <p className="mt-3 text-sm text-foreground/70">{avaliacao.totalAvaliacoes} {avaliacao.totalAvaliacoes === 1 ? "avaliação" : "avaliações"} no total</p>
+                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                  <Link
+                    className="text-accent underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    href={comContextoBusca(`/professores/${avaliacao.professorId}`, contexto)}
+                  >
+                    Ver disciplinas do professor
+                  </Link>
+                  <Link
+                    className="rounded-lg bg-accent px-4 py-2.5 text-center font-medium text-on-accent hover:opacity-90"
+                    href={comContextoBusca(`/professores/${avaliacao.professorId}/disciplinas/${id}/avaliar`, contexto)}
+                  >
+                    Avaliar nesta disciplina
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>

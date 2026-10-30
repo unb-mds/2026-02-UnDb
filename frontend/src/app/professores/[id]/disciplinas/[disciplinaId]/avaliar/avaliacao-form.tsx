@@ -8,9 +8,10 @@ import { consultarSessao } from "@/lib/services/auth";
 import { enviarAvaliacao } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
 
-export default function AvaliacaoForm({ professorId, disciplinaId }: {
+export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }: {
   professorId: string;
   disciplinaId: string;
+  retornoHref: string;
 }) {
   const enviandoRef = useRef(false);
   const [enviando, setEnviando] = useState(false);
@@ -52,11 +53,19 @@ export default function AvaliacaoForm({ professorId, disciplinaId }: {
   }
 
   return (
-    <form onSubmit={enviar} className="flex flex-col gap-6" aria-busy={enviando}>
-      <p className="text-sm text-foreground/70">
-        Responda aos cinco critérios. Para enviar, entre na sua conta e confirme seu e-mail institucional.
-      </p>
-      <CriteriosAvaliacao disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
+    <form onSubmit={enviar} className="flex flex-col gap-6 rounded-xl border border-foreground/10 p-5" aria-busy={enviando}>
+      <div className="flex flex-col items-start gap-3 rounded-lg bg-foreground/[0.03] p-4">
+        <p className="text-sm text-foreground/70">
+          Você pode entrar antes de preencher. Para enviar, é necessário ter uma sessão ativa e confirmar seu e-mail institucional.
+        </p>
+        <Link
+          href={`/login?returnTo=${encodeURIComponent(retornoHref)}`}
+          className="rounded-lg border border-foreground/20 px-4 py-2.5 text-sm font-medium text-accent transition hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Entrar ou criar conta antes de avaliar
+        </Link>
+      </div>
+      <CriteriosAvaliacao rotulosExplicitos destacarDidatica disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
       <button
         type="submit"
         disabled={enviando}
@@ -74,7 +83,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId }: {
           <div role="alert" className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">
             <p>{erro}</p>
             {precisaEntrar && (
-              <Link href="/login" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block font-medium text-accent underline underline-offset-4">
+              <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block font-medium text-accent underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
                 Entrar na conta (nova aba)
               </Link>
             )}

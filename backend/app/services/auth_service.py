@@ -84,8 +84,10 @@ def cadastrar(
     usuario_repository.adicionar_usuario(db, usuario)
     usuario_repository.adicionar_token(db, token)
 
-    parametros = urlencode({"token": token_aberto})
-    link = f"{FRONTEND_URL.rstrip('/')}/confirmar-email?{parametros}"
+    parametros = {"token": token_aberto}
+    if dados.return_to:
+        parametros["returnTo"] = dados.return_to
+    link = f"{FRONTEND_URL.rstrip('/')}/confirmar-email?{urlencode(parametros)}"
     try:
         db.flush()
         email_sender.enviar_confirmacao(dados.email, link)

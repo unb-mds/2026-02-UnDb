@@ -153,7 +153,7 @@ def main():
     with socket.socket() as reserva:
         reserva.bind(("127.0.0.1", 8000))
     suffix = uuid4().hex[:12]
-    fixture = dict(professorId=str(uuid4()), disciplinaId=str(uuid4()), usuarioId=str(uuid4()),
+    fixture = dict(professorId=str(uuid4()), disciplinaId=str(uuid4()), disciplinaCodigo=f"T{suffix}", usuarioId=str(uuid4()),
                    unidadeId=str(uuid4()), turmaId=str(uuid4()), expiredToken=uuid4().hex,
                    confirmationToken=uuid4().hex,
                    email=f"integracao.{suffix}@aluno.unb.br", senha="senha-local-integracao")
@@ -161,7 +161,7 @@ def main():
     try:
         with Session(engine) as db:
             professor = Professor(id=UUID(fixture["professorId"]), nome="Professor de teste", departamento="CIC")
-            disciplina = Disciplina(id=UUID(fixture["disciplinaId"]), codigo=f"T{suffix}", nome="Disciplina de teste", departamento="CIC")
+            disciplina = Disciplina(id=UUID(fixture["disciplinaId"]), codigo=fixture["disciplinaCodigo"], nome="Disciplina de teste", departamento="CIC")
             unidade = Unidade(id=UUID(fixture["unidadeId"]), codigo=suffix, nome="Unidade de teste")
             usuario = Usuario(id=UUID(fixture["usuarioId"]), nome="Estudante de teste", email=fixture["email"],
                               password_hash=gerar_hash_senha(fixture["senha"]), email_confirmado=False)

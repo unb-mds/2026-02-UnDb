@@ -1,0 +1,264 @@
+{
+  "commit": "91ecb79efc1c473624e0adeb358d57eab835da98",
+  "origem": "Protótipo histórico; fixtures demonstrativas, sem persistência",
+  "fontesConferidos": true,
+  "combinacoes": 48,
+  "evidencias": [
+    {
+      "tela": "entrada",
+      "tema": "light",
+      "largura": 320
+    },
+    {
+      "tela": "busca",
+      "tema": "light",
+      "largura": 320
+    },
+    {
+      "tela": "resultados-professores",
+      "tema": "light",
+      "largura": 320
+    },
+    {
+      "tela": "resultados-disciplinas",
+      "tema": "light",
+      "largura": 320
+    },
+    {
+      "tela": "escolha",
+      "tema": "light",
+      "largura": 320
+    },
+    {
+      "tela": "comparacao",
+      "tema": "light",
+      "largura": 320
+    },
+    {
+      "tela": "formulario",
+      "tema": "light",
+      "largura": 320
+    },
+    {
+      "tela": "acesso",
+      "tema": "light",
+      "largura": 320
+    },
+    {
+      "tela": "entrada",
+      "tema": "light",
+      "largura": 768
+    },
+    {
+      "tela": "busca",
+      "tema": "light",
+      "largura": 768
+    },
+    {
+      "tela": "resultados-professores",
+      "tema": "light",
+      "largura": 768
+    },
+    {
+      "tela": "resultados-disciplinas",
+      "tema": "light",
+      "largura": 768
+    },
+    {
+      "tela": "escolha",
+      "tema": "light",
+      "largura": 768
+    },
+    {
+      "tela": "comparacao",
+      "tema": "light",
+      "largura": 768
+    },
+    {
+      "tela": "formulario",
+      "tema": "light",
+      "largura": 768
+    },
+    {
+      "tela": "acesso",
+      "tema": "light",
+      "largura": 768
+    },
+    {
+      "tela": "entrada",
+      "tema": "light",
+      "largura": 1280,
+      "captura": "entrada-light-1280.png"
+    },
+    {
+      "tela": "busca",
+      "tema": "light",
+      "largura": 1280,
+      "captura": "busca-light-1280.png"
+    },
+    {
+      "tela": "resultados-professores",
+      "tema": "light",
+      "largura": 1280,
+      "captura": "resultados-professores-light-1280.png"
+    },
+    {
+      "tela": "resultados-disciplinas",
+      "tema": "light",
+      "largura": 1280,
+      "captura": "resultados-disciplinas-light-1280.png"
+    },
+    {
+      "tela": "escolha",
+      "tema": "light",
+      "largura": 1280,
+      "captura": "escolha-light-1280.png"
+    },
+    {
+      "tela": "comparacao",
+      "tema": "light",
+      "largura": 1280,
+      "captura": "comparacao-light-1280.png"
+    },
+    {
+      "tela": "formulario",
+      "tema": "light",
+      "largura": 1280,
+      "captura": "formulario-light-1280.png"
+    },
+    {
+      "tela": "acesso",
+      "tema": "light",
+      "largura": 1280,
+      "captura": "acesso-light-1280.png"
+    },
+    {
+      "tela": "entrada",
+      "tema": "dark",
+      "largura": 320,
+      "captura": "entrada-dark-320.png"
+    },
+    {
+      "tela": "busca",
+      "tema": "dark",
+      "largura": 320,
+      "captura": "busca-dark-320.png"
+    },
+    {
+      "tela": "resultados-professores",
+      "tema": "dark",
+      "largura": 320,
+      "captura": "resultados-professores-dark-320.png"
+    },
+    {
+      "tela": "resultados-disciplinas",
+      "tema": "dark",
+      "largura": 320,
+      "captura": "resultados-disciplinas-dark-320.png"
+    },
+    {
+      "tela": "escolha",
+      "tema": "dark",
+      "largura": 320,
+      "captura": "escolha-dark-320.png"
+    },
+    {
+      "tela": "comparacao",
+      "tema": "dark",
+      "largura": 320,
+      "captura": "comparacao-dark-320.png"
+    },
+    {
+      "tela": "formulario",
+      "tema": "dark",
+      "largura": 320,
+      "captura": "formulario-dark-320.png"
+    },
+    {
+      "tela": "acesso",
+      "tema": "dark",
+      "largura": 320,
+      "captura": "acesso-dark-320.png"
+    },
+    {
+      "tela": "entrada",
+      "tema": "dark",
+      "largura": 768
+    },
+    {
+      "tela": "busca",
+      "tema": "dark",
+      "largura": 768
+    },
+    {
+      "tela": "resultados-professores",
+      "tema": "dark",
+      "largura": 768
+    },
+    {
+      "tela": "resultados-disciplinas",
+      "tema": "dark",
+      "largura": 768
+    },
+    {
+      "tela": "escolha",
+      "tema": "dark",
+      "largura": 768
+    },
+    {
+      "tela": "comparacao",
+      "tema": "dark",
+      "largura": 768
+    },
+    {
+      "tela": "formulario",
+      "tema": "dark",
+      "largura": 768
+    },
+    {
+      "tela": "acesso",
+      "tema": "dark",
+      "largura": 768
+    },
+    {
+      "tela": "entrada",
+      "tema": "dark",
+      "largura": 1280
+    },
+    {
+      "tela": "busca",
+      "tema": "dark",
+      "largura": 1280
+    },
+    {
+      "tela": "resultados-professores",
+      "tema": "dark",
+      "largura": 1280
+    },
+    {
+      "tela": "resultados-disciplinas",
+      "tema": "dark",
+      "largura": 1280
+    },
+    {
+      "tela": "escolha",
+      "tema": "dark",
+      "largura": 1280
+    },
+    {
+      "tela": "comparacao",
+      "tema": "dark",
+      "largura": 1280
+    },
+    {
+      "tela": "formulario",
+      "tema": "dark",
+      "largura": 1280
+    },
+    {
+      "tela": "acesso",
+      "tema": "dark",
+      "largura": 1280
+    }
+  ]
+}
