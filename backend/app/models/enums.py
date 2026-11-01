@@ -20,3 +20,12 @@ class EstadoComentario(str, Enum):
     REMOVIDO = "REMOVIDO"
     RETIRADO = "RETIRADO"
     SUBSTITUIDO = "SUBSTITUIDO"
+    REJEITADO = "REJEITADO"
+
+
+class AcaoModeracao(str, Enum):
+    APROVAR = "APROVAR"
+    REJEITAR = "REJEITAR"
+    MANTER = "MANTER"
+    RESTAURAR = "RESTAURAR"
+    REMOVER = "REMOVER"

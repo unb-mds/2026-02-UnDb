@@ -8,6 +8,7 @@ from app.models.turma import Turma
 from app.models.token_confirmacao_email import TokenConfirmacaoEmail
 from app.models.unidade import Unidade
 from app.models.usuario import Usuario
+from app.models.decisao_moderacao import DecisaoModeracao
 
 __all__ = [
     "Avaliacao",
@@ -20,4 +21,5 @@ __all__ = [
     "TokenConfirmacaoEmail",
     "Unidade",
     "Usuario",
+    "DecisaoModeracao",
 ]

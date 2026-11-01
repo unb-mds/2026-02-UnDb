@@ -18,7 +18,8 @@ class ComentarioVersao(Base):
     substitui_id: Mapped[UUID | None] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("comentario_versoes.id"), nullable=True
     )
-    texto: Mapped[str] = mapped_column(String(500), nullable=False)
+    texto: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    descartar_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
     estado: Mapped[EstadoComentario] = mapped_column(
         Enum(EstadoComentario, name="estado_comentario"), nullable=False
     )
@@ -35,5 +36,9 @@ class ComentarioVersao(Base):
     __table_args__ = (
         CheckConstraint(
             "length(texto) BETWEEN 1 AND 500", name="ck_comentario_versao_tamanho"
+        ),
+        CheckConstraint(
+            "estado NOT IN ('PENDENTE', 'PUBLICADO', 'SUSPENSO') OR texto IS NOT NULL",
+            name="ck_comentario_texto_ativo",
         ),
     )

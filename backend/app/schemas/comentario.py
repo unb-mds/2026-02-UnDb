@@ -29,6 +29,7 @@ class ComentarioPublicoResponse(BaseModel):
 
 
 class ComentarioDoAutorResponse(ComentarioPublicoResponse):
+    texto: str | None
     estado: EstadoComentario
     avaliacao_id: UUID
     substitui_id: UUID | None

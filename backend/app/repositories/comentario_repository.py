@@ -5,6 +5,28 @@ from sqlalchemy.orm import Session
 
 from app.models.comentario_versao import ComentarioVersao
 from app.models.enums import EstadoComentario
+from app.models.avaliacao import Avaliacao
+
+
+def bloquear_avaliacao(db: Session, avaliacao_id: UUID) -> None:
+    db.scalar(select(Avaliacao).where(Avaliacao.id == avaliacao_id).with_for_update()
+              .execution_options(populate_existing=True))
+
+
+def obter_bloqueado(db: Session, comentario_id: UUID) -> ComentarioVersao | None:
+    avaliacao_id = db.scalar(select(ComentarioVersao.avaliacao_id).where(ComentarioVersao.id == comentario_id))
+    if avaliacao_id is None:
+        return None
+    bloquear_avaliacao(db, avaliacao_id)
+    return db.scalar(select(ComentarioVersao).where(ComentarioVersao.id == comentario_id)
+                     .with_for_update().execution_options(populate_existing=True))
+
+
+def obter_atual_por_avaliacao(db: Session, avaliacao_id: UUID) -> ComentarioVersao | None:
+    return db.scalar(select(ComentarioVersao).where(
+        ComentarioVersao.avaliacao_id == avaliacao_id,
+        ComentarioVersao.estado.in_((EstadoComentario.PUBLICADO, EstadoComentario.SUSPENSO, EstadoComentario.REMOVIDO)),
+    ).order_by(ComentarioVersao.created_at.desc()))
 
 
 def obter_por_id(db: Session, comentario_id: UUID) -> ComentarioVersao | None:
