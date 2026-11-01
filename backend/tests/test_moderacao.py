@@ -85,6 +85,29 @@ class ModeracaoTest(unittest.TestCase):
         self.assertEqual(self.acao(versao.id, "APROVAR")[0], 409)
         self.assertEqual(self.acao(versao.id, "REJEITAR", motivo=" ")[0], 422)
 
+    def test_aprovacao_inicial_nao_consulta_denuncias(self):
+        self.moderador()
+        versao = self.versao()
+        with patch("app.repositories.denuncia_repository.listar", side_effect=AssertionError("dependencia indevida")), patch(
+            "app.repositories.denuncia_repository.existe_da_conta", side_effect=AssertionError("dependencia indevida")
+        ):
+            self.assertEqual(self.acao(versao.id, "APROVAR")[0], 200)
+
+    def test_estados_finais_nao_podem_ser_restaurados_e_schema_exige_motivo(self):
+        self.moderador()
+        versao = self.versao()
+        for estado in (EstadoComentario.RETIRADO, EstadoComentario.REMOVIDO,
+                       EstadoComentario.REJEITADO, EstadoComentario.SUBSTITUIDO):
+            versao.estado = estado
+            versao.texto = None
+            self.db.commit()
+            for acao in ("APROVAR", "REJEITAR", "MANTER", "RESTAURAR", "REMOVER"):
+                with self.subTest(estado=estado, acao=acao):
+                    self.assertEqual(self.acao(versao.id, acao)[0], 409)
+        code, _ = asyncio.run(self._request("POST", f"/api/moderacao/comentarios/{versao.id}/acoes",
+                                           {"acao": "REMOVER"}, "mod"))
+        self.assertEqual(code, 422)
+
     def test_fila_privada_e_filtro(self):
         self.moderador()
         self.versao()
@@ -118,6 +141,11 @@ class ModeracaoTest(unittest.TestCase):
         self.db.refresh(versao)
         decisao = self.db.scalar(select(DecisaoModeracao))
         pendente = self.versao(usuario=self.outro_usuario)
+        from app.models.comentario_versao import ComentarioVersao
+        suspenso = ComentarioVersao(avaliacao_id=pendente.avaliacao_id,
+                                    texto="texto suspenso", estado=EstadoComentario.SUSPENSO)
+        self.db.add(suspenso)
+        self.db.commit()
         descartar_vencidos(self.db, inicio + timedelta(days=7) - timedelta(microseconds=1))
         self.assertEqual(versao.texto, "texto")
         self.assertIsNotNone(self.db.get(DecisaoModeracao, decisao.id))
@@ -130,6 +158,7 @@ class ModeracaoTest(unittest.TestCase):
         self.assertIsNone(versao.texto)
         self.assertIsNone(self.db.scalar(select(DecisaoModeracao)))
         self.assertEqual(pendente.texto, "texto")
+        self.assertEqual(suspenso.texto, "texto suspenso")
         self.assertIsNotNone(self.db.scalar(select(Agradecimento)))
 
     def test_transacao_reverte_acao_e_encerramento_em_falha(self):

@@ -5,9 +5,10 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.models.enums import AcaoModeracao, EstadoComentario
+from app.models.comentario_versao import ComentarioVersao
 from app.models.usuario import Usuario
 from app.repositories import comentario_repository, moderacao_repository, denuncia_repository
-from app.schemas.moderacao import ComentarioModeracaoResponse, IdentidadeInterna
+from app.schemas.moderacao import AcaoModeracaoRequest, ComentarioModeracaoResponse, DecisaoResponse, IdentidadeInterna
 
 RETENCAO = timedelta(days=7)
 
@@ -27,7 +28,7 @@ def autorizar(usuario: Usuario) -> None:
         raise ModeracaoError(403, "permissao de moderador confirmado necessaria")
 
 
-def representar(versao) -> ComentarioModeracaoResponse:
+def representar(versao: ComentarioVersao) -> ComentarioModeracaoResponse:
     return ComentarioModeracaoResponse(
         id=versao.id, texto=versao.texto, estado=versao.estado,
         autor=IdentidadeInterna.model_validate(versao.avaliacao.usuario),
@@ -57,12 +58,14 @@ def consultar(db: Session, usuario: Usuario, versao_id: UUID):
 def decisoes(db: Session, usuario: Usuario, versao_id: UUID):
     autorizar(usuario)
     moderacao_repository.descartar_vencidos(db, agora_utc())
-    resultado = moderacao_repository.listar_decisoes(db, versao_id)
+    if comentario_repository.obter_por_id(db, versao_id) is None:
+        raise ModeracaoError(404, "comentario nao encontrado")
+    resultado = [DecisaoResponse.model_validate(d) for d in moderacao_repository.listar_decisoes(db, versao_id)]
     db.commit()
     return resultado
 
 
-def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados):
+def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados: AcaoModeracaoRequest) -> DecisaoResponse:
     autorizar(usuario)
     try:
         versao = comentario_repository.obter_bloqueado(db, versao_id)
@@ -70,10 +73,10 @@ def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados):
             raise ModeracaoError(404, "comentario nao encontrado")
         if versao.avaliacao.usuario_id == usuario.id:
             raise ModeracaoError(403, "moderador impedido por autoria do comentario")
-        if denuncia_repository.existe_da_conta(db, versao.id, usuario.id):
-            raise ModeracaoError(403, "moderador impedido por denuncia propria")
         anterior = versao.estado
-        abertas = denuncia_repository.listar(db, versao.id)
+        if anterior != EstadoComentario.PENDENTE and denuncia_repository.existe_da_conta(db, versao.id, usuario.id):
+            raise ModeracaoError(403, "moderador impedido por denuncia propria")
+        abertas = denuncia_repository.listar(db, versao.id) if anterior != EstadoComentario.PENDENTE else []
         permitidas = {
             EstadoComentario.PENDENTE: (AcaoModeracao.APROVAR, AcaoModeracao.REJEITAR),
             EstadoComentario.PUBLICADO: (AcaoModeracao.MANTER, AcaoModeracao.REMOVER) if abertas else (),
@@ -115,8 +118,9 @@ def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados):
             estado_anterior=anterior.value, estado_posterior=versao.estado.value,
             created_at=agora, descartar_em=agora + RETENCAO,
         )
+        resultado = DecisaoResponse.model_validate(decisao)
         db.commit()
-        return decisao
+        return resultado
     except Exception:
         db.rollback()
         raise

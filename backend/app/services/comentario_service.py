@@ -74,7 +74,7 @@ def retirar(db: Session, comentario_id: UUID, usuario: Usuario):
         for versao in versoes:
             denuncia_repository.encerrar(db, versao.id, "CONTEUDO_RETIRADO")
             if versao.estado == EstadoComentario.PENDENTE and versao.id != comentario.id:
-                db.delete(versao)
+                comentario_repository.apagar(db, versao)
             else:
                 versao.estado = EstadoComentario.RETIRADO
                 versao.updated_at = agora

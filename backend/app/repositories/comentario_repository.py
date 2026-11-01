@@ -13,6 +13,10 @@ def bloquear_avaliacao(db: Session, avaliacao_id: UUID) -> None:
               .execution_options(populate_existing=True))
 
 
+def apagar(db: Session, comentario: ComentarioVersao) -> None:
+    db.delete(comentario)
+
+
 def obter_bloqueado(db: Session, comentario_id: UUID) -> ComentarioVersao | None:
     avaliacao_id = db.scalar(select(ComentarioVersao.avaliacao_id).where(ComentarioVersao.id == comentario_id))
     if avaliacao_id is None:

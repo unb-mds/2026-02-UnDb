@@ -71,7 +71,7 @@ def _criar_ou_substituir_comentario(
         db, avaliacao_id
     )
     if pendente is not None:
-        db.delete(pendente)
+        comentario_repository.apagar(db, pendente)
 
     publicado = comentario_repository.obter_atual_por_avaliacao(
         db, avaliacao_id

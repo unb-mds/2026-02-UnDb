@@ -1,6 +1,5 @@
 import unittest
 import asyncio
-from uuid import UUID
 from datetime import datetime, timezone
 
 from sqlalchemy.exc import IntegrityError
@@ -197,3 +196,18 @@ class DenunciaHttpTest(unittest.TestCase):
         self.assertEqual(versao.estado, EstadoComentario.PUBLICADO)
         self.assertEqual(denuncia_repository.contar_contas(self.db, versao.id), 0)
         self.assertEqual(self.denunciar(versao.id, self.token_nao_confirmado)[0], 201)
+
+    def test_retirar_substituto_tambem_retira_publicado_sem_agradecer(self):
+        from app.models.comentario_versao import ComentarioVersao
+        self.moderador()
+        atual = self.versao(EstadoComentario.PUBLICADO)
+        self.denunciar(atual.id, self.token_nao_confirmado)
+        pendente = ComentarioVersao(avaliacao_id=atual.avaliacao_id, substitui_id=atual.id,
+                                    texto="substituto", estado=EstadoComentario.PENDENTE)
+        self.db.add(pendente)
+        self.db.commit()
+        self.assertEqual(asyncio.run(self._request("PATCH", f"/api/comentarios/{pendente.id}/retirar", token=self.token))[0], 200)
+        self.db.refresh(atual)
+        self.assertEqual(atual.estado, EstadoComentario.RETIRADO)
+        self.assertEqual(denuncia_repository.listar(self.db, atual.id), [])
+        self.assertEqual(self.acao(pendente.id, "APROVAR")[0], 409)
