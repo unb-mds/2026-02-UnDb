@@ -11,7 +11,7 @@ As seções anteriores à resolução pelo PO descrevem a análise preparatória
 
 - [Requisitos](../requisitos.md): RF20–RF22, AC21-01 a AC22-06 e R2-DEC-01 a
   R2-DEC-15. As regras de produto aprovadas permanecem a fonte de verdade.
-- [Arquitetura](../arquitetura.md), [especificação](../../specs.md), `AGENTS.md`,
+- [Arquitetura](../arquitetura.md), [especificação](https://github.com/unb-mds/2026-02-UnDb/blob/develop/specs.md), `AGENTS.md`,
   `CLAUDE.md`, `CONTRIBUTING.md` e skills locais aplicáveis.
 - Issues [#145](https://github.com/unb-mds/2026-02-UnDb/issues/145),
   [#154](https://github.com/unb-mds/2026-02-UnDb/issues/154),
