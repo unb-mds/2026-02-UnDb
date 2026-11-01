@@ -41,6 +41,7 @@ def listar_agradecimentos(db: Db, usuario: UsuarioAutenticado):
 
 
 @router.post("/agradecimentos/{mensagem_id}/exibido", status_code=204)
-def confirmar_exibicao(mensagem_id: UUID, db: Db, usuario: UsuarioAutenticado):
+def confirmar_exibicao(mensagem_id: UUID, db: Db, usuario: UsuarioAutenticado, response: Response):
     executar(denuncia_service.confirmar_exibicao, db, usuario, mensagem_id)
-    return Response(status_code=204)
+    response.status_code = 204
+    return response

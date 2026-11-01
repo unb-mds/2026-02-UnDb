@@ -67,6 +67,8 @@ def main():
             resposta = erro
         with resposta:
             corpo = resposta.read()
+            if path.endswith("/exibido") and resposta.status == 204:
+                assert "undb_session=" in resposta.headers.get("Set-Cookie", ""), "Cookie de sessao deve acompanhar a renovacao no servidor"
             return resposta.status, json.loads(corpo) if corpo else None
 
     def esperar(method, path, status, payload=None, conta=None):
