@@ -459,7 +459,8 @@ da fonte. O restante deste documento mantém os contratos entregues na R1.
   e a resposta 200 informa o motivo em `comentario_erro`. Esse campo é `null` para
   texto válido ou comentário ausente; comentário inválido não altera texto existente.
 - Reenvio com novo texto: remove `PENDENTE` anterior, cria nova apontando ao
-  `PUBLICADO` atual (se houver) via `substitui_id`.
+  texto vigente `PUBLICADO`, `SUSPENSO` ou `REMOVIDO` (se houver) via `substitui_id`.
+  A publicação do substituto exige nova aprovação; envio nunca restaura o anterior.
 - Reenvio sem texto: mantém comentário existente.
 
 #### Leitura pública (visitante)
@@ -478,6 +479,8 @@ Retorna apenas `id`, `texto`, `created_at` — sem identidade do autor.
 
 Retorna `id`, `texto`, `created_at`, `updated_at`, `estado`, `avaliacao_id`,
 `substitui_id` — apenas comentários da avaliação cujo autor é o usuário autenticado.
+Após descarte aprovado, `texto` pode ser `null`; `REJEITADO` integra os estados.
+Isso não altera o schema público, que continua retornando somente textos publicados.
 
 #### Retirada pelo autor
 
@@ -488,10 +491,17 @@ Retorna `id`, `texto`, `created_at`, `updated_at`, `estado`, `avaliacao_id`,
 - Só pode retirar `PENDENTE`, `PUBLICADO` ou `SUSPENSO`.
 - Cancela evento `PENDENTE` que substitui este comentário (deleta-o).
 - Preserva os cinco critérios estruturados da avaliação.
+- Encerra e descarta denúncias abertas da avaliação como `conteúdo retirado`, sem
+  agradecimento. Selecionar um substituto pendente também retira o texto vigente.
+- Texto retirado é interno por sete dias, com descarte automático.
 
-#### Contratos ainda não definidos (restam para #160/#161)
+#### Contratos compartilhados de denúncias e moderação (#160/#161)
 
-As APIs de **denúncia** (#160, RF21) e **moderação** (#161, RF22) devem ainda
-preservar os cenários AC21-01 a AC22-06, incluindo falta de sessão/confirmação,
-alvo inexistente/obsoleto, motivo inválido, duplicidade, acesso alheio, impedimento
-e transição incompatível.
+Contrato, rotas, schemas, transições, permissões, retenção, operação e evidências
+em [Contrato compartilhado das #160/#161](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolução-pelo-po-e-contrato-de-implementação).
+Essa referência complementa RF20; a fonte de produto permanece `docs/requisitos.md`.
+
+Migrations posteriores à #156: `20261101_01` (papel, decisões e descarte de texto),
+`20261101_02` (denúncias abertas e agradecimentos), `20261101_03` (retenção de
+retiradas legadas). Somente versões `PUBLICADO` aceitam denúncias. Denúncias
+encerradas são apagadas na transação da decisão/retirada/substituição.

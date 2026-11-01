@@ -1,10 +1,11 @@
-# Análise prévia e proposta de contrato — Issues #160/#161
+# Contrato compartilhado e análise de origem — Issues #160/#161
 
 **Estado:** contrato de implementação consolidado após autorização explícita do PO
 para a entrega coordenada das #160/#161. A análise preparatória abaixo é histórica;
 a seção final registra sua resolução e o contrato vigente desta implementação.
 **Data da inspeção:** 01/11/2026.
-**Resultado:** análise preparatória; RF21 não implementado nem validado.
+**Resultado atual:** APIs RF21/RF22 implementadas conjuntamente; evidências abaixo.
+As seções anteriores à resolução pelo PO descrevem a análise preparatória histórica.
 
 ## Fontes e evidências
 
@@ -186,8 +187,9 @@ da configuração do Docker também foi negada pelo ambiente restrito. Python
 disponível no PATH é 3.14; o launcher `py` não enumerou instalações. Esses fatos
 não comprovam regressão do produto nem validam o fluxo solicitado.
 
-Este documento é a única alteração preparatória. Nenhuma migration, endpoint ou
-funcionalidade foi adicionada. RF21 permanece pendente de alinhamento e execução.
+Ao final daquela etapa, este documento era a única alteração preparatória. Ainda
+não havia migration, endpoint ou funcionalidade adicionada; isso foi implementado
+após a autorização coordenada descrita a seguir.
 
 ## Resolução pelo PO e contrato de implementação
 
@@ -251,4 +253,130 @@ As escolhas de persistência e transação descritas acima são adotadas. Comple
 As migrations serão novas, posteriores a `20261024_01`; migrations aplicadas não
 serão editadas. Downgrade não pode recriar texto descartado: se houver versões com
 texto nulo, deve recusar a reversão para o schema antigo em vez de inventar texto.
-O contrato é compartilhado pelas duas issues e será referenciado em `specs.md`.
+O contrato é compartilhado pelas duas issues e referenciado em `specs.md`.
+
+## API entregue para as interfaces #159/#162
+
+Todas as rotas têm prefixo `/api`; schemas Pydantic filtram as respostas. Erros
+seguem o padrão existente `{"detail": "mensagem"}`. Não há acesso a denúncias por
+autor ou denunciante comum nem enum/modelo paralelo de versões.
+
+| Método e rota | Entrada / saída | Permissão e erros |
+|---|---|---|
+| `POST /comentarios/{versao_id}/denuncias` | `DenunciaCreate {motivo}` → `201 ConfirmacaoDenuncia {mensagem}` | Visitante ou conta confirmada ou não; `404` alvo não publicado/inexistente, `409` duplicidade aberta, `422` motivo/schema inválido |
+| `GET /moderacao/comentarios?estado=` | `list[ComentarioModeracaoResponse]`; `[]` se vazia | Moderador confirmado; `401/403`, `422` filtro inválido |
+| `GET /moderacao/comentarios/{versao_id}` | `ComentarioModeracaoResponse` | Moderador confirmado; `401/403/404` |
+| `GET /moderacao/comentarios/{versao_id}/denuncias` | `DenunciasDaVersao` | Moderador confirmado; `401/403/404` |
+| `GET /moderacao/comentarios/{versao_id}/decisoes` | `list[DecisaoResponse]` ainda no prazo | Moderador confirmado; `401/403/404` |
+| `POST /moderacao/comentarios/{versao_id}/acoes` | `AcaoModeracaoRequest {acao, motivo}` → `200 DecisaoResponse` | Moderador confirmado e sem impedimento; `401/403/404/409/422` |
+| `GET /agradecimentos` | `list[AgradecimentoResponse {id, mensagem}]` | Conta autenticada, confirmada ou não; `401`; leitura não consome |
+| `POST /agradecimentos/{id}/exibido` | Sem corpo → `204`, sem conteúdo | Conta destinatária; `401/404`; apagar após primeira exibição |
+
+`ComentarioModeracaoResponse` contém `id`, `texto` opcional, `estado`, `autor`
+(`id/nome/email` internos), `substitui_id` e `created_at`. `DenunciasDaVersao`
+separa arrays `autenticadas`/`visitantes`, `contas_distintas` e `total_visitantes`.
+Cada denúncia interna informa UUID, versão, motivo, `EM_ABERTO`, data e identidade
+de conta quando existir. `DecisaoResponse` contém UUID, versão, moderador, ação,
+motivo, estados anterior/posterior e data, sem cópia de texto ou de denúncias.
+
+Na integração com a #156, `GET /comentarios/meu` admite texto nulo após descarte,
+e `PATCH /comentarios/{id}/retirar` encerra denúncias e cancela substitutos na mesma
+transação. A leitura pública de comentários continua expondo apenas `id`, `texto`,
+`created_at`, sem estados, identidades, critérios individuais ou dados internos.
+Nenhuma interface da #159/#162 foi implementada nesta entrega.
+
+## Arquivos e migrations
+
+| Camada | Arquivos criados ou alterados |
+|---|---|
+| Models | `denuncia.py` (`Denuncia`, `Agradecimento`), `decisao_moderacao.py`, `usuario.py` (papel), `comentario_versao.py` (descarte), `enums.py`, `__init__.py` |
+| Schemas | `denuncia.py`, `moderacao.py`, `comentario.py` (texto descartado opcional) |
+| Repositories | `denuncia_repository.py`, `moderacao_repository.py`, `comentario_repository.py` (locks e versões vigentes) |
+| Services | `denuncia_service.py`, `moderacao_service.py`, `comentario_service.py`, `avaliacao_service.py` |
+| HTTP/auth | `routers/denuncias.py`, `routers/moderacao.py`, `core/auth.py`, `main.py` |
+| Operação | `commands/moderador.py`, `commands/descartar_moderacao.py`, `docker-compose.yml` |
+| Testes | `test_denuncia.py`, `test_moderacao.py`, `integration_moderacao.py`, `migration_moderacao_check.py`, helper HTTP de `test_comentario.py` |
+| Documentação | Este documento, `specs.md`, `README.md`, esclarecimento autorizado em `docs/requisitos.md` |
+
+Migrations novas, sem alterar as da #156:
+
+- `20261101_01_moderacao.py`: papel inicialmente falso; enum `REJEITADO`; texto
+  descartável opcional com constraint de texto obrigatório em estados ativos;
+  prazo de descarte e tabela de decisões privadas.
+- `20261101_02_denuncias.py`: FKs para versão/conta, motivo fechado, unicidade
+  conta/versão com visitantes repetíveis e agradecimentos persistentes até exibição.
+- `20261101_03_retencao_legada.py`: aplica sete dias a retiradas/remoções legadas
+  pela data do evento, descartando imediatamente textos cujo prazo já expirou.
+  Foi criada após a primeira aplicação das anteriores, preservando suas versões.
+
+O descarte mantém somente metadados mínimos de versão; denúncias encerradas e
+decisões vencidas são apagadas. O processo contínuo verifica vencimentos a cada
+60 segundos. Consultas internas e do autor executam a limpeza antes da resposta.
+O operador deve manter `descarte-moderacao` ativo, inclusive quando não houver acessos.
+Não há configuração que prolongue o prazo de sete dias.
+
+## Evidências de validação da implementação
+
+Ambiente principal de validação: imagem do backend `python:3.12-slim`, PostgreSQL
+16 em container descartável, dependências existentes de `backend/requirements.txt`.
+O host Windows possui Python 3.14.7, utilizado adicionalmente para as primeiras
+verificações; não foi adotado como runtime do projeto. Nenhuma dependência nova.
+
+| Verificação executada | Resultado |
+|---|---|
+| `python -m unittest discover -s tests -q`, Python 3.12 | **157 testes aprovados** |
+| `python -m tests.integration_moderacao`, Python 3.12/PostgreSQL 16 | Aprovado: HTTP real, repetição concorrente, corrida da 50ª denúncia, 49/50 contas, 55 visitantes, versões distintas, suspensão, decisões concorrentes, impedimento, encerramento, retirada, agradecimentos e descarte |
+| `python -m tests.integration_avaliacao --api-only`, Python 3.12/PostgreSQL 16 | Aprovado: regressão da #156, permissões, oito envios concorrentes com uma avaliação, substituição e comentário inválido independente dos critérios |
+| `alembic upgrade head` em banco vazio | Aprovado |
+| `alembic downgrade 20261024_01` e novo `upgrade head`, banco vazio | Aprovado |
+| `alembic check`, inclusive em Python 3.12 | Sem diferenças entre models e banco |
+| Dados legados: `tests.migration_legacy_check seed`, `tests.migration_moderacao_check seed/verify` entre revisões | Aprovado: critérios e texto pendente preservados, retirada antiga descartada, nenhum papel concedido automaticamente |
+| Downgrade com texto já descartado | Recusado como esperado; transação preservou `20261101_03` e os dados |
+| `python -m compileall -q app alembic` na imagem | Aprovado |
+| `docker compose config --quiet` e inicialização de backend/db/descarte no projeto isolado | Aprovado; `/health` respondeu `{"status":"ok"}` e migration `20261101_03` aplicada |
+| `docker compose up --build --wait`, composição completa isolada | Backend, banco, descarte e frontend iniciados; build Next.js/TypeScript aprovado e health checks passaram |
+| Links locais e `git diff --check` | Verificados sem falhas |
+
+O teste HTTP integrado usa sessões reais do servidor e PostgreSQL migrado; não
+substitui dependências. Cada execução remove somente suas fixtures por UUID.
+Para reproduzir, configure `DATABASE_URL` para banco descartável, aplique as
+migrations e execute os módulos acima a partir de `backend/`. A regressão de
+avaliações exige também `UNDB_INTEGRATION_TEST=1`. O teste de migration legado
+começa em `20260911_01`, recebe dados institucionais, avança para `20261024_01`,
+recebe comentários legados e depois avança para `head`.
+
+Falhas de ambiente resolvidas: instalação inicial bloqueada pelo sandbox;
+dependências existentes instaladas em venv temporário autorizado. Docker estava
+parado e foi iniciado para as verificações. A primeira execução da suíte na imagem
+não continha `pegar_id.py`, requerido pelos testes SIGAA existentes; ao disponibilizar
+o helper do repositório, a suíte completa passou. Não foi feita correção do produto
+para ocultar essa falha de montagem do ambiente.
+
+Durante o build do frontend, `npm ci` informou 20 vulnerabilidades nas dependências
+do lockfile existente (16 moderadas, três altas, uma crítica). Nenhuma dependência
+ou lockfile do frontend foi alterado nesta entrega; a análise e correção desses
+alertas permanecem fora do escopo das APIs. O build terminou com sucesso.
+
+Não há lint, formatador ou verificação estática de tipos configurados para Python
+no repositório; não se declara aprovação de ferramentas inexistentes. O lint do
+workflow é do frontend. A integração de navegador das interfaces #159/#162 e a
+homologação integral da #163 continuam fora deste escopo. O impedimento de denúncia
+anônima mantém a limitação aprovada: não há identidade cadastrada para detectá-lo.
+Não há decisão essencial de produto pendente nesta implementação; filtro e IA
+continuam fora do fluxo humano entregue.
+
+Commits locais da entrega até a validação funcional:
+
+| Hash | Mensagem |
+|---|---|
+| `81e9b87` | `docs(moderation): define initial moderation contract` — exclusivamente o documento preparatório autorizado |
+| `23ad651` | `docs(moderation): consolidate shared report and moderation contracts` |
+| `3971c61` | `feat(moderation): implement authorization and human comment review` |
+| `5b3a857` | `feat(reports): add open report persistence and validation` |
+| `a78d9f3` | `feat(reports): expose report API and automatic version suspension` |
+| `542969f` | `feat(moderation): integrate report closure and retained data disposal` |
+| `f3f70b4` | `test(moderation): verify integrated report and review workflows` |
+| `db880c4` | `fix(reports): preserve session cookie when acknowledging messages` — mantém renovação de RF02 na resposta 204, verificada por HTTP real |
+
+O commit final de documentação é posterior a esta tabela e pode ser consultado
+no histórico. Não foram realizados push, PR, merge, encerramento ou edição de Issues.

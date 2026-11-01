@@ -83,6 +83,24 @@ A API sobe em `http://127.0.0.1:8000`, o health check em
 Para encerrar os serviços, use `docker compose --env-file backend/.env down`.
 O volume `postgres_data` preserva os dados do banco entre recriações dos containers.
 
+O serviço `descarte-moderacao` acompanha a API e remove dados de moderação vencidos.
+Ao subir somente parte do Compose, inclua `backend db descarte-moderacao` para manter
+o descarte ativo. Sem Docker, execute `python -m app.commands.descartar_moderacao --continuo`
+no mesmo ambiente da API. O prazo aprovado é de sete dias; o worker verifica a cada
+60 segundos e consultas privadas/autor também limpam registros vencidos antes de responder.
+
+Por determinação do PO, o operador pode conceder ou revogar o papel de moderador
+de uma conta confirmada de membro da equipe:
+
+```bash
+docker compose --env-file backend/.env exec backend \
+  python -m app.commands.moderador membro@aluno.unb.br conceder
+# para retirar a permissão, use revogar no lugar de conceder
+```
+
+Não existe concessão pública de papel. Consulte o
+[contrato e as verificações das APIs de denúncia/moderação](docs/estudos/alinhamento-denuncias-issues-160-161.md).
+
 O frontend executa o servidor Next.js com build otimizado, sem recarga automática no
 container. Depois de alterar seu código, execute novamente o comando com `--build`.
 O build precisa de acesso à internet para instalar dependências e baixar as fontes Geist
