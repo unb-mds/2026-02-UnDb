@@ -369,14 +369,22 @@ Commits locais da entrega até a validação funcional:
 
 | Hash | Mensagem |
 |---|---|
-| `81e9b87` | `docs(moderation): define initial moderation contract` — exclusivamente o documento preparatório autorizado |
-| `23ad651` | `docs(moderation): consolidate shared report and moderation contracts` |
-| `3971c61` | `feat(moderation): implement authorization and human comment review` |
-| `5b3a857` | `feat(reports): add open report persistence and validation` |
-| `a78d9f3` | `feat(reports): expose report API and automatic version suspension` |
-| `542969f` | `feat(moderation): integrate report closure and retained data disposal` |
-| `f3f70b4` | `test(moderation): verify integrated report and review workflows` |
-| `db880c4` | `fix(reports): preserve session cookie when acknowledging messages` — mantém renovação de RF02 na resposta 204, verificada por HTTP real |
+| `0d393f6` | `docs(moderation): definir contrato inicial de moderação` — exclusivamente o documento preparatório autorizado |
+| `7df0e8e` | `docs(moderation): consolidar contratos de denúncias e moderação` |
+| `842a635` | `feat(moderation): implementar autorização e revisão humana de comentários` |
+| `7922204` | `feat(reports): adicionar persistência e validação de denúncias abertas` |
+| `bc96ff1` | `feat(reports): expor API de denúncias e suspensão automática de versões` |
+| `a4c0ad0` | `feat(moderation): integrar encerramento de denúncias e descarte de registros` |
+| `20715f0` | `test(moderation): verificar fluxos integrados de denúncia e revisão` |
+| `f08a749` | `fix(reports): preservar cookie de sessão ao confirmar exibição de mensagens` — mantém renovação de RF02 na resposta 204, verificada por HTTP real |
 
 O commit final de documentação é posterior a esta tabela e pode ser consultado
-no histórico. Não foram realizados push, PR, merge, encerramento ou edição de Issues.
+no histórico. Até a conclusão da implementação, não havia push ou PR. A publicação
+foi autorizada posteriormente pelo solicitante; merge e encerramento manual das
+Issues continuam dependendo de autorização própria.
+
+Na preparação da PR, o solicitante pediu mensagens de commit em português.
+Os nove commits locais foram traduzidos antes do primeiro push, preservando
+árvores de arquivos, autoria e datas. Os hashes acima refletem essa tradução.
+A referência local `backup/160-161-mensagens-originais` preserva o histórico
+anterior; nenhum código foi alterado nesse procedimento.
