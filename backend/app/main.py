@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import CORS_ORIGINS
-from app.routers import auth, avaliacoes, comentarios, disciplinas, professores, moderacao
+from app.routers import auth, avaliacoes, comentarios, disciplinas, professores, moderacao, denuncias
 
 app = FastAPI(title="G7 - Avaliação de Disciplinas")
 
@@ -20,6 +20,7 @@ app.include_router(professores.router)
 app.include_router(disciplinas.router)
 app.include_router(comentarios.router)
 app.include_router(moderacao.router)
+app.include_router(denuncias.router)
 
 
 @app.get("/health")
