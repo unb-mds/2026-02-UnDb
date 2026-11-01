@@ -17,7 +17,7 @@ services:
   backend:
     build:
       context: ./backend
-    environment:
+    environment: &backend_environment
       SECRET_KEY: ${SECRET_KEY:-troque-por-um-valor-aleatorio}
       DEBUG: ${DEBUG:-True}
       POSTGRES_DB: ${POSTGRES_DB:-g7}
@@ -38,6 +38,21 @@ services:
       - sh
       - -c
       - alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  descarte-moderacao:
+    build:
+      context: ./backend
+    environment: *backend_environment
+    command: ["python", "-m", "app.commands.descartar_moderacao", "--continuo"]
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
 
   frontend:
     build:

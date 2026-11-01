@@ -6,6 +6,7 @@ import os
 import unittest
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
+from urllib.parse import urlsplit
 
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session
@@ -145,6 +146,8 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         payload: dict | None = None,
         token: str | None = None,
     ) -> tuple[int, dict]:
+        url = urlsplit(path)
+        path = url.path
         corpo = json.dumps(payload).encode("utf-8") if payload else b""
         headers = [
             (b"content-type", b"application/json"),
@@ -178,7 +181,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
                 "scheme": "http",
                 "path": path,
                 "raw_path": path.encode("ascii"),
-                "query_string": b"",
+                "query_string": url.query.encode("ascii"),
                 "headers": headers,
                 "client": ("127.0.0.1", 12345),
                 "server": ("testserver", 80),
@@ -198,7 +201,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
             for mensagem in mensagens
             if mensagem["type"] == "http.response.body"
         )
-        return inicio["status"], json.loads(resposta)
+        return inicio["status"], json.loads(resposta) if resposta else None
 
     def _criar_avaliacao_com_comentario(
         self,

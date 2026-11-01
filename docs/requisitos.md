@@ -199,6 +199,8 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 1. A denúncia tem como alvo uma **versão do comentário textual**; os cinco critérios
    estruturados não são denunciáveis por esse fluxo. Usuários autenticados podem denunciar
    com ou sem confirmação de e-mail. Visitantes sem login também podem denunciar.
+   Conforme decisão do PO na implementação coordenada das #160/#161, somente
+   versões atualmente publicadas aceitam novas denúncias; versões suspensas não aceitam.
 2. Cada denúncia exige um motivo da lista fechada correspondente à política de RF20:
    `ofensa pessoal`, `xingamento`, `palavrão`, `ameaça`, `discriminação`,
    `exposição de dados pessoais` ou `spam`. Não há justificativa textual livre.
