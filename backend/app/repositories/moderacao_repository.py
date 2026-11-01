@@ -1,13 +1,14 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, select, update, or_, exists
 from sqlalchemy.orm import Session
 
 from app.models.comentario_versao import ComentarioVersao
 from app.models.decisao_moderacao import DecisaoModeracao
 from app.models.enums import EstadoComentario
 from app.models.usuario import Usuario
+from app.models.denuncia import Denuncia
 
 
 def descartar_vencidos(db: Session, agora: datetime) -> None:
@@ -19,7 +20,11 @@ def descartar_vencidos(db: Session, agora: datetime) -> None:
 
 
 def listar_fila(db: Session, estado: EstadoComentario | None = None) -> list[ComentarioVersao]:
-    consulta = select(ComentarioVersao).where(ComentarioVersao.estado == EstadoComentario.PENDENTE)
+    consulta = select(ComentarioVersao).where(or_(
+        ComentarioVersao.estado.in_((EstadoComentario.PENDENTE, EstadoComentario.SUSPENSO)),
+        (ComentarioVersao.estado == EstadoComentario.PUBLICADO) & exists().where(
+            Denuncia.comentario_versao_id == ComentarioVersao.id),
+    ))
     if estado is not None:
         consulta = consulta.where(ComentarioVersao.estado == estado)
     return list(db.scalars(consulta.order_by(ComentarioVersao.created_at, ComentarioVersao.id)))

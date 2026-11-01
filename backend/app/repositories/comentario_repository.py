@@ -29,6 +29,13 @@ def obter_atual_por_avaliacao(db: Session, avaliacao_id: UUID) -> ComentarioVers
     ).order_by(ComentarioVersao.created_at.desc()))
 
 
+def listar_ativas_por_avaliacao(db: Session, avaliacao_id: UUID) -> list[ComentarioVersao]:
+    return list(db.scalars(select(ComentarioVersao).where(
+        ComentarioVersao.avaliacao_id == avaliacao_id,
+        ComentarioVersao.estado.in_((EstadoComentario.PUBLICADO, EstadoComentario.SUSPENSO, EstadoComentario.PENDENTE)),
+    ).order_by(ComentarioVersao.id).with_for_update()))
+
+
 def obter_por_id(db: Session, comentario_id: UUID) -> ComentarioVersao | None:
     return db.get(ComentarioVersao, comentario_id)
 

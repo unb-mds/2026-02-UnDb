@@ -4,14 +4,16 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.models.avaliacao import Avaliacao
 from app.models.enums import EstadoComentario
 from app.models.usuario import Usuario
 from app.repositories import (
     avaliacao_repository,
     comentario_repository,
     turma_repository,
+    denuncia_repository,
+    moderacao_repository,
 )
+from app.services.moderacao_service import agora_utc, RETENCAO
 
 
 class RecursoNaoEncontradoError(Exception):
@@ -39,17 +41,19 @@ def listar_publicados(db: Session, professor_id: UUID, disciplina_id: UUID):
 
 def listar_do_autor(db: Session, usuario: Usuario):
     """Lista os comentarios do autor autenticado (todos os estados)."""
-    return comentario_repository.listar_por_usuario(db, usuario.id)
+    moderacao_repository.descartar_vencidos(db, agora_utc())
+    resultado = comentario_repository.listar_por_usuario(db, usuario.id)
+    db.commit()
+    return resultado
 
 
 def retirar(db: Session, comentario_id: UUID, usuario: Usuario):
     """Retira um comentario pelo autor (PUBLICADO, PENDENTE ou SUSPENSO)."""
-    comentario = comentario_repository.obter_por_id(db, comentario_id)
+    comentario = comentario_repository.obter_bloqueado(db, comentario_id)
     if comentario is None:
         raise RecursoNaoEncontradoError("comentario nao encontrado")
 
-    avaliacao = db.get(Avaliacao, comentario.avaliacao_id)
-    if avaliacao is None or avaliacao.usuario_id != usuario.id:
+    if comentario.avaliacao.usuario_id != usuario.id:
         raise ComentarioNaoAutorizadoError(
             "nao autorizado a retirar este comentario"
         )
@@ -63,14 +67,21 @@ def retirar(db: Session, comentario_id: UUID, usuario: Usuario):
             "nao e possivel retirar este comentario"
         )
 
-    # Cancela eventuais substitutos pendentes deste comentario.
-    pendente = comentario_repository.obter_pendente_que_substitui(
-        db, comentario_id
-    )
-    if pendente is not None:
-        db.delete(pendente)
-
-    comentario_repository.retirar(db, comentario)
-    db.commit()
-    db.refresh(comentario)
-    return comentario
+    try:
+        # Retirada explicita tambem vale quando o autor seleciona seu substituto.
+        agora = agora_utc()
+        versoes = comentario_repository.listar_ativas_por_avaliacao(db, comentario.avaliacao_id)
+        for versao in versoes:
+            denuncia_repository.encerrar(db, versao.id, "CONTEUDO_RETIRADO")
+            if versao.estado == EstadoComentario.PENDENTE and versao.id != comentario.id:
+                db.delete(versao)
+            else:
+                versao.estado = EstadoComentario.RETIRADO
+                versao.updated_at = agora
+                versao.descartar_em = agora + RETENCAO
+        db.commit()
+        db.refresh(comentario)
+        return comentario
+    except Exception:
+        db.rollback()
+        raise

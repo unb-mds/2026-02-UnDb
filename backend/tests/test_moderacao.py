@@ -1,6 +1,7 @@
 """RF20/RF22 HTTP flows, using the existing comment integration fixture."""
 import asyncio
 import unittest
+from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
@@ -91,6 +92,61 @@ class ModeracaoTest(unittest.TestCase):
         code, fila = asyncio.run(self._request("GET", "/api/moderacao/comentarios", token="mod"))
         self.assertEqual(code, 200)
         self.assertEqual(fila[0]["autor"]["email"], self.usuario.email)
+        self.assertEqual(asyncio.run(self._request("GET", "/api/moderacao/comentarios?estado=SUSPENSO", token="mod"))[1], [])
+
+    def test_revogacao_imediata_e_conta_nao_confirmada(self):
+        from app.repositories.moderacao_repository import definir_papel
+        usuario = self.moderador()
+        definir_papel(self.db, usuario.email, False)
+        self.db.commit()
+        self.assertEqual(asyncio.run(self._request("GET", "/api/moderacao/comentarios", token="mod"))[0], 403)
+        with self.assertRaises(ValueError):
+            definir_papel(self.db, self.usuario_nao_confirmado.email, True)
+
+    def test_descarte_sete_dias_preserva_pendentes_suspensos_e_mensagens(self):
+        from app.repositories.moderacao_repository import descartar_vencidos
+        from app.models.denuncia import Agradecimento
+        self.moderador()
+        versao = self.versao(EstadoComentario.PUBLICADO)
+        from app.repositories import denuncia_repository
+        from app.models.enums import MotivoDenuncia
+        inicio = datetime.now(timezone.utc)
+        denuncia_repository.criar(self.db, versao.id, self.usuario_nao_confirmado.id, MotivoDenuncia.SPAM, inicio)
+        self.db.commit()
+        with patch("app.services.moderacao_service.agora_utc", return_value=inicio):
+            self.assertEqual(self.acao(versao.id, "REMOVER")[0], 200)
+        self.db.refresh(versao)
+        decisao = self.db.scalar(select(DecisaoModeracao))
+        pendente = self.versao(usuario=self.outro_usuario)
+        descartar_vencidos(self.db, inicio + timedelta(days=7) - timedelta(microseconds=1))
+        self.assertEqual(versao.texto, "texto")
+        self.assertIsNotNone(self.db.get(DecisaoModeracao, decisao.id))
+        self.db.commit()
+        with patch("app.services.comentario_service.agora_utc", return_value=inicio + timedelta(days=7)):
+            code, comentarios_autor = asyncio.run(self._request("GET", "/api/comentarios/meu", token=self.token))
+        self.assertEqual(code, 200)
+        self.assertIsNone(comentarios_autor[0]["texto"])
+        self.db.expire_all()
+        self.assertIsNone(versao.texto)
+        self.assertIsNone(self.db.scalar(select(DecisaoModeracao)))
+        self.assertEqual(pendente.texto, "texto")
+        self.assertIsNotNone(self.db.scalar(select(Agradecimento)))
+
+    def test_transacao_reverte_acao_e_encerramento_em_falha(self):
+        from app.repositories import denuncia_repository
+        from app.models.enums import MotivoDenuncia
+        self.moderador()
+        versao = self.versao(EstadoComentario.PUBLICADO)
+        denuncia_repository.criar(self.db, versao.id, self.usuario_nao_confirmado.id,
+                                  MotivoDenuncia.SPAM, datetime.now(timezone.utc))
+        self.db.commit()
+        with patch("app.repositories.moderacao_repository.registrar_decisao", side_effect=RuntimeError("falha simulada")):
+            with self.assertRaises(RuntimeError):
+                self.acao(versao.id, "REMOVER")
+        self.db.refresh(versao)
+        self.assertEqual(versao.estado, EstadoComentario.PUBLICADO)
+        self.assertEqual(denuncia_repository.contar_contas(self.db, versao.id), 1)
+        self.assertEqual(denuncia_repository.listar_agradecimentos(self.db, self.usuario_nao_confirmado.id), [])
 
 
 if __name__ == "__main__":

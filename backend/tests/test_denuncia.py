@@ -1,5 +1,6 @@
 import unittest
 import asyncio
+from uuid import UUID
 from datetime import datetime, timezone
 
 from sqlalchemy.exc import IntegrityError
@@ -105,6 +106,94 @@ class DenunciaHttpTest(unittest.TestCase):
         self.assertEqual(set(mensagens[0]), {"id", "mensagem"})
         self.assertEqual(asyncio.run(self._request("POST", f"/api/agradecimentos/{mensagens[0]['id']}/exibido", token=self.token))[0], 404)
         self.assertEqual(len(asyncio.run(self._request("GET", "/api/agradecimentos", token=self.token_nao_confirmado))[1]), 1)
-        # The existing ASGI helper expects JSON; exercise the 204 through the service.
-        denuncia_service.confirmar_exibicao(self.db, self.usuario_nao_confirmado, __import__('uuid').UUID(mensagens[0]['id']))
+        self.assertEqual(asyncio.run(self._request("POST", f"/api/agradecimentos/{mensagens[0]['id']}/exibido", token=self.token_nao_confirmado))[0], 204)
         self.assertEqual(asyncio.run(self._request("GET", "/api/agradecimentos", token=self.token_nao_confirmado))[1], [])
+
+    def test_manter_encerra_e_permite_nova_denuncia_sem_contagem_herdada(self):
+        self.moderador()
+        versao = self.versao(EstadoComentario.PUBLICADO)
+        self.assertEqual(self.denunciar(versao.id, self.token_nao_confirmado)[0], 201)
+        self.assertEqual(self.acao(versao.id, "MANTER")[0], 200)
+        self.assertEqual(denuncia_repository.contar_contas(self.db, versao.id), 0)
+        self.assertEqual(self.denunciar(versao.id, self.token_nao_confirmado)[0], 201)
+        self.assertEqual(denuncia_repository.contar_contas(self.db, versao.id), 1)
+
+    def test_impedimento_denuncia_propria_preserva_caso(self):
+        self.moderador()
+        versao = self.versao(EstadoComentario.PUBLICADO)
+        self.assertEqual(self.denunciar(versao.id, "mod")[0], 201)
+        self.assertEqual(self.acao(versao.id, "REMOVER")[0], 403)
+        self.db.refresh(versao)
+        self.assertEqual(versao.estado, EstadoComentario.PUBLICADO)
+        self.assertEqual(denuncia_repository.contar_contas(self.db, versao.id), 1)
+
+    def test_remover_agradece_descarta_denuncias_e_nao_restaura(self):
+        self.moderador()
+        versao = self.versao(EstadoComentario.PUBLICADO)
+        self.denunciar(versao.id, self.token_nao_confirmado)
+        self.assertEqual(self.acao(versao.id, "REMOVER")[0], 200)
+        self.db.refresh(versao)
+        self.assertEqual(versao.estado, EstadoComentario.REMOVIDO)
+        self.assertEqual(versao.texto, "texto")
+        self.assertEqual(denuncia_repository.listar(self.db, versao.id), [])
+        self.assertEqual(len(asyncio.run(self._request("GET", "/api/agradecimentos", token=self.token_nao_confirmado))[1]), 1)
+        self.assertEqual(self.acao(versao.id, "RESTAURAR")[0], 409)
+
+    def test_retirar_encerra_sem_agradecer_e_preserva_criterios(self):
+        self.moderador()
+        versao = self.versao(EstadoComentario.PUBLICADO)
+        self.denunciar(versao.id, self.token_nao_confirmado)
+        self.assertEqual(asyncio.run(self._request("PATCH", f"/api/comentarios/{versao.id}/retirar", token=self.token))[0], 200)
+        self.db.refresh(versao)
+        self.assertEqual(versao.estado, EstadoComentario.RETIRADO)
+        self.assertEqual(versao.avaliacao.didatica, 4)
+        self.assertEqual(denuncia_repository.listar(self.db, versao.id), [])
+        self.assertEqual(asyncio.run(self._request("GET", "/api/agradecimentos", token=self.token_nao_confirmado))[1], [])
+
+    def test_substituicao_de_suspenso_encerra_sem_transferir_denuncias(self):
+        from app.models.comentario_versao import ComentarioVersao
+        self.moderador()
+        anterior = self.versao(EstadoComentario.PUBLICADO)
+        self.denunciar(anterior.id, self.token_nao_confirmado)
+        anterior.estado = EstadoComentario.SUSPENSO
+        self.db.commit()
+        payload = dict(self._payload, comentario="novo texto")
+        self.assertEqual(asyncio.run(self._request("POST", "/api/avaliacoes", payload, self.token))[0], 200)
+        self.db.expire_all()
+        from sqlalchemy import select
+        novo = self.db.scalar(select(ComentarioVersao).where(ComentarioVersao.estado == EstadoComentario.PENDENTE))
+        self.assertEqual(novo.substitui_id, anterior.id)
+        self.assertEqual(self.acao(novo.id, "APROVAR")[0], 200)
+        self.db.refresh(anterior)
+        self.assertIsNone(anterior.texto)
+        self.assertEqual(anterior.estado, EstadoComentario.SUBSTITUIDO)
+        self.assertEqual(denuncia_repository.listar(self.db, anterior.id), [])
+        self.assertEqual(self.denunciar(anterior.id)[0], 404)
+        self.assertEqual(denuncia_repository.contar_contas(self.db, novo.id), 0)
+        self.assertEqual(self.denunciar(novo.id, self.token_nao_confirmado)[0], 201)
+
+    def test_rejeitar_substituto_mantem_anterior_e_denuncias(self):
+        from app.models.comentario_versao import ComentarioVersao
+        self.moderador()
+        anterior = self.versao(EstadoComentario.PUBLICADO)
+        self.denunciar(anterior.id, self.token_nao_confirmado)
+        novo = ComentarioVersao(avaliacao_id=anterior.avaliacao_id, substitui_id=anterior.id,
+                                texto="substituto", estado=EstadoComentario.PENDENTE)
+        self.db.add(novo)
+        self.db.commit()
+        self.assertEqual(self.acao(novo.id, "REJEITAR")[0], 200)
+        self.db.refresh(anterior)
+        self.assertEqual(anterior.estado, EstadoComentario.PUBLICADO)
+        self.assertEqual(denuncia_repository.contar_contas(self.db, anterior.id), 1)
+
+    def test_restaurar_encerra_sem_agradecimento_adicional(self):
+        self.moderador()
+        versao = self.versao(EstadoComentario.PUBLICADO)
+        self.denunciar(versao.id, self.token_nao_confirmado)
+        versao.estado = EstadoComentario.SUSPENSO
+        self.db.commit()
+        self.assertEqual(self.acao(versao.id, "RESTAURAR")[0], 200)
+        self.db.refresh(versao)
+        self.assertEqual(versao.estado, EstadoComentario.PUBLICADO)
+        self.assertEqual(denuncia_repository.contar_contas(self.db, versao.id), 0)
+        self.assertEqual(self.denunciar(versao.id, self.token_nao_confirmado)[0], 201)

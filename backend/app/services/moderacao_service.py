@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.models.enums import AcaoModeracao, EstadoComentario
 from app.models.usuario import Usuario
-from app.repositories import comentario_repository, moderacao_repository
+from app.repositories import comentario_repository, moderacao_repository, denuncia_repository
 from app.schemas.moderacao import ComentarioModeracaoResponse, IdentidadeInterna
 
 RETENCAO = timedelta(days=7)
@@ -70,20 +70,44 @@ def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados):
             raise ModeracaoError(404, "comentario nao encontrado")
         if versao.avaliacao.usuario_id == usuario.id:
             raise ModeracaoError(403, "moderador impedido por autoria do comentario")
+        if denuncia_repository.existe_da_conta(db, versao.id, usuario.id):
+            raise ModeracaoError(403, "moderador impedido por denuncia propria")
         anterior = versao.estado
-        if anterior != EstadoComentario.PENDENTE or dados.acao not in (AcaoModeracao.APROVAR, AcaoModeracao.REJEITAR):
+        abertas = denuncia_repository.listar(db, versao.id)
+        permitidas = {
+            EstadoComentario.PENDENTE: (AcaoModeracao.APROVAR, AcaoModeracao.REJEITAR),
+            EstadoComentario.PUBLICADO: (AcaoModeracao.MANTER, AcaoModeracao.REMOVER) if abertas else (),
+            EstadoComentario.SUSPENSO: (AcaoModeracao.RESTAURAR, AcaoModeracao.REMOVER),
+        }
+        if dados.acao not in permitidas.get(anterior, ()):
             raise ModeracaoError(409, "acao incompativel com estado atual")
+        agora = agora_utc()
         if dados.acao == AcaoModeracao.APROVAR:
             atual = comentario_repository.obter_atual_por_avaliacao(db, versao.avaliacao_id)
             if atual is not None:
+                if denuncia_repository.existe_da_conta(db, atual.id, usuario.id):
+                    raise ModeracaoError(403, "moderador impedido por denuncia propria da versao substituida")
+                denuncia_repository.encerrar(db, atual.id, "VERSAO_SUBSTITUIDA")
                 atual.estado = EstadoComentario.SUBSTITUIDO
                 atual.texto = None
                 atual.descartar_em = None
+                atual.updated_at = agora
             versao.estado = EstadoComentario.PUBLICADO
-        else:
+        elif dados.acao == AcaoModeracao.REJEITAR:
             versao.estado = EstadoComentario.REJEITADO
             versao.texto = None
-        agora = agora_utc()
+        else:
+            if dados.acao == AcaoModeracao.REMOVER:
+                if abertas:
+                    denuncia_repository.agradecer(db, versao.id, "REMOCAO", agora)
+                versao.estado = EstadoComentario.REMOVIDO
+                versao.descartar_em = agora + RETENCAO
+            else:
+                versao.estado = EstadoComentario.PUBLICADO
+            denuncia_repository.encerrar(db, versao.id, {
+                AcaoModeracao.REMOVER: "REMOVIDO", AcaoModeracao.MANTER: "MANTIDO",
+                AcaoModeracao.RESTAURAR: "RESTAURADO",
+            }[dados.acao])
         versao.updated_at = agora
         decisao = moderacao_repository.registrar_decisao(
             db, comentario_versao_id=versao.id, moderador_id=usuario.id,
