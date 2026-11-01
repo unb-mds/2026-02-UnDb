@@ -1,6 +1,8 @@
 # Análise prévia e proposta de contrato — Issues #160/#161
 
-**Estado:** `Proposed`; escolhas técnicas e perguntas abaixo aguardam alinhamento.
+**Estado:** contrato de implementação consolidado após autorização explícita do PO
+para a entrega coordenada das #160/#161. A análise preparatória abaixo é histórica;
+a seção final registra sua resolução e o contrato vigente desta implementação.
 **Data da inspeção:** 01/11/2026.
 **Resultado:** análise preparatória; RF21 não implementado nem validado.
 
@@ -186,3 +188,67 @@ não comprovam regressão do produto nem validam o fluxo solicitado.
 
 Este documento é a única alteração preparatória. Nenhuma migration, endpoint ou
 funcionalidade foi adicionada. RF21 permanece pendente de alinhamento e execução.
+
+## Resolução pelo PO e contrato de implementação
+
+Na continuação desta tarefa o PO confirmou: não existe contrato externo da #161;
+as duas issues devem ser implementadas conjuntamente; somente `PUBLICADO` aceita
+novas denúncias; autorização, decisões, descarte e agradecimentos integram a entrega.
+Autorizou também commits locais, começando pelo documento preparatório exclusivo.
+PD-160-01/02/03 estão resolvidas por essas instruções, sem reaprovar as regras RF20–22.
+
+As escolhas de persistência e transação descritas acima são adotadas. Complementos:
+
+- Permissão `Usuario.moderador`, inicialmente falsa, consultada no servidor a cada
+  operação. Conta precisa estar autenticada e confirmada. Designação/revogação é
+  comando operacional `python -m app.commands.moderador EMAIL conceder|revogar`,
+  executado pelo operador por determinação do PO para membros da equipe. Nenhuma
+  API de cadastro, sessão ou usuário comum permite conceder papel.
+- A fila privada `GET /api/moderacao/comentarios` aceita filtro `estado` e inclui
+  pendentes, publicados denunciados e suspensos. Vazia retorna `[]`. Detalhe em
+  `GET /api/moderacao/comentarios/{id}`; registros de decisão em
+  `GET /api/moderacao/comentarios/{id}/decisoes`. Identidade do autor e denúncias
+  com nome/e-mail são exclusivamente internas. Impedimento proíbe decidir, sem
+  restringir a consulta interna autorizada prevista em RF22.
+- `POST /api/moderacao/comentarios/{id}/acoes` recebe `acao` e `motivo` não vazio.
+  Ações: `APROVAR`, `REJEITAR`, `MANTER`, `RESTAURAR`, `REMOVER`. Retorna `200`
+  com decisão, versão e estado. `APROVAR/REJEITAR` exigem `PENDENTE`;
+  `MANTER` exige `PUBLICADO` com denúncia aberta; `RESTAURAR` exige `SUSPENSO`;
+  `REMOVER` exige publicado denunciado ou suspenso. Estado incompatível retorna
+  `409`; impedimento de autoria ou denúncia própria retorna `403`.
+- Decisões contêm UUID, versão, moderador, data, ação, motivo e estados anterior/
+  posterior, sem cópia do texto ou das denúncias descartadas. Após sete dias são
+  apagadas. Não são produzidas decisões humanas fictícias para suspensão automática.
+- Adicionar `REJEITADO` a `EstadoComentario`; texto passa a admitir `null` apenas
+  em estados descartáveis. Rejeição e substituição apagam texto imediatamente;
+  retirada/remoção conservam internamente até `descartar_em = evento + 7 dias`.
+  Metadados mínimos da versão persistem para vínculos e estado do autor. A resposta
+  do autor admite `texto: null`; a resposta pública continua exigindo texto.
+- A aprovação usa a versão anterior vigente da avaliação, inclusive suspensa ou
+  removida, sem restaurá-la. Envio de edição nunca torna anterior suspenso público.
+  A aprovação substitui a anterior, encerra denúncias e descarta o texto anterior.
+- Todas as escritas de versões da mesma avaliação adquirem primeiro lock da
+  avaliação e depois da versão. Isso também serializa edições, retirada e aprovação;
+  o lock inclui versões relacionadas antes de decidir e é mantido até o commit.
+- Encerrar remove denúncias na mesma transação; a causa acompanha a operação
+  interna. Retirada/substituição não produzem arquivo nem agradecimento. Manter/
+  restaurar permite novas denúncias após o encerramento, sem contagem herdada.
+- `GET /api/agradecimentos` exige conta autenticada (confirmada ou não), lista
+  apenas `id` e mensagem, sem versão/autor/denunciantes. `POST /api/agradecimentos/
+  {id}/exibido` apaga somente mensagem própria após a primeira exibição e retorna
+  `204`; mensagem alheia/inexistente retorna `404`. GET não consome mensagens.
+- Uma mensagem por conta e evento de suspensão/remoção, para todas as contas com
+  denúncia aberta da versão na transação; visitantes não recebem mensagens.
+- Descarte executável por `python -m app.commands.descartar_moderacao`, com modo
+  `--continuo` para operação no Compose. Consultas internas e do autor também
+  descartam dados vencidos antes de responder. O worker deve ser mantido ativo;
+  não há alteração do prazo de sete dias por configuração.
+- Registro de denúncia retorna `201` com confirmação; duplicidade autenticada
+  `409`; alvo não publicado/inexistente `404`; motivo inválido `422`. A resposta
+  não revela se o evento suspendeu o texto ou qual a contagem. Consultas privadas
+  exigem moderador (`401/403`). Nenhum endpoint público consulta denúncias.
+
+As migrations serão novas, posteriores a `20261024_01`; migrations aplicadas não
+serão editadas. Downgrade não pode recriar texto descartado: se houver versões com
+texto nulo, deve recusar a reversão para o schema antigo em vez de inventar texto.
+O contrato é compartilhado pelas duas issues e será referenciado em `specs.md`.
