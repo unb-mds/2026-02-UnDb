@@ -21,9 +21,11 @@ function buildQuery(params: Record<string, string | undefined>): string {
   return "?" + new URLSearchParams(entries).toString();
 }
 
-async function request<T>(path: string, query: Record<string, string | undefined> = {}): Promise<T> {
+type OpcoesRequisicao = Pick<RequestInit, "signal" | "cache">;
+
+async function request<T>(path: string, query: Record<string, string | undefined> = {}, opcoes: OpcoesRequisicao = {}): Promise<T> {
   const url = `${apiBaseUrl()}${path}${buildQuery(query)}`;
-  const response = await fetch(url, { credentials: "include" });
+  const response = await fetch(url, { ...opcoes, credentials: "include" });
 
   if (!response.ok) {
     const detalhe = await response.json().catch(() => null);
@@ -33,8 +35,9 @@ async function request<T>(path: string, query: Record<string, string | undefined
   return response.json() as Promise<T>;
 }
 
-async function post<TResponse, TBody>(path: string, body: TBody): Promise<TResponse> {
+async function post<TResponse, TBody>(path: string, body: TBody, opcoes: OpcoesRequisicao = {}): Promise<TResponse> {
   const response = await fetch(`${apiBaseUrl()}${path}`, {
+    ...opcoes,
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },

@@ -48,6 +48,7 @@ nav:
       - Release 1.0.0: releases/1.0.0.md
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
   - Estudos:
+      - Fila de moderação: estudos/fila-moderacao-issue-162.md
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
       - Docker: estudos/docker.md

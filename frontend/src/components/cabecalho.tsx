@@ -33,6 +33,9 @@ export default function Cabecalho() {
           <Link href="/disciplinas" className="py-2 hover:text-accent hover:underline underline-offset-4">
             Disciplinas
           </Link>
+          <Link href="/moderacao" className="py-2 hover:text-accent hover:underline underline-offset-4">
+            Moderação
+          </Link>
           <Suspense fallback={<LinkConta />}><ContaComRetorno /></Suspense>
         </nav>
       </div>
