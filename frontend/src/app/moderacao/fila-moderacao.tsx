@@ -28,6 +28,11 @@ export default function FilaModeracao() {
   const sequencia = useRef(0);
   const consultaFila = useRef<AbortController | null>(null);
   const consultaDetalhe = useRef<AbortController | null>(null);
+  const painelAnalise = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (detalhe?.tipo === "pronto") painelAnalise.current?.focus();
+  }, [detalhe]);
 
   const negarAcesso = useCallback((erro: unknown) => {
     sequencia.current += 1;
@@ -137,12 +142,12 @@ export default function FilaModeracao() {
                 className="w-full min-w-0 rounded-xl border border-foreground/20 p-4 text-left hover:border-accent aria-pressed:border-accent aria-pressed:bg-accent/5 disabled:opacity-50">
                 <span className="text-sm font-semibold text-accent">{item.estado === "PUBLICADO" ? "Publicado com denúncias" : rotulosEstado[item.estado]}</span>
                 {item.estado === "PENDENTE" && item.substitui_id && <span className="mt-1 block text-sm text-foreground/70">Substituto em análise</span>}
-                <span className="mt-2 block line-clamp-3 whitespace-pre-wrap [overflow-wrap:anywhere]">{item.texto ?? "Texto descartado"}</span>
+                <span className="mt-2 line-clamp-3 whitespace-pre-wrap [overflow-wrap:anywhere]">{item.texto ?? "Texto descartado"}</span>
                 <span className="mt-3 block text-xs text-foreground/70 [overflow-wrap:anywhere]">Versão {item.id}</span>
               </button>
             </li>)}</ul>
           </section>
-          <section aria-label="Análise do comentário" aria-busy={detalhe?.tipo === "carregando"} className="min-w-0 rounded-xl border border-foreground/20 p-5">
+          <section ref={painelAnalise} tabIndex={-1} aria-label="Análise do comentário" aria-busy={detalhe?.tipo === "carregando"} className="min-w-0 rounded-xl border border-foreground/20 p-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
             {!detalhe && <p className="text-sm text-foreground/70">O conteúdo selecionado e suas ações aparecerão aqui.</p>}
             {detalhe?.tipo === "carregando" && <p role="status">Carregando comentário…</p>}
             {detalhe?.tipo === "erro" && <div role="alert"><p>{detalhe.mensagem}</p><button type="button" className={`${botao} mt-3`} onClick={() => void selecionar(detalhe.id)}>Tentar carregar comentário</button></div>}

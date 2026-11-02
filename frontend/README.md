@@ -29,9 +29,24 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 - `npm test`: compila os módulos de formulário, busca e retorno com TypeScript em diretório temporário e
   executa testes com o runner nativo do Node, sem novas dependências.
 - `npm run test:browser`: verifica o formulário no Edge/Chromium headless com respostas
-  controladas de teste; exige build padrão prévio, Node 22+ e portas 8000, 3100 e 9223 livres.
+  controladas de teste; exige build padrão prévio, Node 22+ e portas 8000, 3100, 9223 e 9226 livres.
   No Windows usa o caminho padrão do Edge; em outros ambientes configure `BROWSER_PATH`.
   Esse comando não usa o backend real nem comprova persistência.
+- A partir da #162, `npm run test:browser` também executa sequencialmente a fila de
+  moderação. `npm run test:moderacao` executa somente essa fila, nos três estados,
+  com permissões, ações, erros, atualização e 320/768/1280 px nos dois temas.
+
+## Fila de moderação — Issue #162
+
+A rota `/moderacao`, acessível pelo menu, consulta as APIs privadas da PR #192.
+Somente moderador confirmado e autorizado recebe dados. A sessão não informa papel;
+a autorização definitiva continua na API, com tratamento de `401`, `403` e `409`.
+Pendentes, publicados denunciados e suspensos têm as ações previstas no contrato,
+com motivo obrigatório e atualização após a decisão. Não implementa denúncia ou
+agradecimentos da #193. Leituras privadas não usam cache nem Web Storage.
+
+O [relatório da #162](../docs/estudos/fila-moderacao-issue-162.md) descreve arquivos,
+contratos, limites, verificação real com FastAPI/PostgreSQL e reprodução dos testes.
 
 ## Acesso e retorno à avaliação — Issue #158
 
