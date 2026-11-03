@@ -9,11 +9,47 @@ const carregar = (arquivo) =>
 const servicoDenuncias = await carregar("services/denuncias.js");
 const servicoComentarios = await carregar("services/comentarios.js");
 const tiposDenuncia = await carregar("types/denuncia.js");
+const auth = await carregar("services/auth.js");
 
 const versaoId = "11111111-1111-4111-8111-111111111111";
 const professorId = "22222222-2222-4222-8222-222222222222";
 const disciplinaId = "33333333-3333-4333-8333-333333333333";
 const mensagemId = "44444444-4444-4444-8444-444444444444";
+
+test("login e logout bem-sucedidos notificam o layout após a resposta", async (t) => {
+  const janelaAnterior = globalThis.window;
+  globalThis.window = new EventTarget();
+  t.after(() => {
+    if (janelaAnterior === undefined) delete globalThis.window;
+    else globalThis.window = janelaAnterior;
+  });
+  let notificacoes = 0;
+  window.addEventListener(auth.EVENTO_SESSAO_ALTERADA, () => notificacoes++);
+  t.mock.method(globalThis, "fetch", async () => {
+    assert.equal(notificacoes, 0, "Não notifica antes da confirmação do servidor");
+    return Response.json({ message: "OK" });
+  });
+  await auth.entrar({ email: "fixture@aluno.unb.br", senha: "fixture" });
+  assert.equal(notificacoes, 1);
+  notificacoes = 0;
+  await auth.sair();
+  assert.equal(notificacoes, 1);
+});
+
+test("login ou logout recusados não notificam mudança de sessão", async (t) => {
+  const janelaAnterior = globalThis.window;
+  globalThis.window = new EventTarget();
+  t.after(() => {
+    if (janelaAnterior === undefined) delete globalThis.window;
+    else globalThis.window = janelaAnterior;
+  });
+  let notificacoes = 0;
+  window.addEventListener(auth.EVENTO_SESSAO_ALTERADA, () => notificacoes++);
+  t.mock.method(globalThis, "fetch", async () => Response.json({}, { status: 503 }));
+  await assert.rejects(auth.entrar({ email: "fixture@aluno.unb.br", senha: "fixture" }));
+  await assert.rejects(auth.sair());
+  assert.equal(notificacoes, 0);
+});
 
 test("aceita exatamente os sete motivos fechados de RF21", () => {
   const motivosEsperados = [

@@ -1,5 +1,13 @@
 import { apiClient } from "./api-client";
 
+export const EVENTO_SESSAO_ALTERADA = "undb:sessao-alterada";
+
+function notificarSessao() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(EVENTO_SESSAO_ALTERADA));
+  }
+}
+
 export type CadastroInput = {
   nome: string;
   email: string;
@@ -29,7 +37,9 @@ export async function confirmarEmail(token: string): Promise<MensagemResponse> {
 }
 
 export async function entrar(dados: LoginInput): Promise<MensagemResponse> {
-  return apiClient.post<MensagemResponse, LoginInput>("/api/auth/login", dados);
+  const resposta = await apiClient.post<MensagemResponse, LoginInput>("/api/auth/login", dados);
+  notificarSessao();
+  return resposta;
 }
 
 export async function consultarSessao(): Promise<SessaoResponse> {
@@ -37,5 +47,7 @@ export async function consultarSessao(): Promise<SessaoResponse> {
 }
 
 export async function sair(): Promise<MensagemResponse> {
-  return apiClient.post<MensagemResponse, Record<string, never>>("/api/auth/logout", {});
+  const resposta = await apiClient.post<MensagemResponse, Record<string, never>>("/api/auth/logout", {});
+  notificarSessao();
+  return resposta;
 }

@@ -27,7 +27,7 @@ export default async function AvaliacaoAgregadaPage({
     throw erro;
   });
 
-  const comentarios = await listarComentariosPublicados(id, disciplinaId).catch(() => []);
+  const comentarios = await listarComentariosPublicados(id, disciplinaId).catch(() => null);
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
@@ -79,7 +79,14 @@ export default async function AvaliacaoAgregadaPage({
         Comparar professores desta disciplina
       </Link>
 
-      <SecaoComentarios comentarios={comentarios} />
+      {comentarios === null ? (
+        <section aria-label="Comentários" className="border-t border-foreground/10 pt-6">
+          <h2 className="text-lg font-semibold">Comentários</h2>
+          <p role="alert" className="mt-3 text-sm text-foreground/70">
+            Não foi possível carregar os comentários. Recarregue a página para tentar novamente.
+          </p>
+        </section>
+      ) : <SecaoComentarios comentarios={comentarios} />}
     </main>
   );
 }

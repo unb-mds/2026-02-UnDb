@@ -23,7 +23,7 @@ for (const porta of real ? [3100, 9227] : [8000, 3100, 9227]) {
   const reserva = createServer();
   await new Promise((resolve, reject) => {
     reserva.once("error", reject);
-    reserva.listen(porta, resolve);
+    reserva.listen(porta, "127.0.0.1", resolve);
   });
   await new Promise((resolve) => reserva.close(resolve));
 }
@@ -34,8 +34,14 @@ const versaoId = real?.versaoId ?? "33333333-3333-4333-8333-333333333333";
 const mensagemId = real?.mensagemId ?? "44444444-4444-4444-8444-444444444444";
 
 let statusDenuncia = 201;
-let statusAgradecimento = 200;
+let statusAgradecimento = 401;
+let comentariosStatus = 200;
+let contaAtual = null;
+let denunciaAutenticada = false;
+const denunciante = real?.denunciante ?? { email: "denunciante@aluno.unb.br", senha: "Senha-fixture-123!" };
+const outraConta = real?.outraConta ?? { email: "outra@aluno.unb.br", senha: "Senha-fixture-123!" };
 let agradecimentoConsumido = false;
+let agradecimentoPendente = false;
 const enviosDenuncia = [];
 const exibicoesConfirmadas = [];
 
@@ -56,18 +62,31 @@ const fixture = createServer(async (req, res) => {
     if (!res.destroyed) res.writeHead(status).end(JSON.stringify(corpo));
   };
 
+  if (url.pathname === "/api/auth/sessao") { responder(200, {autenticado: !!contaAtual}); return; }
+  if (url.pathname === "/api/auth/login") {
+    let body = ""; for await (const parte of req) body += parte;
+    contaAtual = JSON.parse(body).email;
+    statusAgradecimento = contaAtual === denunciante.email ? 200 : 401;
+    res.setHeader("Set-Cookie", "fixture=conta; Path=/; HttpOnly; SameSite=Lax");
+    responder(200, {message:"Login realizado."}); return;
+  }
+  if (url.pathname === "/api/auth/logout") {
+    contaAtual = null; statusAgradecimento = 401;
+    res.setHeader("Set-Cookie", "fixture=; Path=/; Max-Age=0");
+    responder(200, {message:"Sessão encerrada."}); return;
+  }
   // Avaliação agregada da disciplina
   if (url.pathname === `/api/professores/${professorId}/disciplinas/${disciplinaId}`) {
     responder(200, {
       professor: { id: professorId, nome: "Prof. Teste Denúncia", departamento: "Dep. Informática" },
       disciplina: { id: disciplinaId, codigo: "CIC0099", nome: "MDS Teste", departamento: "Dep. Informática" },
-      totalAvaliacoes: 5,
-      dadosSuficientes: true,
+      professor_id: professorId, disciplina_id: disciplinaId, total_avaliacoes: 5,
+      dados_suficientes: true,
       didatica: 4.2,
       dificuldade: "MEDIO",
-      chamada: "NAO",
-      disponibilizaMaterial: "SIM",
-      qualidadeMaterial: "BOM",
+      chamada: false,
+      disponibiliza_material: true,
+      qualidade_material: "BOM",
       recomenda: 85,
     });
     return;
@@ -75,6 +94,7 @@ const fixture = createServer(async (req, res) => {
 
   // Comentários publicados
   if (url.pathname === `/api/professores/${professorId}/disciplinas/${disciplinaId}/comentarios`) {
+    if (comentariosStatus !== 200) { responder(comentariosStatus, {}); return; }
     responder(200, [
       {
         id: versaoId,
@@ -94,6 +114,10 @@ const fixture = createServer(async (req, res) => {
     const entrada = JSON.parse(corpo);
     enviosDenuncia.push({ id, ...entrada, cookie: req.headers.cookie });
 
+    if (statusDenuncia === 201 && contaAtual) {
+      if (denunciaAutenticada) { responder(409, {}); return; }
+      denunciaAutenticada = true;
+    }
     if (statusDenuncia === 201) {
       responder(201, { mensagem: "Denuncia registrada. Obrigado por contribuir." });
     } else if (statusDenuncia === 409) {
@@ -112,7 +136,7 @@ const fixture = createServer(async (req, res) => {
       responder(statusAgradecimento, { detail: "Não autenticado" });
       return;
     }
-    if (agradecimentoConsumido) {
+    if (agradecimentoConsumido || !agradecimentoPendente) {
       responder(200, []);
     } else {
       responder(200, [
@@ -206,13 +230,13 @@ try {
 
   next = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", "3100"], {
     cwd: frontend,
-    stdio: "ignore",
+    stdio: "inherit",
     windowsHide: true,
   });
   await aguardar(
     async () => {
       try {
-        return (await fetch("http://localhost:3100/")).ok;
+        return (await fetch("http://127.0.0.1:3100/", { signal: AbortSignal.timeout(2000) })).ok;
       } catch {
         return false;
       }
@@ -224,6 +248,7 @@ try {
     navegador,
     [
       "--headless=new",
+      "--edge-skip-compat-layer-relaunch",
       "--disable-gpu",
       "--no-first-run",
       "--remote-debugging-port=9227",
@@ -236,7 +261,7 @@ try {
   await aguardar(
     async () => {
       try {
-        return (await fetch("http://localhost:9227/json")).ok;
+        return (await fetch("http://127.0.0.1:9227/json", { signal: AbortSignal.timeout(2000) })).ok;
       } catch {
         return false;
       }
@@ -244,7 +269,7 @@ try {
     "Edge/Chromium",
   );
 
-  const paginas = await (await fetch("http://localhost:9227/json")).json();
+  const paginas = await (await fetch("http://127.0.0.1:9227/json", { signal: AbortSignal.timeout(2000) })).json();
   socket = new WebSocket(paginas.find((item) => item.type === "page").webSocketDebuggerUrl);
   await new Promise((resolve) => socket.addEventListener("open", resolve, { once: true }));
 
@@ -262,91 +287,103 @@ try {
   await cdp("Network.enable");
   await cdp("Network.setCacheDisabled", { cacheDisabled: true });
 
-  // 1. Navegação e verificação visual em desktop (1280px) e smartphone (320px)
-  for (const tema of ["light", "dark"]) {
-    for (const largura of [1280, 320]) {
-      await cdp("Emulation.setDeviceMetricsOverride", {
-        width: largura,
-        height: 800,
-        deviceScaleFactor: 1,
-        mobile: largura === 320,
-      });
-      await cdp("Emulation.setEmulatedMedia", {
-        features: [{ name: "prefers-color-scheme", value: tema }],
-      });
-
-      await navegar();
-      await esperarTexto("Comentário publicado para verificação de denúncia RF21.");
-      assert.equal(
-        await avaliar("document.documentElement.scrollWidth <= innerWidth"),
-        true,
-        `Sem rolagem horizontal em ${tema}/${largura}px`,
-      );
-
-      // Verifica exibição do agradecimento no topo da tela
-      await esperarTexto("Obrigado por contribuir com a moderacao do conteudo.");
-      assert.ok(exibicoesConfirmadas.includes(mensagemId), "Confirma exibição pelo POST exibido");
-
-      await captura(`denuncia-pagina-${tema}-${largura}`);
+  const clicar = (rotulo) => avaliar(`Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === ${JSON.stringify(rotulo)})?.click()`);
+  async function abrir() {
+    await avaliar(`document.querySelector('[data-testid="botao-denunciar-${versaoId}"]').click()`);
+    await esperarTexto("Denunciar comentário");
+    assert.equal(await avaliar(`document.querySelectorAll('input[name="motivoDenuncia"]').length`), 7);
+    assert.equal(await avaliar(`!!document.querySelector('textarea, input[type="text"]')`), false);
+    assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`), true);
+    await avaliar(`document.querySelector('#motivo-SPAM').click()`);
+    assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`), false);
+  }
+  async function enviar(mensagem) {
+    await clicar("Confirmar denúncia");
+    await esperarTexto(mensagem);
+    if (!real && mensagem === "registrada") {
+      assert.equal(enviosDenuncia.at(-1)?.motivo, "SPAM");
+      assert.equal(enviosDenuncia.at(-1)?.id, versaoId);
+    }
+    if (mensagem !== "registrada") {
+      assert.ok(!(await texto()).includes("Denuncia registrada"));
+      assert.ok(!(await texto()).includes("limiar"));
     }
   }
+  async function login(conta) {
+    await aguardar(async () => await avaliar(`!!document.querySelector('input[name="email"]')`), "formulário de login");
+    await avaliar(`{
+      const preencher = (nome, valor) => {
+        const input = document.querySelector('input[name="' + nome + '"]');
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, valor);
+        input.dispatchEvent(new Event('input', {bubbles:true}));
+      };
+      preencher('email', ${JSON.stringify(conta.email)}); preencher('senha', ${JSON.stringify(conta.senha)});
+    }`);
+    await clicar("Entrar"); await esperarTexto("Sua sessão está ativa");
+  }
+  const mensagensServidor = () => avaliar(`fetch('http://localhost:8000/api/agradecimentos', {credentials:'include'}).then(r => r.json())`);
 
-  // 2. Fluxo de denúncia com sucesso (201)
-  await navegar();
-  const temBotao = await avaliar(`!!document.querySelector('[data-testid="botao-denunciar-${versaoId}"]')`);
-  assert.ok(temBotao, "Botão denunciar deve estar presente no comentário");
+  // Cada viewport testa leitura e denúncia, sem reutilizar um agradecimento consumido.
+  for (const tema of ["light", "dark"]) {
+    for (const largura of [1280, 320]) {
+      await cdp("Emulation.setDeviceMetricsOverride", {width:largura, height:800, deviceScaleFactor:1, mobile:largura === 320});
+      await cdp("Emulation.setEmulatedMedia", {features:[{name:"prefers-color-scheme", value:tema}]});
+      await navegar(); await esperarTexto("Comentário publicado para verificação de denúncia RF21.");
+      await abrir();
+      assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true);
+      await captura(`denuncia-modal-${tema}-${largura}`);
+      await enviar("registrada"); await clicar("Fechar");
+    }
+  }
+  await cdp("Page.navigate", {url:"http://localhost:3100/login"});
+  await login(denunciante);
+  await navegar(); await abrir(); await enviar("registrada"); await clicar("Fechar");
+  await abrir(); await enviar("Você já possui uma denúncia aberta"); await clicar("Cancelar");
+  await abrir();
+  if (real) {
+    const sessao = await fetch("http://localhost:8000/api/auth/login", {
+      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(real.moderador),
+    });
+    assert.equal(sessao.status, 200);
+    const cookie = sessao.headers.getSetCookie().map(v => v.split(";")[0]).join("; ");
+    const acao = await fetch(`http://localhost:8000/api/moderacao/comentarios/${versaoId}/acoes`, {
+      method:"POST", headers:{"Content-Type":"application/json", Cookie:cookie},
+      body:JSON.stringify({acao:"REMOVER", motivo:"Verificar primeira exibição"}),
+    });
+    assert.equal(acao.status, 200, await acao.text());
+  } else { statusDenuncia = 404; agradecimentoPendente = true; }
+  await enviar("Este comentário não está mais disponível"); await clicar("Cancelar");
+  assert.equal((await mensagensServidor()).length, 1, "GET não consome agradecimento");
 
-  await avaliar(`document.querySelector('[data-testid="botao-denunciar-${versaoId}"]').click()`);
-  await esperarTexto("Denunciar comentário");
-  await esperarTexto(versaoId);
+  // Aba oculta: mensagem no DOM ainda não representa primeira exibição.
+  const gate = await cdp("Page.addScriptToEvaluateOnNewDocument", {source:
+    `Object.defineProperty(document, 'visibilityState', {configurable:true, get:() => 'hidden'});`});
+  await cdp("Page.navigate", {url:"http://localhost:3100/login"});
+  await esperarTexto("Sua sessão está ativa"); await esperarTexto("Obrigado por contribuir");
+  assert.equal((await mensagensServidor()).length, 1);
+  await clicar("Sair");
+  await aguardar(async () => !(await texto()).includes("Obrigado por contribuir"), "limpeza no logout");
+  await login(denunciante); await esperarTexto("Obrigado por contribuir");
+  assert.equal((await mensagensServidor()).length, 1, "Login não consome antes da exibição");
+  await avaliar(`Object.defineProperty(document, 'visibilityState', {configurable:true, get:() => 'visible'}); document.dispatchEvent(new Event('visibilitychange'));`);
+  await aguardar(async () => (await mensagensServidor()).length === 0, "consumo após exibição");
+  await clicar("Sair");
+  await aguardar(async () => !(await texto()).includes("Obrigado por contribuir"), "limpeza de mensagem exibida");
+  await login(outraConta);
+  assert.ok(!(await texto()).includes("Obrigado por contribuir"));
+  await cdp("Page.removeScriptToEvaluateOnNewDocument", {identifier:gate.identifier});
+  if (!real) {
+    comentariosStatus = 503;
+    await navegar(); await esperarTexto("Não foi possível carregar os comentários");
+    assert.ok(!(await texto()).includes("Ainda não há comentários publicados"));
+    comentariosStatus = 200;
+  }
+  console.log(`Denúncia/agradecimentos aprovados: ${real ? "API/PostgreSQL reais" : "HTTP controlado"}, quatro viewports, visitante, conta não confirmada, duplicidade, 404, login/logout e consumo após visibilidade.`);
 
-  // Verifica que não há campo de justificativa livre
-  const temCampoTexto = await avaliar(`!!document.querySelector('textarea, input[type="text"]')`);
-  assert.equal(temCampoTexto, false, "Não deve haver campo de justificativa livre");
-
-  // Verifica que os sete motivos estão presentes
-  const totalRadios = await avaliar(`document.querySelectorAll('input[name="motivoDenuncia"]').length`);
-  assert.equal(totalRadios, 7, "Devem existir exatamente os 7 motivos fechados de RF21");
-
-  // Botão confirmar deve estar desabilitado sem seleção
-  const botaoDesabilitado = await avaliar(`document.querySelector('button[type="submit"]').disabled`);
-  assert.equal(botaoDesabilitado, true, "Confirmar deve estar desabilitado sem seleção");
-
-  // Seleciona motivo SPAM
-  await avaliar(`document.querySelector('#motivo-SPAM').click()`);
-  assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`), false);
-
-  // Submete
-  await avaliar(`document.querySelector('button[type="submit"]').click()`);
-  await esperarTexto("Denuncia registrada. Obrigado por contribuir.");
-  assert.equal(enviosDenuncia.at(-1)?.motivo, "SPAM");
-  assert.equal(enviosDenuncia.at(-1)?.id, versaoId);
-
-  // Fecha o modal
-  await avaliar(`Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === 'Fechar')?.click()`);
-  await aguardar(async () => !(await texto()).includes("Denunciar comentário"), "modal fechado");
-
-  // 3. Fluxo de duplicidade (409)
-  statusDenuncia = 409;
-  await avaliar(`document.querySelector('[data-testid="botao-denunciar-${versaoId}"]').click()`);
-  await esperarTexto("Denunciar comentário");
-  await avaliar(`document.querySelector('#motivo-OFENSA_PESSOAL').click()`);
-  await avaliar(`document.querySelector('button[type="submit"]').click()`);
-  await esperarTexto("Você já possui uma denúncia aberta para este comentário.");
-  assert.ok(!(await texto()).includes("Denuncia registrada"));
-  assert.ok(!(await texto()).includes("limiar"));
-  await avaliar(`Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === 'Cancelar')?.click()`);
-
-  // 4. Fluxo de versão indisponível (404)
-  statusDenuncia = 404;
-  await avaliar(`document.querySelector('[data-testid="botao-denunciar-${versaoId}"]').click()`);
-  await esperarTexto("Denunciar comentário");
-  await avaliar(`document.querySelector('#motivo-AMEACA').click()`);
-  await avaliar(`document.querySelector('button[type="submit"]').click()`);
-  await esperarTexto("Este comentário não está mais disponível para denúncia.");
-
-  console.log("Teste de navegador de denúncias e agradecimentos aprovado com sucesso!");
 } finally {
+  if (socket?.readyState === WebSocket.OPEN) {
+    await cdp("Browser.close").catch(() => {});
+  }
   socket?.close();
   for (const atual of pendentes.values()) {
     clearTimeout(atual.timer);
