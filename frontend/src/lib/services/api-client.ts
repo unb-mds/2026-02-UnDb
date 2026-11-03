@@ -32,6 +32,10 @@ async function request<T>(path: string, query: Record<string, string | undefined
     throw new ApiError(mensagemErro(detalhe?.detail), response.status, detalhe?.detail);
   }
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return response.json() as Promise<T>;
 }
 
@@ -48,6 +52,10 @@ async function post<TResponse, TBody>(path: string, body: TBody, opcoes: OpcoesR
     const detalhe = await response.json().catch(() => null);
     const mensagem = mensagemErro(detalhe?.detail);
     throw new ApiError(mensagem, response.status, detalhe?.detail);
+  }
+
+  if (response.status === 204) {
+    return undefined as TResponse;
   }
 
   return response.json() as Promise<TResponse>;
