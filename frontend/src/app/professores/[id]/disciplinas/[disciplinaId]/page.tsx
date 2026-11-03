@@ -3,9 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { identificadorValido } from "@/lib/identificador";
 import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
+import { listarComentariosPublicados } from "@/lib/services/comentarios";
 import { ApiError } from "@/lib/services/http-error";
 import CriteriosAgregados from "@/components/criterios-agregados";
 import EtapasJornada from "@/components/etapas-jornada";
+import SecaoComentarios from "@/components/secao-comentarios";
 
 const MIN_AVALIACOES_EXIBICAO = 3;
 
@@ -24,6 +26,8 @@ export default async function AvaliacaoAgregadaPage({
     if (erro instanceof ApiError && erro.naoEncontrado) notFound();
     throw erro;
   });
+
+  const comentarios = await listarComentariosPublicados(id, disciplinaId).catch(() => []);
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
@@ -74,6 +78,8 @@ export default async function AvaliacaoAgregadaPage({
       >
         Comparar professores desta disciplina
       </Link>
+
+      <SecaoComentarios comentarios={comentarios} />
     </main>
   );
 }
