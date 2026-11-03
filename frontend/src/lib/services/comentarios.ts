@@ -1,5 +1,10 @@
 import { identificadorValido } from "../identificador";
-import type { ComentarioPublico } from "../types/comentario";
+import type {
+  ComentarioDoAutor,
+  ComentarioPublico,
+  EstadoComentario,
+} from "../types/comentario";
+import { ESTADOS_COMENTARIO } from "../types/comentario";
 import { apiClient } from "./api-client";
 
 const registro = (valor: unknown): valor is Record<string, unknown> =>
@@ -36,5 +41,27 @@ export async function listarComentariosPublicados(
     throw new Error("Resposta de comentários incompatível com o contrato.");
   }
 
+  return resposta;
+}
+
+function comentarioDoAutor(valor: unknown): valor is ComentarioDoAutor {
+  return (
+    registro(valor) &&
+    idValido(valor.id) &&
+    (valor.texto === null || typeof valor.texto === "string") &&
+    typeof valor.created_at === "string" &&
+    typeof valor.updated_at === "string" &&
+    typeof valor.estado === "string" &&
+    ESTADOS_COMENTARIO.includes(valor.estado as EstadoComentario) &&
+    idValido(valor.avaliacao_id) &&
+    (valor.substitui_id === null || idValido(valor.substitui_id))
+  );
+}
+
+export async function consultarMeusComentarios(): Promise<ComentarioDoAutor[]> {
+  const resposta = await apiClient.request<unknown>("/api/comentarios/meu", {});
+  if (!Array.isArray(resposta) || !resposta.every(comentarioDoAutor)) {
+    throw new Error("Resposta de comentários do autor incompatível com o contrato.");
+  }
   return resposta;
 }

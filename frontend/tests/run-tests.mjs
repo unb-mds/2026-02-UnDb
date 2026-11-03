@@ -27,6 +27,7 @@ try {
       "--test",
       "tests/avaliacao.test.mjs",
       "tests/busca.test.mjs",
+      "tests/comentarios.test.mjs",
       "tests/moderacao.test.mjs",
       "tests/denuncia.test.mjs",
     ], {
