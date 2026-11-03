@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Cabecalho from "@/components/cabecalho";
+import AvisoAgradecimento from "@/components/aviso-agradecimento";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <Cabecalho />
+        <AvisoAgradecimento />
         {children}
       </body>
     </html>

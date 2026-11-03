@@ -16,12 +16,20 @@ try {
     "src/lib/retorno-avaliacao.ts",
     "src/lib/contexto-busca.ts", "src/lib/services/disciplinas.ts", "src/lib/services/professores.ts",
     "src/lib/moderacao.ts", "src/lib/services/moderacao.ts",
+    "src/lib/types/denuncia.ts", "src/lib/services/denuncias.ts",
+    "src/lib/types/comentario.ts", "src/lib/services/comentarios.ts",
   ], { cwd: frontend, stdio: "inherit" });
   if (compilacao.error) throw compilacao.error;
   if (compilacao.status !== 0) {
     process.exitCode = compilacao.status ?? 1;
   } else {
-    const testes = spawnSync(process.execPath, ["--test", "tests/avaliacao.test.mjs", "tests/busca.test.mjs", "tests/moderacao.test.mjs"], {
+    const testes = spawnSync(process.execPath, [
+      "--test",
+      "tests/avaliacao.test.mjs",
+      "tests/busca.test.mjs",
+      "tests/moderacao.test.mjs",
+      "tests/denuncia.test.mjs",
+    ], {
       cwd: frontend,
       stdio: "inherit",
       env: { ...process.env, AVALIACAO_TEST_BUILD: destino },
