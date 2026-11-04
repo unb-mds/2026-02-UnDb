@@ -66,9 +66,7 @@ test("texto nulo, estado e IDs são validados contra o contrato antes de retorna
     { ...comentarioPublicado, created_at: undefined },
   ];
   for (const corpo of invalidos) {
-    t.mock.method(globalThis, "fetch", async () => {
-      assert.fail("não deve realizar fetch com resposta incompatível");
-    });
+    t.mock.method(globalThis, "fetch", async () => Response.json([corpo]));
     await assert.rejects(servico.consultarMeusComentarios(), /incompatível/);
   }
 });
