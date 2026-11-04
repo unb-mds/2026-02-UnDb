@@ -52,9 +52,17 @@ class AuthSchemaTest(unittest.TestCase):
         destino = "/professores/11111111-1111-4111-8111-111111111111/disciplinas/22222222-2222-4222-8222-222222222222/avaliar"
         self.assertIsNone(CadastroRequest(**dados).return_to)
         self.assertEqual(CadastroRequest(**dados, return_to=destino).return_to, destino)
-        for valor in ("", "https://outro.example" + destino, "//outro.example" + destino,
-                      destino + "?x=1", destino + "#x", destino + "\n", destino + "/",
-                      destino.replace("11111111-", "invalido-"), "javascript:alert(1)"):
+        for valor in (
+            "",
+            "https://outro.example" + destino,
+            "//outro.example" + destino,
+            destino + "?x=1",
+            destino + "#x",
+            destino + "\n",
+            destino + "/",
+            destino.replace("11111111-", "invalido-"),
+            "javascript:alert(1)",
+        ):
             with self.subTest(valor=valor), self.assertRaises(ValidationError):
                 CadastroRequest(**dados, return_to=valor)
 
@@ -198,8 +206,9 @@ class AuthServiceTest(unittest.TestCase):
         self.db.commit()
 
         for valor in (token_aberto, "x" * 43):
-            with self.subTest(valor=valor), self.assertRaises(
-                auth_service.TokenConfirmacaoInvalidoError
+            with (
+                self.subTest(valor=valor),
+                self.assertRaises(auth_service.TokenConfirmacaoInvalidoError),
             ):
                 auth_service.confirmar_email(self.db, valor)
 
@@ -257,12 +266,11 @@ class AuthServiceTest(unittest.TestCase):
             ("desconhecida@aluno.unb.br", "uma senha longa e segura"),
             ("maria@aluno.unb.br", "senha incorreta"),
         ):
-            with self.subTest(email=email), self.assertRaises(
-                auth_service.CredenciaisInvalidasError
+            with (
+                self.subTest(email=email),
+                self.assertRaises(auth_service.CredenciaisInvalidasError),
             ):
-                auth_service.autenticar(
-                    self.db, LoginRequest(email=email, senha=senha)
-                )
+                auth_service.autenticar(self.db, LoginRequest(email=email, senha=senha))
 
         quantidade = self.db.scalar(select(func.count()).select_from(SessaoUsuario))
         self.assertEqual(quantidade, 0)
@@ -307,9 +315,7 @@ class AuthServiceTest(unittest.TestCase):
         sessao.expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
         self.db.commit()
 
-        renovada = auth_service.validar_e_renovar_sessao(
-            self.db, autenticacao.token
-        )
+        renovada = auth_service.validar_e_renovar_sessao(self.db, autenticacao.token)
 
         self.assertGreater(
             auth_service._como_utc(renovada.expires_at),
@@ -344,9 +350,7 @@ class AuthServiceTest(unittest.TestCase):
                 senha="uma senha longa e segura",
             ),
         )
-        sessao = auth_service.validar_e_renovar_sessao(
-            self.db, autenticacao.token
-        )
+        sessao = auth_service.validar_e_renovar_sessao(self.db, autenticacao.token)
 
         mensagem = auth_service.encerrar_sessao(self.db, sessao)
 
@@ -363,9 +367,7 @@ class AuthServiceTest(unittest.TestCase):
                 senha="uma senha longa e segura",
             ),
         )
-        sessao = auth_service.validar_e_renovar_sessao(
-            self.db, autenticacao.token
-        )
+        sessao = auth_service.validar_e_renovar_sessao(self.db, autenticacao.token)
         response = Response()
 
         resultado = auth_router.logout(response, sessao, self.db)

@@ -1,0 +1,10 @@
+[tool.ruff]
+target-version = "py312"
+required-version = "==0.17.3"
+line-length = 100
+# Preserva as exclusões padrão de ambientes, dependências, caches e builds.
+extend-exclude = ["__pycache__"]
+
+[tool.ruff.lint]
+# Erros de importação/sintaxe e Pyflakes; estilo de layout fica com o formatter.
+select = ["E4", "E7", "E9", "F"]

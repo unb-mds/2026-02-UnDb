@@ -8,7 +8,12 @@ from app.core.auth import obter_moderador, obter_sessao_opcional, obter_usuario_
 from app.core.database import get_db
 from app.models.sessao_usuario import SessaoUsuario
 from app.models.usuario import Usuario
-from app.schemas.denuncia import AgradecimentoResponse, ConfirmacaoDenuncia, DenunciaCreate, DenunciasDaVersao
+from app.schemas.denuncia import (
+    AgradecimentoResponse,
+    ConfirmacaoDenuncia,
+    DenunciaCreate,
+    DenunciasDaVersao,
+)
 from app.services import denuncia_service
 from app.services.moderacao_service import ModeracaoError
 
@@ -24,10 +29,18 @@ def executar(operacao, *args):
         raise HTTPException(erro.status_code, str(erro)) from erro
 
 
-@router.post("/comentarios/{versao_id}/denuncias", response_model=ConfirmacaoDenuncia, status_code=201)
-def registrar(versao_id: UUID, dados: DenunciaCreate, db: Db,
-              sessao: Annotated[SessaoUsuario | None, Depends(obter_sessao_opcional)]):
-    return executar(denuncia_service.registrar, db, versao_id, sessao.usuario if sessao else None, dados)
+@router.post(
+    "/comentarios/{versao_id}/denuncias", response_model=ConfirmacaoDenuncia, status_code=201
+)
+def registrar(
+    versao_id: UUID,
+    dados: DenunciaCreate,
+    db: Db,
+    sessao: Annotated[SessaoUsuario | None, Depends(obter_sessao_opcional)],
+):
+    return executar(
+        denuncia_service.registrar, db, versao_id, sessao.usuario if sessao else None, dados
+    )
 
 
 @router.get("/moderacao/comentarios/{versao_id}/denuncias", response_model=DenunciasDaVersao)

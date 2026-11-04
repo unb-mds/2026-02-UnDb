@@ -9,8 +9,12 @@ from app.models.avaliacao import Avaliacao
 
 
 def bloquear_avaliacao(db: Session, avaliacao_id: UUID) -> None:
-    db.scalar(select(Avaliacao).where(Avaliacao.id == avaliacao_id).with_for_update()
-              .execution_options(populate_existing=True))
+    db.scalar(
+        select(Avaliacao)
+        .where(Avaliacao.id == avaliacao_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
 
 
 def apagar(db: Session, comentario: ComentarioVersao) -> None:
@@ -18,35 +22,58 @@ def apagar(db: Session, comentario: ComentarioVersao) -> None:
 
 
 def obter_bloqueado(db: Session, comentario_id: UUID) -> ComentarioVersao | None:
-    avaliacao_id = db.scalar(select(ComentarioVersao.avaliacao_id).where(ComentarioVersao.id == comentario_id))
+    avaliacao_id = db.scalar(
+        select(ComentarioVersao.avaliacao_id).where(ComentarioVersao.id == comentario_id)
+    )
     if avaliacao_id is None:
         return None
     bloquear_avaliacao(db, avaliacao_id)
-    return db.scalar(select(ComentarioVersao).where(ComentarioVersao.id == comentario_id)
-                     .with_for_update().execution_options(populate_existing=True))
+    return db.scalar(
+        select(ComentarioVersao)
+        .where(ComentarioVersao.id == comentario_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
 
 
 def obter_atual_por_avaliacao(db: Session, avaliacao_id: UUID) -> ComentarioVersao | None:
-    return db.scalar(select(ComentarioVersao).where(
-        ComentarioVersao.avaliacao_id == avaliacao_id,
-        ComentarioVersao.estado.in_((EstadoComentario.PUBLICADO, EstadoComentario.SUSPENSO, EstadoComentario.REMOVIDO)),
-    ).order_by(ComentarioVersao.created_at.desc()))
+    return db.scalar(
+        select(ComentarioVersao)
+        .where(
+            ComentarioVersao.avaliacao_id == avaliacao_id,
+            ComentarioVersao.estado.in_(
+                (EstadoComentario.PUBLICADO, EstadoComentario.SUSPENSO, EstadoComentario.REMOVIDO)
+            ),
+        )
+        .order_by(ComentarioVersao.created_at.desc())
+    )
 
 
 def listar_ativas_por_avaliacao(db: Session, avaliacao_id: UUID) -> list[ComentarioVersao]:
-    return list(db.scalars(select(ComentarioVersao).where(
-        ComentarioVersao.avaliacao_id == avaliacao_id,
-        ComentarioVersao.estado.in_((EstadoComentario.PUBLICADO, EstadoComentario.SUSPENSO, EstadoComentario.PENDENTE)),
-    ).order_by(ComentarioVersao.id).with_for_update()))
+    return list(
+        db.scalars(
+            select(ComentarioVersao)
+            .where(
+                ComentarioVersao.avaliacao_id == avaliacao_id,
+                ComentarioVersao.estado.in_(
+                    (
+                        EstadoComentario.PUBLICADO,
+                        EstadoComentario.SUSPENSO,
+                        EstadoComentario.PENDENTE,
+                    )
+                ),
+            )
+            .order_by(ComentarioVersao.id)
+            .with_for_update()
+        )
+    )
 
 
 def obter_por_id(db: Session, comentario_id: UUID) -> ComentarioVersao | None:
     return db.get(ComentarioVersao, comentario_id)
 
 
-def obter_pendente_por_avaliacao(
-    db: Session, avaliacao_id: UUID
-) -> ComentarioVersao | None:
+def obter_pendente_por_avaliacao(db: Session, avaliacao_id: UUID) -> ComentarioVersao | None:
     return db.scalar(
         select(ComentarioVersao)
         .where(
@@ -57,9 +84,7 @@ def obter_pendente_por_avaliacao(
     )
 
 
-def obter_publicado_por_avaliacao(
-    db: Session, avaliacao_id: UUID
-) -> ComentarioVersao | None:
+def obter_publicado_por_avaliacao(db: Session, avaliacao_id: UUID) -> ComentarioVersao | None:
     return db.scalar(
         select(ComentarioVersao)
         .where(
@@ -106,8 +131,12 @@ def criar(
     return comentario
 
 
-def listar_por_usuario(db: Session, usuario_id: UUID, professor_id: UUID | None = None,
-                      disciplina_id: UUID | None = None) -> list[ComentarioVersao]:
+def listar_por_usuario(
+    db: Session,
+    usuario_id: UUID,
+    professor_id: UUID | None = None,
+    disciplina_id: UUID | None = None,
+) -> list[ComentarioVersao]:
     filtros = [Avaliacao.usuario_id == usuario_id]
     if professor_id is not None:
         filtros.append(Avaliacao.professor_id == professor_id)
@@ -122,9 +151,7 @@ def listar_por_usuario(db: Session, usuario_id: UUID, professor_id: UUID | None 
     )
 
 
-def obter_pendente_que_substitui(
-    db: Session, comentario_id: UUID
-) -> ComentarioVersao | None:
+def obter_pendente_que_substitui(db: Session, comentario_id: UUID) -> ComentarioVersao | None:
     return db.scalar(
         select(ComentarioVersao).where(
             ComentarioVersao.substitui_id == comentario_id,

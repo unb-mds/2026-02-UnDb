@@ -34,9 +34,7 @@ class ComentarioVersao(Base):
     substitui = relationship("ComentarioVersao", remote_side=[id])
 
     __table_args__ = (
-        CheckConstraint(
-            "length(texto) BETWEEN 1 AND 500", name="ck_comentario_versao_tamanho"
-        ),
+        CheckConstraint("length(texto) BETWEEN 1 AND 500", name="ck_comentario_versao_tamanho"),
         CheckConstraint(
             "estado NOT IN ('PENDENTE', 'PUBLICADO', 'SUSPENSO') OR texto IS NOT NULL",
             name="ck_comentario_texto_ativo",

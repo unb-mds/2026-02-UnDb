@@ -102,8 +102,6 @@ def listar_turmas_da_disciplina(
     session: Annotated[Session, Depends(get_db)],
 ) -> list[TurmaInstitucionalResponse]:
     try:
-        return institucional_service.listar_turmas_da_disciplina(
-            session, disciplina_id
-        )
+        return institucional_service.listar_turmas_da_disciplina(session, disciplina_id)
     except institucional_service.RecursoInstitucionalNaoEncontradoError as erro:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(erro)) from erro

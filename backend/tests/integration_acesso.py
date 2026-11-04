@@ -4,6 +4,7 @@ UNDB_INTEGRATION_TEST=1 python -m tests.integration_acesso
 Exige migrations e build frontend prévios. --prepare/--inspect/--cleanup permitem
 usar a mesma verificação com API externa em container, sem endpoint de testes.
 """
+
 import json
 import os
 import socket
@@ -32,22 +33,47 @@ from tests.integration_avaliacao import requisicao
 
 def preparar():
     suffix = uuid4().hex[:12]
-    fixture = dict(professores=[str(uuid4()), str(uuid4())], disciplinaId=str(uuid4()),
-                   unidadeId=str(uuid4()), turmas=[str(uuid4()), str(uuid4())],
-                   emails=[f"acesso.{suffix}.{i}@aluno.unb.br" for i in range(2)],
-                   senha="senha-local-integracao", codigo=f"A{suffix}")
+    fixture = dict(
+        professores=[str(uuid4()), str(uuid4())],
+        disciplinaId=str(uuid4()),
+        unidadeId=str(uuid4()),
+        turmas=[str(uuid4()), str(uuid4())],
+        emails=[f"acesso.{suffix}.{i}@aluno.unb.br" for i in range(2)],
+        senha="senha-local-integracao",
+        codigo=f"A{suffix}",
+    )
     with Session(engine) as db:
-        professores = [Professor(id=UUID(pid), nome=f"Professor de acesso {i + 1}",
-                                nome_normalizado=normalizar_busca(f"Professor de acesso {i + 1}"), departamento="CIC")
-                       for i, pid in enumerate(fixture["professores"])]
-        disciplina = Disciplina(id=UUID(fixture["disciplinaId"]), codigo=fixture["codigo"],
-                                nome="Disciplina de acesso e confirmação",
-                                nome_normalizado=normalizar_busca("Disciplina de acesso e confirmação"), departamento="CIC")
-        unidade = Unidade(id=UUID(fixture["unidadeId"]), codigo=suffix, nome="Unidade sintética de acesso")
+        professores = [
+            Professor(
+                id=UUID(pid),
+                nome=f"Professor de acesso {i + 1}",
+                nome_normalizado=normalizar_busca(f"Professor de acesso {i + 1}"),
+                departamento="CIC",
+            )
+            for i, pid in enumerate(fixture["professores"])
+        ]
+        disciplina = Disciplina(
+            id=UUID(fixture["disciplinaId"]),
+            codigo=fixture["codigo"],
+            nome="Disciplina de acesso e confirmação",
+            nome_normalizado=normalizar_busca("Disciplina de acesso e confirmação"),
+            departamento="CIC",
+        )
+        unidade = Unidade(
+            id=UUID(fixture["unidadeId"]), codigo=suffix, nome="Unidade sintética de acesso"
+        )
         db.add_all([*professores, disciplina, unidade])
         for i, professor in enumerate(professores):
-            db.add(Turma(id=UUID(fixture["turmas"][i]), disciplina=disciplina, unidade=unidade,
-                         codigo=str(i + 1), semestre="2026.2", professores=[professor]))
+            db.add(
+                Turma(
+                    id=UUID(fixture["turmas"][i]),
+                    disciplina=disciplina,
+                    unidade=unidade,
+                    codigo=str(i + 1),
+                    semestre="2026.2",
+                    professores=[professor],
+                )
+            )
         db.commit()
     return fixture
 
@@ -55,29 +81,63 @@ def preparar():
 def inspecionar(fixture):
     with Session(engine) as db:
         usuarios = list(db.scalars(select(Usuario).where(Usuario.email.in_(fixture["emails"]))))
-        return dict(usuarios=[dict(email=u.email, confirmado=u.email_confirmado,
-                                   sessoes=db.scalar(select(func.count()).select_from(SessaoUsuario).where(SessaoUsuario.usuario_id == u.id)),
-                                   tokensUsados=db.scalar(select(func.count()).select_from(TokenConfirmacaoEmail).where(
-                                       TokenConfirmacaoEmail.usuario_id == u.id, TokenConfirmacaoEmail.used_at.is_not(None))))
-                              for u in usuarios],
-                    avaliacoes=[dict(id=str(a.id), email=a.usuario.email, professorId=str(a.professor_id),
-                                     didatica=a.didatica, chamada=a.chamada, recomenda=a.recomenda,
-                                     disponibilizaMaterial=a.disponibiliza_material)
-                                for a in db.scalars(select(Avaliacao).where(
-                                    Avaliacao.professor_id.in_([UUID(p) for p in fixture["professores"]])))])
+        return dict(
+            usuarios=[
+                dict(
+                    email=u.email,
+                    confirmado=u.email_confirmado,
+                    sessoes=db.scalar(
+                        select(func.count())
+                        .select_from(SessaoUsuario)
+                        .where(SessaoUsuario.usuario_id == u.id)
+                    ),
+                    tokensUsados=db.scalar(
+                        select(func.count())
+                        .select_from(TokenConfirmacaoEmail)
+                        .where(
+                            TokenConfirmacaoEmail.usuario_id == u.id,
+                            TokenConfirmacaoEmail.used_at.is_not(None),
+                        )
+                    ),
+                )
+                for u in usuarios
+            ],
+            avaliacoes=[
+                dict(
+                    id=str(a.id),
+                    email=a.usuario.email,
+                    professorId=str(a.professor_id),
+                    didatica=a.didatica,
+                    chamada=a.chamada,
+                    recomenda=a.recomenda,
+                    disponibilizaMaterial=a.disponibiliza_material,
+                )
+                for a in db.scalars(
+                    select(Avaliacao).where(
+                        Avaliacao.professor_id.in_([UUID(p) for p in fixture["professores"]])
+                    )
+                )
+            ],
+        )
 
 
 def limpar(fixture):
     with Session(engine) as db:
         usuarios = list(db.scalars(select(Usuario.id).where(Usuario.email.in_(fixture["emails"]))))
-        db.execute(delete(Avaliacao).where(Avaliacao.professor_id.in_([UUID(p) for p in fixture["professores"]])))
+        db.execute(
+            delete(Avaliacao).where(
+                Avaliacao.professor_id.in_([UUID(p) for p in fixture["professores"]])
+            )
+        )
         for model in (SessaoUsuario, TokenConfirmacaoEmail):
             db.execute(delete(model).where(model.usuario_id.in_(usuarios)))
         db.execute(delete(Usuario).where(Usuario.id.in_(usuarios)))
         turmas = [UUID(t) for t in fixture["turmas"]]
         db.execute(delete(turmas_professores).where(turmas_professores.c.turma_id.in_(turmas)))
         db.execute(delete(Turma).where(Turma.id.in_(turmas)))
-        db.execute(delete(Professor).where(Professor.id.in_([UUID(p) for p in fixture["professores"]])))
+        db.execute(
+            delete(Professor).where(Professor.id.in_([UUID(p) for p in fixture["professores"]]))
+        )
         db.execute(delete(Disciplina).where(Disciplina.id == UUID(fixture["disciplinaId"])))
         db.execute(delete(Unidade).where(Unidade.id == UUID(fixture["unidadeId"])))
         db.commit()
@@ -112,15 +172,25 @@ def main():
     try:
         with TemporaryDirectory(prefix="undb-acesso-") as temporario:
             log_path = Path(temporario) / "api.log"
-            env = {**os.environ, "DEBUG": "True", "CORS_ORIGINS": "http://localhost:3100",
-                   "FRONTEND_URL": "http://localhost:3100", "EMAIL_BACKEND": "console",
-                   "E2E_ACESSO_FIXTURE": json.dumps(fixture), "E2E_PYTHON": sys.executable,
-                   "E2E_EMAIL_LOG_FILE": str(log_path)}
+            env = {
+                **os.environ,
+                "DEBUG": "True",
+                "CORS_ORIGINS": "http://localhost:3100",
+                "FRONTEND_URL": "http://localhost:3100",
+                "EMAIL_BACKEND": "console",
+                "E2E_ACESSO_FIXTURE": json.dumps(fixture),
+                "E2E_PYTHON": sys.executable,
+                "E2E_EMAIL_LOG_FILE": str(log_path),
+            }
             # O link/token é lido do adaptador console real, sem gerar ou confirmar
             # tokens por fora da API. O log temporário não é evidência versionada.
             with log_path.open("w", encoding="utf8") as log:
-                api = subprocess.Popen([sys.executable, "-m", "uvicorn", "app.main:app", "--port", "8000"],
-                                       env=env, stdout=log, stderr=subprocess.STDOUT)
+                api = subprocess.Popen(
+                    [sys.executable, "-m", "uvicorn", "app.main:app", "--port", "8000"],
+                    env=env,
+                    stdout=log,
+                    stderr=subprocess.STDOUT,
+                )
                 try:
                     for _ in range(100):
                         if api.poll() is not None:
@@ -133,8 +203,12 @@ def main():
                         time.sleep(0.1)
                     else:
                         raise TimeoutError("API indisponível")
-                    subprocess.run(["node", "tests/acesso-browser.mjs"], env=env, check=True,
-                                   cwd=Path(__file__).resolve().parents[2] / "frontend")
+                    subprocess.run(
+                        ["node", "tests/acesso-browser.mjs"],
+                        env=env,
+                        check=True,
+                        cwd=Path(__file__).resolve().parents[2] / "frontend",
+                    )
                 finally:
                     api.terminate()
                     api.wait(timeout=15)

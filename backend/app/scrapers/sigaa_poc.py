@@ -163,8 +163,7 @@ def _docentes(text: str) -> tuple[str, ...]:
     docentes = tuple(
         nome
         for name in names
-        if (nome := " ".join(name.split()))
-        and nome.casefold() != "a definir docente"
+        if (nome := " ".join(name.split())) and nome.casefold() != "a definir docente"
     )
     if names:
         return docentes
@@ -281,7 +280,17 @@ def main() -> None:
     if not args.real:
         parser.error("use --real para autorizar a consulta pública ao SIGAA")
     ofertas, total = coletar_ofertas_reais()
-    print(json.dumps({"total_reportado": total, "ofertas_extraidas": len(ofertas), "primeira_oferta": asdict(ofertas[0])}, ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            {
+                "total_reportado": total,
+                "ofertas_extraidas": len(ofertas),
+                "primeira_oferta": asdict(ofertas[0]),
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

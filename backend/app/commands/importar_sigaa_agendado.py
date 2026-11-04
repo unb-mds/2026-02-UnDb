@@ -51,7 +51,10 @@ def main() -> None:
     try:
         with SessionLocal() as db:
             if args.todas_unidades:
-                departamentos = lambda: _todas_unidades(db)
+
+                def departamentos():
+                    return _todas_unidades(db)
+
             else:
                 departamentos = args.departamento
             registro = executar_importacao_agendada(
@@ -66,9 +69,7 @@ def main() -> None:
             "status": registro.status,
             "iniciada_em": registro.iniciada_em.isoformat(),
             "finalizada_em": (
-                registro.finalizada_em.isoformat()
-                if registro.finalizada_em
-                else None
+                registro.finalizada_em.isoformat() if registro.finalizada_em else None
             ),
             "ofertas_extraidas": registro.ofertas_extraidas,
             "ofertas_processadas": registro.ofertas_processadas,

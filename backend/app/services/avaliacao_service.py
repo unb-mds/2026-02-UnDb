@@ -54,9 +54,7 @@ def _persistir_avaliacao(
     )
 
 
-def _criar_ou_substituir_comentario(
-    db: Session, avaliacao_id: UUID, texto: str | None
-) -> None:
+def _criar_ou_substituir_comentario(db: Session, avaliacao_id: UUID, texto: str | None) -> None:
     """Cria uma nova versao PENDENTE do comentario, se texto for valido.
 
     - texto None: mantem comentario existente (re-envio de criterios).
@@ -67,15 +65,11 @@ def _criar_ou_substituir_comentario(
     if texto is None:
         return
 
-    pendente = comentario_repository.obter_pendente_por_avaliacao(
-        db, avaliacao_id
-    )
+    pendente = comentario_repository.obter_pendente_por_avaliacao(db, avaliacao_id)
     if pendente is not None:
         comentario_repository.apagar(db, pendente)
 
-    publicado = comentario_repository.obter_atual_por_avaliacao(
-        db, avaliacao_id
-    )
+    publicado = comentario_repository.obter_atual_por_avaliacao(db, avaliacao_id)
     substitui_id = publicado.id if publicado is not None else None
 
     comentario_repository.criar(
@@ -95,9 +89,7 @@ def registrar_avaliacao(
     if not turma_repository.existe_vinculo_professor_disciplina(
         db, dados.professor_id, dados.disciplina_id
     ):
-        raise RecursoNaoEncontradoError(
-            "professor nao possui vinculo com a disciplina"
-        )
+        raise RecursoNaoEncontradoError("professor nao possui vinculo com a disciplina")
 
     try:
         avaliacao = _persistir_avaliacao(db, usuario, dados)
@@ -154,12 +146,8 @@ def consultar_agregado(
     disciplina = avaliacao_repository.obter_disciplina(db, disciplina_id)
     if disciplina is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
-    if not turma_repository.existe_vinculo_professor_disciplina(
-        db, professor_id, disciplina_id
-    ):
-        raise RecursoNaoEncontradoError(
-            "professor nao possui vinculo com a disciplina"
-        )
+    if not turma_repository.existe_vinculo_professor_disciplina(db, professor_id, disciplina_id):
+        raise RecursoNaoEncontradoError("professor nao possui vinculo com a disciplina")
 
     professor_institucional = ProfessorInstitucional(
         id=professor.id,

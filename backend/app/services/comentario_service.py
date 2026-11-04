@@ -30,20 +30,22 @@ def listar_publicados(db: Session, professor_id: UUID, disciplina_id: UUID):
         raise RecursoNaoEncontradoError("professor nao encontrado")
     if avaliacao_repository.obter_disciplina(db, disciplina_id) is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
-    if not turma_repository.existe_vinculo_professor_disciplina(
-        db, professor_id, disciplina_id
-    ):
-        raise RecursoNaoEncontradoError(
-            "professor nao possui vinculo com a disciplina"
-        )
+    if not turma_repository.existe_vinculo_professor_disciplina(db, professor_id, disciplina_id):
+        raise RecursoNaoEncontradoError("professor nao possui vinculo com a disciplina")
     return comentario_repository.listar_publicados(db, professor_id, disciplina_id)
 
 
-def listar_do_autor(db: Session, usuario: Usuario, professor_id: UUID | None = None,
-                   disciplina_id: UUID | None = None):
+def listar_do_autor(
+    db: Session,
+    usuario: Usuario,
+    professor_id: UUID | None = None,
+    disciplina_id: UUID | None = None,
+):
     """Lista os comentarios do autor autenticado (todos os estados)."""
     moderacao_repository.descartar_vencidos(db, agora_utc())
-    resultado = comentario_repository.listar_por_usuario(db, usuario.id, professor_id, disciplina_id)
+    resultado = comentario_repository.listar_por_usuario(
+        db, usuario.id, professor_id, disciplina_id
+    )
     db.commit()
     return resultado
 
@@ -55,18 +57,14 @@ def retirar(db: Session, comentario_id: UUID, usuario: Usuario):
         raise RecursoNaoEncontradoError("comentario nao encontrado")
 
     if comentario.avaliacao.usuario_id != usuario.id:
-        raise ComentarioNaoAutorizadoError(
-            "nao autorizado a retirar este comentario"
-        )
+        raise ComentarioNaoAutorizadoError("nao autorizado a retirar este comentario")
 
     if comentario.estado not in (
         EstadoComentario.PENDENTE,
         EstadoComentario.PUBLICADO,
         EstadoComentario.SUSPENSO,
     ):
-        raise ComentarioNaoAutorizadoError(
-            "nao e possivel retirar este comentario"
-        )
+        raise ComentarioNaoAutorizadoError("nao e possivel retirar este comentario")
 
     try:
         # Retirada explicita tambem vale quando o autor seleciona seu substituto.

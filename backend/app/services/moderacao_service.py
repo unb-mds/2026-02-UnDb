@@ -1,4 +1,5 @@
 """Human review of comment versions; decisions never copy discarded content."""
+
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
@@ -8,7 +9,12 @@ from app.models.enums import AcaoModeracao, EstadoComentario
 from app.models.comentario_versao import ComentarioVersao
 from app.models.usuario import Usuario
 from app.repositories import comentario_repository, moderacao_repository, denuncia_repository
-from app.schemas.moderacao import AcaoModeracaoRequest, ComentarioModeracaoResponse, DecisaoResponse, IdentidadeInterna
+from app.schemas.moderacao import (
+    AcaoModeracaoRequest,
+    ComentarioModeracaoResponse,
+    DecisaoResponse,
+    IdentidadeInterna,
+)
 
 RETENCAO = timedelta(days=7)
 
@@ -30,9 +36,12 @@ def autorizar(usuario: Usuario) -> None:
 
 def representar(versao: ComentarioVersao) -> ComentarioModeracaoResponse:
     return ComentarioModeracaoResponse(
-        id=versao.id, texto=versao.texto, estado=versao.estado,
+        id=versao.id,
+        texto=versao.texto,
+        estado=versao.estado,
         autor=IdentidadeInterna.model_validate(versao.avaliacao.usuario),
-        substitui_id=versao.substitui_id, created_at=versao.created_at,
+        substitui_id=versao.substitui_id,
+        created_at=versao.created_at,
     )
 
 
@@ -60,12 +69,17 @@ def decisoes(db: Session, usuario: Usuario, versao_id: UUID):
     moderacao_repository.descartar_vencidos(db, agora_utc())
     if comentario_repository.obter_por_id(db, versao_id) is None:
         raise ModeracaoError(404, "comentario nao encontrado")
-    resultado = [DecisaoResponse.model_validate(d) for d in moderacao_repository.listar_decisoes(db, versao_id)]
+    resultado = [
+        DecisaoResponse.model_validate(d)
+        for d in moderacao_repository.listar_decisoes(db, versao_id)
+    ]
     db.commit()
     return resultado
 
 
-def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados: AcaoModeracaoRequest) -> DecisaoResponse:
+def decidir(
+    db: Session, usuario: Usuario, versao_id: UUID, dados: AcaoModeracaoRequest
+) -> DecisaoResponse:
     autorizar(usuario)
     try:
         versao = comentario_repository.obter_bloqueado(db, versao_id)
@@ -74,12 +88,20 @@ def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados: AcaoModeracao
         if versao.avaliacao.usuario_id == usuario.id:
             raise ModeracaoError(403, "moderador impedido por autoria do comentario")
         anterior = versao.estado
-        if anterior != EstadoComentario.PENDENTE and denuncia_repository.existe_da_conta(db, versao.id, usuario.id):
+        if anterior != EstadoComentario.PENDENTE and denuncia_repository.existe_da_conta(
+            db, versao.id, usuario.id
+        ):
             raise ModeracaoError(403, "moderador impedido por denuncia propria")
-        abertas = denuncia_repository.listar(db, versao.id) if anterior != EstadoComentario.PENDENTE else []
+        abertas = (
+            denuncia_repository.listar(db, versao.id)
+            if anterior != EstadoComentario.PENDENTE
+            else []
+        )
         permitidas = {
             EstadoComentario.PENDENTE: (AcaoModeracao.APROVAR, AcaoModeracao.REJEITAR),
-            EstadoComentario.PUBLICADO: (AcaoModeracao.MANTER, AcaoModeracao.REMOVER) if abertas else (),
+            EstadoComentario.PUBLICADO: (AcaoModeracao.MANTER, AcaoModeracao.REMOVER)
+            if abertas
+            else (),
             EstadoComentario.SUSPENSO: (AcaoModeracao.RESTAURAR, AcaoModeracao.REMOVER),
         }
         if dados.acao not in permitidas.get(anterior, ()):
@@ -89,7 +111,9 @@ def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados: AcaoModeracao
             atual = comentario_repository.obter_atual_por_avaliacao(db, versao.avaliacao_id)
             if atual is not None:
                 if denuncia_repository.existe_da_conta(db, atual.id, usuario.id):
-                    raise ModeracaoError(403, "moderador impedido por denuncia propria da versao substituida")
+                    raise ModeracaoError(
+                        403, "moderador impedido por denuncia propria da versao substituida"
+                    )
                 denuncia_repository.encerrar(db, atual.id, "VERSAO_SUBSTITUIDA")
                 atual.estado = EstadoComentario.SUBSTITUIDO
                 atual.texto = None
@@ -107,16 +131,26 @@ def decidir(db: Session, usuario: Usuario, versao_id: UUID, dados: AcaoModeracao
                 versao.descartar_em = agora + RETENCAO
             else:
                 versao.estado = EstadoComentario.PUBLICADO
-            denuncia_repository.encerrar(db, versao.id, {
-                AcaoModeracao.REMOVER: "REMOVIDO", AcaoModeracao.MANTER: "MANTIDO",
-                AcaoModeracao.RESTAURAR: "RESTAURADO",
-            }[dados.acao])
+            denuncia_repository.encerrar(
+                db,
+                versao.id,
+                {
+                    AcaoModeracao.REMOVER: "REMOVIDO",
+                    AcaoModeracao.MANTER: "MANTIDO",
+                    AcaoModeracao.RESTAURAR: "RESTAURADO",
+                }[dados.acao],
+            )
         versao.updated_at = agora
         decisao = moderacao_repository.registrar_decisao(
-            db, comentario_versao_id=versao.id, moderador_id=usuario.id,
-            acao=dados.acao.value, motivo=dados.motivo,
-            estado_anterior=anterior.value, estado_posterior=versao.estado.value,
-            created_at=agora, descartar_em=agora + RETENCAO,
+            db,
+            comentario_versao_id=versao.id,
+            moderador_id=usuario.id,
+            acao=dados.acao.value,
+            motivo=dados.motivo,
+            estado_anterior=anterior.value,
+            estado_posterior=versao.estado.value,
+            created_at=agora,
+            descartar_em=agora + RETENCAO,
         )
         resultado = DecisaoResponse.model_validate(decisao)
         db.commit()

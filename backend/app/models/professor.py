@@ -14,14 +14,8 @@ class Professor(Base):
     nome_normalizado: Mapped[str] = mapped_column(String(150), nullable=False, default="")
     departamento: Mapped[str] = mapped_column(String(100), nullable=False)
     siape: Mapped[str | None] = mapped_column(String(30), nullable=True, unique=True)
-    identidade_origem: Mapped[str | None] = mapped_column(
-        String(255), nullable=True, unique=True
-    )
-    identidade_confirmada: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False
-    )
+    identidade_origem: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
+    identidade_confirmada: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
-    turmas = relationship(
-        "Turma", secondary="turmas_professores", back_populates="professores"
-    )
+    turmas = relationship("Turma", secondary="turmas_professores", back_populates="professores")
     avaliacoes = relationship("Avaliacao", back_populates="professor")

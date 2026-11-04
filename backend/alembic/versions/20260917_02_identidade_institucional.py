@@ -44,9 +44,7 @@ def upgrade() -> None:
 
     op.add_column("professores", sa.Column("nome_normalizado", sa.String(150)))
     op.add_column("professores", sa.Column("siape", sa.String(30), nullable=True))
-    op.add_column(
-        "professores", sa.Column("identidade_origem", sa.String(255), nullable=True)
-    )
+    op.add_column("professores", sa.Column("identidade_origem", sa.String(255), nullable=True))
     op.add_column(
         "professores",
         sa.Column(
@@ -61,24 +59,18 @@ def upgrade() -> None:
         "uq_professores_identidade_origem", "professores", ["identidade_origem"]
     )
 
-    op.add_column(
-        "disciplinas", sa.Column("identificador_externo", sa.String(50), nullable=True)
-    )
+    op.add_column("disciplinas", sa.Column("identificador_externo", sa.String(50), nullable=True))
     op.add_column("disciplinas", sa.Column("nome_normalizado", sa.String(150)))
 
     conexao = op.get_bind()
     for row in conexao.execute(sa.text("SELECT id, nome FROM professores")):
         conexao.execute(
-            sa.text(
-                "UPDATE professores SET nome_normalizado=:normalizado WHERE id=:id"
-            ),
+            sa.text("UPDATE professores SET nome_normalizado=:normalizado WHERE id=:id"),
             {"normalizado": _normalizar(row.nome), "id": row.id},
         )
     for row in conexao.execute(sa.text("SELECT id, nome FROM disciplinas")):
         conexao.execute(
-            sa.text(
-                "UPDATE disciplinas SET nome_normalizado=:normalizado WHERE id=:id"
-            ),
+            sa.text("UPDATE disciplinas SET nome_normalizado=:normalizado WHERE id=:id"),
             {"normalizado": _normalizar(row.nome), "id": row.id},
         )
     op.alter_column("professores", "nome_normalizado", nullable=False)
@@ -102,9 +94,7 @@ def upgrade() -> None:
     )
 
     unidades: dict[str, object] = {}
-    departamentos = conexao.execute(
-        sa.text("SELECT DISTINCT departamento FROM disciplinas")
-    )
+    departamentos = conexao.execute(sa.text("SELECT DISTINCT departamento FROM disciplinas"))
     for row in departamentos:
         unidade_id = uuid4()
         unidades[row.departamento] = unidade_id
@@ -140,9 +130,7 @@ def upgrade() -> None:
     op.alter_column("turmas", "fonte", nullable=False)
     op.alter_column("turmas", "unidade_id", nullable=False)
     op.alter_column("turmas", "codigo", nullable=False)
-    op.create_foreign_key(
-        "fk_turmas_unidade_id", "turmas", "unidades", ["unidade_id"], ["id"]
-    )
+    op.create_foreign_key("fk_turmas_unidade_id", "turmas", "unidades", ["unidade_id"], ["id"])
     op.create_table(
         "turmas_professores",
         sa.Column("turma_id", sa.Uuid(), nullable=False),
@@ -160,9 +148,7 @@ def upgrade() -> None:
             {"turma_id": row.id, "professor_id": row.professor_id},
         )
 
-    op.drop_constraint(
-        "uq_turma_disciplina_professor_semestre", "turmas", type_="unique"
-    )
+    op.drop_constraint("uq_turma_disciplina_professor_semestre", "turmas", type_="unique")
     op.drop_constraint("turmas_professor_id_fkey", "turmas", type_="foreignkey")
     op.drop_column("turmas", "professor_id")
     op.create_unique_constraint(

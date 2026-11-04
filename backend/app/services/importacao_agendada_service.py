@@ -12,14 +12,8 @@ from app.services.sigaa_import_service import (
 
 
 def _resumir_resultado(resultado: ResultadoImportacao) -> tuple[int, int]:
-    extraidas = sum(
-        departamento.ofertas_extraidas
-        for departamento in resultado.departamentos
-    )
-    processadas = sum(
-        departamento.ofertas_processadas
-        for departamento in resultado.departamentos
-    )
+    extraidas = sum(departamento.ofertas_extraidas for departamento in resultado.departamentos)
+    processadas = sum(departamento.ofertas_processadas for departamento in resultado.departamentos)
     return extraidas, processadas
 
 
@@ -73,9 +67,7 @@ def executar_importacao_agendada(
             registro.erro = None
         else:
             erros = [
-                erro
-                for departamento in resultado.departamentos
-                for erro in departamento.erros
+                erro for departamento in resultado.departamentos for erro in departamento.erros
             ]
             registro.erro = "\n".join(erros) or "A importação falhou."
 

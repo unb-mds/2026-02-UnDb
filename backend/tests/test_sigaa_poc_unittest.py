@@ -17,10 +17,13 @@ class SigaaPocParserTest(unittest.TestCase):
         </form>
         """
 
-        self.assertEqual(listar_unidades(html), [
-            ("508", "DEPTO CIÊNCIAS DA COMPUTAÇÃO"),
-            ("509", "DEPARTAMENTO DE MATEMÁTICA"),
-        ])
+        self.assertEqual(
+            listar_unidades(html),
+            [
+                ("508", "DEPTO CIÊNCIAS DA COMPUTAÇÃO"),
+                ("509", "DEPARTAMENTO DE MATEMÁTICA"),
+            ],
+        )
 
     def test_form_extracts_jsf_state_options_and_dynamic_submit(self) -> None:
         form = parse_form("""
@@ -110,7 +113,9 @@ class SigaaPocMultipleDocentesParserTest(unittest.TestCase):
         self.assertEqual(ofertas[0].componente_nome, "ALGORITMOS E PROGRAMAÇÃO DE COMPUTADORES")
         self.assertEqual(ofertas[0].turma_codigo, "02")
         self.assertEqual(ofertas[0].periodo, "2026.2")
-        self.assertEqual(ofertas[0].docentes, ("YURI COSSICH LAVINAS", "JOAO GABRIEL ROSSI DE BORBA"))
+        self.assertEqual(
+            ofertas[0].docentes, ("YURI COSSICH LAVINAS", "JOAO GABRIEL ROSSI DE BORBA")
+        )
         self.assertEqual(ofertas[0].componente_id, "177944")
 
 

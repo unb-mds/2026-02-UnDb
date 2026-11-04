@@ -51,9 +51,7 @@ def listar_disciplinas_do_professor(
     session: Annotated[Session, Depends(get_db)],
 ) -> list[DisciplinaDetalheResponse]:
     try:
-        return institucional_service.listar_disciplinas_do_professor(
-            session, professor_id
-        )
+        return institucional_service.listar_disciplinas_do_professor(session, professor_id)
     except institucional_service.RecursoInstitucionalNaoEncontradoError as erro:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(erro)) from erro
 
@@ -116,9 +114,7 @@ def listar_comentarios_publicados(
 ) -> list[ComentarioPublicoResponse]:
     """Lista comentarios publicados (visitante, sem necessidade de sessao)."""
     try:
-        return comentario_svc.listar_publicados(
-            session, professor_id, disciplina_id
-        )
+        return comentario_svc.listar_publicados(session, professor_id, disciplina_id)
     except comentario_svc.RecursoNaoEncontradoError as erro:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
