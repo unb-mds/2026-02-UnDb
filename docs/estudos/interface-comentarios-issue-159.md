@@ -75,3 +75,17 @@ arquivos de produção alterados não encontrou ocorrências.
   concluídos; usar `Refs #159`. A validação integrada final pertence à #163.
 
 O resumo temporário `/tmp/rf20-resumo.md` não faz parte do commit.
+
+## Correção do check Frontend do PR #197
+
+O job `Frontend` da execução `41758377473` passou em lint, testes e build,
+mas falhou em `prototipo-browser.mjs:255`: a asserção de zero chamadas à API
+recebeu consultas a `/api/agradecimentos`. O banner global era montado também
+nas rotas demonstrativas. Ele agora segue o isolamento usado pelo cabeçalho:
+em `/prototipo` e subrotas, o componente que consulta avisos reais não é montado.
+Sair da demonstração permite montá-lo normalmente nas rotas reais.
+
+O observador do teste usa `documentURL` para verificar requisições originadas no
+protótipo. A visita inicial à página real `/` não pertence à asserção de isolamento.
+A exigência de zero chamadas à API da demonstração permanece ativa, sem liberar
+o endpoint de agradecimentos ou quaisquer outros endpoints nessas rotas.

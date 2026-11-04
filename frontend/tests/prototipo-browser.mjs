@@ -7,7 +7,11 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
   const requisicoesApi = [];
   const observar = ({ data }) => {
     const evento = JSON.parse(data);
-    if (evento.method === "Network.requestWillBeSent" && new URL(evento.params.request.url).pathname.startsWith("/api/")) {
+    if (evento.method !== "Network.requestWillBeSent") return;
+    const documento = new URL(evento.params.documentURL).pathname;
+    // A página inicial real também é visitada pelo roteiro; somente o protótipo
+    // deve permanecer isolado da API, inclusive dos avisos globais da conta.
+    if ((documento === "/prototipo" || documento.startsWith("/prototipo/")) && new URL(evento.params.request.url).pathname.startsWith("/api/")) {
       requisicoesApi.push(evento.params.request.url);
     }
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import type { Agradecimento } from "@/lib/types/denuncia";
 import { EVENTO_SESSAO_ALTERADA } from "@/lib/services/auth";
 import { confirmarAgradecimentoExibido, listarAgradecimentos } from "@/lib/services/denuncias";
@@ -55,6 +56,13 @@ function MensagemAgradecimento({ item, dispensar }: {
 }
 
 export default function AvisoAgradecimento() {
+  const caminho = usePathname();
+  // A demonstração usa somente dados fictícios e não deve consumir avisos reais.
+  if (caminho === "/prototipo" || caminho.startsWith("/prototipo/")) return null;
+  return <AvisosDaConta />;
+}
+
+function AvisosDaConta() {
   const [lote, setLote] = useState<{ geracao: number; mensagens: Agradecimento[] }>({ geracao: 0, mensagens: [] });
 
   useEffect(() => {
