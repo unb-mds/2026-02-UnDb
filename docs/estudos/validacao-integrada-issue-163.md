@@ -41,12 +41,27 @@ fixtures sintéticas da `denuncia_browser_fixture.py`, criadas antes do roteiro.
 | Evidência | Correção e verificação |
 |---|---|
 | [CI 41764883195](https://github.com/unb-mds/2026-02-UnDb/actions/runs/41764883195/job/126360816454): `document.body.innerText` executado antes de existir body | Leitura segura compartilhada em `browser-navigation.mjs`; ausência de body é carregamento. Somente erros transitórios de troca de contexto CDP são tolerados; TypeError inesperado, asserção e timeout continuam falhando. Limites e asserções não foram removidos |
-| Roteiro integrado inicialmente repetia seleção antes de terminar a consulta dos relatos | Espera seleção por `aria-pressed` uma vez e depois aguarda análise interativa, sem reiniciar requisições repetidamente |
+| Revisão da PR #198: o polling de seleção repetia o clique enquanto a consulta do comentário estava em andamento, cancelando a requisição anterior | Aguarda o item habilitado na fila, clica uma única vez e apenas consulta `aria-pressed` até concluir a seleção; depois aguarda a análise interativa. O timeout de 25 segundos e as asserções permanecem |
 
 Três testes determinísticos reproduzem body ausente, troca de contexto e preservação de
 erros inesperados. A suíte completa de navegador passou e o runner de denúncia passou
 em três repetições adicionais. Isso reduz a corrida conhecida; não prova ausência universal
 de intermitência. Nenhum defeito funcional do produto foi confirmado nesta execução.
+
+### Correção após a revisão da PR #198
+
+Na reprodução controlada da revisão, uma consulta de 250 ms não concluía: os cliques
+repetidos cancelavam as requisições até o timeout de 25 segundos. Após a correção,
+as funções reais `analisar`, `aguardar` e `selecionar` foram exercitadas em simulação
+controlada com consultas de 0, 250 e 1000 ms; no último caso, o item também demorou
+350 ms para aparecer na fila. Todos os casos concluíram com um clique, uma consulta
+concluída e nenhum cancelamento, aguardando também a análise interativa.
+
+Nesta correção, os 61 testes frontend e a verificação de sintaxe do runner passaram.
+Não houve nova execução local do percurso completo com navegador/PostgreSQL;
+os resultados de integração abaixo pertencem à entrega original. O job de CI
+`Moderation end to end (PostgreSQL)` permanece responsável por reproduzir esse percurso
+no novo commit.
 
 ## Ambiente e resultados
 

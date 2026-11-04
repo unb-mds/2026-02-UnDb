@@ -50,11 +50,10 @@ await comNavegador({ executar: async ({ cdp, avaliar, aguardar }) => {
   }
   async function analisar(id) {
     await navegar('/moderacao'); await esperar('Fila de moderação');
-    await aguardar(async()=>{
-      if (await avaliar(`Array.from(document.querySelectorAll('[aria-label="Comentários na fila"] button')).some(b=>b.textContent.includes(${JSON.stringify(id)}) && b.getAttribute('aria-pressed')==='true')`)) return true;
-      await avaliar(`Array.from(document.querySelectorAll('[aria-label="Comentários na fila"] button')).find(b=>b.textContent.includes(${JSON.stringify(id)}))?.click()`);
-      return false;
-    },'comentário selecionado');
+    await aguardar(async()=>await avaliar(`Array.from(document.querySelectorAll('[aria-label="Comentários na fila"] button')).some(b=>b.textContent.includes(${JSON.stringify(id)}) && !b.disabled)`),'comentário disponível');
+    // Repetir o clique durante o carregamento cancela a consulta anterior.
+    await avaliar(`Array.from(document.querySelectorAll('[aria-label="Comentários na fila"] button')).find(b=>b.textContent.includes(${JSON.stringify(id)})).click()`);
+    await aguardar(async()=>await avaliar(`Array.from(document.querySelectorAll('[aria-label="Comentários na fila"] button')).some(b=>b.textContent.includes(${JSON.stringify(id)}) && b.getAttribute('aria-pressed')==='true')`),'comentário selecionado');
     await aguardar(async()=>await avaliar(`!!document.querySelector('#acao-moderacao') && !!document.querySelector('[aria-label="Análise do comentário"]')?.innerText.includes(${JSON.stringify(id)})`),'análise interativa');
   }
   async function decidir(acao, estadoEsperado) {
