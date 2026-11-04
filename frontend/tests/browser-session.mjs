@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
+import { contextoEmTransicao } from './browser-navigation.mjs';
 
 export async function comNavegador({ fixture, executar }) {
   const navegador = process.env.BROWSER_PATH ?? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
@@ -32,7 +33,11 @@ export async function comNavegador({ fixture, executar }) {
   const aguardar = async (condicao, nome) => {
     const inicio = Date.now();
     while (Date.now() - inicio < 25000) {
-      if (await condicao()) return;
+      try {
+        if (await condicao()) return;
+      } catch (erro) {
+        if (!contextoEmTransicao(erro)) throw erro;
+      }
       await new Promise(resolve => setTimeout(resolve, 100));
     }
     throw new Error(`Timeout: ${nome}`);

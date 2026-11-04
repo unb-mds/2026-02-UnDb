@@ -1,3 +1,4 @@
+import { lerTextoPagina } from "./browser-navigation.mjs";
 // Interface controlada por padrão; E2E_FIXTURE ativa FastAPI/PostgreSQL reais (runner Python).
 // Requer build padrão (API localhost:8000), Node 22+ e Edge/Chromium headless.
 import assert from "node:assert/strict";
@@ -151,7 +152,7 @@ async function removerPerfilTemporario() {
     }
   }
 }
-const texto = () => avaliar("document.body.innerText");
+const texto = () => lerTextoPagina(avaliar);
 const enviar = () => avaliar('document.querySelector("button[type=submit]").click()');
 const aguardarTexto = (trecho) => aguardar(async () => (await texto()).includes(trecho), trecho);
 

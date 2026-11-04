@@ -1,3 +1,4 @@
+import { lerTextoPagina } from "./browser-navigation.mjs";
 // Mesmo mecanismo das suítes existentes: Node, CDP e Edge/Chromium isolado.
 // MODERACAO_FIXTURE_FILE seleciona API/PostgreSQL reais; padrão usa HTTP controlado.
 import assert from "node:assert/strict";
@@ -92,7 +93,7 @@ async function aguardar(consulta, nome) {
   for (let i = 0; i < 200; i++) { if (await consulta()) return; await new Promise((r) => setTimeout(r, 100)); }
   throw new Error(`Não encontrado: ${nome}`);
 }
-const texto = () => avaliar("document.body.innerText");
+const texto = () => lerTextoPagina(avaliar);
 const esperarTexto = (valor) => aguardar(async () => (await texto()).includes(valor), valor);
 const clicar = (valor) => avaliar(`Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === ${JSON.stringify(valor)})?.click()`);
 async function navegar() { await cdp("Page.navigate", { url: "http://localhost:3100/moderacao" }); await esperarTexto("Fila de moderação"); }

@@ -30,6 +30,7 @@ try {
       "tests/comentarios.test.mjs",
       "tests/moderacao.test.mjs",
       "tests/denuncia.test.mjs",
+      "tests/browser-navigation.test.mjs",
     ], {
       cwd: frontend,
       stdio: "inherit",

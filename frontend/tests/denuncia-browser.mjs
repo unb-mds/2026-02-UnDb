@@ -1,3 +1,4 @@
+import { contextoEmTransicao, lerTextoPagina } from "./browser-navigation.mjs";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
@@ -201,13 +202,17 @@ async function avaliar(expression) {
 
 async function aguardar(consulta, nome) {
   for (let i = 0; i < 400; i++) {
-    if (await consulta()) return;
+    try {
+      if (await consulta()) return;
+    } catch (erro) {
+      if (!contextoEmTransicao(erro)) throw erro;
+    }
     await new Promise((r) => setTimeout(r, 100));
   }
   throw new Error(`Não encontrado: ${nome}`);
 }
 
-const texto = () => avaliar("document.body.innerText");
+const texto = () => lerTextoPagina(avaliar);
 const esperarTexto = (valor) => aguardar(async () => (await texto()).includes(valor), valor);
 
 async function navegar() {
