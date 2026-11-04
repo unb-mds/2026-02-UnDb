@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 const carregar = (arquivo) => import(pathToFileURL(join(process.env.AVALIACAO_TEST_BUILD, arquivo)));
 const servico = await carregar("services/comentarios.js");
 const { ApiError } = await carregar("services/http-error.js");
+const apresentacao = await carregar("apresentacao-comentario.js");
 
 const versaoId = "11111111-1111-4111-8111-111111111111";
 const outraVersao = "22222222-2222-4222-8222-222222222222";
@@ -53,6 +54,70 @@ test("consulta GET /api/comentarios/meu com cookie e mapeia versões do autor", 
   assert.equal(resultado[1].estado, "RETIRADO");
   assert.equal(resultado[2].estado, "PENDENTE");
   assert.equal(resultado[2].texto, "Revisado: didática excelente e aulas práticas.");
+});
+
+test("respostas do autor são reduzidas aos campos privados autorizados", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => Response.json([{
+    ...comentarioPublicado,
+    nome_autor: "Pessoa não autorizada",
+    email: "privado@example.test",
+    usuario_id: "55555555-5555-4555-8555-555555555555",
+  }]));
+
+  const [comentario] = await servico.consultarMeusComentarios();
+  assert.deepEqual(comentario, comentarioPublicado);
+  assert.equal("nome_autor" in comentario, false);
+  assert.equal("email" in comentario, false);
+  assert.equal("usuario_id" in comentario, false);
+});
+
+test("respostas públicas retêm somente os campos permitidos pelo contrato", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => Response.json([{
+    id: versaoId,
+    texto: "Comentário público.",
+    created_at: "2026-11-01T10:00:00Z",
+    email: "privado@example.test",
+    usuario_id: "55555555-5555-4555-8555-555555555555",
+  }]));
+
+  const [comentario] = await servico.listarComentariosPublicados(avaliacaoId, outraAvaliacao);
+  assert.deepEqual(comentario, {
+    id: versaoId,
+    texto: "Comentário público.",
+    created_at: "2026-11-01T10:00:00Z",
+  });
+  assert.equal("email" in comentario, false);
+  assert.equal("usuario_id" in comentario, false);
+});
+
+test("apresentação cobre os estados RF20 sem publicar versões pendentes", () => {
+  const esperado = {
+    PENDENTE: "Em análise",
+    PUBLICADO: "Publicado",
+    SUSPENSO: "Temporariamente indisponível",
+    REMOVIDO: "Removido",
+    RETIRADO: "Retirado",
+    SUBSTITUIDO: "Substituído",
+  };
+  for (const [estado, rotulo] of Object.entries(esperado)) {
+    const comentario = { ...comentarioPublicado, estado };
+    assert.equal(apresentacao.rotulosEstadoComentario[estado], rotulo);
+    const descricao = apresentacao.descricaoEstadoComentario(comentario);
+    if (estado === "PUBLICADO") {
+      assert.match(descricao, /visível publicamente/);
+    } else {
+      assert.match(descricao, /não .*visível|ainda não.*público/);
+    }
+  }
+
+  assert.match(
+    apresentacao.descricaoEstadoComentario({ ...substitutoPendente, substitui_id: versaoId }),
+    /substituto aguarda aprovação/,
+  );
+  assert.equal(
+    apresentacao.textoExibivelComentario(comentarioDescartado),
+    "O texto desta versão não está mais disponível.",
+  );
 });
 
 test("texto nulo, estado e IDs são validados contra o contrato antes de retornar", async (t) => {

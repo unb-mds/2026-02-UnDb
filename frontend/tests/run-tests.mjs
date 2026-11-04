@@ -17,7 +17,7 @@ try {
     "src/lib/contexto-busca.ts", "src/lib/services/disciplinas.ts", "src/lib/services/professores.ts",
     "src/lib/moderacao.ts", "src/lib/services/moderacao.ts",
     "src/lib/types/denuncia.ts", "src/lib/services/denuncias.ts",
-    "src/lib/types/comentario.ts", "src/lib/services/comentarios.ts",
+    "src/lib/types/comentario.ts", "src/lib/apresentacao-comentario.ts", "src/lib/services/comentarios.ts",
   ], { cwd: frontend, stdio: "inherit" });
   if (compilacao.error) throw compilacao.error;
   if (compilacao.status !== 0) {

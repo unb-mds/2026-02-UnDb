@@ -41,7 +41,7 @@ export async function listarComentariosPublicados(
     throw new Error("Resposta de comentários incompatível com o contrato.");
   }
 
-  return resposta;
+  return resposta.map(({ id, texto, created_at }) => ({ id, texto, created_at }));
 }
 
 function comentarioDoAutor(valor: unknown): valor is ComentarioDoAutor {
@@ -63,5 +63,15 @@ export async function consultarMeusComentarios(): Promise<ComentarioDoAutor[]> {
   if (!Array.isArray(resposta) || !resposta.every(comentarioDoAutor)) {
     throw new Error("Resposta de comentários do autor incompatível com o contrato.");
   }
-  return resposta;
+  return resposta.map(
+    ({ id, texto, created_at, updated_at, estado, avaliacao_id, substitui_id }) => ({
+      id,
+      texto,
+      created_at,
+      updated_at,
+      estado,
+      avaliacao_id,
+      substitui_id,
+    }),
+  );
 }
