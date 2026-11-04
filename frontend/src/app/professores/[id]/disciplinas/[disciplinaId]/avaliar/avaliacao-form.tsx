@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import CriteriosAvaliacao from "@/components/criterios-avaliacao";
-import { useRef, useState, type FormEvent } from "react";
+import MeusComentarios from "@/components/meus-comentarios";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { criarEntradaAvaliacao, mensagemErroAvaliacao } from "@/lib/avaliacao-formulario";
 import { consultarSessao } from "@/lib/services/auth";
 import { enviarAvaliacao } from "@/lib/services/avaliacoes";
+import { consultarMeusComentarios } from "@/lib/services/comentarios";
 import { ApiError } from "@/lib/services/http-error";
+import type { ComentarioDoAutor } from "@/lib/types/comentario";
 
 export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }: {
   professorId: string;
@@ -18,6 +21,25 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
   const [erro, setErro] = useState<string | null>(null);
   const [precisaEntrar, setPrecisaEntrar] = useState(false);
   const [sucesso, setSucesso] = useState(false);
+  const [meusComentarios, setMeusComentarios] = useState<ComentarioDoAutor[] | null>(null);
+  const [erroComentarios, setErroComentarios] = useState(false);
+
+  useEffect(() => {
+    let ativo = true;
+    void consultarMeusComentarios()
+      .then((comentarios) => {
+        if (ativo) setMeusComentarios(comentarios);
+      })
+      .catch((falha) => {
+        if (!ativo) return;
+        // RF20/R2-DEC-01: somente o autor confirmado pode consultar versões próprias.
+        if (falha instanceof ApiError && [401, 403].includes(falha.status)) return;
+        setErroComentarios(true);
+      });
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -90,6 +112,12 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
           </div>
         )}
       </div>
+      {meusComentarios !== null && <MeusComentarios comentarios={meusComentarios} />}
+      {erroComentarios && (
+        <p role="alert" className="text-sm text-foreground/70">
+          Não foi possível carregar seus comentários agora. Tente recarregar a página.
+        </p>
+      )}
     </form>
   );
 }
