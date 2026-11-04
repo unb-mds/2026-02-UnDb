@@ -7,9 +7,11 @@ import type { ComentarioDoAutor } from "@/lib/types/comentario";
 
 type MeusComentariosProps = {
   comentarios: ComentarioDoAutor[];
+  aoRetirar: (id: string) => void;
+  disabled?: boolean;
 };
 
-export default function MeusComentarios({ comentarios }: MeusComentariosProps) {
+export default function MeusComentarios({ comentarios, aoRetirar, disabled }: MeusComentariosProps) {
   if (comentarios.length === 0) {
     return (
       <p className="text-sm text-foreground/70">
@@ -33,13 +35,17 @@ export default function MeusComentarios({ comentarios }: MeusComentariosProps) {
           <li
             key={comentario.id}
             data-testid={`meu-comentario-${comentario.id}`}
-            className="rounded-xl border border-foreground/10 bg-background p-4"
+            className="min-w-0 break-words rounded-xl border border-foreground/10 bg-background p-4"
           >
             <p className="text-sm font-medium text-accent">{rotulosEstadoComentario[comentario.estado]}</p>
             <p className="mt-1 text-sm text-foreground/70">{descricaoEstadoComentario(comentario)}</p>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
               {textoExibivelComentario(comentario)}
             </p>
+            {["PENDENTE", "PUBLICADO", "SUSPENSO"].includes(comentario.estado) && (
+              <button type="button" disabled={disabled} onClick={() => aoRetirar(comentario.id)}
+                aria-label={`Retirar comentário ${comentario.id}`} className="mt-3 text-sm text-accent underline disabled:opacity-60">Retirar comentário</button>
+            )}
           </li>
         ))}
       </ul>

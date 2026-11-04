@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
 from app.models.comentario_versao import ComentarioVersao
@@ -106,11 +106,17 @@ def criar(
     return comentario
 
 
-def listar_por_usuario(db: Session, usuario_id: UUID) -> list[ComentarioVersao]:
+def listar_por_usuario(db: Session, usuario_id: UUID, professor_id: UUID | None = None,
+                      disciplina_id: UUID | None = None) -> list[ComentarioVersao]:
+    filtros = [Avaliacao.usuario_id == usuario_id]
+    if professor_id is not None:
+        filtros.append(Avaliacao.professor_id == professor_id)
+    if disciplina_id is not None:
+        filtros.append(Avaliacao.disciplina_id == disciplina_id)
     return list(
         db.scalars(
             select(ComentarioVersao)
-            .where(ComentarioVersao.avaliacao.has(usuario_id=usuario_id))
+            .where(ComentarioVersao.avaliacao.has(and_(*filtros)))
             .order_by(ComentarioVersao.created_at.desc())
         ).all()
     )

@@ -1,103 +1,95 @@
 # Interface de comentários — Issue #159
 
-**Estado:** entrega parcial para revisão; critérios da issue ainda pendentes.
-**Base:** `78dfa46` (`develop`). Branch: `feature/159-interface-comentarios-rf20`.
+**Estado:** fluxos RF20 implementados para revisão e aceite; merge e homologação da #163 pendentes.
+**Base da revisão:** `b9f0416` (PR #197), sobre `develop` em `78dfa46`.
 **Fontes:** [RF20 e decisões R2-DEC](../requisitos.md),
-[contrato das APIs #160/#161](alinhamento-denuncias-issues-160-161.md) e
-[Issue #159](https://github.com/unb-mds/2026-02-UnDb/issues/159).
+[contratos das APIs](alinhamento-denuncias-issues-160-161.md) e [Issue #159](https://github.com/unb-mds/2026-02-UnDb/issues/159).
 
-## Interface entregue
+## Entrega e correções
 
-A rota `/professores/[id]/disciplinas/[disciplinaId]/avaliar` consulta
-`GET /api/comentarios/meu` pelo cliente HTTP existente, com cookie e sem cache.
-As versões retornadas ficam no estado local da página. A seção `MeusComentarios`
-mostra os seis estados contratados e informa quando o texto foi descartado
-(`texto: null`). A lista vazia tem mensagem própria; 401/403 não mostram a seção
-privada; outras falhas mostram aviso de indisponibilidade.
+- A rota `/professores/[id]/disciplinas/[disciplinaId]/avaliar` permite enviar texto
+  opcional junto dos critérios. Novo texto/substituto sempre aguarda aprovação humana.
+  Campo vazio omite o comentário e mantém o anterior. Texto inválido não bloqueia os
+  critérios válidos: a interface trata `comentario_erro` e informa o sucesso parcial.
+- O acompanhamento aceita os sete estados reais, incluindo `REJEITADO`, e apresenta
+  texto descartado (`null`) sem recuperar conteúdo apagado. Compartilha o enum existente
+  da PR #192. O substituto pendente não é anunciado como publicado nem restaura suspensos.
+- Consulta privada com cookie, `no-store`, cancelamento e filtros opcionais UUID
+  `professor_id`/`disciplina_id`. O servidor aplica os filtros junto da autoria da sessão.
+  O GET sem filtros preserva a listagem anterior; UUID inválido retorna 422. O complemento
+  técnico está em `specs.md`; não houve migration, mudança de modelo ou de requisito.
+- Login/logout, foco e visibilidade invalidam dados privados anteriores. Respostas
+  atrasadas ou posteriores à desmontagem/troca de sessão não reaparecem. Carregamento,
+  vazio, acesso negado e falha de consulta têm estados distintos, com recuperação.
+- Retirada explícita com confirmação usa `PATCH /api/comentarios/{id}/retirar`, sem
+  reenviar critérios. Somente estados ativos oferecem a ação; autorização/estado são
+  conferidos novamente na API. A lista é reconsultada após confirmação, refletindo também
+  o cancelamento de eventual substituto. Falha HTTP não simula sucesso.
+- Leitura pública e denúncia da #193 são preservadas, com projeção apenas de `id`,
+  `texto`, `created_at`. Não há identidade pública, Web Storage, nova dependência,
+  alteração de agregação ou decisão automática sobre procedência de texto.
+- Textos longos quebram linha. O navegador temporário da fila é encerrado por CDP;
+  os cenários passavam, mas a limpeza do processo ficava bloqueada no Windows.
 
-| Fonte | Comportamento implementado |
+## Evidências desta correção
+
+Ambiente: Windows, Node 24.22.1, Edge/Chromium headless; Python 3.12 e PostgreSQL 16
+em containers descartáveis exclusivos, com migrations até `20261101_03`.
+
+| Verificação | Alcance |
 |---|---|
-| RF20; R2-DEC-01/03 | Leitura pública mantém apenas `id`, `texto`, `created_at`, sem identidade do autor |
-| R2-DEC-04/05 | Pendente aguarda aprovação humana; substituto pendente é distinguido da versão publicada |
-| RF20 item 10; R2-DEC-11 | Autor acompanha as versões retornadas por `/api/comentarios/meu` |
-| R2-DEC-14; contrato da PR #192 | Texto nulo recebe mensagem de indisponibilidade, sem tentativa de recuperar conteúdo descartado |
+| `node tests/run-tests.mjs` | 58 testes aprovados: estados, texto nulo, projeção pública/privada, contexto, cookie, no-store, cancelamento, PATCH e confirmação inválida, falhas HTTP e sucesso parcial de avaliação |
+| ESLint, TypeScript e `next build --webpack` | Aprovados; usado o compilador suportado que funciona neste Windows, sem alterar o script padrão do projeto |
+| `python -m unittest discover -s tests -q` | 159 testes aprovados, incluindo filtro de contexto/autoria, compatibilidade sem filtros, UUID inválido e limites do texto |
+| `python -m tests.integration_moderacao` | PostgreSQL real: HTTP, limiar 49/50, concorrência, privacidade, ações, retenção e agradecimentos aprovados |
+| Runners de avaliação/busca/protótipo, moderação, denúncia e comentários | Cenários aprovados; fila reexecutada após corrigir o encerramento do navegador de teste |
+| `node tests/comentarios-browser.mjs` | HTTP controlado: permissões, sete estados, descarte, texto longo/escape, envio, substituição/retirada, erros/recuperação, vazio e resposta obsoleta após invalidar sessão |
+| Mesmo runner com `COMENTARIOS_FIXTURE_FILE` | Sessões/API/PostgreSQL reais: acesso confirmado, texto opcional/inválido, substituto pendente, rejeição humana com descarte sem alterar versão publicada e retirada cancelando substituto |
+| Conferência no PostgreSQL após navegador real | Uma avaliação e cinco critérios preservados após retirada: didática 4, dificuldade MEDIO, chamada verdadeira, material BOM e recomendação verdadeira |
+| `mkdocs build --strict --site-dir /tmp/undb-rf20-site` | Documentação construída sem falhas em container temporário Python 3.12 |
 
-`MeusComentarios` reutiliza os valores de estado do contrato; a apresentação fica
-em `apresentacao-comentario.ts`. O serviço valida campos, estados e UUIDs e projeta
-somente os campos autorizados antes de entregar respostas à interface. O contrato
-do autor inclui `avaliacao_id` e `substitui_id`; não inclui identidade nominal,
-denúncias ou registros de moderação. Não há armazenamento global ou logs desses dados.
+O runner `comentarios-browser.mjs` integra `npm run test:browser` e também pode ser
+executado por `npm run test:comentarios`. Usa Node/CDP como os runners existentes,
+sem framework adicional. O backend de produto recebeu apenas filtros opcionais na
+consulta existente, mantendo a identidade derivada do cookie.
 
-A leitura pública em `/professores/[id]/disciplinas/[disciplinaId]` reutiliza
-`SecaoComentarios`, `ItemComentario` e o serviço já integrados pela #193.
-Os IDs de versão não foram renomeados. Não há mudança de API, schema, migration,
-dependência de produto, escalas ou agregação.
+## Rastreabilidade e limitações
 
-## Verificações e alcance
+| Critério | Evidência |
+|---|---|
+| AC20-01/02 | Texto opcional, validação 1/500 e 0/501, moderação prévia e critérios preservados quando texto é recusado |
+| AC20-03 | Projeção pública sem identidade; leitura e denúncia existentes preservadas |
+| AC20-04 | Substituto pendente e rejeição real com descarte; versão publicada anterior preservada |
+| AC20-05 | Reenvio sem texto mantém comentário; retirada cancela pendente e preserva critérios, conferidos no banco |
+| AC20-06 | Política visível na tela e julgamento humano; nenhum filtro/IA ou rejeição automática por discordância |
 
-As fases anteriores executaram `npm test` (54 testes), `npm run lint`,
-`npm run build` e `git diff --check`. A revisão do diff confirmou que os campos
-de identidade adicionados aparecem apenas nas fixtures negativas de testes.
-Os testes de apresentação cobrem funções usadas pelo componente, não sua montagem
-ou interação no navegador; os testes HTTP usam `fetch` mockado.
+Foram verificadas seis combinações de largura emulada (320/768/1280 px) e tema
+claro/escuro. Não houve smartphone físico, leitor de tela ou teste com usuários.
+As evidências da #159 não substituem aceite humano nem homologação global RF20–RF22
+na #163. Não se declara esta issue encerrada antes do merge e aceite.
 
-Na Fase 5, `npm run test:browser` interrompeu antes de abrir a interface:
-`Informe BROWSER_PATH com o executável Edge/Chromium.` Não se verificou desktop
-ou smartphone. O runner existente verifica outras telas em larguras emuladas,
-mas não contém cenários específicos das novas versões do autor.
+## Reprodução com API/PostgreSQL reais
 
-Os comandos do job frontend em `.github/workflows/pull-request.yml` são
-`npm ci`, `npm run lint`, `npm test`, `npm run build` e `npm run test:browser`.
-O CI usa Node 22 e Edge no Windows; a sessão local usa Node 24.14.1 e npm 11.11.0.
-`npm ci` reinstalou as dependências do lockfile e informou 20 vulnerabilidades
-(16 moderadas, 3 altas, 1 crítica); não foi executado `npm audit fix` nem alterado
-o lockfile para tentar corrigi-las nesta issue.
+Use somente banco descartável, migrations aplicadas, API na porta 8000 com
+`CORS_ORIGINS=http://localhost:3100` e `UNDB_INTEGRATION_TEST=1`. A fixture existente
+na #193 cria contas e dados sintéticos; gere outra a cada execução, pois o cenário
+rejeita textos e retira comentários. `undb-teste-api` abaixo representa seu container
+isolado com `backend/` montado em `/app`.
 
-Na Fase 6, após `npm ci`, `npm run lint` passou, `npm test` passou com 54 testes
-e `npm run build` compilou e verificou TypeScript com sucesso. `git diff --check
-origin/develop...HEAD` e `git diff --check` passaram. `npm run test:browser`
-foi repetido e falhou na mesma pré-condição de navegador, antes dos cenários.
-`mkdocs build --strict --site-dir /tmp/undb-rf20-site` construiu a documentação
-com sucesso. A busca por logs, Web Storage e acesso a campos de identidade nos
-arquivos de produção alterados não encontrou ocorrências.
+```powershell
+$fixtureRF20 = Join-Path $env:TEMP 'undb-rf20-fixture.json'
+docker exec undb-teste-api python -m tests.denuncia_browser_fixture | Set-Content -Encoding utf8 $fixtureRF20
+$env:COMENTARIOS_FIXTURE_FILE = $fixtureRF20
+Push-Location frontend
+npm ci
+npm run build
+npm run test:comentarios
+Pop-Location
+Remove-Item Env:COMENTARIOS_FIXTURE_FILE
+Remove-Item -LiteralPath $fixtureRF20
+```
 
-## Pendências para conclusão
-
-- Implementar os fluxos de envio, substituição e retirada mencionados no
-  encaminhamento atual da #159, usando os contratos aprovados.
-- Completar testes de componente e integração da tela: 401/403, erro de consulta,
-  lista vazia, seis estados, texto nulo, versão pública e substituto pendente.
-  Verificar também atualização/limpeza do conteúdo privado após troca de sessão.
-- Abrir a nova interface em desktop e smartphone (ou navegador com larguras
-  emuladas), verificando textos longos, navegação, temas e ausência de overflow.
-  Essa evidência depende de execução com navegador disponível ou checagem humana.
-- Obter revisão e aceite humano. Os três critérios da issue não são declarados
-  concluídos; usar `Refs #159`. A validação integrada final pertence à #163.
-
-O resumo temporário `/tmp/rf20-resumo.md` não faz parte do commit.
-
-## Correção do check Frontend do PR #197
-
-O job `Frontend` da execução `41758377473` passou em lint, testes e build,
-mas falhou em `prototipo-browser.mjs:255`: a asserção de zero chamadas à API
-recebeu consultas a `/api/agradecimentos`. O banner global era montado também
-nas rotas demonstrativas. Ele agora segue o isolamento usado pelo cabeçalho:
-em `/prototipo` e subrotas, o componente que consulta avisos reais não é montado.
-Sair da demonstração permite montá-lo normalmente nas rotas reais.
-
-O observador do teste usa `documentURL` para verificar requisições originadas no
-protótipo. A visita inicial à página real `/` não pertence à asserção de isolamento.
-A exigência de zero chamadas à API da demonstração permanece ativa, sem liberar
-o endpoint de agradecimentos ou quaisquer outros endpoints nessas rotas.
-
-A execução seguinte (`41759375943`) confirmou o protótipo e avançou até uma
-asserção antiga de `moderacao-browser.mjs`, que proibia inclusive o GET do banner
-global da #193. A fixture da fila agora responde com lista vazia a esse GET;
-a asserção permite somente essa leitura exata e continua proibindo denúncias e
-confirmação de consumo (`POST /api/agradecimentos/{id}/exibido`). Nenhuma regra de
-produto ou comportamento de moderação foi alterado por esse ajuste de teste.
-
-Na execução `41760024228`, protótipo e fila passaram; o cenário de denúncia
-clicou no botão antes da hidratação e expirou aguardando o modal. A abertura do
-modal agora repete apenas o clique idempotente (sem enviar denúncia) até confirmar
-o estado interativo, seguindo o cuidado de hidratação já usado no runner de avaliação.
+Neste Windows, o build foi `node node_modules/next/dist/bin/next build --webpack`.
+Remova somente seus containers/banco de teste ao terminar. Para HTTP controlado,
+libere a porta 8000 e omita `COMENTARIOS_FIXTURE_FILE`. `BROWSER_PATH` pode selecionar
+outro Edge/Chromium instalado; o runner usa portas 3100/9228 livres e perfil temporário.

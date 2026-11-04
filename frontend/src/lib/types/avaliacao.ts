@@ -13,6 +13,7 @@ export type AvaliacaoInput = {
   dificuldade: Dificuldade;
   chamada: boolean;
   recomenda: boolean;
+  comentario?: string;
 } & (
   | { disponibiliza_material: false; qualidade_material: null }
   | { disponibiliza_material: true; qualidade_material: QualidadeMaterial }

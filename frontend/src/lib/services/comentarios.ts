@@ -58,8 +58,12 @@ function comentarioDoAutor(valor: unknown): valor is ComentarioDoAutor {
   );
 }
 
-export async function consultarMeusComentarios(): Promise<ComentarioDoAutor[]> {
-  const resposta = await apiClient.request<unknown>("/api/comentarios/meu", {});
+export async function consultarMeusComentarios(signal?: AbortSignal, contexto?: { professorId: string; disciplinaId: string }): Promise<ComentarioDoAutor[]> {
+  if (contexto && (!identificadorValido(contexto.professorId) || !identificadorValido(contexto.disciplinaId))) {
+    throw new Error("Contexto de comentários inválido.");
+  }
+  const query = contexto ? { professor_id: contexto.professorId, disciplina_id: contexto.disciplinaId } : {};
+  const resposta = await apiClient.request<unknown>("/api/comentarios/meu", query, { cache: "no-store", signal });
   if (!Array.isArray(resposta) || !resposta.every(comentarioDoAutor)) {
     throw new Error("Resposta de comentários do autor incompatível com o contrato.");
   }
@@ -74,4 +78,14 @@ export async function consultarMeusComentarios(): Promise<ComentarioDoAutor[]> {
       substitui_id,
     }),
   );
+}
+
+export async function retirarComentario(id: string, signal?: AbortSignal): Promise<ComentarioDoAutor> {
+  if (!identificadorValido(id)) throw new Error("Identificador de comentário inválido.");
+  const resposta = await apiClient.patch<unknown>(`/api/comentarios/${id}/retirar`, { signal });
+  if (!comentarioDoAutor(resposta) || resposta.id !== id || resposta.estado !== "RETIRADO") {
+    throw new Error("Resposta de retirada incompatível com o contrato.");
+  }
+  const { texto, created_at, updated_at, estado, avaliacao_id, substitui_id } = resposta;
+  return { id, texto, created_at, updated_at, estado, avaliacao_id, substitui_id };
 }

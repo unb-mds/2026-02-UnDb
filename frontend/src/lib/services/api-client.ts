@@ -39,10 +39,10 @@ async function request<T>(path: string, query: Record<string, string | undefined
   return response.json() as Promise<T>;
 }
 
-async function post<TResponse, TBody>(path: string, body: TBody, opcoes: OpcoesRequisicao = {}): Promise<TResponse> {
+async function post<TResponse, TBody>(path: string, body: TBody, opcoes: OpcoesRequisicao = {}, method: "POST" | "PATCH" = "POST"): Promise<TResponse> {
   const response = await fetch(`${apiBaseUrl()}${path}`, {
     ...opcoes,
-    method: "POST",
+    method,
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -61,7 +61,11 @@ async function post<TResponse, TBody>(path: string, body: TBody, opcoes: OpcoesR
   return response.json() as Promise<TResponse>;
 }
 
-export const apiClient = { post, request };
+async function patch<TResponse>(path: string, opcoes: OpcoesRequisicao = {}): Promise<TResponse> {
+  return post<TResponse, undefined>(path, undefined, opcoes, "PATCH");
+}
+
+export const apiClient = { post, request, patch };
 
 function mensagemErro(detalhe: unknown): string {
   if (typeof detalhe === "string") return detalhe;

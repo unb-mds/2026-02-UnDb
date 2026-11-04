@@ -119,7 +119,7 @@ try {
   if (!real) await new Promise((resolve) => fixture.listen(8000, resolve));
   next = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", "3100"], { cwd: frontend, stdio: "ignore", windowsHide: true });
   await aguardar(async () => { try { return (await fetch("http://localhost:3100/moderacao")).ok; } catch { return false; } }, "Next.js");
-  browser = spawn(navegador, ["--headless=new", "--disable-gpu", "--no-first-run", "--remote-debugging-port=9226", `--user-data-dir=${perfil}`, "about:blank"], { stdio: "ignore", windowsHide: true });
+  browser = spawn(navegador, ["--headless=new", "--edge-skip-compat-layer-relaunch", "--disable-gpu", "--no-first-run", "--remote-debugging-port=9226", `--user-data-dir=${perfil}`, "about:blank"], { stdio: "ignore", windowsHide: true });
   await aguardar(async () => { try { return (await fetch("http://localhost:9226/json")).ok; } catch { return false; } }, "Edge/Chromium");
   const paginas = await (await fetch("http://localhost:9226/json")).json();
   socket = new WebSocket(paginas.find((item) => item.type === "page").webSocketDebuggerUrl);
@@ -241,6 +241,7 @@ try {
       || /\/api\/comentarios\/[^/]+\/denuncias/.test(caminho);
   }), "a fila não denuncia nem confirma consumo de agradecimentos da #193");
 } finally {
+  if (socket?.readyState === WebSocket.OPEN) await cdp("Browser.close").catch(() => {});
   socket?.close();
   for (const atual of pendentes.values()) { clearTimeout(atual.timer); atual.reject(new Error("Teste encerrado")); }
   browser?.kill(); next?.kill();

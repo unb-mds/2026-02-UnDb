@@ -80,7 +80,7 @@ const fixture = createServer(async (req, res) => {
     for await (const chunk of req) body += chunk;
     envios.push({ body: JSON.parse(body), cookie: req.headers.cookie });
 
-    res.writeHead(statusEnvio).end(JSON.stringify(statusEnvio === 200 ? {} : {detail:"Rejeição de teste"}));
+    res.writeHead(statusEnvio).end(JSON.stringify(statusEnvio === 200 ? {id:"33333333-3333-4333-8333-333333333333",comentario_erro:null} : {detail:"Rejeição de teste"}));
   } else if (req.url === "/api/auth/confirmar") {
     res.writeHead(statusConfirmacao).end(JSON.stringify(statusConfirmacao === 200 ? {message:"E-mail confirmado."} : {detail:"Falha de confirmação"}));
   } else if (req.url === "/api/auth/cadastro") {
@@ -307,7 +307,8 @@ try {
       assert.equal(await avaliar("document.documentElement.scrollWidth <= window.innerWidth"), true, `${tema}, ${width}px`);
     }
   }
-  assert.equal(await avaliar('document.querySelectorAll("textarea, [name=historico], [name=comentario]").length'), 0);
+  assert.equal(await avaliar('document.querySelectorAll("textarea[name=comentario]").length'), 1);
+  assert.equal(await avaliar('document.querySelectorAll("[name=historico]").length'), 0);
   if (!real) await cenarioBusca.verificar({ cdp, avaliar, aguardar, aguardarTexto });
   if (!real) await verificarCorrecoesInterface();
   if (!real) await verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto, aguardarValidacaoLocal, socket });

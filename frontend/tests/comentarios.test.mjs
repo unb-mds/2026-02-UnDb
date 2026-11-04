@@ -44,10 +44,12 @@ test("consulta GET /api/comentarios/meu com cookie e mapeia versões do autor", 
   t.mock.method(globalThis, "fetch", async (url, init) => {
     assert.equal(new URL(url).pathname, "/api/comentarios/meu");
     assert.equal(init.credentials, "include");
+    assert.equal(init.cache, "no-store");
+    assert.ok(init.signal);
     return Response.json(respostas);
   });
 
-  const resultado = await servico.consultarMeusComentarios();
+  const resultado = await servico.consultarMeusComentarios(new AbortController().signal);
   assert.deepEqual(resultado, respostas);
   // Texto nulo após descarte é preservado; substituto pendente distingue versão publicada.
   assert.equal(resultado[1].texto, null);
@@ -98,6 +100,7 @@ test("apresentação cobre os estados RF20 sem publicar versões pendentes", () 
     REMOVIDO: "Removido",
     RETIRADO: "Retirado",
     SUBSTITUIDO: "Substituído",
+    REJEITADO: "Rejeitado",
   };
   for (const [estado, rotulo] of Object.entries(esperado)) {
     const comentario = { ...comentarioPublicado, estado };
@@ -144,7 +147,7 @@ test("resposta que não é array falha em vez de produzir lista vazia", async (t
 });
 
 test("401 e 404 do serviço de comentários do autor propagam o status", async (t) => {
-  for (const status of [401, 404]) {
+  for (const status of [401, 403, 404]) {
     t.mock.method(
       globalThis,
       "fetch",
@@ -166,4 +169,56 @@ test("falha de rede não é sucesso e explica que a consulta não foi confirmada
     assert.ok(erro instanceof TypeError);
     return true;
   });
+});
+
+test("consulta privada envia apenas o contexto da tela, com cancelamento e sem cache", async (t) => {
+  const signal = new AbortController().signal;
+  t.mock.method(globalThis, "fetch", async (url, init) => {
+    const query = new URL(url).searchParams;
+    assert.equal(query.get("professor_id"), avaliacaoId);
+    assert.equal(query.get("disciplina_id"), outraAvaliacao);
+    assert.equal(query.size, 2);
+    assert.equal(init.cache, "no-store");
+    assert.equal(init.signal, signal);
+    return Response.json([]);
+  });
+  assert.deepEqual(await servico.consultarMeusComentarios(signal, {professorId:avaliacaoId,disciplinaId:outraAvaliacao}), []);
+  await assert.rejects(servico.consultarMeusComentarios(signal, {professorId:"invalido",disciplinaId:outraAvaliacao}));
+});
+
+test("retirada é PATCH sem critérios, valida confirmação e remove campos extras", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url, init) => {
+    assert.equal(new URL(url).pathname, `/api/comentarios/${versaoId}/retirar`);
+    assert.equal(init.method, "PATCH");
+    assert.equal(init.body, undefined);
+    assert.equal(init.credentials, "include");
+    return Response.json({...comentarioPublicado,estado:"RETIRADO",email:"privado"});
+  });
+  const retirada = await servico.retirarComentario(versaoId);
+  assert.equal(retirada.estado,"RETIRADO");
+  assert.equal("email" in retirada,false);
+});
+
+test("retirada rejeita confirmação errada, estado incompatível e falha HTTP", async (t) => {
+  for (const resposta of [{...comentarioPublicado,estado:"PUBLICADO"},{...comentarioPublicado,id:outraVersao,estado:"RETIRADO"}]) {
+    t.mock.method(globalThis,"fetch", async()=>Response.json(resposta));
+    await assert.rejects(servico.retirarComentario(versaoId), /incompatível/);
+  }
+  for (const status of [401,403,404,503]) {
+    t.mock.method(globalThis,"fetch",async()=>Response.json({}, {status}));
+    await assert.rejects(servico.retirarComentario(versaoId), e=>e.status===status);
+  }
+});
+
+test("envio de comentário preserva critérios e diferencia texto recusado de falha no envio", async (t) => {
+  const {enviarAvaliacaoComComentario} = await carregar("services/avaliacoes.js");
+  const entrada = {professor_id:avaliacaoId,disciplina_id:outraAvaliacao,didatica:4,dificuldade:"MEDIO",chamada:false,disponibiliza_material:false,qualidade_material:null,recomenda:true,comentario:"   "};
+  t.mock.method(globalThis,"fetch",async(url,init)=>{
+    assert.equal(new URL(url).pathname,"/api/avaliacoes");
+    assert.deepEqual(JSON.parse(init.body),entrada);
+    return Response.json({id:avaliacaoId,comentario_erro:"texto inválido",usuario_id:"privado"});
+  });
+  assert.deepEqual(await enviarAvaliacaoComComentario(entrada),{id:avaliacaoId,comentario_erro:"texto inválido"});
+  t.mock.method(globalThis,"fetch",async()=>Response.json({}));
+  await assert.rejects(enviarAvaliacaoComComentario(entrada),/incompatível/);
 });

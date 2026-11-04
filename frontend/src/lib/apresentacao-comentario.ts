@@ -7,6 +7,7 @@ export const rotulosEstadoComentario: Record<EstadoComentario, string> = {
   REMOVIDO: "Removido",
   RETIRADO: "Retirado",
   SUBSTITUIDO: "Substituído",
+  REJEITADO: "Rejeitado",
 };
 
 // RF20/R2-DEC-05: uma versão pendente, inclusive substituta, não é pública.
@@ -14,7 +15,7 @@ export function descricaoEstadoComentario(comentario: ComentarioDoAutor): string
   switch (comentario.estado) {
     case "PENDENTE":
       return comentario.substitui_id
-        ? "Seu substituto aguarda aprovação. O texto aprovado anterior continua público enquanto estiver disponível."
+        ? "Seu substituto aguarda aprovação. O envio não publica nem restaura a versão anterior; confira o estado dela abaixo."
         : "Seu comentário aguarda aprovação humana e ainda não está público.";
     case "PUBLICADO":
       return "Este comentário está visível publicamente sem identificar sua autoria.";
@@ -24,6 +25,8 @@ export function descricaoEstadoComentario(comentario: ComentarioDoAutor): string
       return "Este comentário foi removido e não está visível publicamente.";
     case "RETIRADO":
       return "Você retirou este comentário; ele não está visível publicamente.";
+    case "REJEITADO":
+      return "Este texto foi rejeitado, não está visível publicamente e seu conteúdo foi descartado.";
     case "SUBSTITUIDO":
       return "Este texto foi substituído e não está mais visível publicamente.";
   }

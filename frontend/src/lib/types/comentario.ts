@@ -4,30 +4,14 @@ export type ComentarioPublico = {
   created_at: string;
 };
 
-/**
- * Estados de uma versão de comentário (RF20, R2-DEC-04/05).
- * Reutiliza os mesmos valores do backend (`EstadoComentario`); não cria enum paralelo.
- */
-export type EstadoComentario =
-  | "PENDENTE"
-  | "PUBLICADO"
-  | "SUSPENSO"
-  | "REMOVIDO"
-  | "RETIRADO"
-  | "SUBSTITUIDO";
-
-export const ESTADOS_COMENTARIO: EstadoComentario[] = [
-  "PENDENTE",
-  "PUBLICADO",
-  "SUSPENSO",
-  "REMOVIDO",
-  "RETIRADO",
-  "SUBSTITUIDO",
-];
+// Estados compartilhados com o contrato privado existente da PR #192.
+import { estadosComentario, type EstadoComentario } from "./moderacao";
+export type { EstadoComentario };
+export const ESTADOS_COMENTARIO = estadosComentario;
 
 /**
  * Versão de comentário visível ao próprio autor (GET /api/comentarios/meu).
- * Espelha backend/app/schemas/comentario.py (ComentarioDoAuthorResponse).
+ * Espelha backend/app/schemas/comentario.py (ComentarioDoAutorResponse).
  * `texto` admite `null`: descarte/retirada do autor remove o texto sem remover o registro da versão.
  * O autor acompanha a distinção entre versão publicada (PUBLICADO) e substituto em revisão (PENDENTE).
  */

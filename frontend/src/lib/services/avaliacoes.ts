@@ -1,4 +1,5 @@
 import { apiClient } from "./api-client";
+import { identificadorValido } from "../identificador";
 import type {
   AvaliacaoAgregada,
   AvaliacaoInput,
@@ -13,6 +14,16 @@ import type { DisciplinaInstitucional, ProfessorInstitucional } from "../types/i
  */
 export async function enviarAvaliacao(dados: AvaliacaoInput): Promise<void> {
   await apiClient.post<unknown, AvaliacaoInput>("/api/avaliacoes", dados);
+}
+
+export async function enviarAvaliacaoComComentario(dados: AvaliacaoInput, signal?: AbortSignal): Promise<{ id: string; comentario_erro: string | null }> {
+  const resposta = await apiClient.post<unknown, AvaliacaoInput>("/api/avaliacoes", dados, { signal });
+  if (!resposta || typeof resposta !== "object" || !("id" in resposta) ||
+      typeof resposta.id !== "string" || !identificadorValido(resposta.id) ||
+      !("comentario_erro" in resposta) || (resposta.comentario_erro !== null && typeof resposta.comentario_erro !== "string")) {
+    throw new Error("Resposta de avaliação incompatível com o contrato.");
+  }
+  return { id: resposta.id, comentario_erro: resposta.comentario_erro };
 }
 
 interface AvaliacaoAgregadaWireBase {
