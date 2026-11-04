@@ -69,6 +69,7 @@ nav:
       - Verificação docker compose: estudos/verificacao-docker-compose.md
       - Verificação execucao frontend: estudos/verificacao-execucao-frontend.md
       - Verificação formulario avaliacao: estudos/verificacao-formulario-avaliacao.md
+      - Interface de comentários — Issue 159: estudos/interface-comentarios-issue-159.md
   - Processo:
       - Template de ata de reunião: atas/template-ata-reuniao.md
   - Atas:
