@@ -89,3 +89,10 @@ O observador do teste usa `documentURL` para verificar requisições originadas 
 protótipo. A visita inicial à página real `/` não pertence à asserção de isolamento.
 A exigência de zero chamadas à API da demonstração permanece ativa, sem liberar
 o endpoint de agradecimentos ou quaisquer outros endpoints nessas rotas.
+
+A execução seguinte (`41759375943`) confirmou o protótipo e avançou até uma
+asserção antiga de `moderacao-browser.mjs`, que proibia inclusive o GET do banner
+global da #193. A fixture da fila agora responde com lista vazia a esse GET;
+a asserção permite somente essa leitura exata e continua proibindo denúncias e
+confirmação de consumo (`POST /api/agradecimentos/{id}/exibido`). Nenhuma regra de
+produto ou comportamento de moderação foi alterado por esse ajuste de teste.
