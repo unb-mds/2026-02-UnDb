@@ -39,6 +39,8 @@ const fixture = createServer(async (req, res) => {
   if (req.method === "OPTIONS") { res.writeHead(204).end(); return; }
   const url = new URL(req.url, "http://localhost:8000");
   const responder = (status, corpo) => { if (!res.destroyed) res.writeHead(status).end(JSON.stringify(corpo)); };
+  // O layout real consulta os avisos globais da #193; este cenário não tem mensagens.
+  if (req.method === "GET" && url.pathname === "/api/agradecimentos") { responder(200, []); return; }
   if (acesso !== 200) { responder(acesso, { detail: "Rejeição privada: não exibir" }); return; }
   if (url.pathname === "/api/moderacao/comentarios") {
     const resposta = structuredClone(itens.filter((item) => !url.searchParams.has("estado") || item.estado === url.searchParams.get("estado")));
@@ -117,14 +119,16 @@ try {
   if (!real) await new Promise((resolve) => fixture.listen(8000, resolve));
   next = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", "3100"], { cwd: frontend, stdio: "ignore", windowsHide: true });
   await aguardar(async () => { try { return (await fetch("http://localhost:3100/moderacao")).ok; } catch { return false; } }, "Next.js");
-  browser = spawn(navegador, ["--headless=new", "--disable-gpu", "--no-first-run", "--remote-debugging-port=9226", `--user-data-dir=${perfil}`, "about:blank"], { stdio: "ignore", windowsHide: true });
+  browser = spawn(navegador, ["--headless=new", "--edge-skip-compat-layer-relaunch", "--disable-gpu", "--no-first-run", "--remote-debugging-port=9226", `--user-data-dir=${perfil}`, "about:blank"], { stdio: "ignore", windowsHide: true });
   await aguardar(async () => { try { return (await fetch("http://localhost:9226/json")).ok; } catch { return false; } }, "Edge/Chromium");
   const paginas = await (await fetch("http://localhost:9226/json")).json();
   socket = new WebSocket(paginas.find((item) => item.type === "page").webSocketDebuggerUrl);
   await new Promise((resolve) => socket.addEventListener("open", resolve, { once: true }));
   socket.addEventListener("message", ({ data }) => {
     const mensagem = JSON.parse(data);
-    if (mensagem.method === "Network.requestWillBeSent") consultas.push(mensagem.params.request.url);
+    if (mensagem.method === "Network.requestWillBeSent") {
+      consultas.push({ url: mensagem.params.request.url, metodo: mensagem.params.request.method });
+    }
     const atual = pendentes.get(mensagem.id);
     if (!atual) return;
     clearTimeout(atual.timer); pendentes.delete(mensagem.id);
@@ -231,8 +235,13 @@ try {
     await esperarTexto("Selecione um comentário");
     console.log("Fila real: navegador → FastAPI/PostgreSQL, visitante/conta comum/não confirmada, seis ações, impedimento próprio e seis combinações de largura/tema aprovados.");
   }
-  assert.ok(!consultas.some((url) => url.includes("/api/agradecimentos") || /\/api\/comentarios\/[^/]+\/denuncias/.test(url)), "não consome a interface da #193");
+  assert.ok(!consultas.some(({ url, metodo }) => {
+    const caminho = new URL(url).pathname;
+    return (caminho.startsWith("/api/agradecimentos") && !(metodo === "GET" && caminho === "/api/agradecimentos"))
+      || /\/api\/comentarios\/[^/]+\/denuncias/.test(caminho);
+  }), "a fila não denuncia nem confirma consumo de agradecimentos da #193");
 } finally {
+  if (socket?.readyState === WebSocket.OPEN) await cdp("Browser.close").catch(() => {});
   socket?.close();
   for (const atual of pendentes.values()) { clearTimeout(atual.timer); atual.reject(new Error("Teste encerrado")); }
   browser?.kill(); next?.kill();

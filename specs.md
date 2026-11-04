@@ -479,6 +479,11 @@ Retorna apenas `id`, `texto`, `created_at` — sem identidade do autor.
 
 Retorna `id`, `texto`, `created_at`, `updated_at`, `estado`, `avaliacao_id`,
 `substitui_id` — apenas comentários da avaliação cujo autor é o usuário autenticado.
+Para a interface da #159, a consulta aceita filtros opcionais UUID `professor_id`
+e `disciplina_id`. Ambos restringem apenas as avaliações do usuário autenticado;
+a omissão preserva a listagem completa anterior. UUID inválido retorna 422.
+A identidade do autor continua derivada exclusivamente da sessão, sem parâmetro de conta.
+
 Após descarte aprovado, `texto` pode ser `null`; `REJEITADO` integra os estados.
 Isso não altera o schema público, que continua retornando somente textos publicados.
 

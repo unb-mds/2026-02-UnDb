@@ -39,10 +39,11 @@ def listar_publicados(db: Session, professor_id: UUID, disciplina_id: UUID):
     return comentario_repository.listar_publicados(db, professor_id, disciplina_id)
 
 
-def listar_do_autor(db: Session, usuario: Usuario):
+def listar_do_autor(db: Session, usuario: Usuario, professor_id: UUID | None = None,
+                   disciplina_id: UUID | None = None):
     """Lista os comentarios do autor autenticado (todos os estados)."""
     moderacao_repository.descartar_vencidos(db, agora_utc())
-    resultado = comentario_repository.listar_por_usuario(db, usuario.id)
+    resultado = comentario_repository.listar_por_usuario(db, usuario.id, professor_id, disciplina_id)
     db.commit()
     return resultado
 

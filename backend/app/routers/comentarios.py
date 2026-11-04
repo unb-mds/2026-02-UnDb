@@ -21,9 +21,11 @@ router = APIRouter(prefix="/api/comentarios", tags=["comentarios"])
 def listar_meus_comentarios(
     usuario: Annotated[Usuario, Depends(obter_usuario_confirmado)],
     session: Annotated[Session, Depends(get_db)],
+    professor_id: UUID | None = None,
+    disciplina_id: UUID | None = None,
 ) -> list[ComentarioDoAutorResponse]:
     """Lista os comentarios do autor autenticado (todos os estados)."""
-    return comentario_service.listar_do_autor(session, usuario)
+    return comentario_service.listar_do_autor(session, usuario, professor_id, disciplina_id)
 
 
 @router.patch(

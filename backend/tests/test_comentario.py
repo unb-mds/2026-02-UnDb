@@ -337,6 +337,37 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         self.assertEqual(resposta[0]["estado"], "PENDENTE")
         self.assertEqual(resposta[0]["avaliacao_id"], str(avaliacao.id))
 
+    def test_limites_texto_preservam_avaliacao_e_pendente_anterior(self):
+        for texto, invalido in [("x", False), ("x" * 500, False), ("", True), ("   ", True), ("x" * 501, True)]:
+            status, resposta = asyncio.run(self._request("POST", "/api/avaliacoes", {**self._payload, "comentario": texto}, token=self.token))
+            self.assertEqual(status, 200)
+            self.assertEqual(bool(resposta["comentario_erro"]), invalido)
+            self.assertEqual(self.db.scalar(select(func.count()).select_from(Avaliacao)), 1)
+            pendente = self.db.scalar(select(ComentarioVersao).where(ComentarioVersao.estado == EstadoComentario.PENDENTE))
+            self.assertEqual(pendente.texto, "x" * (500 if invalido else len(texto)))
+
+    def test_filtro_contexto_mantem_autoria_e_rejeita_uuid_invalido(self):
+        self._criar_avaliacao_com_comentario(self.usuario, "meu texto")
+        self._criar_avaliacao_com_comentario(self.outro_usuario, "texto alheio")
+        outra = Disciplina(codigo="OUTRA", nome="Outra", departamento="CIC")
+        self.db.add(outra)
+        self.db.flush()
+        avaliacao = Avaliacao(usuario_id=self.usuario.id, professor_id=self.professor.id,
+                              disciplina_id=outra.id, didatica=4, dificuldade="MEDIO", chamada=True,
+                              disponibiliza_material=False, qualidade_material=None, recomenda=True)
+        self.db.add(avaliacao)
+        self.db.flush()
+        self.db.add(ComentarioVersao(avaliacao_id=avaliacao.id, texto="outro contexto", estado=EstadoComentario.PENDENTE))
+        self.db.commit()
+        query = f"?professor_id={self.professor.id}&disciplina_id={self.disciplina.id}"
+        status, resposta = asyncio.run(self._request("GET", "/api/comentarios/meu" + query, token=self.token))
+        self.assertEqual(status, 200)
+        self.assertEqual([v["texto"] for v in resposta], ["meu texto"])
+        status, resposta = asyncio.run(self._request("GET", "/api/comentarios/meu", token=self.token))
+        self.assertEqual(len(resposta), 2)
+        status, _ = asyncio.run(self._request("GET", "/api/comentarios/meu?professor_id=invalido", token=self.token))
+        self.assertEqual(status, 422)
+
     def test_ac20_04_autor_nao_ve_comentarios_de_outros(self) -> None:
         self._criar_avaliacao_com_comentario(
             self.usuario, "comentario de maria", EstadoComentario.PENDENTE
