@@ -14,6 +14,8 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 - [Board de requisitos no Figma](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3O-de-Professores-UnB-)
 - [Especificação de implementação](specs.md)
 - [Arquitetura](docs/arquitetura.md)
+- [ADRs — catálogo, manutenção e template](docs/adrs/index.md)
+- [Estratégia de qualidade — ADR 09 proposto](docs/adrs/09-estrategia-qualidade.md)
 
 ## Equipe
 

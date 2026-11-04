@@ -50,6 +50,13 @@ git switch -c hotfix/1.0.1
 
 ## Política de Pull Request
 
+Para registrar uma decisão técnica, consulte o
+[catálogo e guia de ADRs](docs/adrs/index.md) e use o
+[template versionado](docs/adrs/template.md). Preserve evidências e estados de
+aprovação dos registros existentes. A estratégia de lint, testes e cobertura está
+preparada no [ADR 09](docs/adrs/09-estrategia-qualidade.md), que distingue configuração
+observada, entregas planejadas e decisões pendentes de aprovação.
+
 - PRs para `develop`: somente `feature/*`, `fix/*`, `chore/*`, `docs/*`,
   `release/*` ou `hotfix/*`.
 - PRs para `main`: somente `release/*` ou `hotfix/*`.
