@@ -103,6 +103,14 @@ def main():
         else:
             raise RuntimeError("API nao iniciou")
 
+        # AC22-01: o comando operacional deve conceder/revogar papel sem trocar a sessão.
+        email_papel = f"{marca}51@aluno.unb.br"
+        assert http("GET", "/api/moderacao/comentarios", conta=51)[0] == 403
+        subprocess.run([sys.executable, "-m", "app.commands.moderador", email_papel, "conceder"], check=True)
+        assert http("GET", "/api/moderacao/comentarios", conta=51)[0] == 200
+        subprocess.run([sys.executable, "-m", "app.commands.moderador", email_papel, "revogar"], check=True)
+        assert http("GET", "/api/moderacao/comentarios", conta=51)[0] == 403
+
         versao = enviar_texto(51, "Critica academica de fixture")
         assert denunciar(versao)[0] == 404
         assert agir(versao, "APROVAR")[0] == 200
@@ -201,7 +209,16 @@ def main():
         with ThreadPoolExecutor(max_workers=2) as pool:
             resultados = list(pool.map(revisar, ("APROVAR", "REJEITAR")))
         assert sorted(resultados) == [200, 409], resultados
-        assert len(esperar("GET", f"/api/moderacao/comentarios/{pendente}/decisoes", 200, conta=54)) == 1
+        decisoes = esperar("GET", f"/api/moderacao/comentarios/{pendente}/decisoes", 200, conta=54)
+        assert len(decisoes) == 1
+        assert set(decisoes[0]) == {"id", "comentario_versao_id", "moderador_id", "acao", "motivo",
+                                    "estado_anterior", "estado_posterior", "created_at"}
+        # Um moderador impedido não pode decidir seu texto nem produzir decisão fictícia.
+        proprio = enviar_texto(53, "Texto de autoria do moderador")
+        assert agir(proprio, "APROVAR", 53)[0] == 403
+        assert esperar("GET", f"/api/moderacao/comentarios/{proprio}", 200, conta=53)["estado"] == "PENDENTE"
+        assert esperar("GET", f"/api/moderacao/comentarios/{proprio}/decisoes", 200, conta=53) == []
+        assert agir(proprio, "APROVAR", 54)[0] == 200
         print("RF20–22: HTTP real/PostgreSQL, 49/50, concorrencia, privacidade, acoes, retencao e agradecimentos aprovados")
     finally:
         servidor.terminate()

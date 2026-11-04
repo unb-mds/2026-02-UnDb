@@ -1,3 +1,4 @@
+import { lerTextoPagina } from "./browser-navigation.mjs";
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { readFileSync } from 'node:fs';
@@ -66,7 +67,7 @@ const fixture = createServer(async (req,res) => {
 });
 
 await comNavegador({ fixture:real?null:fixture, executar:async ({cdp,avaliar,aguardar}) => {
-  const texto=()=>avaliar('document.body.innerText');
+  const texto=()=>lerTextoPagina(avaliar);
   const esperar=t=>aguardar(async()=>(await texto()).includes(t),t);
   const clicar=async t=>{await avaliar(`Array.from(document.querySelectorAll('button')).find(b=>b.textContent.trim()===${JSON.stringify(t)})?.click()`);};
   const navegar=async path=>{await cdp('Page.navigate',{url:`http://localhost:3100${path}`});};
