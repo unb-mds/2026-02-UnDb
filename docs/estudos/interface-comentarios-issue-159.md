@@ -96,3 +96,8 @@ global da #193. A fixture da fila agora responde com lista vazia a esse GET;
 a asserção permite somente essa leitura exata e continua proibindo denúncias e
 confirmação de consumo (`POST /api/agradecimentos/{id}/exibido`). Nenhuma regra de
 produto ou comportamento de moderação foi alterado por esse ajuste de teste.
+
+Na execução `41760024228`, protótipo e fila passaram; o cenário de denúncia
+clicou no botão antes da hidratação e expirou aguardando o modal. A abertura do
+modal agora repete apenas o clique idempotente (sem enviar denúncia) até confirmar
+o estado interativo, seguindo o cuidado de hidratação já usado no runner de avaliação.

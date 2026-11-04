@@ -289,8 +289,12 @@ try {
 
   const clicar = (rotulo) => avaliar(`Array.from(document.querySelectorAll('button')).find(b => b.textContent.trim() === ${JSON.stringify(rotulo)})?.click()`);
   async function abrir() {
-    await avaliar(`document.querySelector('[data-testid="botao-denunciar-${versaoId}"]').click()`);
-    await esperarTexto("Denunciar comentário");
+    // O HTML pode chegar antes da hidratação. Abrir o modal é idempotente e
+    // não envia denúncia; repetir somente esse clique até o React responder.
+    await aguardar(async () => {
+      await avaliar(`document.querySelector('[data-testid="botao-denunciar-${versaoId}"]')?.click()`);
+      return (await texto()).includes("Denunciar comentário");
+    }, "modal de denúncia interativo");
     assert.equal(await avaliar(`document.querySelectorAll('input[name="motivoDenuncia"]').length`), 7);
     assert.equal(await avaliar(`!!document.querySelector('textarea, input[type="text"]')`), false);
     assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`), true);
