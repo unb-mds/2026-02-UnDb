@@ -248,6 +248,12 @@ back que motivou a saída do Django.
 
 ## 7. Decisões arquiteturais (ADRs)
 
+O [catálogo e guia de manutenção](adrs/index.md) reúne os estados registrados,
+o [template para novos ADRs](adrs/template.md) e a
+[estratégia de qualidade proposta (ADR 09)](adrs/09-estrategia-qualidade.md).
+Os ADRs 01–08 abaixo mantêm seus textos e referências históricos; a divergência
+entre o resumo inicial e os estados individuais de 07/08 está explicitada no catálogo.
+
 ### ADR 01 — SQLAlchemy + Alembic como ORM e ferramenta de migração
 
 **Contexto.** O RNF05 exige que toda alteração de schema seja feita por migração versionada.

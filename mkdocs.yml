@@ -41,6 +41,9 @@ nav:
       - Board no Figma: figma.md
   - Arquitetura:
       - Visão e decisões: arquitetura.md
+      - ADRs — catálogo e manutenção: adrs/index.md
+      - Template de ADR: adrs/template.md
+      - ADR 09 — estratégia de qualidade: adrs/09-estrategia-qualidade.md
       - Modelos de dados: modelos.md
       - Importação do SIGAA: importacao-sigaa.md
       - Operação do SIGAA: operacao-importacao-sigaa.md
