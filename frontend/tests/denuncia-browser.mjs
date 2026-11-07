@@ -1,4 +1,5 @@
 import { contextoEmTransicao, lerTextoPagina } from "./browser-navigation.mjs";
+import { contrasteTexto } from "./browser-contrast.mjs";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
@@ -302,9 +303,9 @@ try {
     }, "modal de denúncia interativo");
     assert.equal(await avaliar(`document.querySelectorAll('input[name="motivoDenuncia"]').length`), 7);
     assert.equal(await avaliar(`!!document.querySelector('textarea, input[type="text"]')`), false);
-    assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`), true);
+    assert.equal(await avaliar(`document.querySelector('dialog button[type="submit"]').disabled`), true);
     await avaliar(`document.querySelector('#motivo-SPAM').click()`);
-    assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`), false);
+    assert.equal(await avaliar(`document.querySelector('dialog button[type="submit"]').disabled`), false);
   }
   async function enviar(mensagem) {
     await clicar("Confirmar denúncia");
@@ -338,10 +339,15 @@ try {
       await cdp("Emulation.setDeviceMetricsOverride", {width:largura, height:800, deviceScaleFactor:1, mobile:largura === 320});
       await cdp("Emulation.setEmulatedMedia", {features:[{name:"prefers-color-scheme", value:tema}]});
       await navegar(); await esperarTexto("Comentário publicado para verificação de denúncia RF21.");
+      const contrasteBotao = await contrasteTexto(avaliar, `[data-testid="botao-denunciar-${versaoId}"]`);
+      assert.ok(contrasteBotao >= 4.5, `Denunciar, sistema ${tema}, ${largura}px: ${contrasteBotao}`);
       await abrir();
       assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true);
       await captura(`denuncia-modal-${tema}-${largura}`);
-      await enviar("registrada"); await clicar("Fechar");
+      await enviar("registrada");
+      const contrasteSucesso = await contrasteTexto(avaliar, 'dialog [role="status"] p');
+      assert.ok(contrasteSucesso >= 4.5, `Sucesso da denúncia, sistema ${tema}, ${largura}px: ${contrasteSucesso}`);
+      await clicar("Fechar");
     }
   }
   await cdp("Page.navigate", {url:"http://localhost:3100/login"});

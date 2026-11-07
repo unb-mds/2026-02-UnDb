@@ -65,9 +65,9 @@ export function criarCenarioBusca(professor, disciplina) {
       await aguardarTexto(texto);
     };
     const clicar = (trecho) => avaliar(`Array.from(document.querySelectorAll('main a, main button')).find(e => e.textContent.includes(${JSON.stringify(trecho)})).click()`);
-    const preencher = (valor) => avaliar(`(() => { const e = document.querySelector('input[type=search]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(e, ${JSON.stringify(valor)}); e.dispatchEvent(new Event('input', {bubbles:true})); })()`);
+    const preencher = (valor) => avaliar(`(() => { const e = document.querySelector('main input[type=search]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(e, ${JSON.stringify(valor)}); e.dispatchEvent(new Event('input', {bubbles:true})); })()`);
     const ordenar = async (ordem) => {
-      await avaliar(`const s = document.querySelector('select'); s.value=${JSON.stringify(ordem)}; s.dispatchEvent(new Event('change', {bubbles:true}));`);
+      await avaliar(`const s = document.querySelector('main select'); s.value=${JSON.stringify(ordem)}; s.dispatchEvent(new Event('change', {bubbles:true}));`);
       await aguardar(async () => await avaliar(`new URL(location.href).searchParams.get('ordem') === ${JSON.stringify(ordem)}`), "ordem na URL");
     };
     const itens = () => avaliar("Array.from(document.querySelectorAll('section[aria-label=\"Resultados da busca\"] > ul > li')).map(e => e.querySelector('h2').textContent)");
@@ -95,9 +95,9 @@ export function criarCenarioBusca(professor, disciplina) {
         await cdp("Network.setBlockedURLs", { urls: ["*.js*"] });
         try {
           await cdp("Page.navigate", { url: "http://localhost:3100/" });
-          await aguardar(async () => await avaliar("!!document.querySelector('form input[name=q]')"), "formulário HTML da entrada");
-          assert.equal(await avaliar("Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), false, "O envio deve ocorrer antes da hidratação");
-          await avaliar(`document.querySelector('input[type=radio][value="${tipo}"]').click(); document.querySelector('[name=q]').value=${JSON.stringify(termoAntesDaHidratacao)}; document.querySelector('form').requestSubmit()`);
+          await aguardar(async () => await avaliar("!!document.querySelector('main form input[name=q]')"), "formulário HTML da entrada");
+          assert.equal(await avaliar("Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), false, "O envio deve ocorrer antes da hidratação");
+          await avaliar(`document.querySelector('main select[name=busca]').value="${tipo}"; document.querySelector('[name=q]').value=${JSON.stringify(termoAntesDaHidratacao)}; document.querySelector('main form').requestSubmit()`);
           await aguardar(async () => await avaliar(`location.pathname === '/${tipo}' && new URLSearchParams(location.search).get('q') === ${JSON.stringify(termoAntesDaHidratacao)} && new URLSearchParams(location.search).get('ordem') === 'nome'`), "modalidade e termo preservados sem scripts");
         } finally {
           await cdp("Network.setBlockedURLs", { urls: [] });
@@ -112,24 +112,24 @@ export function criarCenarioBusca(professor, disciplina) {
         for (const tema of ["light", "dark"]) {
           await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
           await navegar("/", "Encontre professores e disciplinas");
-          await aguardar(async () => await avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
+          await aguardar(async () => await avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
           assert.equal(await avaliar("document.querySelectorAll('main h1').length"), 1);
-          assert.equal(await avaliar("document.querySelector('[aria-current=step]').textContent.includes('Busque')"), true);
-          assert.equal(await avaliar("document.querySelector('form').checkValidity()"), false);
+          assert.equal(await avaliar("document.querySelector('[aria-current=step]') === null"), true);
+          assert.equal(await avaliar("document.querySelector('main form').checkValidity()"), false);
           await semTransbordar();
           if (width === 320 || width === 1280) await capturar(`entrada-${width}-${tema}`);
           for (const tipo of ["professores", "disciplinas"]) {
             await navegar("/", "Encontre professores e disciplinas");
-            await aguardar(async () => await avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
-            await avaliar(`document.querySelector('input[type=radio][value="${tipo}"]').click()`);
-            assert.equal(await avaliar("new FormData(document.querySelector('form')).get('busca')"), tipo);
-            await avaliar("document.querySelector('input[type=search]').focus()");
+            await aguardar(async () => await avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
+            await avaliar(`document.querySelector('main select[name=busca]').value="${tipo}"`);
+            assert.equal(await avaliar("new FormData(document.querySelector('main form')).get('busca')"), tipo);
+            await avaliar("document.querySelector('main input[type=search]').focus()");
             await cdp("Input.insertText", { text: "Teste" });
-            await avaliar("document.querySelector('form').requestSubmit()");
+            await avaliar("document.querySelector('main form').requestSubmit()");
             await aguardar(async () => await avaliar(`location.pathname === '/${tipo}' && new URLSearchParams(location.search).get('q') === 'Teste'`), "busca inicial encaminhada");
             await aguardarTexto("3 resultado(s)");
             await contexto(tipo, "Teste", "nome", true);
-            assert.equal(await avaliar("document.querySelector('[aria-current=step]').textContent.includes('Escolha')"), true);
+            assert.equal(await avaliar("document.querySelector('.breadcrumb [aria-current=page]') !== null && document.querySelector('[aria-current=step]') === null"), true);
           }
           for (const tipo of ["professores", "disciplinas"]) {
             await navegar(`/${tipo}`, "Digite ao menos 2 letras");
@@ -141,12 +141,12 @@ export function criarCenarioBusca(professor, disciplina) {
             await preencher("Teste");
             await aguardarTexto("3 resultado(s)");
             assert.equal(await avaliar("document.querySelectorAll('header a[aria-label=\"Conta: entrar ou criar conta\"]').length"), 1);
-            await avaliar("document.querySelector('input[type=search]').focus()");
+            await avaliar("document.querySelector('main input[type=search]').focus()");
             await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
             await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
-            assert.equal(await avaliar("document.activeElement === document.querySelector('select')"), true);
+            assert.equal(await avaliar("document.activeElement === document.querySelector('main select')"), true);
             assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle !== 'none'"), true);
-            assert.equal(await avaliar("document.querySelector('select').labels[0].textContent.includes('Ordenar resultados')"), true);
+            assert.equal(await avaliar("document.querySelector('main select').labels[0].textContent.includes('Ordenar resultados')"), true);
             assert.deepEqual(await itens(), tipo === "professores" ? ["Álvaro Teste", "Ana Teste", "Zélia Teste"] : ["Álgebra Teste", "Biologia Teste", "Zoologia Teste"]);
             assert.equal(await avaliar("getComputedStyle(document.querySelector('section[aria-label=\"Resultados da busca\"] > ul')).gridTemplateColumns.split(' ').length"), width < 640 ? 1 : 2);
             const total = consultas;
@@ -156,9 +156,9 @@ export function criarCenarioBusca(professor, disciplina) {
             await semTransbordar();
             if (width === 320 || width === 1280) await capturar(`${tipo}-${width}-${tema}`);
             await avaliar("history.back()");
-            await aguardar(async () => await avaliar("document.querySelector('select').value === 'nome'"), "histórico da ordenação");
+            await aguardar(async () => await avaliar("document.querySelector('main select').value === 'nome'"), "histórico da ordenação");
             await avaliar("history.forward()");
-            await aguardar(async () => await avaliar("document.querySelector('select').value === 'unidade'"), "avançar ordenação");
+            await aguardar(async () => await avaliar("document.querySelector('main select').value === 'unidade'"), "avançar ordenação");
             const destino = tipo === "professores" ? professor.id : disciplina.id;
             await avaliar(`document.querySelector('main a[href^="/${tipo}/${destino}?"]').click()`);
             await aguardar(async () => await avaliar(`location.pathname === '/${tipo}/${destino}'`), "detalhe do resultado");
@@ -167,7 +167,7 @@ export function criarCenarioBusca(professor, disciplina) {
             await clicar("Voltar aos resultados");
             await aguardarTexto("3 resultado(s)");
             await contexto(tipo, "Teste", "unidade", true);
-            assert.equal(await avaliar("document.querySelector('input[type=search]').value"), "Teste");
+            assert.equal(await avaliar("document.querySelector('main input[type=search]').value"), "Teste");
             await avaliar("history.back()");
             await aguardar(async () => await avaliar(`location.pathname === '/${tipo}/${destino}'`), "histórico volta ao detalhe");
             await aguardarTexto(tipo === "professores" ? "Disciplinas lecionadas" : "Comparação de professores");
@@ -207,7 +207,7 @@ export function criarCenarioBusca(professor, disciplina) {
             assert.equal(await avaliar("document.querySelector('button[aria-controls]').getAttribute('aria-pressed')"), "false");
             assert.equal(await avaliar("document.querySelector('[name=senha]').value"), "senha-apenas-teste");
             assert.equal(logins, enviosAntes);
-            assert.equal(await avaliar("document.querySelector('[aria-label=\"Etapas da jornada\"], input[type=search], main select') === null"), true);
+            assert.equal(await avaliar("document.querySelector('[aria-label=\"Etapas da jornada\"], main input[type=search], main select') === null"), true);
             await avaliar("document.querySelector('button[aria-controls]').focus()");
             assert.equal(await avaliar("document.activeElement === document.querySelector('button[aria-controls]')"), true);
             await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Enter", text: "\r", windowsVirtualKeyCode: 13 });
@@ -260,7 +260,7 @@ export function criarCenarioBusca(professor, disciplina) {
       falharContexto = false;
       await navegar("/login", "Use sua conta institucional");
       await aguardar(async () => await avaliar("!!document.querySelector('[name=email]')"), "formulário de entrada");
-      await avaliar("document.querySelector('[name=email]').value='teste@aluno.unb.br'; document.querySelector('[name=senha]').value='senha-apenas-teste'; document.querySelector('button[type=submit]').click()");
+      await avaliar("document.querySelector('[name=email]').value='teste@aluno.unb.br'; document.querySelector('[name=senha]').value='senha-apenas-teste'; document.querySelector('main button[type=submit]').click()");
       await aguardarTexto("Sua sessão está ativa");
       assert.equal(logins, 1);
       console.log("#155: buscas, ordenação sem HTTP, ida/retorno, histórico, recarga, vazio, erro/recuperação em 320/768/1280 e claro/escuro; componentes de #157/#158, corrida de respostas, senha por teclado e login via serviço controlado aprovados. Este runner usa HTTP controlado e viewport emulado.");

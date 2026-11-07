@@ -57,9 +57,9 @@ await comNavegador({ executar: async ({ cdp, avaliar, aguardar }) => {
     await aguardar(async()=>await avaliar(`!!document.querySelector('#acao-moderacao') && !!document.querySelector('[aria-label="Análise do comentário"]')?.innerText.includes(${JSON.stringify(id)})`),'análise interativa');
   }
   async function decidir(acao, estadoEsperado) {
-    assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`),true,'motivo obrigatório');
+    assert.equal(await avaliar(`document.querySelector('main button[type="submit"]').disabled`),true,'motivo obrigatório');
     await avaliar(`const select=document.querySelector('#acao-moderacao');select.value=${JSON.stringify(acao)};select.dispatchEvent(new Event('change',{bubbles:true}));const motivo=document.querySelector('#motivo-moderacao');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(motivo,'Revisão humana de fixture: conteúdo acadêmico analisado conforme política.');motivo.dispatchEvent(new Event('input',{bubbles:true}));`);
-    await aguardar(async()=>!(await avaliar(`document.querySelector('button[type="submit"]').disabled`)),'decisão disponível');
+    await aguardar(async()=>!(await avaliar(`document.querySelector('main button[type="submit"]').disabled`)),'decisão disponível');
     await clicar('Confirmar decisão');
     await esperar(`Decisão registrada. Estado retornado: ${estadoEsperado}.`);
   }

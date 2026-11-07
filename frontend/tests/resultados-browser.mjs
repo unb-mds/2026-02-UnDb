@@ -57,8 +57,8 @@ async function navegar(rota, trecho) {
 }
 async function buscar(rota, termo, trecho) {
   await navegar(rota, rota === "/professores" ? "Buscar professor" : "Buscar disciplina");
-  await aguardar(async () => await avaliar(`!!document.querySelector('input[type=search]') && Object.keys(document.querySelector('input[type=search]')).some(k => k.startsWith('__reactProps'))`), "hidratação da busca");
-  await avaliar("document.querySelector('input[type=search]').focus()");
+  await aguardar(async () => await avaliar(`!!document.querySelector('main input[type=search]') && Object.keys(document.querySelector('main input[type=search]')).some(k => k.startsWith('__reactProps'))`), "hidratação da busca");
+  await avaliar("document.querySelector('main input[type=search]').focus()");
   await cdp("Input.insertText", { text: termo });
   await esperarTexto(trecho);
   await aguardar(async () => !(await texto()).includes("Carregando disciplinas"), "disciplinas carregadas");
@@ -134,10 +134,10 @@ try {
     } },
     { nome: "busca-carregando", abrir: async () => {
       await navegar("/professores", "Digite ao menos 2 letras");
-      await aguardar(async () => await avaliar("!!document.querySelector('input[type=search]') && Object.keys(document.querySelector('input[type=search]')).some(k => k.startsWith('__reactProps'))"), "busca hidratada");
+      await aguardar(async () => await avaliar("!!document.querySelector('main input[type=search]') && Object.keys(document.querySelector('main input[type=search]')).some(k => k.startsWith('__reactProps'))"), "busca hidratada");
       // Latência induzida, sem substituir a resposta da API real.
       await cdp("Network.emulateNetworkConditions", { offline: false, latency: 2000, downloadThroughput: -1, uploadThroughput: -1 });
-      await avaliar("document.querySelector('input[type=search]').focus()");
+      await avaliar("document.querySelector('main input[type=search]').focus()");
       await cdp("Input.insertText", { text: fixture.termo });
       await esperarTexto("Buscando…");
     } },

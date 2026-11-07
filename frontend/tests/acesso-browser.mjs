@@ -83,13 +83,13 @@ async function clicar(tab, seletor, trecho) {
   await esperarTexto(tab, trecho);
 }
 async function preencher(tab, valores) {
-  await aguardar(async () => await tab.avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "formulário hidratado");
+  await aguardar(async () => await tab.avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "formulário hidratado");
   await tab.avaliar(`Object.entries(${JSON.stringify(valores)}).forEach(([nome, valor]) => { const e=document.querySelector('[name="'+nome+'"]'); e.value=valor; e.dispatchEvent(new Event('change',{bubbles:true})); })`);
 }
 async function enviar(tab, mensagem) {
-  await tab.avaliar("document.querySelector('form').requestSubmit()");
+  await tab.avaliar("document.querySelector('main form').requestSubmit()");
   await esperarTexto(tab, mensagem);
-  await aguardar(async () => !(await tab.avaliar("document.querySelector('button[type=submit]')?.disabled ?? false")), "envio concluído");
+  await aguardar(async () => !(await tab.avaliar("document.querySelector('main button[type=submit]')?.disabled ?? false")), "envio concluído");
 }
 function banco() {
   const args = process.env.E2E_ACESSO_CONTAINER
@@ -169,12 +169,12 @@ try {
     const lista = `/${contexto.busca}?${new URLSearchParams({ q: contexto.q, ordem: contexto.ordem })}`;
     await navegar(tab, "/", "Encontre professores e disciplinas");
     if (i === 0) await matriz(tab, "entrada");
-    await aguardar(async () => await tab.avaliar("!!document.querySelector('form') && Object.keys(document.querySelector('form')).some(k => k.startsWith('__reactProps'))"), "busca inicial hidratada");
-    await tab.avaliar(`document.querySelector('input[type=radio][value="${contexto.busca}"]').click(); document.querySelector('[name=q]').value=${JSON.stringify(contexto.q)}`);
-    assert.equal(await tab.avaliar("new FormData(document.querySelector('form')).get('busca')"), contexto.busca);
-    await tab.avaliar("document.querySelector('form').requestSubmit()");
+    await aguardar(async () => await tab.avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "busca inicial hidratada");
+    await tab.avaliar(`document.querySelector('main select[name=busca]').value="${contexto.busca}"; document.querySelector('[name=q]').value=${JSON.stringify(contexto.q)}`);
+    assert.equal(await tab.avaliar("new FormData(document.querySelector('main form')).get('busca')"), contexto.busca);
+    await tab.avaliar("document.querySelector('main form').requestSubmit()");
     await esperarTexto(tab, "resultado(s)");
-    await tab.avaliar(`const s=document.querySelector('select'); s.value=${JSON.stringify(contexto.ordem)}; s.dispatchEvent(new Event('change',{bubbles:true}))`);
+    await tab.avaliar(`const s=document.querySelector('main select'); s.value=${JSON.stringify(contexto.ordem)}; s.dispatchEvent(new Event('change',{bubbles:true}))`);
     await aguardar(async () => await tab.avaliar(`location.pathname + location.search === ${JSON.stringify(lista)}`), "lista com contexto da entrada");
     await matriz(tab, `busca-${contexto.busca}`);
     if (i === 1) await clicar(tab, `main a[href^="/disciplinas/${fixture.disciplinaId}?"]`, "Comparação de professores");
@@ -219,9 +219,9 @@ try {
   const cookies = await a.cdp("Network.getCookies", { urls: ["http://localhost:8000"] });
   assert.ok(cookies.cookies.some((c) => c.name === "undb_session" && c.httpOnly && c.sameSite === "Lax"));
   await preencherAvaliacao(a);
-  const respostas = await a.avaliar("Object.fromEntries(new FormData(document.querySelector('form')))");
+  const respostas = await a.avaliar("Object.fromEntries(new FormData(document.querySelector('main form')))");
   await enviar(a, "link recebido");
-  assert.deepEqual(await a.avaliar("Object.fromEntries(new FormData(document.querySelector('form')))") , respostas);
+  assert.deepEqual(await a.avaliar("Object.fromEntries(new FormData(document.querySelector('main form')))") , respostas);
   assert.deepEqual(banco().avaliacoes, []);
   await matriz(a, "email-pendente");
   await navegar(a, linkEmail(fixture.emails[0]), "E-mail confirmado.");
@@ -266,7 +266,7 @@ try {
   await clicar(b, 'main a[href*="?q="]', "resultado(s)");
   assert.equal(await b.avaliar("location.pathname"), "/disciplinas");
   assert.equal(await b.avaliar("new URLSearchParams(location.search).get('q')"), fixture.codigo);
-  assert.equal(await b.avaliar("document.querySelector('select').value"), "nome");
+  assert.equal(await b.avaliar("document.querySelector('main select').value"), "nome");
   await navegar(a, linkEmail(fixture.emails[0]), "Este link é inválido ou expirou");
   assert.equal(await a.avaliar("!!document.querySelector('a[href^=\"/login?returnTo=\"]')"), false);
   const resumo = { origem: "Telas reais → FastAPI → adaptador console → PostgreSQL", combinacoes: evidencias.length,
