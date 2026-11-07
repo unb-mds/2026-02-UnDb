@@ -87,8 +87,28 @@ jobs:
       - name: Compile Python sources
         run: python -m compileall -q app alembic
 
-      - name: Run deterministic tests
-        run: python -m unittest discover -s tests -v
+      - name: Install coverage.py
+        run: python -m pip install -r requirements-coverage.txt
+
+      - name: Run deterministic tests with coverage
+        id: backend-tests
+        run: python -m coverage run --branch --source=app -m unittest discover -s tests -v
+
+      - name: Generate backend coverage reports
+        id: backend-coverage
+        if: ${{ !cancelled() && (steps.backend-tests.outcome == 'success' || steps.backend-tests.outcome == 'failure') }}
+        run: |
+          python -m coverage report -m
+          python -m coverage html -d coverage/html
+          python -m coverage xml -o coverage/coverage.xml
+
+      - name: Upload backend coverage reports
+        if: ${{ !cancelled() && steps.backend-coverage.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+          if-no-files-found: error
 
       - name: Import application
         run: python -c "from app.main import app; assert app is not None"
@@ -304,7 +324,16 @@ jobs:
         run: npm run typecheck
 
       - name: Test evaluation form logic and HTTP client
-        run: npm test
+        id: frontend-tests
+        run: npm run test:coverage
+
+      - name: Upload frontend coverage reports
+        if: ${{ !cancelled() && (steps.frontend-tests.outcome == 'success' || steps.frontend-tests.outcome == 'failure') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/
+          if-no-files-found: error
 
       - name: Build frontend
         run: npm run build

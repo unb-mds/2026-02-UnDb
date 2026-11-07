@@ -4,6 +4,7 @@ import asyncio
 import unittest
 from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 from sqlalchemy import select
 
@@ -156,6 +157,40 @@ class ModeracaoTest(unittest.TestCase):
             )[1],
             [],
         )
+
+    def test_ac22_04_detalhe_e_historico_sao_restritos_a_moderadores(self):
+        moderador = self.moderador()
+        versao = self.versao()
+        caminho = f"/api/moderacao/comentarios/{versao.id}"
+        status, decisao = self.acao(versao.id, "APROVAR")
+        self.assertEqual(status, 200)
+
+        for rota in (caminho, f"{caminho}/decisoes"):
+            for token, esperado in ((None, 401), (self.token, 403)):
+                with self.subTest(rota=rota, status=esperado):
+                    status, _ = asyncio.run(self._request("GET", rota, token=token))
+                    self.assertEqual(status, esperado)
+
+        status, detalhe = asyncio.run(self._request("GET", caminho, token="mod"))
+        self.assertEqual(status, 200)
+        self.assertEqual(detalhe["id"], str(versao.id))
+        self.assertEqual(detalhe["autor"]["nome"], self.usuario.nome)
+        self.assertEqual(detalhe["autor"]["email"], self.usuario.email)
+
+        status, historico = asyncio.run(self._request("GET", f"{caminho}/decisoes", token="mod"))
+        self.assertEqual(status, 200)
+        self.assertEqual(len(historico), 1)
+        self.assertEqual(historico[0]["id"], decisao["id"])
+        self.assertEqual(historico[0]["comentario_versao_id"], str(versao.id))
+        self.assertEqual(historico[0]["moderador_id"], str(moderador.id))
+
+    def test_consultas_de_moderacao_de_versao_inexistente_retornam_404(self):
+        self.moderador()
+        caminho = f"/api/moderacao/comentarios/{uuid4()}"
+        for rota in (caminho, f"{caminho}/decisoes"):
+            with self.subTest(rota=rota):
+                status, _ = asyncio.run(self._request("GET", rota, token="mod"))
+                self.assertEqual(status, 404)
 
     def test_revogacao_imediata_e_conta_nao_confirmada(self):
         from app.repositories.moderacao_repository import definir_papel

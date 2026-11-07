@@ -39,6 +39,34 @@ const substitutoPendente = {
   avaliacao_id: avaliacaoId,
 };
 
+test("AC20-03: a consulta pública retorna apenas os campos do comentário publicado", async (t) => {
+  const publico = {
+    id: versaoId,
+    texto: comentarioPublicado.texto,
+    created_at: comentarioPublicado.created_at,
+  };
+  t.mock.method(globalThis, "fetch", async () => Response.json([{
+    ...comentarioPublicado,
+    nome_autor: "Identidade interna",
+    email: "privado@example.test",
+    didatica: 5,
+  }]));
+
+  assert.deepEqual(await servico.listarComentariosPublicados(avaliacaoId, outraAvaliacao), [publico]);
+});
+
+test("AC20-03: a consulta pública rejeita uma lista com comentário sem texto", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => Response.json([
+    comentarioPublicado,
+    { ...comentarioPublicado, id: outraVersao, texto: null },
+  ]));
+
+  await assert.rejects(
+    servico.listarComentariosPublicados(avaliacaoId, outraAvaliacao),
+    /Resposta de comentários incompatível/,
+  );
+});
+
 test("consulta GET /api/comentarios/meu com cookie e mapeia versões do autor", async (t) => {
   const respostas = [comentarioPublicado, comentarioDescartado, substitutoPendente];
   t.mock.method(globalThis, "fetch", async (url, init) => {

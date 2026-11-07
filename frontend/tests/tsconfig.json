@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "../src",
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "incremental": false,
+    "noEmit": false,
+    "noEmitOnError": true,
+    "inlineSourceMap": true,
+    "inlineSources": true
+  },
+  "include": ["../next-env.d.ts", "../src/**/*.ts", "../src/**/*.tsx"]
+}
