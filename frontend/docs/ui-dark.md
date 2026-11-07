@@ -4,6 +4,7 @@ A aplicação oficial usa agora os tokens e a navegação compartilhada da propo
 
 ## Contrato para as próximas entregas
 
+- O tema dark é fixo: o layout aplica `.dark` em `html` e `globals.css` associa as variantes `dark:` a essa classe. Cores de erro, sucesso e demais estados devem acompanhar o tema da aplicação, inclusive quando o sistema prefere o tema claro. Não reintroduzir dependência de `prefers-color-scheme` para essas variantes.
 - `src/app/globals.css` contém os tokens e as classes comuns. Use `--background`, `--foreground`, `--panel`, `--raised`, `--border`, `--muted`, `--accent`, `--on-accent`, `--primary`, `--primary-hover`, `--on-primary`, `--focus`, `--danger` e `--radius`. `accent` é a cor clara de texto/realce; `primary` é a superfície azul de ação. Preserve os pares de contraste.
 - `.container` limita a largura compartilhada a 1280 px, com recuo lateral responsivo. `.panel` oferece superfície com bordas arredondadas. `.button` é a ação secundária e `.button.primary` a principal. Use elementos semânticos `button`/`Link`, labels e estados reais de `disabled`.
 - `Cabecalho` e `Rodape` são montados uma vez no layout. O cabeçalho usa links existentes na home e busca compacta nas páginas internas; telas de conta ficam sem busca. Não repita esses componentes em cada página.

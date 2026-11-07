@@ -1,4 +1,5 @@
 import { lerTextoPagina } from "./browser-navigation.mjs";
+import { contrasteTexto } from "./browser-contrast.mjs";
 // Interface controlada por padrão; E2E_FIXTURE ativa FastAPI/PostgreSQL reais (runner Python).
 // Requer build padrão (API localhost:8000), Node 22+ e Edge/Chromium headless.
 import assert from "node:assert/strict";
@@ -436,6 +437,11 @@ async function verificarCorrecoesInterface() {
   statusConfirmacao = 400;
   await cdp("Page.navigate", {url:"http://localhost:3100/confirmar-email?token=invalido"});
   await aguardarTexto("Este link é inválido ou expirou");
+  for (const tema of ["light", "dark"]) {
+    await cdp("Emulation.setEmulatedMedia", {features:[{name:"prefers-color-scheme", value:tema}]});
+    const contraste = await contrasteTexto(avaliar, 'main p[aria-live]');
+    assert.ok(contraste >= 4.5, `Confirmação com token inválido, sistema ${tema}: ${contraste}`);
+  }
 
   const destino = `${caminho}/avaliar`;
   autenticado = true;

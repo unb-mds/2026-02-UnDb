@@ -1,5 +1,8 @@
 @import "tailwindcss" source("../");
 
+/* As variantes acompanham o tema da aplicação, não o tema do sistema. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   color-scheme: dark;
   --background: #0b0f17;

@@ -44,6 +44,16 @@ Também passaram localmente `moderacao-browser.mjs` (fila, estados, seis ações
 
 O histórico da PR foi consolidado a pedido do PO. A versão final depende dos checks remotos e da revisão exigida pelo ruleset; os resultados antigos com falha não representam a versão corrigida.
 
+## Correção de contraste após revisão
+
+A revisão encontrou cores de texto destinadas ao tema claro sobre o fundo dark fixo: as variantes `dark:` ainda dependiam da preferência do sistema. O layout agora marca `html` com `.dark`, e `globals.css` vincula essas variantes à classe. A correção mantém os componentes e fluxos existentes, sem antecipar o redesenho das issues #205/#206.
+
+No Edge headless, com preferência de sistema clara, o contraste da confirmação incompleta/inválida e do botão Denunciar passou de 4,02:1 para 6,64:1; o sucesso da denúncia passou de 3,40:1 para 12,01:1. Com preferência escura, os valores finais são os mesmos. A medição usa cores renderizadas convertidas para sRGB e compõe os fundos transparentes. Como controle negativo, remover `.dark` somente no DOM de teste com sistema claro reproduziu 4,02:1; restaurar a classe recuperou o contraste adequado.
+
+Foram acrescentadas asserções de contraste mínimo de 4,5:1 nos cenários existentes de confirmação com token inválido e de denúncia (botão e sucesso), em ambas as preferências de sistema; a denúncia cobre também desktop/celular. Nenhuma asserção de negócio foi removida.
+
+Validação da correção em worktree isolado, Windows, Node 24.21.0 e dependências locais: ESLint, `next typegen`, `tsc --noEmit`, 61 testes, build `next build --webpack` e as quatro suítes de `npm run test:browser` aprovados. Os cenários de navegador usaram fixtures HTTP controladas, sem mutações em PostgreSQL real. `git diff --check` aprovado.
+
 ## Limites e continuidade
 
 Não houve mudança de backend, dados, cookies, infraestrutura, serviços de API, política de cobertura ou checks. Home/resultados completos (#203), perfil/comparação (#204), conta/avaliação (#205) e comentários/moderação (#206) seguem abertos. O [contrato compartilhado](ui-dark.md) orienta essas entregas; a cópia visual anterior fica apenas como referência.
