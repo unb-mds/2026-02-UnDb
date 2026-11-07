@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Rodape from "@/components/rodape";
 import Cabecalho from "@/components/cabecalho";
 import AvisoAgradecimento from "@/components/aviso-agradecimento";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Avaliação de Professores UnB",
+  title: "UnDb — Avaliação de Professores UnB",
   description: "Consulta pública de avaliações estruturadas de professores e disciplinas da UnB.",
 };
 
@@ -26,9 +27,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <a href="#conteudo" className="skip-link">Pular para o conteúdo</a>
         <Cabecalho />
         <AvisoAgradecimento />
-        {children}
+        <div id="conteudo" tabIndex={-1} className="app-content">{children}</div>
+        <Rodape />
       </body>
     </html>
   );

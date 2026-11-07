@@ -6,7 +6,7 @@ import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
 import { ApiError } from "@/lib/services/http-error";
 import { caminhoAvaliacao } from "@/lib/retorno-avaliacao";
 import AvaliacaoForm from "./avaliacao-form";
-import EtapasJornada from "@/components/etapas-jornada";
+import Caminho from "@/components/caminho";
 
 export default async function AvaliarPage({ params, searchParams }: {
   searchParams: Promise<ParametrosBusca>;
@@ -24,7 +24,7 @@ export default async function AvaliarPage({ params, searchParams }: {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
-      <EtapasJornada atual={2} />
+      <Caminho itens={[{ nome: "Início", href: "/" }, ...(contexto ? [{ nome: "Resultados", href: urlBusca(contexto), retornoBusca: true }] : []), { nome: "Consulta", href: consultaHref }, { nome: "Avaliar" }]} />
       {contexto && <Link href={urlBusca(contexto)} className="text-sm text-accent underline underline-offset-4">← Voltar aos resultados da busca</Link>}
       <Link href={consultaHref} className="self-start text-sm text-accent underline underline-offset-4">
         ← Voltar para a consulta

@@ -302,9 +302,9 @@ try {
     }, "modal de denúncia interativo");
     assert.equal(await avaliar(`document.querySelectorAll('input[name="motivoDenuncia"]').length`), 7);
     assert.equal(await avaliar(`!!document.querySelector('textarea, input[type="text"]')`), false);
-    assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`), true);
+    assert.equal(await avaliar(`document.querySelector('dialog button[type="submit"]').disabled`), true);
     await avaliar(`document.querySelector('#motivo-SPAM').click()`);
-    assert.equal(await avaliar(`document.querySelector('button[type="submit"]').disabled`), false);
+    assert.equal(await avaliar(`document.querySelector('dialog button[type="submit"]').disabled`), false);
   }
   async function enviar(mensagem) {
     await clicar("Confirmar denúncia");

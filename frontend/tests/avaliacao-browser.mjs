@@ -153,14 +153,14 @@ async function removerPerfilTemporario() {
   }
 }
 const texto = () => lerTextoPagina(avaliar);
-const enviar = () => avaliar('document.querySelector("button[type=submit]").click()');
+const enviar = () => avaliar('document.querySelector("main button[type=submit]").click()');
 const aguardarTexto = (trecho) => aguardar(async () => (await texto()).includes(trecho), trecho);
 
 // HTML visível não garante hidratação. Somente usar com dados localmente inválidos:
 // repetir um evento sintético não navega nem envia dados antes de o React estar pronto.
 async function aguardarValidacaoLocal(mensagem) {
   await aguardar(async () => {
-    await avaliar('document.querySelector("form")?.dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
+    await avaliar('document.querySelector("main form")?.dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
     return (await texto()).includes(mensagem);
   }, `validação interativa: ${mensagem}`);
 }
@@ -194,7 +194,7 @@ try {
   await cdp("Page.navigate", { url: `http://localhost:3100${caminho}` });
   await aguardarTexto("Avaliar este professor na disciplina");
   await avaliar('Array.from(document.querySelectorAll("a")).find(a => a.textContent.includes("Avaliar este professor")).click()');
-  await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("select").length === 4'), "formulário");
+  await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("main select").length === 4'), "formulário");
   assert.match(await texto(), /Professor de teste/);
   assert.match(await texto(), /Disciplina de teste/);
   assert.ok((await texto()).includes(`Código da disciplina: ${real?.disciplinaCodigo ?? "CIC0001"}`));
@@ -204,12 +204,12 @@ try {
   // Confirma hidratação antes de testar a validação local.
   await aguardarValidacaoLocal("Selecione uma opção válida para Didática.");
   await enviar();
-  assert.equal(await avaliar('document.querySelector("form").checkValidity()'), false);
+  assert.equal(await avaliar('document.querySelector("main form").checkValidity()'), false);
   assert.equal(envios.length, 0);
   await avaliar(`document.querySelector('[name="didatica"][value="5"]').click(); Object.entries({dificuldade:"DIFICIL", chamada:"false", material:"NAO_DISPONIBILIZA", recomenda:"false"}).forEach(([nome, valor]) => { const campo = document.querySelector('[name="'+nome+'"]'); campo.value = valor; campo.dispatchEvent(new Event("change", {bubbles:true})); })`);
-  assert.equal(await avaliar('document.querySelector("form").checkValidity()'), true);
-  assert.equal(await avaliar('document.querySelector("button[type=submit]").disabled'), false);
-  const respostas = () => avaliar('Object.fromEntries(new FormData(document.querySelector("form")))');
+  assert.equal(await avaliar('document.querySelector("main form").checkValidity()'), true);
+  assert.equal(await avaliar('document.querySelector("main button[type=submit]").disabled'), false);
+  const respostas = () => avaliar('Object.fromEntries(new FormData(document.querySelector("main form")))');
   const preenchidas = await respostas();
   if (real) {
     const banco = () => JSON.parse(executarPython("--inspect"));
@@ -287,8 +287,8 @@ try {
   }
   // Acesso direto não predefine respostas e mantém os cinco campos obrigatórios.
   await cdp("Page.navigate", { url: `http://localhost:3100${caminho}/avaliar` });
-  await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("select").length === 4'), "formulário direto");
-  assert.equal(await avaliar('document.querySelector("form").reportValidity()'), false);
+  await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("main select").length === 4'), "formulário direto");
+  assert.equal(await avaliar('document.querySelector("main form").reportValidity()'), false);
   // Assim como na entrada por link, aguarda a hidratação com dados inválidos.
   // Um único evento antes do React estar pronto pode ser perdido no acesso direto.
   await aguardarValidacaoLocal("Selecione uma opção válida para Didática.");
@@ -387,9 +387,9 @@ async function verificarCorrecoesInterface() {
     await cdp("Page.navigate", {url:"http://localhost:3100/cadastro"});
     await aguardar(async () => await avaliar('!!document.querySelector("[name=nome]")'), "cadastro");
     await avaliar(`document.querySelector('[name=nome]').value='   '; document.querySelector('[name=email]').value='TESTE@ALUNO.UNB.BR'; document.querySelector('[name=senha]').value='senha-teste-local'`);
-    assert.equal(await avaliar('document.querySelector("form").checkValidity()'), true);
+    assert.equal(await avaliar('document.querySelector("main form").checkValidity()'), true);
     assert.ok(scriptsAtrasados.length > 0, "O cenário precisa atrasar scripts de hidratação");
-    await avaliar('document.querySelector("form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
+    await avaliar('document.querySelector("main form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
     assert.equal(await avaliar('!!document.querySelector("#nome-erro")'), false, "HTML antes da hidratação ainda não executa a validação React");
     assert.equal(await avaliar('location.pathname === "/cadastro" && location.search === ""'), true);
     liberarScripts();
@@ -412,15 +412,15 @@ async function verificarCorrecoesInterface() {
   await aguardarTexto("Revise os dados do cadastro");
   assert.equal(await avaliar('document.querySelector("[name=email]").value'), "TESTE@ALUNO.UNB.BR");
   statusCadastro = 202;
-  await aguardar(async () => !(await avaliar('document.querySelector("button[type=submit]").disabled')), "cadastro liberado após rejeição");
+  await aguardar(async () => !(await avaliar('document.querySelector("main button[type=submit]").disabled')), "cadastro liberado após rejeição");
   await enviar();
   await aguardarTexto("Se o endereço informado estiver disponível");
   assert.equal(cadastrosRecebidos, 2, "Apenas as tentativas válidas de 422 e 202 chegam à API");
-  await aguardar(async () => !(await avaliar('document.querySelector("button[type=submit]").disabled')), "botão de cadastro habilitado");
+  await aguardar(async () => !(await avaliar('document.querySelector("main button[type=submit]").disabled')), "botão de cadastro habilitado");
   for (const tema of ["light", "dark"]) {
     await cdp("Emulation.setEmulatedMedia", {features:[{name:"prefers-color-scheme", value:tema}]});
     const contraste = await avaliar(`(() => {
-      const style = getComputedStyle(document.querySelector('button[type=submit]'));
+      const style = getComputedStyle(document.querySelector('main button[type=submit]'));
       const lum = rgb => { const c = rgb.match(/[\\d.]+/g).slice(0,3).map(Number).map(x => {x/=255; return x<=0.04045 ? x/12.92 : ((x+0.055)/1.055)**2.4}); return c[0]*0.2126+c[1]*0.7152+c[2]*0.0722; };
       const a=lum(style.color), b=lum(style.backgroundColor); return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
     })()`);
@@ -447,7 +447,7 @@ async function verificarCorrecoesInterface() {
   autenticado = false;
   await cdp("Page.navigate", {url:`http://localhost:3100/login?returnTo=${encodeURIComponent(destino)}`});
   await aguardar(async () => await avaliar('!!document.querySelector("[name=email]")'), "login com destino de retorno");
-  await avaliar('document.querySelector("[name=email]").value="estudante@aluno.unb.br"; document.querySelector("[name=senha]").value="senha-teste-local"; document.querySelector("form").requestSubmit()');
+  await avaliar('document.querySelector("[name=email]").value="estudante@aluno.unb.br"; document.querySelector("[name=senha]").value="senha-teste-local"; document.querySelector("main form").requestSubmit()');
   await aguardar(async () => await avaliar('location.pathname === ' + JSON.stringify(destino)), "retorno da autenticação para avaliação");
   assert.match(await texto(), /Professor de teste/);
 
@@ -467,7 +467,7 @@ async function verificarCorrecoesInterface() {
   await avaliar('Array.from(document.querySelectorAll("a")).find(a => a.textContent.includes("Continuar para a avaliação")).click()');
   await aguardar(async () => await avaliar('location.pathname === "/login" && !!document.querySelector("[name=senha]")'), "login obrigatório da conta recém-confirmada");
   assert.equal(await avaliar('new URLSearchParams(location.search).get("returnTo")'), destino);
-  await avaliar('document.querySelector("[name=email]").value="estudante@aluno.unb.br"; document.querySelector("[name=senha]").value="senha-teste-local"; document.querySelector("form").requestSubmit()');
+  await avaliar('document.querySelector("[name=email]").value="estudante@aluno.unb.br"; document.querySelector("[name=senha]").value="senha-teste-local"; document.querySelector("main form").requestSubmit()');
   await aguardar(async () => await avaliar('location.pathname === ' + JSON.stringify(destino)), "retorno após confirmação de e-mail");
   await aguardar(async () => await avaliar('!!document.querySelector("[name=didatica]")'), "formulário após confirmação");
   assert.equal(await avaliar('document.querySelector("[name=didatica]:checked")'), null);
