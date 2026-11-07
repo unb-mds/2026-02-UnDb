@@ -26,8 +26,11 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 - `npm run lint`: executa o ESLint.
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
-- `npm test`: compila os módulos de formulário, busca e retorno com TypeScript em diretório temporário e
-  executa testes com o runner nativo do Node, sem novas dependências.
+- `npm test` gera os tipos de rotas, compila `src` em um diretório temporário e
+  executa a suíte com o runner nativo do Node.
+- `npm run test:coverage` mede a mesma suíte com c8 e gera resumo, HTML e LCOV.
+  Use Node.js 22 (22.12 ou superior), como no CI. Veja o escopo e a consulta dos
+  relatórios no [registro da #190](../docs/estudos/cobertura-testes-issue-190.md).
 - `npm run test:browser`: verifica o formulário no Edge/Chromium headless com respostas
   controladas de teste; exige build padrão prévio, Node 22+ e portas 8000, 3100, 9223 e 9226 livres.
   No Windows usa o caminho padrão do Edge; em outros ambientes configure `BROWSER_PATH`.

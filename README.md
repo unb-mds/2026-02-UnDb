@@ -193,9 +193,14 @@ estão no [ADR 08](docs/arquitetura.md#adr-08--execução-e-containerização-do
 ### Verificações automatizadas
 
 O check `Backend` executa os testes determinísticos com `python -m unittest discover -s tests -v`,
-valida aplicação e migrações em um PostgreSQL 16 descartável de CI, compara o schema com os modelos
-e testa downgrade/upgrade. Também constrói a imagem e verifica a presença das migrações Alembic.
+sob instrumentação do coverage.py. O job também valida aplicação e migrações em um PostgreSQL 16
+descartável de CI, compara o schema com os modelos, testa downgrade/upgrade, constrói a imagem
+e verifica a presença das migrações Alembic.
 A versão do banco de CI não define, por si só, a versão de produção.
+
+Os checks `Backend` e `Frontend` publicam relatórios de cobertura como artefatos
+do GitHub Actions. Consulte os comandos locais, o escopo e a linha de base no
+[registro de cobertura da #190](docs/estudos/cobertura-testes-issue-190.md).
 
 O acesso real ao SIGAA permanece uma verificação manual documentada na
 [POC](docs/estudos/sigaa-poc.md); não é dependência dos testes determinísticos.

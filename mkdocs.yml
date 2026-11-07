@@ -53,6 +53,7 @@ nav:
   - Estudos:
       - Denúncia e agradecimentos: estudos/denuncia-agradecimentos-issue-193.md
       - Fila de moderação: estudos/fila-moderacao-issue-162.md
+      - Cobertura de testes — Issue 190: estudos/cobertura-testes-issue-190.md
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
       - Docker: estudos/docker.md
