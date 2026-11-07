@@ -14,6 +14,8 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 - [Board de requisitos no Figma](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3O-de-Professores-UnB-)
 - [Especificação de implementação](specs.md)
 - [Arquitetura](docs/arquitetura.md)
+- [ADRs — catálogo, manutenção e template](docs/adrs/index.md)
+- [Estratégia de qualidade — ADR 09 proposto](docs/adrs/09-estrategia-qualidade.md)
 
 ## Equipe
 
@@ -189,6 +191,12 @@ estão no [ADR 08](docs/arquitetura.md#adr-08--execução-e-containerização-do
 ## Fluxo de contribuição
 
 ### Verificações automatizadas
+
+Lint e formatação Python usam Ruff, fixado em `backend/requirements-dev.txt`, sobre
+aplicação, testes, migrações e scripts. O frontend preserva ESLint e oferece
+`npm run typecheck` (`next typegen && tsc --noEmit`) sem depender de build anterior.
+Instalação, comandos de verificação/correção e escopo estão no
+[guia de contribuição](CONTRIBUTING.md#verificações-de-qualidade-locais).
 
 O check `Backend` executa os testes determinísticos com `python -m unittest discover -s tests -v`,
 sob instrumentação do coverage.py. O job também valida aplicação e migrações em um PostgreSQL 16

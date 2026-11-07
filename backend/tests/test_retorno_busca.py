@@ -11,7 +11,9 @@ DESTINO = "/professores/11111111-1111-4111-8111-111111111111/disciplinas/2222222
 
 class RetornoBuscaTest(unittest.TestCase):
     def cadastro(self, destino):
-        return CadastroRequest(nome="Estudante", email="teste@aluno.unb.br", senha="senha-teste", return_to=destino)
+        return CadastroRequest(
+            nome="Estudante", email="teste@aluno.unb.br", senha="senha-teste", return_to=destino
+        )
 
     def test_preserva_rotas_antigas_e_contexto_permitido(self):
         self.assertEqual(self.cadastro(None).return_to, None)
@@ -24,8 +26,12 @@ class RetornoBuscaTest(unittest.TestCase):
 
     def test_rejeita_destinos_externos_e_parametros_nao_permitidos(self):
         for valor in (
-            "https://externo.test" + DESTINO, "//externo.test" + DESTINO,
-            DESTINO + "/", DESTINO + "\n", DESTINO + "#fim", DESTINO + "?",
+            "https://externo.test" + DESTINO,
+            "//externo.test" + DESTINO,
+            DESTINO + "/",
+            DESTINO + "\n",
+            DESTINO + "#fim",
+            DESTINO + "?",
             DESTINO + "?busca=professores&q=x&ordem=nome&token=segredo",
             DESTINO + "?busca=professores&q=x&ordem=nome&q=y",
             DESTINO + "?busca=professores&q=x&ordem=recomendacao",

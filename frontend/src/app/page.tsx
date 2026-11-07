@@ -1,11 +1,9 @@
 import Link from "next/link";
 import BuscaEntrada from "@/components/busca-entrada";
-import EtapasJornada from "@/components/etapas-jornada";
 
 export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
-      <EtapasJornada atual={0} />
       <div>
         <h1 className="text-2xl font-semibold">Encontre professores e disciplinas</h1>
         <p className="mt-2 text-base text-foreground/70">
@@ -33,12 +31,6 @@ export default function Home() {
           </Link>
         </div>
       </div>
-      <details className="text-sm text-foreground/70">
-        <summary className="cursor-pointer py-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">Sobre a demonstração da jornada</summary>
-        <Link href="/prototipo" className="mt-2 inline-block text-accent underline underline-offset-4">
-          Experimentar o protótipo da jornada · dados demonstrativos →
-        </Link>
-      </details>
     </main>
   );
 }

@@ -23,9 +23,7 @@ def obter_professor(db: Session, professor_id: UUID) -> Professor:
     return professor
 
 
-def listar_disciplinas_do_professor(
-    db: Session, professor_id: UUID
-) -> list[Disciplina]:
+def listar_disciplinas_do_professor(db: Session, professor_id: UUID) -> list[Disciplina]:
     obter_professor(db, professor_id)
     return professor_repository.listar_disciplinas(db, professor_id)
 

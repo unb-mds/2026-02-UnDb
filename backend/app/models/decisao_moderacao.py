@@ -20,4 +20,6 @@ class DecisaoModeracao(Base):
     estado_anterior: Mapped[str] = mapped_column(String(20), nullable=False)
     estado_posterior: Mapped[str] = mapped_column(String(20), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    descartar_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    descartar_em: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, index=True
+    )

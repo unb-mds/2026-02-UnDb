@@ -1,7 +1,17 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Table, UniqueConstraint, Uuid, func
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    String,
+    Table,
+    UniqueConstraint,
+    Uuid,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -40,9 +50,7 @@ class Turma(Base):
 
     disciplina = relationship("Disciplina", back_populates="turmas")
     unidade = relationship("Unidade", back_populates="turmas")
-    professores = relationship(
-        "Professor", secondary=turmas_professores, back_populates="turmas"
-    )
+    professores = relationship("Professor", secondary=turmas_professores, back_populates="turmas")
 
     __table_args__ = (
         UniqueConstraint(

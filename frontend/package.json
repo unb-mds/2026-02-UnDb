@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "node tests/run-tests.mjs",
     "test:coverage": "node tests/run-tests.mjs --coverage",
     "test:browser": "node tests/avaliacao-browser.mjs && node tests/moderacao-browser.mjs && node tests/denuncia-browser.mjs && node tests/comentarios-browser.mjs",

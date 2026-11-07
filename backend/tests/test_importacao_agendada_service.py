@@ -41,9 +41,7 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
     def setUp(self) -> None:
         self.engine = create_engine("sqlite+pysqlite:///:memory:")
         Base.metadata.create_all(self.engine)
-        self.departamentos = [
-            DepartamentoImportacao("CIC", "DEPTO CIÊNCIAS DA COMPUTAÇÃO")
-        ]
+        self.departamentos = [DepartamentoImportacao("CIC", "DEPTO CIÊNCIAS DA COMPUTAÇÃO")]
 
     def tearDown(self) -> None:
         self.engine.dispose()
@@ -63,9 +61,7 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
 
         with Session(self.engine) as db:
             persistido = db.scalar(
-                select(ImportacaoExecucao).where(
-                    ImportacaoExecucao.id == registro_id
-                )
+                select(ImportacaoExecucao).where(ImportacaoExecucao.id == registro_id)
             )
             self.assertIsNotNone(persistido)
             self.assertEqual(persistido.status, "sucesso")
@@ -75,9 +71,7 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
             self.assertIsNotNone(persistido.finalizada_em)
 
     @patch("app.services.importacao_agendada_service.executar_importacao")
-    def test_registra_falha_retornada_pela_importacao(
-        self, executar_importacao
-    ) -> None:
+    def test_registra_falha_retornada_pela_importacao(self, executar_importacao) -> None:
         executar_importacao.return_value = _resultado(
             sucesso=False,
             erros=("SIGAA indisponível",),
@@ -111,9 +105,7 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
 
         with Session(self.engine) as db:
             persistido = db.scalar(
-                select(ImportacaoExecucao).where(
-                    ImportacaoExecucao.id == registro_id
-                )
+                select(ImportacaoExecucao).where(ImportacaoExecucao.id == registro_id)
             )
             self.assertEqual(persistido.status, "falha")
             self.assertIn("RuntimeError: falha inesperada", persistido.erro)
@@ -124,9 +116,7 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
             raise RuntimeError("formulário SIGAA indisponível")
 
         with Session(self.engine) as db:
-            registro = executar_importacao_agendada(
-                db, enumerar, ano="2026", periodo="2"
-            )
+            registro = executar_importacao_agendada(db, enumerar, ano="2026", periodo="2")
             registro_id = registro.id
 
         with Session(self.engine) as db:
@@ -142,9 +132,7 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
             ("672", "CAMPUS CEILÂNDIA"),
         ]
         with Session(self.engine) as db:
-            db.add(Unidade(
-                fonte="SIGAA", codigo="CIC", nome="CIC", identificador_externo="508"
-            ))
+            db.add(Unidade(fonte="SIGAA", codigo="CIC", nome="CIC", identificador_externo="508"))
             db.commit()
             solicitacoes = _todas_unidades(db)
 

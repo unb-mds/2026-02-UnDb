@@ -9,7 +9,7 @@ import { listarProfessores } from "@/lib/services/professores";
 import { buscarDisciplinas } from "@/lib/services/disciplinas";
 import type { DisciplinaDetalhe, ProfessorDetalhe } from "@/lib/types/institucional";
 import ProfessorResultado from "@/app/professores/professor-resultado";
-import EtapasJornada from "./etapas-jornada";
+import Caminho from "@/components/caminho";
 
 type Resultado = ProfessorDetalhe | DisciplinaDetalhe;
 type Consulta = { termo: string; tentativa: number } & (
@@ -48,7 +48,7 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
-      <EtapasJornada atual={buscaValida && atual && !erro && resultados.length > 0 ? 1 : 0} />
+      <Caminho itens={[{ nome: "Início", href: "/" }, { nome: professor ? "Professores" : "Disciplinas" }]} />
       <div className="flex w-full max-w-2xl flex-col gap-6">
         <div>
           <h1 className="text-2xl font-semibold">Buscar {professor ? "professor" : "disciplina"}</h1>

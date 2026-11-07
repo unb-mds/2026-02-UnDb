@@ -29,18 +29,12 @@ class AvaliacaoBase(BaseModel):
         le=5,
         description="Nota inteira de didatica, de 1 a 5",
     )
-    dificuldade: Dificuldade = Field(
-        description="Dificuldade percebida: FACIL, MEDIO ou DIFICIL"
-    )
+    dificuldade: Dificuldade = Field(description="Dificuldade percebida: FACIL, MEDIO ou DIFICIL")
     chamada: StrictBool = Field(description="Se o professor realiza chamada")
-    disponibiliza_material: StrictBool = Field(
-        description="Se o professor disponibiliza material"
-    )
+    disponibiliza_material: StrictBool = Field(description="Se o professor disponibiliza material")
     qualidade_material: QualidadeMaterial | None = Field(
         default=None,
-        description=(
-            "Qualidade do material: RUIM, MEDIO ou BOM; nulo quando nao ha material"
-        ),
+        description=("Qualidade do material: RUIM, MEDIO ou BOM; nulo quando nao ha material"),
     )
     recomenda: StrictBool = Field(description="Se o estudante recomenda a materia")
 

@@ -61,9 +61,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
             password_hash="hash-de-teste",
             email_confirmado=True,
         )
-        self.professor = Professor(
-            nome="Professora Comentarios", departamento="CIC"
-        )
+        self.professor = Professor(nome="Professora Comentarios", departamento="CIC")
         self.disciplina = Disciplina(
             codigo="CIC0098",
             nome="Disciplina Comentarios",
@@ -154,9 +152,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
             (b"content-length", str(len(corpo)).encode("ascii")),
         ]
         if token is not None:
-            headers.append(
-                (b"cookie", f"{SESSION_COOKIE_NAME}={token}".encode("ascii"))
-            )
+            headers.append((b"cookie", f"{SESSION_COOKIE_NAME}={token}".encode("ascii")))
 
         recebido = False
 
@@ -192,9 +188,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
             send,
         )
         inicio = next(
-            mensagem
-            for mensagem in mensagens
-            if mensagem["type"] == "http.response.start"
+            mensagem for mensagem in mensagens if mensagem["type"] == "http.response.start"
         )
         resposta = b"".join(
             mensagem.get("body", b"")
@@ -235,9 +229,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
     def _obter_comentario(self, avaliacao_id):
         self.db.expire_all()
         return self.db.scalar(
-            select(ComentarioVersao).where(
-                ComentarioVersao.avaliacao_id == avaliacao_id
-            )
+            select(ComentarioVersao).where(ComentarioVersao.avaliacao_id == avaliacao_id)
         )
 
     # --- AC20-03: Leitura publica (visitante) ---
@@ -302,8 +294,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         status_code, resposta = asyncio.run(
             self._request(
                 "GET",
-                f"/api/professores/{uuid4()}"
-                f"/disciplinas/{self.disciplina.id}/comentarios",
+                f"/api/professores/{uuid4()}/disciplinas/{self.disciplina.id}/comentarios",
             )
         )
         self.assertEqual(status_code, 404)
@@ -313,8 +304,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         status_code, resposta = asyncio.run(
             self._request(
                 "GET",
-                f"/api/professores/{self.professor.id}"
-                f"/disciplinas/{uuid4()}/comentarios",
+                f"/api/professores/{self.professor.id}/disciplinas/{uuid4()}/comentarios",
             )
         )
         self.assertEqual(status_code, 404)
@@ -338,12 +328,27 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         self.assertEqual(resposta[0]["avaliacao_id"], str(avaliacao.id))
 
     def test_limites_texto_preservam_avaliacao_e_pendente_anterior(self):
-        for texto, invalido in [("x", False), ("x" * 500, False), ("", True), ("   ", True), ("x" * 501, True)]:
-            status, resposta = asyncio.run(self._request("POST", "/api/avaliacoes", {**self._payload, "comentario": texto}, token=self.token))
+        for texto, invalido in [
+            ("x", False),
+            ("x" * 500, False),
+            ("", True),
+            ("   ", True),
+            ("x" * 501, True),
+        ]:
+            status, resposta = asyncio.run(
+                self._request(
+                    "POST",
+                    "/api/avaliacoes",
+                    {**self._payload, "comentario": texto},
+                    token=self.token,
+                )
+            )
             self.assertEqual(status, 200)
             self.assertEqual(bool(resposta["comentario_erro"]), invalido)
             self.assertEqual(self.db.scalar(select(func.count()).select_from(Avaliacao)), 1)
-            pendente = self.db.scalar(select(ComentarioVersao).where(ComentarioVersao.estado == EstadoComentario.PENDENTE))
+            pendente = self.db.scalar(
+                select(ComentarioVersao).where(ComentarioVersao.estado == EstadoComentario.PENDENTE)
+            )
             self.assertEqual(pendente.texto, "x" * (500 if invalido else len(texto)))
 
     def test_filtro_contexto_mantem_autoria_e_rejeita_uuid_invalido(self):
@@ -352,20 +357,38 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         outra = Disciplina(codigo="OUTRA", nome="Outra", departamento="CIC")
         self.db.add(outra)
         self.db.flush()
-        avaliacao = Avaliacao(usuario_id=self.usuario.id, professor_id=self.professor.id,
-                              disciplina_id=outra.id, didatica=4, dificuldade="MEDIO", chamada=True,
-                              disponibiliza_material=False, qualidade_material=None, recomenda=True)
+        avaliacao = Avaliacao(
+            usuario_id=self.usuario.id,
+            professor_id=self.professor.id,
+            disciplina_id=outra.id,
+            didatica=4,
+            dificuldade="MEDIO",
+            chamada=True,
+            disponibiliza_material=False,
+            qualidade_material=None,
+            recomenda=True,
+        )
         self.db.add(avaliacao)
         self.db.flush()
-        self.db.add(ComentarioVersao(avaliacao_id=avaliacao.id, texto="outro contexto", estado=EstadoComentario.PENDENTE))
+        self.db.add(
+            ComentarioVersao(
+                avaliacao_id=avaliacao.id, texto="outro contexto", estado=EstadoComentario.PENDENTE
+            )
+        )
         self.db.commit()
         query = f"?professor_id={self.professor.id}&disciplina_id={self.disciplina.id}"
-        status, resposta = asyncio.run(self._request("GET", "/api/comentarios/meu" + query, token=self.token))
+        status, resposta = asyncio.run(
+            self._request("GET", "/api/comentarios/meu" + query, token=self.token)
+        )
         self.assertEqual(status, 200)
         self.assertEqual([v["texto"] for v in resposta], ["meu texto"])
-        status, resposta = asyncio.run(self._request("GET", "/api/comentarios/meu", token=self.token))
+        status, resposta = asyncio.run(
+            self._request("GET", "/api/comentarios/meu", token=self.token)
+        )
         self.assertEqual(len(resposta), 2)
-        status, _ = asyncio.run(self._request("GET", "/api/comentarios/meu?professor_id=invalido", token=self.token))
+        status, _ = asyncio.run(
+            self._request("GET", "/api/comentarios/meu?professor_id=invalido", token=self.token)
+        )
         self.assertEqual(status, 422)
 
     def test_ac20_04_autor_nao_ve_comentarios_de_outros(self) -> None:
@@ -385,17 +408,13 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         self.assertEqual(resposta[0]["texto"], "comentario de maria")
 
     def test_ac20_04_exige_sessao_valida(self) -> None:
-        status_code, resposta = asyncio.run(
-            self._request("GET", "/api/comentarios/meu")
-        )
+        status_code, resposta = asyncio.run(self._request("GET", "/api/comentarios/meu"))
         self.assertEqual(status_code, 401)
         self.assertIn("Sessão", resposta["detail"])
 
     def test_ac20_04_bloqueia_email_nao_confirmado(self) -> None:
         status_code, resposta = asyncio.run(
-            self._request(
-                "GET", "/api/comentarios/meu", token=self.token_nao_confirmado
-            )
+            self._request("GET", "/api/comentarios/meu", token=self.token_nao_confirmado)
         )
         self.assertEqual(status_code, 403)
         self.assertIn("Confirme seu e-mail", resposta["detail"])
@@ -428,24 +447,36 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
             self.usuario, "texto suspenso", EstadoComentario.SUSPENSO
         )
         comentario_id = self._obter_comentario(avaliacao.id).id
-        criterios = (avaliacao.didatica, avaliacao.dificuldade, avaliacao.chamada,
-                     avaliacao.disponibiliza_material, avaliacao.qualidade_material,
-                     avaliacao.recomenda)
+        criterios = (
+            avaliacao.didatica,
+            avaliacao.dificuldade,
+            avaliacao.chamada,
+            avaliacao.disponibiliza_material,
+            avaliacao.qualidade_material,
+            avaliacao.recomenda,
+        )
 
         status_code, resposta = asyncio.run(
-            self._request(
-                "PATCH", f"/api/comentarios/{comentario_id}/retirar", token=self.token
-            )
+            self._request("PATCH", f"/api/comentarios/{comentario_id}/retirar", token=self.token)
         )
 
         self.assertEqual(status_code, 200)
         self.assertEqual(resposta["estado"], "RETIRADO")
         self.db.expire_all()
-        self.assertEqual(self.db.get(ComentarioVersao, comentario_id).estado,
-                         EstadoComentario.RETIRADO)
-        self.assertEqual((avaliacao.didatica, avaliacao.dificuldade, avaliacao.chamada,
-                          avaliacao.disponibiliza_material, avaliacao.qualidade_material,
-                          avaliacao.recomenda), criterios)
+        self.assertEqual(
+            self.db.get(ComentarioVersao, comentario_id).estado, EstadoComentario.RETIRADO
+        )
+        self.assertEqual(
+            (
+                avaliacao.didatica,
+                avaliacao.dificuldade,
+                avaliacao.chamada,
+                avaliacao.disponibiliza_material,
+                avaliacao.qualidade_material,
+                avaliacao.recomenda,
+            ),
+            criterios,
+        )
 
     def test_ac20_05_retirada_de_suspenso_cancela_substituto_pendente(self) -> None:
         self._verificar_retirada_cancela_substituto(EstadoComentario.SUSPENSO)
@@ -454,9 +485,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         self._verificar_retirada_cancela_substituto(EstadoComentario.PUBLICADO)
 
     def _verificar_retirada_cancela_substituto(self, estado: EstadoComentario) -> None:
-        avaliacao = self._criar_avaliacao_com_comentario(
-            self.usuario, "texto anterior", estado
-        )
+        avaliacao = self._criar_avaliacao_com_comentario(self.usuario, "texto anterior", estado)
         self.db.expire_all()
         publicado = self._obter_comentario(avaliacao.id)
 
@@ -502,9 +531,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         comentario = self._obter_comentario(avaliacao.id)
 
         status_code, resposta = asyncio.run(
-            self._request(
-                "PATCH", f"/api/comentarios/{comentario.id}/retirar"
-            )
+            self._request("PATCH", f"/api/comentarios/{comentario.id}/retirar")
         )
         self.assertEqual(status_code, 401)
         self.assertIn("Sessão", resposta["detail"])

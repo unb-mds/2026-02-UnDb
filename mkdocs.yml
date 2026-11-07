@@ -41,6 +41,9 @@ nav:
       - Board no Figma: figma.md
   - Arquitetura:
       - Visão e decisões: arquitetura.md
+      - ADRs — catálogo e manutenção: adrs/index.md
+      - Template de ADR: adrs/template.md
+      - ADR 09 — estratégia de qualidade: adrs/09-estrategia-qualidade.md
       - Modelos de dados: modelos.md
       - Importação do SIGAA: importacao-sigaa.md
       - Operação do SIGAA: operacao-importacao-sigaa.md
@@ -48,6 +51,7 @@ nav:
       - Release 1.0.0: releases/1.0.0.md
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
   - Estudos:
+      - Lint e tipos — Issue 189: estudos/verificacao-lint-tipos-issue-189.md
       - Denúncia e agradecimentos: estudos/denuncia-agradecimentos-issue-193.md
       - Fila de moderação: estudos/fila-moderacao-issue-162.md
       - Cobertura de testes — Issue 190: estudos/cobertura-testes-issue-190.md

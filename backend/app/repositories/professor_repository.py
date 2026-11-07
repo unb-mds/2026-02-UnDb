@@ -10,9 +10,7 @@ from app.models.turma import Turma, turmas_professores
 
 
 def get_by_identidade_origem(db: Session, identidade: str) -> Professor | None:
-    return db.scalar(
-        select(Professor).where(Professor.identidade_origem == identidade)
-    )
+    return db.scalar(select(Professor).where(Professor.identidade_origem == identidade))
 
 
 def get_or_create_provisorio(

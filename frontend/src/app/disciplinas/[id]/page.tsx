@@ -9,7 +9,7 @@ import {
 } from "@/lib/services/disciplinas";
 import { ApiError } from "@/lib/services/http-error";
 import CriteriosAgregados from "@/components/criterios-agregados";
-import EtapasJornada from "@/components/etapas-jornada";
+import Caminho from "@/components/caminho";
 
 export default async function DetalheDisciplinaPage({
   params,
@@ -37,7 +37,7 @@ export default async function DetalheDisciplinaPage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
-      <EtapasJornada atual={2} />
+      <Caminho itens={[{ nome: "Início", href: "/" }, { nome: "Disciplinas", href: contexto ? urlBusca(contexto) : "/disciplinas", retornoBusca: !!contexto }, { nome: disciplina.nome }]} />
       <Link href={contexto ? urlBusca(contexto) : "/disciplinas"} className="self-start text-sm text-accent underline underline-offset-4">
         {contexto ? "← Voltar aos resultados da busca" : "← Buscar outra disciplina"}
       </Link>
