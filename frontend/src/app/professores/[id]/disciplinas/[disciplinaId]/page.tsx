@@ -6,7 +6,7 @@ import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
 import { listarComentariosPublicados } from "@/lib/services/comentarios";
 import { ApiError } from "@/lib/services/http-error";
 import CriteriosAgregados from "@/components/criterios-agregados";
-import EtapasJornada from "@/components/etapas-jornada";
+import Caminho from "@/components/caminho";
 import SecaoComentarios from "@/components/secao-comentarios";
 
 const MIN_AVALIACOES_EXIBICAO = 3;
@@ -31,7 +31,7 @@ export default async function AvaliacaoAgregadaPage({
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
-      <EtapasJornada atual={2} />
+      <Caminho itens={[{ nome: "Início", href: "/" }, ...(contexto ? [{ nome: "Resultados", href: urlBusca(contexto), retornoBusca: true }] : []), { nome: avaliacao.professor.nome, href: comContextoBusca(`/professores/${id}`, contexto) }, { nome: avaliacao.disciplina.nome }]} />
       {contexto && <Link href={urlBusca(contexto)} className="text-sm text-accent underline underline-offset-4">← Voltar aos resultados da busca</Link>}
       <Link href={comContextoBusca(`/professores/${id}`, contexto)} className="self-start text-sm text-accent underline underline-offset-4">
         ← Voltar para {avaliacao.professor.nome}

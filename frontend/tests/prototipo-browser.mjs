@@ -38,9 +38,8 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "light" }] });
     await cdp("Page.navigate", { url: "http://localhost:3100" });
     await aguardarTexto("Encontre professores e disciplinas");
-    await avaliar("document.querySelector('main details summary').click()");
-    await aguardarTexto("Experimentar o protótipo");
-    await clicar("Experimentar o protótipo");
+    assert.equal(await avaliar("document.querySelector('main a[href=\"/prototipo\"]') === null"), true, "A referência antiga não integra a jornada funcional da #202");
+    await navegar("", "Protótipo navegável");
     await aguardarTexto("Protótipo navegável");
     await aguardarTexto("Encontre professores e disciplinas");
     await capturar("01-entrada");

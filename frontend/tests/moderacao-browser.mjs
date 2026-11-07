@@ -175,8 +175,8 @@ try {
     }
     for (const [i, acao] of [[1, "APROVAR"], [1, "REJEITAR"], [2, "MANTER"], [2, "REMOVER"], [3, "RESTAURAR"], [3, "REMOVER"]]) {
       reiniciar(); await clicar("Atualizar fila"); await esperarTexto("Selecione um comentário"); await selecionar(uuid(i));
-      assert.equal(await avaliar("document.querySelector('button[type=submit]').disabled"), true);
-      await preencher(acao, "   "); assert.equal(await avaliar("document.querySelector('button[type=submit]').disabled"), true);
+      assert.equal(await avaliar("document.querySelector('main button[type=submit]').disabled"), true);
+      await preencher(acao, "   "); assert.equal(await avaliar("document.querySelector('main button[type=submit]').disabled"), true);
       await preencher(acao); await clicar("Confirmar decisão"); await esperarTexto("Decisão registrada");
       await esperarTexto("Selecione um comentário");
       assert.ok(!await avaliar(`Array.from(document.querySelectorAll('[aria-label="Comentários na fila"] button')).some(b=>b.textContent.includes(${JSON.stringify(uuid(i))}))`));
