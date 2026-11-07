@@ -5,9 +5,7 @@ from app.models.unidade import Unidade
 
 
 def get_by_fonte_codigo(db: Session, fonte: str, codigo: str) -> Unidade | None:
-    return db.scalar(
-        select(Unidade).where(Unidade.fonte == fonte, Unidade.codigo == codigo)
-    )
+    return db.scalar(select(Unidade).where(Unidade.fonte == fonte, Unidade.codigo == codigo))
 
 
 def get_by_fonte_identificador_externo(

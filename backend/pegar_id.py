@@ -2,7 +2,9 @@
 
 import sys
 
-from app.scrapers.sigaa_poc import listar_unidades, listar_unidades_reais
+# Exportação pública preservada para os consumidores do parser do SIGAA.
+from app.scrapers.sigaa_poc import listar_unidades as listar_unidades
+from app.scrapers.sigaa_poc import listar_unidades_reais
 
 
 def main() -> None:

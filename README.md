@@ -192,6 +192,12 @@ estão no [ADR 08](docs/arquitetura.md#adr-08--execução-e-containerização-do
 
 ### Verificações automatizadas
 
+Lint e formatação Python usam Ruff, fixado em `backend/requirements-dev.txt`, sobre
+aplicação, testes, migrações e scripts. O frontend preserva ESLint e oferece
+`npm run typecheck` (`next typegen && tsc --noEmit`) sem depender de build anterior.
+Instalação, comandos de verificação/correção e escopo estão no
+[guia de contribuição](CONTRIBUTING.md#verificações-de-qualidade-locais).
+
 O check `Backend` executa os testes determinísticos com `python -m unittest discover -s tests -v`,
 valida aplicação e migrações em um PostgreSQL 16 descartável de CI, compara o schema com os modelos
 e testa downgrade/upgrade. Também constrói a imagem e verifica a presença das migrações Alembic.

@@ -17,9 +17,7 @@ from app.services.sigaa_import_service import (
 )
 
 
-def _oferta(
-    *docentes: str, turma: str = "01", componente_id: str = "123"
-) -> Oferta:
+def _oferta(*docentes: str, turma: str = "01", componente_id: str = "123") -> Oferta:
     return Oferta(
         componente_codigo="CIC0001",
         componente_nome="INTRODUCAO A CIENCIA DA COMPUTACAO",
@@ -43,9 +41,7 @@ class SigaaImportServiceTest(unittest.TestCase):
         with Session(self.engine) as db:
             sem_docente = salvar_oferta(db, _oferta(turma="01"), "CIC")
             um_docente = salvar_oferta(db, _oferta("DOCENTE UM", turma="02"), "CIC")
-            varios = salvar_oferta(
-                db, _oferta("DOCENTE UM", "DOCENTE DOIS", turma="03"), "CIC"
-            )
+            varios = salvar_oferta(db, _oferta("DOCENTE UM", "DOCENTE DOIS", turma="03"), "CIC")
             db.commit()
             self.assertEqual(len(sem_docente.professores), 0)
             self.assertEqual(len(um_docente.professores), 1)
@@ -163,13 +159,20 @@ class ExecucaoImportacaoTest(unittest.TestCase):
     def test_coleta_completa_inativa_ausentes(self) -> None:
         with Session(self.engine) as db:
             executar_importacao(
-                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                db,
+                [DepartamentoImportacao("CIC", "CIC")],
+                "2026",
+                "2",
                 coletor=lambda *_: (
-                    [_oferta("DOCENTE", turma="01"), _oferta("DOCENTE", turma="02")], 2
+                    [_oferta("DOCENTE", turma="01"), _oferta("DOCENTE", turma="02")],
+                    2,
                 ),
             )
             executar_importacao(
-                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                db,
+                [DepartamentoImportacao("CIC", "CIC")],
+                "2026",
+                "2",
                 coletor=lambda *_: ([_oferta("DOCENTE", turma="01")], 1),
             )
             turmas = list(db.scalars(select(Turma).order_by(Turma.codigo)).all())
@@ -178,10 +181,11 @@ class ExecucaoImportacaoTest(unittest.TestCase):
     def test_linhas_da_mesma_turma_unem_docentes_sem_preservar_obsoletos(self) -> None:
         with Session(self.engine) as db:
             primeira = executar_importacao(
-                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
-                coletor=lambda *_: (
-                    [_oferta("DOCENTE UM"), _oferta("DOCENTE DOIS")], 2
-                ),
+                db,
+                [DepartamentoImportacao("CIC", "CIC")],
+                "2026",
+                "2",
+                coletor=lambda *_: ([_oferta("DOCENTE UM"), _oferta("DOCENTE DOIS")], 2),
             )
             turma = db.scalar(select(Turma))
             self.assertTrue(primeira.sucesso)
@@ -190,7 +194,10 @@ class ExecucaoImportacaoTest(unittest.TestCase):
             self.assertEqual({p.nome for p in turma.professores}, {"DOCENTE UM", "DOCENTE DOIS"})
 
             segunda = executar_importacao(
-                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                db,
+                [DepartamentoImportacao("CIC", "CIC")],
+                "2026",
+                "2",
                 coletor=lambda *_: ([_oferta("DOCENTE TRES")], 1),
             )
             self.assertTrue(segunda.sucesso)
@@ -200,13 +207,20 @@ class ExecucaoImportacaoTest(unittest.TestCase):
     def test_coleta_parcial_nunca_inativa_ausentes(self) -> None:
         with Session(self.engine) as db:
             executar_importacao(
-                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                db,
+                [DepartamentoImportacao("CIC", "CIC")],
+                "2026",
+                "2",
                 coletor=lambda *_: (
-                    [_oferta("DOCENTE", turma="01"), _oferta("DOCENTE", turma="02")], 2
+                    [_oferta("DOCENTE", turma="01"), _oferta("DOCENTE", turma="02")],
+                    2,
                 ),
             )
             resultado = executar_importacao(
-                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                db,
+                [DepartamentoImportacao("CIC", "CIC")],
+                "2026",
+                "2",
                 coletor=lambda *_: ([_oferta("DOCENTE", turma="01")], 2),
             )
             self.assertEqual(resultado.departamentos[0].estado, "parcial")
@@ -215,7 +229,10 @@ class ExecucaoImportacaoTest(unittest.TestCase):
     def test_resultado_e_serializavel_para_a_rotina_26(self) -> None:
         with Session(self.engine) as db:
             resultado = executar_importacao(
-                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                db,
+                [DepartamentoImportacao("CIC", "CIC")],
+                "2026",
+                "2",
                 coletor=lambda *_: ([], 0),
             ).to_dict()
         self.assertTrue(resultado["sucesso"])
@@ -224,7 +241,10 @@ class ExecucaoImportacaoTest(unittest.TestCase):
     def test_total_ausente_impede_sucesso_silencioso(self) -> None:
         with Session(self.engine) as db:
             resultado = executar_importacao(
-                db, [DepartamentoImportacao("CIC", "CIC")], "2026", "2",
+                db,
+                [DepartamentoImportacao("CIC", "CIC")],
+                "2026",
+                "2",
                 coletor=lambda *_: ([], None),
             )
         self.assertFalse(resultado.sucesso)

@@ -1,4 +1,5 @@
 """Operational role assignment, executed by the operator on the PO's instruction."""
+
 import argparse
 
 from app.core.database import SessionLocal

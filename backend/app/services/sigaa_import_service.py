@@ -32,9 +32,7 @@ class OfertaNaoPersistivelError(ValueError):
 FONTE_SIGAA = "SIGAA"
 
 
-def _identidade_provisoria(
-    oferta: Oferta, unidade: Unidade, nome: str
-) -> str:
+def _identidade_provisoria(oferta: Oferta, unidade: Unidade, nome: str) -> str:
     componente = oferta.componente_id or oferta.componente_codigo
     return ":".join(
         (
@@ -48,9 +46,7 @@ def _identidade_provisoria(
     )
 
 
-def _get_or_create_disciplina(
-    db: Session, oferta: Oferta, departamento: str
-) -> Disciplina:
+def _get_or_create_disciplina(db: Session, oferta: Oferta, departamento: str) -> Disciplina:
     disciplina = disciplina_repository.get_by_codigo(db, oferta.componente_codigo)
     if disciplina is None:
         disciplina = disciplina_repository.create(
@@ -214,9 +210,7 @@ def _rollback_seguro(db: Session) -> str | None:
 
 
 def _consolidar_ofertas(ofertas: list[Oferta]) -> list[tuple[Oferta, int]]:
-    agrupadas: dict[
-        tuple[str, str, str, str, str | None, str | None], tuple[Oferta, int]
-    ] = {}
+    agrupadas: dict[tuple[str, str, str, str, str | None, str | None], tuple[Oferta, int]] = {}
     for oferta in ofertas:
         identidade = (
             oferta.componente_codigo,
@@ -270,9 +264,7 @@ def _importar_departamento(
         )
 
     try:
-        ofertas, total_reportado = _coletar_com_tentativas(
-            coletor, unidade_sigaa, ano, periodo
-        )
+        ofertas, total_reportado = _coletar_com_tentativas(coletor, unidade_sigaa, ano, periodo)
     except Exception as erro:
         return ResultadoDepartamento(
             departamento=departamento,
@@ -306,8 +298,7 @@ def _importar_departamento(
 
     if total_reportado is None:
         erros.append(
-            "total de ofertas nao informado pelo SIGAA; "
-            "nao foi possivel validar a extracao"
+            "total de ofertas nao informado pelo SIGAA; nao foi possivel validar a extracao"
         )
     elif total_reportado != len(ofertas):
         erros.append(
@@ -317,9 +308,7 @@ def _importar_departamento(
 
     if not erros:
         try:
-            unidade = unidade_repository.get_by_fonte_codigo(
-                db, FONTE_SIGAA, departamento
-            )
+            unidade = unidade_repository.get_by_fonte_codigo(db, FONTE_SIGAA, departamento)
             if unidade is not None:
                 with db.begin_nested():
                     turma_repository.inativar_ausentes(
@@ -330,9 +319,7 @@ def _importar_departamento(
                         ids_observados,
                     )
         except Exception as erro:
-            erros.append(
-                "falha ao sincronizar ofertas ausentes: " + _mensagem_erro(erro)
-            )
+            erros.append("falha ao sincronizar ofertas ausentes: " + _mensagem_erro(erro))
 
     try:
         db.commit()
@@ -371,8 +358,7 @@ def executar_importacao(
 
     inicio = datetime.now(UTC)
     resultados = tuple(
-        _importar_departamento(db, item, ano, periodo, coletor)
-        for item in departamentos
+        _importar_departamento(db, item, ano, periodo, coletor) for item in departamentos
     )
     fim = datetime.now(UTC)
     return ResultadoImportacao(

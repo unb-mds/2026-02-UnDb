@@ -55,19 +55,13 @@ class ApiInstitucionalTest(unittest.TestCase):
         self.assertTrue(esperados <= set(caminhos))
 
     def test_busca_parcial_ignora_caixa_e_acentos(self) -> None:
-        professores = institucional_service.listar_professores(
-            self.db, "maria emilia"
-        )
-        disciplinas = institucional_service.listar_disciplinas(
-            self.db, nome="teoricos computacao"
-        )
+        professores = institucional_service.listar_professores(self.db, "maria emilia")
+        disciplinas = institucional_service.listar_disciplinas(self.db, nome="teoricos computacao")
         self.assertEqual(len(professores), 1)
         self.assertEqual(len(disciplinas), 1)
 
     def test_busca_sem_resultado_retorna_lista_vazia(self) -> None:
-        self.assertEqual(
-            institucional_service.listar_professores(self.db, "inexistente"), []
-        )
+        self.assertEqual(institucional_service.listar_professores(self.db, "inexistente"), [])
 
     def test_recurso_individual_inexistente_retorna_404(self) -> None:
         with self.assertRaises(HTTPException) as contexto:
@@ -77,12 +71,8 @@ class ApiInstitucionalTest(unittest.TestCase):
     def test_disponibiliza_relacoes_e_turmas(self) -> None:
         professor = institucional_service.listar_professores(self.db)[0]
         disciplina = institucional_service.listar_disciplinas(self.db)[0]
-        disciplinas = institucional_service.listar_disciplinas_do_professor(
-            self.db, professor.id
-        )
-        turmas = institucional_service.listar_turmas_da_disciplina(
-            self.db, disciplina.id
-        )
+        disciplinas = institucional_service.listar_disciplinas_do_professor(self.db, professor.id)
+        turmas = institucional_service.listar_turmas_da_disciplina(self.db, disciplina.id)
         self.assertEqual(disciplinas[0].codigo, "CIC0002")
         self.assertEqual(turmas[0].professores[0].nome, "MARIA EMÍLIA")
 

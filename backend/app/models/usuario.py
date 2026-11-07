@@ -25,7 +25,5 @@ class Usuario(Base):
     )
 
     avaliacoes = relationship("Avaliacao", back_populates="usuario")
-    tokens_confirmacao_email = relationship(
-        "TokenConfirmacaoEmail", back_populates="usuario"
-    )
+    tokens_confirmacao_email = relationship("TokenConfirmacaoEmail", back_populates="usuario")
     sessoes = relationship("SessaoUsuario", back_populates="usuario")

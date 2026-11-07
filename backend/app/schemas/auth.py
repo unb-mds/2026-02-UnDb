@@ -41,7 +41,9 @@ class CadastroRequest(BaseModel):
                 or re.search(r"[\x00-\x1f\x7f]", parametros.get("q", ""))
             )
         if invalido:
-            raise ValueError("return_to deve ser uma rota interna de avaliação com UUIDs válidos e contexto de busca permitido")
+            raise ValueError(
+                "return_to deve ser uma rota interna de avaliação com UUIDs válidos e contexto de busca permitido"
+            )
         return valor
 
     @field_validator("nome")

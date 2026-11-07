@@ -1,4 +1,5 @@
 """Discard expired moderation data. Keep --continuo running in the application environment."""
+
 import argparse
 import logging
 import time

@@ -12,8 +12,7 @@ def _departamento(argumento: str) -> DepartamentoImportacao:
     departamento, separador, unidade_sigaa = argumento.partition("=")
     if not separador or not departamento.strip() or not unidade_sigaa.strip():
         raise argparse.ArgumentTypeError(
-            "use CODIGO=ROTULO_SIGAA, por exemplo "
-            "CIC=DEPTO CIENCIAS DA COMPUTACAO"
+            "use CODIGO=ROTULO_SIGAA, por exemplo CIC=DEPTO CIENCIAS DA COMPUTACAO"
         )
     return DepartamentoImportacao(departamento.strip(), unidade_sigaa.strip())
 

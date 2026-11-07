@@ -24,6 +24,11 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
 
 - `npm run dev`: inicia o servidor de desenvolvimento.
 - `npm run lint`: executa o ESLint.
+- `npm run lint -- --fix`: aplica correções disponíveis do ESLint; revise o diff.
+- `npm run typecheck`: gera os tipos do Next.js com `next typegen` e executa
+  `tsc --noEmit` sobre o projeto estrito, sem build prévio nem emissão de JavaScript.
+  Tipos gerados e caches não devem ser versionados. Falhas de geração ou de tipos
+  fazem o comando falhar. Use `npm ci` para reproduzir as dependências do lockfile.
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
 - `npm test`: compila os módulos de formulário, busca e retorno com TypeScript em diretório temporário e

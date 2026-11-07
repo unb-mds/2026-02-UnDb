@@ -83,41 +83,47 @@ def seed() -> None:
 
 def verify_upgrade() -> None:
     assert _scalar("SELECT count(*) FROM usuarios WHERE id=:id", id=USUARIO_ID) == 1
-    assert _scalar(
-        "SELECT count(*) FROM avaliacoes WHERE id=:id", id=AVALIACAO_ID
-    ) == 1
-    assert _scalar(
-        "SELECT nome_normalizado FROM professores WHERE id=:id", id=PROFESSOR_ID
-    ) == "professora teste"
-    assert _scalar(
-        "SELECT nome_normalizado FROM disciplinas WHERE id=:id", id=DISCIPLINA_ID
-    ) == "fundamentos teoricos da computacao"
-    assert _scalar(
-        "SELECT count(*) FROM turmas_professores "
-        "WHERE turma_id=:turma_id AND professor_id=:professor_id",
-        turma_id=TURMA_ID,
-        professor_id=PROFESSOR_ID,
-    ) == 1
-    assert _scalar(
-        "SELECT count(*) FROM turmas t "
-        "JOIN unidades u ON u.id=t.unidade_id "
-        "WHERE t.id=:id AND t.fonte='SIGAA' AND t.codigo IS NOT NULL "
-        "AND t.ativa=true AND u.codigo='CIC'",
-        id=TURMA_ID,
-    ) == 1
+    assert _scalar("SELECT count(*) FROM avaliacoes WHERE id=:id", id=AVALIACAO_ID) == 1
+    assert (
+        _scalar("SELECT nome_normalizado FROM professores WHERE id=:id", id=PROFESSOR_ID)
+        == "professora teste"
+    )
+    assert (
+        _scalar("SELECT nome_normalizado FROM disciplinas WHERE id=:id", id=DISCIPLINA_ID)
+        == "fundamentos teoricos da computacao"
+    )
+    assert (
+        _scalar(
+            "SELECT count(*) FROM turmas_professores "
+            "WHERE turma_id=:turma_id AND professor_id=:professor_id",
+            turma_id=TURMA_ID,
+            professor_id=PROFESSOR_ID,
+        )
+        == 1
+    )
+    assert (
+        _scalar(
+            "SELECT count(*) FROM turmas t "
+            "JOIN unidades u ON u.id=t.unidade_id "
+            "WHERE t.id=:id AND t.fonte='SIGAA' AND t.codigo IS NOT NULL "
+            "AND t.ativa=true AND u.codigo='CIC'",
+            id=TURMA_ID,
+        )
+        == 1
+    )
 
 
 def verify_downgrade() -> None:
     assert _scalar("SELECT count(*) FROM usuarios WHERE id=:id", id=USUARIO_ID) == 1
-    assert _scalar(
-        "SELECT count(*) FROM avaliacoes WHERE id=:id", id=AVALIACAO_ID
-    ) == 1
-    assert _scalar(
-        "SELECT count(*) FROM turmas "
-        "WHERE id=:id AND professor_id=:professor_id",
-        id=TURMA_ID,
-        professor_id=PROFESSOR_ID,
-    ) == 1
+    assert _scalar("SELECT count(*) FROM avaliacoes WHERE id=:id", id=AVALIACAO_ID) == 1
+    assert (
+        _scalar(
+            "SELECT count(*) FROM turmas WHERE id=:id AND professor_id=:professor_id",
+            id=TURMA_ID,
+            professor_id=PROFESSOR_ID,
+        )
+        == 1
+    )
 
 
 def main() -> None:

@@ -70,9 +70,7 @@ def agregar_avaliacoes(avaliacoes: list[AvaliacaoParaAgregacao]) -> ResultadoAgr
         [avaliacao.disponibiliza_material for avaliacao in avaliacoes]
     )
     qualidades = [
-        avaliacao.qualidade_material
-        for avaliacao in avaliacoes
-        if avaliacao.disponibiliza_material
+        avaliacao.qualidade_material for avaliacao in avaliacoes if avaliacao.disponibiliza_material
     ]
     if any(qualidade is None for qualidade in qualidades):
         raise ValueError("avaliacao com material deve informar sua qualidade")
@@ -89,7 +87,9 @@ def agregar_avaliacoes(avaliacoes: list[AvaliacaoParaAgregacao]) -> ResultadoAgr
         )
 
     total = len(avaliacoes)
-    media_didatica = (sum(avaliacao.didatica for avaliacao in avaliacoes) / Decimal(total)).quantize(
+    media_didatica = (
+        sum(avaliacao.didatica for avaliacao in avaliacoes) / Decimal(total)
+    ).quantize(
         Decimal("0.1"),
         rounding=ROUND_HALF_UP,
     )
