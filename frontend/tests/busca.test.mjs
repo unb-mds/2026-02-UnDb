@@ -6,6 +6,8 @@ const carregar = (arquivo) => import(pathToFileURL(join(process.env.AVALIACAO_TE
 const { lerContextoBusca, comContextoBusca, urlBusca, ordenarResultados } = await carregar("contexto-busca.js");
 const { buscarDisciplinas } = await carregar("services/disciplinas.js");
 const { listarProfessores } = await carregar("services/professores.js");
+const { listarDisciplinas } = await carregar("services/disciplinas.js");
+const { unidadesDoCatalogo, urlUnidade } = await carregar("catalogo.js");
 const { retornoAvaliacaoSeguro } = await carregar("retorno-avaliacao.js");
 
 test("retorno autenticado permite apenas rota da avaliação e contexto autorizado, até 2048 caracteres", () => {
@@ -94,4 +96,32 @@ test("professores usam contrato público existente, sem filtros por unidade nem 
     return Response.json([]);
   });
   assert.deepEqual(await listarProfessores("Ána"), []);
+});
+
+test("catálogo usa a listagem pública completa e preserva disciplinas de unidades distintas", async (t) => {
+  t.mock.method(globalThis, "fetch", async (url) => {
+    assert.equal(new URL(url).pathname, "/api/disciplinas");
+    assert.equal(new URL(url).search, "");
+    return Response.json([
+      { id: "1", nome: "Cálculo", codigo: "MAT01", departamento: "Matemática", creditos: null, identificador_externo: null },
+      { id: "2", nome: "Cálculo", codigo: "ENG01", departamento: "Engenharia", creditos: 4, identificador_externo: "sigaa:2" },
+    ]);
+  });
+  const disciplinas = await listarDisciplinas();
+  assert.deepEqual(disciplinas.map((d) => d.id), ["1", "2"]);
+  assert.equal(disciplinas[1].identificadorExterno, "sigaa:2");
+  assert.deepEqual(unidadesDoCatalogo(disciplinas), ["Engenharia", "Matemática"]);
+});
+
+test("unidades vêm apenas do catálogo, sem unir nomes parecidos e com URL reversível", () => {
+  const nomes = ["Matemática", "CIC · Computação", "CIC · Computação", "CIC", "Álgebra & Análise + Ensino"];
+  const disciplinas = nomes.map((departamento, i) => ({ id: String(i), nome: "Disciplina", departamento }));
+  assert.deepEqual(unidadesDoCatalogo(disciplinas), ["Álgebra & Análise + Ensino", "CIC", "CIC · Computação", "Matemática"]);
+  assert.deepEqual(unidadesDoCatalogo([]), []);
+  for (const nome of nomes) {
+    const url = new URL(urlUnidade(nome), "http://local");
+    assert.equal(url.pathname, "/departamentos");
+    assert.equal(url.searchParams.get("unidade"), nome);
+  }
+  assert.deepEqual(disciplinas.map((d) => d.departamento), nomes);
 });
