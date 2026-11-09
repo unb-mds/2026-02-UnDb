@@ -8,6 +8,8 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 
 ## Documentação do produto
 
+- [Release 1.1.0 — candidata e instruções de atualização](docs/releases/1.1.0.md)
+
 - [Documento de visão](docs/visao.md)
 - [Engenharia de requisitos](docs/requisitos.md)
 - [Site de documentação](https://unb-mds.github.io/2026-02-UnDb/)
