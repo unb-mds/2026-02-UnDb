@@ -51,6 +51,7 @@ class Avaliacao(Base):
     usuario = relationship("Usuario", back_populates="avaliacoes")
     professor = relationship("Professor", back_populates="avaliacoes")
     disciplina = relationship("Disciplina", back_populates="avaliacoes")
+    comentarios = relationship("ComentarioVersao", back_populates="avaliacao")
 
     __table_args__ = (
         CheckConstraint("didatica BETWEEN 1 AND 5", name="ck_avaliacao_didatica"),

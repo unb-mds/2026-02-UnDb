@@ -23,8 +23,9 @@ from app.core.database import get_db
 from app.core.security import gerar_hash_token
 from app.main import app
 from app.models.avaliacao import Avaliacao
+from app.models.comentario_versao import ComentarioVersao
 from app.models.disciplina import Disciplina
-from app.models.enums import Dificuldade, QualidadeMaterial
+from app.models.enums import Dificuldade, EstadoComentario, QualidadeMaterial
 from app.models.professor import Professor
 from app.models.sessao_usuario import SessaoUsuario
 from app.models.turma import Turma
@@ -109,16 +110,58 @@ class AvaliacaoSchemaTest(unittest.TestCase):
         )
 
         for payload in casos_invalidos:
-            with self.subTest(payload=payload), self.assertRaisesRegex(
-                ValidationError,
-                "qualidade_material e obrigatoria",
+            with (
+                self.subTest(payload=payload),
+                self.assertRaisesRegex(
+                    ValidationError,
+                    "qualidade_material e obrigatoria",
+                ),
             ):
                 AvaliacaoCreate.model_validate(payload)
 
-    def test_rejeita_campos_fora_do_formulario_da_release_1(self) -> None:
-        for campo in ("comentario", "nota_geral", "usuario_id", "created_at"):
+    def test_rejeita_campos_fora_do_formulario(self) -> None:
+        for campo in ("nota_geral", "usuario_id", "created_at", "comentario_erro"):
             with self.subTest(campo=campo), self.assertRaises(ValidationError):
                 AvaliacaoCreate.model_validate({**self.payload, campo: "nao permitido"})
+
+    def test_aceita_comentario_valido(self) -> None:
+        avaliacao = AvaliacaoCreate.model_validate(
+            {**self.payload, "comentario": "Excelente professor!"}
+        )
+        self.assertEqual(avaliacao.comentario, "Excelente professor!")
+        self.assertIsNone(avaliacao.comentario_erro)
+
+    def test_comentario_e_opcional(self) -> None:
+        avaliacao = AvaliacaoCreate.model_validate(self.payload)
+        self.assertIsNone(avaliacao.comentario)
+        self.assertIsNone(avaliacao.comentario_erro)
+
+    def test_aceita_limites_do_comentario_apos_normalizar(self) -> None:
+        for tamanho in (1, 500):
+            with self.subTest(tamanho=tamanho):
+                avaliacao = AvaliacaoCreate.model_validate(
+                    {**self.payload, "comentario": "  " + "x" * tamanho + "  "}
+                )
+                self.assertEqual(avaliacao.comentario, "x" * tamanho)
+                self.assertIsNone(avaliacao.comentario_erro)
+                self.assertNotIn("comentario_erro", avaliacao.model_dump())
+
+    def test_ignora_comentario_vazio(self) -> None:
+        for texto in ("", "   ", "\t\n"):
+            with self.subTest(texto=texto):
+                avaliacao = AvaliacaoCreate.model_validate({**self.payload, "comentario": texto})
+                self.assertIsNone(avaliacao.comentario)
+                self.assertIn("1 e 500", avaliacao.comentario_erro)
+
+    def test_ignora_comentario_com_mais_de_500_caracteres(self) -> None:
+        texto_501 = "x" * 501
+        avaliacao = AvaliacaoCreate.model_validate({**self.payload, "comentario": texto_501})
+        self.assertIsNone(avaliacao.comentario)
+        self.assertIn("1 e 500", avaliacao.comentario_erro)
+
+    def test_normaliza_comentario_removendo_espacos_extremos(self) -> None:
+        avaliacao = AvaliacaoCreate.model_validate({**self.payload, "comentario": "  otimo  "})
+        self.assertEqual(avaliacao.comentario, "otimo")
 
 
 class AvaliacaoModelTest(unittest.TestCase):
@@ -220,13 +263,15 @@ class RegistroAvaliacaoTest(unittest.TestCase):
         self.unidade = Unidade(codigo="CIC", nome="CIC")
         self.db.add_all((self.usuario, self.professor, self.disciplina, self.unidade))
         self.db.flush()
-        self.db.add(Turma(
-            disciplina=self.disciplina,
-            unidade=self.unidade,
-            codigo="01",
-            semestre="2026.2",
-            professores=[self.professor],
-        ))
+        self.db.add(
+            Turma(
+                disciplina=self.disciplina,
+                unidade=self.unidade,
+                codigo="01",
+                semestre="2026.2",
+                professores=[self.professor],
+            )
+        )
         self.db.commit()
         self.dados = AvaliacaoCreate(
             professor_id=self.professor.id,
@@ -307,21 +352,19 @@ class RegistroAvaliacaoTest(unittest.TestCase):
             departamento="CIC",
         )
         self.db.add_all((outro_usuario, outra_disciplina))
-        self.db.add(Turma(
-            disciplina=outra_disciplina,
-            unidade=self.unidade,
-            codigo="01",
-            semestre="2026.2",
-            professores=[self.professor],
-        ))
+        self.db.add(
+            Turma(
+                disciplina=outra_disciplina,
+                unidade=self.unidade,
+                codigo="01",
+                semestre="2026.2",
+                professores=[self.professor],
+            )
+        )
         self.db.commit()
 
-        primeira = avaliacao_service.registrar_avaliacao(
-            self.db, self.usuario, self.dados
-        )
-        segundo_usuario = avaliacao_service.registrar_avaliacao(
-            self.db, outro_usuario, self.dados
-        )
+        primeira = avaliacao_service.registrar_avaliacao(self.db, self.usuario, self.dados)
+        segundo_usuario = avaliacao_service.registrar_avaliacao(self.db, outro_usuario, self.dados)
         outro_par = avaliacao_service.registrar_avaliacao(
             self.db,
             self.usuario,
@@ -352,9 +395,12 @@ class RegistroAvaliacaoTest(unittest.TestCase):
             ("disciplina", self.dados.model_copy(update={"disciplina_id": uuid4()})),
         )
         for recurso, dados in casos:
-            with self.subTest(recurso=recurso), self.assertRaisesRegex(
-                avaliacao_service.RecursoNaoEncontradoError,
-                recurso,
+            with (
+                self.subTest(recurso=recurso),
+                self.assertRaisesRegex(
+                    avaliacao_service.RecursoNaoEncontradoError,
+                    recurso,
+                ),
             ):
                 avaliacao_service.registrar_avaliacao(self.db, self.usuario, dados)
 
@@ -366,9 +412,7 @@ class RegistroAvaliacaoTest(unittest.TestCase):
         self.db.add(outro_professor)
         self.db.commit()
 
-        with self.assertRaisesRegex(
-            avaliacao_service.RecursoNaoEncontradoError, "vinculo"
-        ):
+        with self.assertRaisesRegex(avaliacao_service.RecursoNaoEncontradoError, "vinculo"):
             avaliacao_service.registrar_avaliacao(
                 self.db,
                 self.usuario,
@@ -397,9 +441,7 @@ class RegistroAvaliacaoTest(unittest.TestCase):
             {dependencia.call.__name__ for dependencia in rota.dependant.dependencies},
         )
         self.assertEqual(
-            operacoes["post"]["responses"]["200"]["content"]["application/json"][
-                "schema"
-            ]["$ref"],
+            operacoes["post"]["responses"]["200"]["content"]["application/json"]["schema"]["$ref"],
             "#/components/schemas/AvaliacaoResponse",
         )
 
@@ -442,13 +484,15 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
             )
         )
         self.db.flush()
-        self.db.add(Turma(
-            disciplina=self.disciplina,
-            unidade=self.unidade,
-            codigo="01",
-            semestre="2026.2",
-            professores=[self.professor],
-        ))
+        self.db.add(
+            Turma(
+                disciplina=self.disciplina,
+                unidade=self.unidade,
+                codigo="01",
+                semestre="2026.2",
+                professores=[self.professor],
+            )
+        )
         self.token_confirmado = "token-confirmado"
         self.token_nao_confirmado = "token-nao-confirmado"
         expiracao = datetime.now(timezone.utc) + timedelta(days=1)
@@ -500,9 +544,7 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
             (b"content-length", str(len(corpo)).encode("ascii")),
         ]
         if token is not None:
-            headers.append(
-                (b"cookie", f"{SESSION_COOKIE_NAME}={token}".encode("ascii"))
-            )
+            headers.append((b"cookie", f"{SESSION_COOKIE_NAME}={token}".encode("ascii")))
 
         recebido = False
 
@@ -538,9 +580,7 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
             send,
         )
         inicio = next(
-            mensagem
-            for mensagem in mensagens
-            if mensagem["type"] == "http.response.start"
+            mensagem for mensagem in mensagens if mensagem["type"] == "http.response.start"
         )
         resposta = b"".join(
             mensagem.get("body", b"")
@@ -560,9 +600,7 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
         self.assertEqual(quantidade, 0)
 
     def test_http_bloqueia_email_nao_confirmado(self) -> None:
-        status_code, resposta = asyncio.run(
-            self._request(self.payload, self.token_nao_confirmado)
-        )
+        status_code, resposta = asyncio.run(self._request(self.payload, self.token_nao_confirmado))
 
         self.assertEqual(status_code, 403)
         self.assertIn("Confirme seu e-mail", resposta["detail"])
@@ -570,9 +608,7 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
         self.assertEqual(quantidade, 0)
 
     def test_http_persiste_usuario_confirmado_e_retorna_schema(self) -> None:
-        status_code, resposta = asyncio.run(
-            self._request(self.payload, self.token_confirmado)
-        )
+        status_code, resposta = asyncio.run(self._request(self.payload, self.token_confirmado))
 
         self.db.expire_all()
         registro = self.db.scalar(select(Avaliacao))
@@ -580,6 +616,7 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
         self.assertEqual(registro.usuario_id, self.usuario_confirmado.id)
         self.assertEqual(resposta["id"], str(registro.id))
         self.assertNotIn("usuario_id", resposta)
+        self.assertIsNone(resposta["comentario_erro"])
 
     def test_http_rejeita_professor_sem_vinculo(self) -> None:
         outro_professor = Professor(nome="Professor sem vínculo", departamento="CIC")
@@ -630,17 +667,131 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
         self.assertEqual(substituida.didatica, 1)
         self.assertNotEqual(substituida.updated_at, instante_antigo)
 
-    def test_http_rejeita_comentario_sem_persistir(self) -> None:
-        status_code, _ = asyncio.run(
+    def test_http_aceita_comentario_valido_e_persiste_avaliacao_e_pendente(self) -> None:
+        status_code, resposta = asyncio.run(
             self._request(
-                {**self.payload, "comentario": "campo livre proibido"},
+                {**self.payload, "comentario": "excelente professor!"},
                 self.token_confirmado,
             )
         )
 
-        self.assertEqual(status_code, 422)
-        quantidade = self.db.scalar(select(func.count()).select_from(Avaliacao))
+        self.assertEqual(status_code, 200)
+        self.assertIsNone(resposta["comentario_erro"])
+        self.db.expire_all()
+        avaliacao = self.db.scalar(select(Avaliacao))
+        comentario = self.db.scalar(select(ComentarioVersao))
+        self.assertIsNotNone(avaliacao)
+        self.assertIsNotNone(comentario)
+        self.assertEqual(comentario.avaliacao_id, avaliacao.id)
+        self.assertEqual(comentario.estado, EstadoComentario.PENDENTE)
+        self.assertEqual(comentario.texto, "excelente professor!")
+
+    def test_http_informa_comentario_vazio_e_persiste_avaliacao(self) -> None:
+        for texto in ("", "   ", "\t\n"):
+            with self.subTest(texto=texto):
+                status_code, resposta = asyncio.run(
+                    self._request(
+                        {**self.payload, "comentario": texto},
+                        self.token_confirmado,
+                    )
+                )
+                self.assertEqual(status_code, 200)
+                self.assertIn("1 e 500", resposta["comentario_erro"])
+        self.db.expire_all()
+        avaliacao = self.db.scalar(select(Avaliacao))
+        self.assertIsNotNone(avaliacao)
+        quantidade = self.db.scalar(select(func.count()).select_from(ComentarioVersao))
         self.assertEqual(quantidade, 0)
+
+    def test_http_comentario_invalido_preserva_texto_e_substitui_criterios(self) -> None:
+        asyncio.run(
+            self._request(
+                {**self.payload, "comentario": "texto existente"},
+                self.token_confirmado,
+            )
+        )
+        comentario_id = self.db.scalar(select(ComentarioVersao.id))
+        status_code, resposta = asyncio.run(
+            self._request(
+                {**self.payload, "didatica": 1, "comentario": "x" * 501},
+                self.token_confirmado,
+            )
+        )
+        self.assertEqual(status_code, 200)
+        self.assertIn("1 e 500", resposta["comentario_erro"])
+        self.db.expire_all()
+        avaliacao = self.db.scalar(select(Avaliacao))
+        self.assertEqual(avaliacao.didatica, 1)
+        comentario = self.db.scalars(select(ComentarioVersao)).one()
+        self.assertEqual(comentario.id, comentario_id)
+        self.assertEqual(comentario.texto, "texto existente")
+        self.assertEqual(comentario.estado, EstadoComentario.PENDENTE)
+
+    def test_http_informa_comentario_com_501_caracteres_e_persiste_avaliacao(self) -> None:
+        status_code, resposta = asyncio.run(
+            self._request(
+                {**self.payload, "comentario": "x" * 501},
+                self.token_confirmado,
+            )
+        )
+
+        self.assertEqual(status_code, 200)
+        self.assertIn("1 e 500", resposta["comentario_erro"])
+        self.db.expire_all()
+        avaliacao = self.db.scalar(select(Avaliacao))
+        self.assertIsNotNone(avaliacao)
+        quantidade = self.db.scalar(select(func.count()).select_from(ComentarioVersao))
+        self.assertEqual(quantidade, 0)
+
+    def test_http_reatribuicao_sem_comentario_mantem_comentario_pendente(self) -> None:
+        asyncio.run(
+            self._request(
+                {**self.payload, "comentario": "texto original"},
+                self.token_confirmado,
+            )
+        )
+        self.db.expire_all()
+        comentario_original = self.db.scalar(select(ComentarioVersao))
+        self.assertIsNotNone(comentario_original)
+        estado_original = comentario_original.estado
+
+        # Re-envio sem comentario mantem texto (criterios reenviados)
+        status_code, _ = asyncio.run(self._request(self.payload, self.token_confirmado))
+        self.assertEqual(status_code, 200)
+
+        self.db.expire_all()
+        quantidade = self.db.scalar(select(func.count()).select_from(ComentarioVersao))
+        self.assertEqual(quantidade, 1)
+        comentario = self.db.scalar(select(ComentarioVersao))
+        self.assertEqual(comentario.estado, estado_original)
+
+    def test_http_reatribuicao_com_novo_comentario_substitui_pendente(self) -> None:
+        asyncio.run(
+            self._request(
+                {**self.payload, "comentario": "texto original"},
+                self.token_confirmado,
+            )
+        )
+        self.db.expire_all()
+        comentario_original = self.db.scalar(select(ComentarioVersao))
+        self.assertEqual(comentario_original.estado, EstadoComentario.PENDENTE)
+
+        # Re-envio com novo comentario substitui pendente
+        status_code, _ = asyncio.run(
+            self._request(
+                {**self.payload, "comentario": "texto substituto"},
+                self.token_confirmado,
+            )
+        )
+        self.assertEqual(status_code, 200)
+
+        self.db.expire_all()
+        quantidade = self.db.scalar(select(func.count()).select_from(ComentarioVersao))
+        self.assertEqual(quantidade, 1)  # pendente anterior removido
+        comentario = self.db.scalar(
+            select(ComentarioVersao).where(ComentarioVersao.texto == "texto substituto")
+        )
+        self.assertIsNotNone(comentario)
 
 
 if __name__ == "__main__":

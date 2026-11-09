@@ -8,6 +8,17 @@ const { enviarAvaliacao } = await carregar("services/avaliacoes.js");
 const { consultarSessao } = await carregar("services/auth.js");
 const { ApiError } = await carregar("services/http-error.js");
 const { apiClient } = await carregar("services/api-client.js");
+const { retornoAvaliacaoSeguro, caminhoAvaliacao } = await carregar("retorno-avaliacao.js");
+
+test("o retorno aceita somente a rota interna exata de avaliação", () => {
+  const destino = caminhoAvaliacao("11111111-1111-4111-8111-111111111111", "22222222-2222-4222-8222-222222222222");
+  assert.equal(retornoAvaliacaoSeguro(destino), destino);
+  for (const valor of [null, undefined, "", "https://outro.example" + destino,
+    "//outro.example" + destino, "http://undb.local" + destino, "javascript:alert(1)",
+    destino + "?x=1", destino + "#x", destino + "\n", destino + "/", destino.replace("11111111-", "invalido-")]) {
+    assert.equal(retornoAvaliacaoSeguro(valor), null, String(valor));
+  }
+});
 
 function formulario(alteracoes = {}) {
   const dados = new FormData();

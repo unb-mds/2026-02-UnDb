@@ -25,4 +25,6 @@ def registrar_avaliacao(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(erro),
         ) from erro
-    return AvaliacaoResponse.model_validate(avaliacao)
+    resposta = AvaliacaoResponse.model_validate(avaliacao)
+    resposta.comentario_erro = dados.comentario_erro
+    return resposta

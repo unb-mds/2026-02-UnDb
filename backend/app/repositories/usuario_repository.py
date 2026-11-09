@@ -11,9 +11,9 @@ def obter_por_email(db: Session, email: str) -> Usuario | None:
 
 def obter_token_por_hash(db: Session, token_hash: str) -> TokenConfirmacaoEmail | None:
     return db.scalar(
-        select(TokenConfirmacaoEmail).where(
-            TokenConfirmacaoEmail.token_hash == token_hash
-        ).with_for_update()
+        select(TokenConfirmacaoEmail)
+        .where(TokenConfirmacaoEmail.token_hash == token_hash)
+        .with_for_update()
     )
 
 

@@ -1,0 +1,324 @@
+{
+  "origem": "FastAPI e PostgreSQL reais; dados sintéticos em banco isolado",
+  "combinacoes": 48,
+  "cenarios": [
+    "homônimos por ID",
+    "disciplinas agrupadas sem duplicatas",
+    "atalhos",
+    "ordenação e desempates",
+    "conflito",
+    "insuficiência",
+    "zero avaliações",
+    "zero turmas",
+    "falha complementar",
+    "busca vazia de resultados",
+    "teclado e foco",
+    "quebra de textos"
+  ],
+  "evidencias": [
+    {
+      "tela": "busca-professores",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "detalhe-professor",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "comparacao",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "agregado",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "insuficiente",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "sem-avaliacoes",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "sem-turmas",
+      "tema": "light",
+      "largura": 320,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "detalhe-professor",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "comparacao",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "agregado",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "insuficiente",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "sem-avaliacoes",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "sem-turmas",
+      "tema": "light",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "busca-professores-light-1280.png"
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "busca-disciplinas-light-1280.png"
+    },
+    {
+      "tela": "detalhe-professor",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "detalhe-professor-light-1280.png"
+    },
+    {
+      "tela": "comparacao",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "comparacao-light-1280.png"
+    },
+    {
+      "tela": "agregado",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "agregado-light-1280.png"
+    },
+    {
+      "tela": "insuficiente",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "insuficiente-light-1280.png"
+    },
+    {
+      "tela": "sem-avaliacoes",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "sem-avaliacoes-light-1280.png"
+    },
+    {
+      "tela": "sem-turmas",
+      "tema": "light",
+      "largura": 1280,
+      "aprovado": true,
+      "captura": "sem-turmas-light-1280.png"
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "busca-professores-dark-320.png"
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "busca-disciplinas-dark-320.png"
+    },
+    {
+      "tela": "detalhe-professor",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "detalhe-professor-dark-320.png"
+    },
+    {
+      "tela": "comparacao",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "comparacao-dark-320.png"
+    },
+    {
+      "tela": "agregado",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "agregado-dark-320.png"
+    },
+    {
+      "tela": "insuficiente",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "insuficiente-dark-320.png"
+    },
+    {
+      "tela": "sem-avaliacoes",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "sem-avaliacoes-dark-320.png"
+    },
+    {
+      "tela": "sem-turmas",
+      "tema": "dark",
+      "largura": 320,
+      "aprovado": true,
+      "captura": "sem-turmas-dark-320.png"
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "detalhe-professor",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "comparacao",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "agregado",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "insuficiente",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "sem-avaliacoes",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "sem-turmas",
+      "tema": "dark",
+      "largura": 768,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-professores",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "busca-disciplinas",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "detalhe-professor",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "comparacao",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "agregado",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "insuficiente",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "sem-avaliacoes",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    },
+    {
+      "tela": "sem-turmas",
+      "tema": "dark",
+      "largura": 1280,
+      "aprovado": true
+    }
+  ]
+}

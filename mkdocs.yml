@@ -41,17 +41,48 @@ nav:
       - Board no Figma: figma.md
   - Arquitetura:
       - Visão e decisões: arquitetura.md
+      - ADRs — catálogo e manutenção: adrs/index.md
+      - Template de ADR: adrs/template.md
+      - ADR 09 — estratégia de qualidade: adrs/09-estrategia-qualidade.md
       - Modelos de dados: modelos.md
       - Importação do SIGAA: importacao-sigaa.md
       - Operação do SIGAA: operacao-importacao-sigaa.md
   - Releases:
       - Release 1.0.0: releases/1.0.0.md
+      - Release 1.1.0 — candidata: releases/1.1.0.md
+      - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
   - Estudos:
+      - Lint e tipos — Issue 189: estudos/verificacao-lint-tipos-issue-189.md
+      - Denúncia e agradecimentos: estudos/denuncia-agradecimentos-issue-193.md
+      - Fila de moderação: estudos/fila-moderacao-issue-162.md
+      - Cobertura de testes — Issue 190: estudos/cobertura-testes-issue-190.md
       - Mapeamento do SIGAA: estudos/mapeamento-sigaa.md
       - Prova de conceito do SIGAA: estudos/sigaa-poc.md
       - Docker: estudos/docker.md
+      - Busca, comparação e avaliação: estudos/observacao-jornada-busca-comparacao.md
+      - Preparação da Validação da Jornada: estudos/validacao-prototipo-jornada-issue-153.md
+      - Resultados do reteste da jornada: estudos/resultados-reteste-jornada-issue-153.md
+      - Protótipo adaptado aos relatos de uso: estudos/ajustes-prototipo-jornada-issue-153.md
+      - Integração visual da jornada real: estudos/integracao-visual-jornada-issue-186.md
+      - Auditoria de Clareza dos Requisitos: estudos/auditoria-requisitos-issue-149.md
+      - Relato de uso — aluno externo: estudos/relato-usabilidade-aluno-01-issue-148.md
+      - Relato de uso — aluno da UnB: estudos/relato-usabilidade-aluno-02-issue-148.md
+      - Tela exemplo API real: estudos/tela-exemplo-api-real.md
+      - Validação Release 1 SIGAA 2026-09-24: estudos/validacao-release-1-sigaa-2026-09-24.md
+      - Verificação ambiente completo issue 37: estudos/verificacao-ambiente-completo-issue-37.md
+      - Verificação ambiente completo issue 37 tiago vieira: estudos/verificacao-ambiente-completo-issue-37-tiago-vieira.md
+      - Verificação busca professor disciplina: estudos/verificacao-busca-professor-disciplina.md
+      - Verificação docker compose: estudos/verificacao-docker-compose.md
+      - Verificação execucao frontend: estudos/verificacao-execucao-frontend.md
+      - Verificação formulario avaliacao: estudos/verificacao-formulario-avaliacao.md
+      - Interface de comentários — Issue 159: estudos/interface-comentarios-issue-159.md
+      - Validação integrada de comentários e moderação — Issue 163: estudos/validacao-integrada-issue-163.md
   - Processo:
       - Template de ata de reunião: atas/template-ata-reuniao.md
+  - Atas:
+      - 2026-09-17: atas/2026-09-17.md
+  - Relatórios:
+      - Relatório RF19: relatorio_rf19.md
 
 exclude_docs: |
   agent-skills.md

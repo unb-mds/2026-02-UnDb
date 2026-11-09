@@ -138,9 +138,7 @@ class ConsultaAgregadaServiceTest(unittest.TestCase):
             consultar_agregado(self.session, self.professor_id, self.disciplina_id)
 
     @patch("app.services.avaliacao_service.avaliacao_repository")
-    def test_rejeita_professor_sem_vinculo_com_disciplina(
-        self, repository: Mock
-    ) -> None:
+    def test_rejeita_professor_sem_vinculo_com_disciplina(self, repository: Mock) -> None:
         repository.obter_professor.return_value = professor(self.professor_id)
         repository.obter_disciplina.return_value = disciplina(self.disciplina_id)
         self.turma_repository.existe_vinculo_professor_disciplina.return_value = False
@@ -185,11 +183,10 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
         self.assertTrue(resultado)
         expressoes = db.query.return_value.join.return_value.filter.call_args.args
         parametros = {
-            valor
-            for expressao in expressoes
-            for valor in expressao.compile().params.values()
+            valor for expressao in expressoes for valor in expressao.compile().params.values()
         }
         self.assertTrue({professor_id, disciplina_id} <= parametros)
+
 
 class ConsultaAgregadaContratoTest(unittest.TestCase):
     def test_endpoint_publico_esta_registrado(self) -> None:

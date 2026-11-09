@@ -29,9 +29,7 @@ def create(
     return disciplina
 
 
-def listar(
-    db: Session, codigo: str | None = None, nome: str | None = None
-) -> list[Disciplina]:
+def listar(db: Session, codigo: str | None = None, nome: str | None = None) -> list[Disciplina]:
     consulta = select(Disciplina).order_by(Disciplina.codigo)
     filtros = []
     if codigo is not None:
@@ -39,9 +37,7 @@ def listar(
     if nome is not None:
         termos = normalizar_busca(nome).split()
         if termos:
-            filtros.append(
-                and_(*(Disciplina.nome_normalizado.contains(termo) for termo in termos))
-            )
+            filtros.append(and_(*(Disciplina.nome_normalizado.contains(termo) for termo in termos)))
     if filtros:
         consulta = consulta.where(and_(*filtros))
     return list(db.scalars(consulta).all())

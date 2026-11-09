@@ -100,3 +100,11 @@ def obter_usuario_confirmado(
             detail=auth_service.EMAIL_NAO_CONFIRMADO_MESSAGE,
         )
     return usuario
+
+
+def obter_moderador(
+    usuario: Annotated[Usuario, Depends(obter_usuario_confirmado)],
+) -> Usuario:
+    if not usuario.moderador:
+        raise HTTPException(status_code=403, detail="permissao de moderador necessaria")
+    return usuario

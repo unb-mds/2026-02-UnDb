@@ -1,14 +1,20 @@
 {
   "name": "frontend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "node tests/run-tests.mjs",
-    "test:browser": "node tests/avaliacao-browser.mjs"
+    "test:coverage": "node tests/run-tests.mjs --coverage",
+    "test:browser": "node tests/avaliacao-browser.mjs && node tests/moderacao-browser.mjs && node tests/denuncia-browser.mjs && node tests/comentarios-browser.mjs",
+    "test:moderacao": "node tests/moderacao-browser.mjs",
+    "test:denuncia": "node tests/denuncia-browser.mjs",
+    "test:comentarios": "node tests/comentarios-browser.mjs",
+    "test:fluxo-moderacao": "node tests/fluxo-moderacao-browser.mjs"
   },
   "dependencies": {
     "next": "16.3.5",
@@ -20,6 +26,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "c8": "12.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",

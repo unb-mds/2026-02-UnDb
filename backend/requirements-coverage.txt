@@ -1,0 +1,2 @@
+# Dependência de desenvolvimento e CI.
+coverage==7.12.0

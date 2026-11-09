@@ -1,6 +1,8 @@
 venv/
 *.pyc
 db.sqlite3
+/backend/.coverage
+/backend/coverage/
 .vscode/
 .idea/
 *.log
@@ -11,3 +13,4 @@ __pycache__/
 **/__pycache__/
 .DS_Store
 site/
+.ruff_cache/

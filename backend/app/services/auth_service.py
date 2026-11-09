@@ -20,9 +20,7 @@ from app.schemas.auth import CadastroRequest, LoginRequest
 from app.services.email_service import EmailDeliveryError, EmailSender
 
 
-CADASTRO_MESSAGE = (
-    "Se o endereço informado estiver disponível, enviaremos um link de confirmação."
-)
+CADASTRO_MESSAGE = "Se o endereço informado estiver disponível, enviaremos um link de confirmação."
 CONFIRMACAO_MESSAGE = "E-mail confirmado. Sua conta já pode registrar avaliações."
 TOKEN_INVALIDO_MESSAGE = "Link de confirmação inválido ou expirado."
 LOGIN_MESSAGE = "Autenticação realizada com sucesso."
@@ -84,8 +82,10 @@ def cadastrar(
     usuario_repository.adicionar_usuario(db, usuario)
     usuario_repository.adicionar_token(db, token)
 
-    parametros = urlencode({"token": token_aberto})
-    link = f"{FRONTEND_URL.rstrip('/')}/confirmar-email?{parametros}"
+    parametros = {"token": token_aberto}
+    if dados.return_to:
+        parametros["returnTo"] = dados.return_to
+    link = f"{FRONTEND_URL.rstrip('/')}/confirmar-email?{urlencode(parametros)}"
     try:
         db.flush()
         email_sender.enviar_confirmacao(dados.email, link)
@@ -104,9 +104,7 @@ def cadastrar(
 
 
 def confirmar_email(db: Session, token_aberto: str) -> str:
-    token = usuario_repository.obter_token_por_hash(
-        db, gerar_hash_token(token_aberto)
-    )
+    token = usuario_repository.obter_token_por_hash(db, gerar_hash_token(token_aberto))
     if token is None:
         raise TokenConfirmacaoInvalidoError(TOKEN_INVALIDO_MESSAGE)
 
@@ -142,9 +140,7 @@ def validar_e_renovar_sessao(db: Session, token_aberto: str | None) -> SessaoUsu
     if not token_aberto:
         raise SessaoInvalidaError(SESSION_INVALIDA_MESSAGE)
 
-    sessao = sessao_repository.obter_por_token_hash(
-        db, gerar_hash_token(token_aberto)
-    )
+    sessao = sessao_repository.obter_por_token_hash(db, gerar_hash_token(token_aberto))
     if sessao is None:
         raise SessaoInvalidaError(SESSION_INVALIDA_MESSAGE)
 

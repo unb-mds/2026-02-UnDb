@@ -116,14 +116,10 @@ class ComparacaoProfessoresRepositoryTest(unittest.TestCase):
 
 class ComparacaoProfessoresContratoTest(unittest.TestCase):
     def test_endpoint_exige_a_chave_de_ordenacao_permitida(self) -> None:
-        operacao = app.openapi()["paths"]["/api/disciplinas/{disciplina_id}/professores"][
-            "get"
-        ]
+        operacao = app.openapi()["paths"]["/api/disciplinas/{disciplina_id}/professores"]["get"]
 
         parametro = next(
-            parametro
-            for parametro in operacao["parameters"]
-            if parametro["name"] == "ordenar_por"
+            parametro for parametro in operacao["parameters"] if parametro["name"] == "ordenar_por"
         )
         self.assertTrue(parametro["required"])
         self.assertEqual(parametro["schema"]["const"], "recomendacao")

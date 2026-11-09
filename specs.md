@@ -42,6 +42,14 @@ class QualidadeMaterial(str, Enum):
     RUIM = "RUIM"
     MEDIO = "MEDIO"
     BOM = "BOM"
+
+class EstadoComentario(str, Enum):
+    PENDENTE = "PENDENTE"
+    PUBLICADO = "PUBLICADO"
+    SUSPENSO = "SUSPENSO"
+    REMOVIDO = "REMOVIDO"
+    RETIRADO = "RETIRADO"
+    SUBSTITUIDO = "SUBSTITUIDO"
 ```
 
 Ordinalidade aprovada para desempate de moda:
@@ -50,6 +58,10 @@ Ordinalidade aprovada para desempate de moda:
 ---
 
 ## 3. Modelo de dados
+
+Esta seção descreve o modelo da Release 1 e da Release 2 (RF20). As regras de RF21 e
+RF22 (denúncia e moderação) ainda dependem das issues #160/#161; seus modelos
+físicos e contratos não estão definidos aqui.
 
 ### `usuarios`
 | Campo | Tipo | Regra |
@@ -131,7 +143,24 @@ pode ter zero ou vários docentes.
 **Constraint obrigatória:** `UNIQUE(usuario_id, professor_id, disciplina_id)`.
 Implementar no banco, via migração — não apenas na aplicação.
 
-**Não criar** campo de nota geral, índice composto, ranking persistido ou campo de comentário.
+**Não criar** campo de nota geral, índice composto ou ranking persistido. Na Release 1,
+não criar campo de comentário; o detalhamento de RF20 para a R2 não autoriza alterar
+o schema sem o processo próprio das issues dependentes.
+
+### `comentario_versoes`
+| Campo | Tipo | Regra |
+|---|---|---|
+| `id` | UUID | PK, default `uuid4` |
+| `avaliacao_id` | FK → `avaliacoes` | obrigatório |
+| `substitui_id` | FK → `comentario_versoes.id` | opcional; aponta para a versão anterior quando este texto substitui outro |
+| `texto` | VARCHAR(500) | obrigatório, 1–500 caracteres |
+| `estado` | ENUM EstadoComentario | obrigatório, default `PENDENTE` |
+| `created_at` | TIMESTAMPTZ | default now |
+| `updated_at` | TIMESTAMPTZ | default now, atualizado em cada modificação |
+
+**Constraint:** `CK(texto)` — `length(texto) BETWEEN 1 AND 500`.
+Cada avaliação tem **zero ou um** comentário pendente e **zero ou um** publicado;
+a criação de uma nova versão pendente remove a pendência anterior.
 
 ---
 
@@ -267,6 +296,20 @@ modelo SQLAlchemy diretamente.
 Nenhuma busca filtra por curso ou departamento do usuário (RF07).
 Nenhum endpoint dispara importação do SIGAA em tempo real.
 
+Para o retorno à avaliação da #158, `POST /auth/cadastro` aceita o campo opcional
+`return_to`: `/professores/{UUID}/disciplinas/{UUID}/avaliar`, sem origem ou
+fragmento, com até 2.048 caracteres. Conforme autorização da #155 registrada nos
+requisitos, pode conter a query completa `busca=professores|disciplinas`, `q=<termo>`
+e `ordem=nome|unidade`. As três chaves devem aparecer exatamente uma vez; chaves
+extras, controles e escapes percentuais inválidos são rejeitados. A rota sem query
+continua aceita. O backend inclui esse destino em `returnTo` no link de
+confirmação enviado por e-mail. O frontend valida o destino novamente e o mantém
+nos links de login/cadastro. Cada link carrega seu próprio contexto, inclusive
+entre abas; não há armazenamento global do destino no navegador nem persistência
+de respostas do formulário. O destino não autentica, não confirma a conta e não
+dispensa as verificações de sessão, e-mail e vínculo professor/disciplina da API.
+Cadastros sem esse campo e links antigos de confirmação continuam válidos.
+
 O `GET /professores/{id}/disciplinas/{disciplina_id}` retorna, além dos UUIDs e da
 contagem/agregação, os dados institucionais persistidos necessários à apresentação:
 
@@ -315,6 +358,11 @@ Não implementar nem inventar valor para os itens abaixo.
 | Item | Situação |
 |---|---|
 | Estratégia de povoamento inicial da base | Não decidido |
+| Lista de termos do filtro de comentários | Solicitante definirá depois; moderação humana até então |
+| IA sem aprovação humana prévia | Objetivo futuro condicionado, sem mecanismo/provedor aprovado; não substituir moderação humana nesta etapa |
+| Dados e contratos de RF20–RF22 | RF20 implementado em #156: migration `comentario_versoes`, endpoints de
+  leitura pública, acompanhamento do autor e retirada. RF21/RF22 ainda dependem
+  de #160/#161 — modelos e contratos de denúncia e moderação não definidos. |
 
 ---
 
@@ -327,3 +375,138 @@ Não implementar nem inventar valor para os itens abaixo.
 - Não armazenar dado acadêmico identificável do avaliador.
 - Não introduzir campo de texto livre antes do Release 2.
 - Não alterar schema fora de migração Alembic.
+
+---
+
+## 12. Comentários, denúncia e moderação — Release 2
+
+**Fonte:** detalhamento de RF20–RF22 e decisões R2-DEC-01 a R2-DEC-15 em
+[`docs/requisitos.md`](docs/requisitos.md), definidos nas respostas humanas da #154.
+Este resumo não substitui as tabelas de estados, retenção, erros e critérios AC20/21/22
+da fonte. O restante deste documento mantém os contratos entregues na R1.
+
+### Escrita, consulta e substituição de comentário
+
+- Comentário opcional da avaliação única estudante/professor/disciplina. Escrita e retirada
+  pertencem ao autor autenticado com e-mail confirmado; ausência de novo texto no reenvio
+  mantém o existente. Texto informado: 1–500 caracteres, desconsiderando espaços nas extremidades.
+- Leitura pública do texto publicado, sem nome/e-mail/identificador do autor ou vínculo
+  público com a conta. A consulta não expõe os cinco critérios individuais; RNF02 continua
+  protegendo os critérios agregados abaixo de três avaliações.
+- Novos textos e substitutos exigem moderação vigente. Nesta etapa, aprovação humana
+  antes de publicar; não ativar filtro enquanto a lista não estiver definida. IA é evolução
+  condicionada, não mecanismo atual. Crítica acadêmica negativa não é motivo de rejeição.
+- Critérios válidos são registrados normalmente; moderação do texto não os modifica.
+  Versão anterior aprovada permanece enquanto o substituto é analisado, se não suspensa
+  ou removida. Rejeitar o substituto mantém o estado anterior e descarta o texto rejeitado.
+- Aprovar substituto descarta texto anterior e encerra suas denúncias como `versão substituída`,
+  sem transferência. Retirada explícita cancela substituto pendente e encerra denúncias
+  como `conteúdo retirado`, sem julgar procedência e sem remover as notas.
+
+### Denúncias e suspensão
+
+- Apenas texto é denunciável. Conta autenticada confirmada ou não e visitante sem login
+  podem denunciar. Motivos fechados obrigatórios: ofensa pessoal, xingamento, palavrão,
+  ameaça, discriminação, exposição de dados pessoais ou spam; sem justificativa livre.
+- No máximo uma denúncia aberta por conta/versão para autenticados. Visitantes podem
+  repetir; a fila agrupa por comentário/versão e separa as origens e suas contagens.
+  Denúncia autenticada não implica automaticamente procedência.
+- **50 contas autenticadas distintas com denúncia aberta da mesma versão publicada**
+  suspendem o texto e o encaminham à revisão humana. Contas não confirmadas contam;
+  anônimas, duplicadas e encerradas não contam. Suspensão não é remoção definitiva.
+- Denunciantes recebem confirmação, sem acompanhamento posterior em tempo real. Na
+  suspensão pelo limiar ou remoção humana de denunciado, autenticados relacionados recebem
+  agradecimento na aplicação, disponível até primeira exibição e apagado depois.
+
+### Permissão, ações e dados privados
+
+- PO concede/retira papel a membros da equipe com conta autenticada e confirmada. Não
+  permitir decisão sem permissão ou sobre comentário/denúncia próprios; sem outro moderador
+  elegível o caso permanece pendente. Denúncia anônima não oferece vínculo de conta para
+  garantir detecção automática de todo impedimento pessoal.
+- Ações: aprovar/rejeitar pendente, manter/remover denunciado, restaurar/remover suspenso.
+  Não restaurar texto retirado pelo autor ou descartado. Não modificar os cinco critérios.
+- Denúncias e decisões têm registros privados: versão, data/hora, ator interno quando
+  existir, transição e motivo; decisões exigem motivo. Moderador autorizado pode consultar
+  nome/e-mail dos usuários envolvidos. Autor acompanha estado próprio, não os registros
+  privados de denunciantes ou de outros comentários.
+- Rejeitados e substituídos: não conservar o texto. Retirados pelo autor ou removidos pelo
+  moderador: texto privado por sete dias após o evento. Denúncias encerradas: não conservar.
+  Decisões: registros privados por sete dias após decisão. Não copiar texto descartado nos
+  registros. Suspensos permanecem disponíveis internamente para revisão.
+
+### Contratos definidos em #156 (RF20)
+
+> Implementação limitada à RF20. RF21 (denúncia) e RF22 (moderação) permanecem
+> em #160/#161; seus contratos não são definidos aqui.
+
+#### Migration
+
+- `20261024_01_create_comentario_versoes.py` — cria a tabela `comentario_versoes`
+  com colunas, constraint de tamanho (`CK length(texto) BETWEEN 1 AND 500`),
+  FK para `avaliacoes` e auto-referência `substitui_id`, e o ENUM
+  `estado_comentario` (`PENDENTE`, `PUBLICADO`, `SUSPENSO`, `REMOVIDO`,
+  `RETIRADO`, `SUBSTITUIDO`). Reversível (drop table + drop type).
+
+#### Escrita de comentário (via avaliação)
+
+| Endpoint | Método | Auth | Request body | Sucesso | Erros |
+|---|---|---|---|---|---|
+| `/api/avaliacoes` | POST | confirmado | `AvaliacaoCreate` + `comentario?: str` | 200 | 401 (sem sessão), 403 (e-mail não confirmado), 404 (professor/disciplina/vínculo) |
+
+- Texto de **1–500** caracteres (após strip) → cria versão `PENDENTE`.
+- Texto vazio, só-espaços ou >500 → comentário omitido; avaliação persiste normalmente
+  e a resposta 200 informa o motivo em `comentario_erro`. Esse campo é `null` para
+  texto válido ou comentário ausente; comentário inválido não altera texto existente.
+- Reenvio com novo texto: remove `PENDENTE` anterior, cria nova apontando ao
+  texto vigente `PUBLICADO`, `SUSPENSO` ou `REMOVIDO` (se houver) via `substitui_id`.
+  A publicação do substituto exige nova aprovação; envio nunca restaura o anterior.
+- Reenvio sem texto: mantém comentário existente.
+
+#### Leitura pública (visitante)
+
+| Endpoint | Método | Auth | Sucesso | Erros |
+|---|---|---|---|---|
+| `/api/professores/{professor_id}/disciplinas/{disciplina_id}/comentarios` | GET | nenhuma | 200 → `list[ComentarioPublicoResponse]` | 404 (professor ou disciplina inexistente, ou sem vínculo) |
+
+Retorna apenas `id`, `texto`, `created_at` — sem identidade do autor.
+
+#### Acompanhamento pelo autor
+
+| Endpoint | Método | Auth | Sucesso | Erros |
+|---|---|---|---|---|
+| `/api/comentarios/meu` | GET | confirmado | 200 → `list[ComentarioDoAutorResponse]` | 401 (sem sessão), 403 (e-mail não confirmado) |
+
+Retorna `id`, `texto`, `created_at`, `updated_at`, `estado`, `avaliacao_id`,
+`substitui_id` — apenas comentários da avaliação cujo autor é o usuário autenticado.
+Para a interface da #159, a consulta aceita filtros opcionais UUID `professor_id`
+e `disciplina_id`. Ambos restringem apenas as avaliações do usuário autenticado;
+a omissão preserva a listagem completa anterior. UUID inválido retorna 422.
+A identidade do autor continua derivada exclusivamente da sessão, sem parâmetro de conta.
+
+Após descarte aprovado, `texto` pode ser `null`; `REJEITADO` integra os estados.
+Isso não altera o schema público, que continua retornando somente textos publicados.
+
+#### Retirada pelo autor
+
+| Endpoint | Método | Auth | Sucesso | Erros |
+|---|---|---|---|---|
+| `/api/comentarios/{comentario_id}/retirar` | PATCH | confirmado | 200 → `ComentarioDoAutorResponse` | 401 (sem sessão), 403 (e-mail não confirmado, alheio ou estado bloqueado), 404 (comentário inexistente) |
+
+- Só pode retirar `PENDENTE`, `PUBLICADO` ou `SUSPENSO`.
+- Cancela evento `PENDENTE` que substitui este comentário (deleta-o).
+- Preserva os cinco critérios estruturados da avaliação.
+- Encerra e descarta denúncias abertas da avaliação como `conteúdo retirado`, sem
+  agradecimento. Selecionar um substituto pendente também retira o texto vigente.
+- Texto retirado é interno por sete dias, com descarte automático.
+
+#### Contratos compartilhados de denúncias e moderação (#160/#161)
+
+Contrato, rotas, schemas, transições, permissões, retenção, operação e evidências
+em [Contrato compartilhado das #160/#161](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolução-pelo-po-e-contrato-de-implementação).
+Essa referência complementa RF20; a fonte de produto permanece `docs/requisitos.md`.
+
+Migrations posteriores à #156: `20261101_01` (papel, decisões e descarte de texto),
+`20261101_02` (denúncias abertas e agradecimentos), `20261101_03` (retenção de
+retiradas legadas). Somente versões `PUBLICADO` aceitam denúncias. Denúncias
+encerradas são apagadas na transação da decisão/retirada/substituição.

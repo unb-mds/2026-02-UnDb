@@ -21,21 +21,28 @@ function buildQuery(params: Record<string, string | undefined>): string {
   return "?" + new URLSearchParams(entries).toString();
 }
 
-async function request<T>(path: string, query: Record<string, string | undefined> = {}): Promise<T> {
+type OpcoesRequisicao = Pick<RequestInit, "signal" | "cache">;
+
+async function request<T>(path: string, query: Record<string, string | undefined> = {}, opcoes: OpcoesRequisicao = {}): Promise<T> {
   const url = `${apiBaseUrl()}${path}${buildQuery(query)}`;
-  const response = await fetch(url, { credentials: "include" });
+  const response = await fetch(url, { ...opcoes, credentials: "include" });
 
   if (!response.ok) {
     const detalhe = await response.json().catch(() => null);
     throw new ApiError(mensagemErro(detalhe?.detail), response.status, detalhe?.detail);
   }
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return response.json() as Promise<T>;
 }
 
-async function post<TResponse, TBody>(path: string, body: TBody): Promise<TResponse> {
+async function post<TResponse, TBody>(path: string, body: TBody, opcoes: OpcoesRequisicao = {}, method: "POST" | "PATCH" = "POST"): Promise<TResponse> {
   const response = await fetch(`${apiBaseUrl()}${path}`, {
-    method: "POST",
+    ...opcoes,
+    method,
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -47,10 +54,18 @@ async function post<TResponse, TBody>(path: string, body: TBody): Promise<TRespo
     throw new ApiError(mensagem, response.status, detalhe?.detail);
   }
 
+  if (response.status === 204) {
+    return undefined as TResponse;
+  }
+
   return response.json() as Promise<TResponse>;
 }
 
-export const apiClient = { post, request };
+async function patch<TResponse>(path: string, opcoes: OpcoesRequisicao = {}): Promise<TResponse> {
+  return post<TResponse, undefined>(path, undefined, opcoes, "PATCH");
+}
+
+export const apiClient = { post, request, patch };
 
 function mensagemErro(detalhe: unknown): string {
   if (typeof detalhe === "string") return detalhe;

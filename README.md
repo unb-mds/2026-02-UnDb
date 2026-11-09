@@ -8,12 +8,16 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 
 ## Documentação do produto
 
+- [Release 1.1.0 — candidata e instruções de atualização](docs/releases/1.1.0.md)
+
 - [Documento de visão](docs/visao.md)
 - [Engenharia de requisitos](docs/requisitos.md)
 - [Site de documentação](https://unb-mds.github.io/2026-02-UnDb/)
 - [Board de requisitos no Figma](https://www.figma.com/board/qs0bvgeJXyfCxYFEDSX9VH/G7---Requisitos--Avalia%C3%A7%C3%A3O-de-Professores-UnB-)
 - [Especificação de implementação](specs.md)
 - [Arquitetura](docs/arquitetura.md)
+- [ADRs — catálogo, manutenção e template](docs/adrs/index.md)
+- [Estratégia de qualidade — ADR 09 proposto](docs/adrs/09-estrategia-qualidade.md)
 
 ## Equipe
 
@@ -82,6 +86,24 @@ A API sobe em `http://127.0.0.1:8000`, o health check em
 `http://127.0.0.1:8000/docs`. O frontend fica em `http://localhost:3000`.
 Para encerrar os serviços, use `docker compose --env-file backend/.env down`.
 O volume `postgres_data` preserva os dados do banco entre recriações dos containers.
+
+O serviço `descarte-moderacao` acompanha a API e remove dados de moderação vencidos.
+Ao subir somente parte do Compose, inclua `backend db descarte-moderacao` para manter
+o descarte ativo. Sem Docker, execute `python -m app.commands.descartar_moderacao --continuo`
+no mesmo ambiente da API. O prazo aprovado é de sete dias; o worker verifica a cada
+60 segundos e consultas privadas/autor também limpam registros vencidos antes de responder.
+
+Por determinação do PO, o operador pode conceder ou revogar o papel de moderador
+de uma conta confirmada de membro da equipe:
+
+```bash
+docker compose --env-file backend/.env exec backend \
+  python -m app.commands.moderador membro@aluno.unb.br conceder
+# para retirar a permissão, use revogar no lugar de conceder
+```
+
+Não existe concessão pública de papel. Consulte o
+[contrato e as verificações das APIs de denúncia/moderação](docs/estudos/alinhamento-denuncias-issues-160-161.md).
 
 O frontend executa o servidor Next.js com build otimizado, sem recarga automática no
 container. Depois de alterar seu código, execute novamente o comando com `--build`.
@@ -172,10 +194,21 @@ estão no [ADR 08](docs/arquitetura.md#adr-08--execução-e-containerização-do
 
 ### Verificações automatizadas
 
+Lint e formatação Python usam Ruff, fixado em `backend/requirements-dev.txt`, sobre
+aplicação, testes, migrações e scripts. O frontend preserva ESLint e oferece
+`npm run typecheck` (`next typegen && tsc --noEmit`) sem depender de build anterior.
+Instalação, comandos de verificação/correção e escopo estão no
+[guia de contribuição](CONTRIBUTING.md#verificações-de-qualidade-locais).
+
 O check `Backend` executa os testes determinísticos com `python -m unittest discover -s tests -v`,
-valida aplicação e migrações em um PostgreSQL 16 descartável de CI, compara o schema com os modelos
-e testa downgrade/upgrade. Também constrói a imagem e verifica a presença das migrações Alembic.
+sob instrumentação do coverage.py. O job também valida aplicação e migrações em um PostgreSQL 16
+descartável de CI, compara o schema com os modelos, testa downgrade/upgrade, constrói a imagem
+e verifica a presença das migrações Alembic.
 A versão do banco de CI não define, por si só, a versão de produção.
+
+Os checks `Backend` e `Frontend` publicam relatórios de cobertura como artefatos
+do GitHub Actions. Consulte os comandos locais, o escopo e a linha de base no
+[registro de cobertura da #190](docs/estudos/cobertura-testes-issue-190.md).
 
 O acesso real ao SIGAA permanece uma verificação manual documentada na
 [POC](docs/estudos/sigaa-poc.md); não é dependência dos testes determinísticos.
