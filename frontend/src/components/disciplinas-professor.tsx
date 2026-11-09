@@ -9,7 +9,7 @@ export default function DisciplinasProfessor({ professorId, disciplinas, context
 }) {
   if (disciplinas.length === 0) {
     return (
-      <p className="mt-2 text-sm text-foreground/60">
+      <p className="mt-2 text-sm text-(--muted)">
         Nenhuma turma ativa registrada para este professor no momento.
       </p>
     );
@@ -18,24 +18,27 @@ export default function DisciplinasProfessor({ professorId, disciplinas, context
   return (
     <ul className="mt-4 flex min-w-0 flex-col gap-3">
       {disciplinas.map((disciplina) => (
-        <li key={disciplina.id} className="min-w-0 rounded-lg bg-foreground/[0.03] p-4 break-words">
-          <Link href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}`, contexto)} className="block hover:text-accent">
-            <span className="block text-lg font-semibold">{disciplina.nome}</span>
-            <span className="mt-1 block text-sm text-foreground/70">
-              Código da disciplina: <span className="font-mono">{disciplina.codigo}</span>
-            </span>
-            <span className="mt-1 block text-sm text-foreground/70">Unidade acadêmica: {disciplina.departamento}</span>
-          </Link>
-          <div className="mt-3 flex flex-wrap gap-3 text-sm">
+        <li key={disciplina.id} className="flex min-w-0 flex-col justify-between gap-4 rounded-xl border border-(--border) bg-(--raised) p-4 break-words lg:flex-row lg:items-center">
+          <div className="min-w-0">
+            <Link href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}`, contexto)} className="block hover:text-accent">
+              <span className="block text-base font-semibold">{disciplina.nome}</span>
+              <span className="mt-1 block text-sm text-(--muted)">
+                Código da disciplina: <span className="font-mono">{disciplina.codigo}</span>
+              </span>
+              <span className="mt-1 block text-sm text-(--muted)">Unidade acadêmica: {disciplina.departamento}</span>
+            </Link>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-3 text-sm lg:max-w-64">
+            <Link href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}`, contexto)} className="button">Consultar</Link>
             <Link
               href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}/avaliar`, contexto)}
-              className="rounded-lg bg-accent px-4 py-2.5 text-center font-medium text-on-accent hover:opacity-90"
+              className="button primary"
             >
-              Avaliar nesta disciplina →
+              Avaliar
             </Link>
             <Link
               href={comContextoBusca(`/disciplinas/${disciplina.id}`, contexto)}
-              className="rounded-lg border border-accent/30 px-4 py-2.5 text-center font-medium text-accent hover:bg-accent/5"
+              className="w-full text-sm text-accent hover:underline"
             >
               Comparar professores desta disciplina →
             </Link>

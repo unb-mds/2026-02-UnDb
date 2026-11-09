@@ -15,6 +15,7 @@ type ConsultaDisciplinas =
 // O resultado é montado com key=professor.id, inclusive para nomes iguais.
 export default function ProfessorResultado({ professor, contexto = null }: { professor: ProfessorDetalhe; contexto?: ContextoBusca | null }) {
   const [consulta, setConsulta] = useState<ConsultaDisciplinas>({ estado: "carregando" });
+  const [tentativa, setTentativa] = useState(0);
 
   useEffect(() => {
     let cancelado = false;
@@ -26,22 +27,35 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
         if (!cancelado) setConsulta({ estado: "erro" });
       });
     return () => { cancelado = true; };
-  }, [professor.id]);
+  }, [professor.id, tentativa]);
+
+  function tentarNovamente() {
+    setConsulta({ estado: "carregando" });
+    setTentativa((valor) => valor + 1);
+  }
+
+  const iniciais = professor.nome.split(/\s+/).filter(Boolean).slice(0, 2).map((parte) => parte[0]).join("");
 
   return (
-    <li className="min-w-0 rounded-xl border border-foreground/10 p-5 break-words">
-      <p className="text-sm font-medium text-accent">Unidade acadêmica: {professor.departamento}</p>
-      <h2 className="mt-1 text-xl font-semibold">
-        <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="text-accent underline underline-offset-2 hover:text-foreground">
-          {professor.nome}
-        </Link>
-      </h2>
-      <h3 className="mt-4 text-sm font-medium text-foreground/70">Disciplinas lecionadas</h3>
-      {consulta.estado === "carregando" && <p className="mt-2 text-sm text-foreground/60">Carregando disciplinas…</p>}
+    <li className="min-w-0 rounded-2xl border border-(--border) bg-(--panel) p-5 break-words sm:p-6">
+      <div className="flex items-start gap-4">
+        <span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-(--primary)/20 text-sm font-bold text-accent">{iniciais}</span>
+        <div className="min-w-0">
+          <h2 className="text-xl font-semibold">
+            <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="hover:text-accent">
+              {professor.nome}
+            </Link>
+          </h2>
+          <p className="mt-2 text-sm text-(--muted)">Unidade acadêmica: {professor.departamento}</p>
+        </div>
+      </div>
+      <h3 className="mt-6 text-xs font-medium tracking-wide text-(--muted) uppercase">Disciplinas lecionadas</h3>
+      {consulta.estado === "carregando" && <p role="status" className="mt-2 text-sm text-(--muted)">Carregando disciplinas…</p>}
       {consulta.estado === "erro" && (
-        <p className="mt-2 text-sm text-foreground/70" role="status">
-          Não foi possível carregar as disciplinas deste professor. Tente abrir o perfil novamente em instantes.
-        </p>
+        <div className="mt-3 flex flex-col items-start gap-3">
+          <p className="text-sm" role="alert">Não foi possível carregar as disciplinas deste professor.</p>
+          <button type="button" onClick={tentarNovamente} className="button" aria-label={`Tentar novamente disciplinas de ${professor.nome}`}>Tentar novamente</button>
+        </div>
       )}
       {consulta.estado === "sucesso" && <DisciplinasProfessor professorId={professor.id} disciplinas={consulta.disciplinas} contexto={contexto} />}
     </li>
