@@ -11,6 +11,8 @@ export function criarCenarioBusca(professor, disciplina) {
   let consultas = 0;
   let logins = 0;
   let lentasConcluidas = 0;
+  let catalogo = "sucesso";
+  let falharDisciplinas = false;
   const professores = [
     { ...professor, id: "33333333-3333-4333-8333-333333333333", nome: "Zélia Teste", departamento: "Administração" },
     { ...professor, nome: "Álvaro Teste", departamento: "Matemática" },
@@ -37,12 +39,18 @@ export function criarCenarioBusca(professor, disciplina) {
         await new Promise(resolve => setTimeout(resolve, 900));
         lentasConcluidas += 1;
       }
-      if (falhar) enviar({ detail: "Falha controlada" }, 503);
+      if (url.pathname === "/api/disciplinas" && !termo) {
+        if (catalogo === "lento") await new Promise(resolve => setTimeout(resolve, 900));
+        enviar(catalogo === "erro" ? { detail: "Falha do catálogo" } : catalogo === "vazio" ? [] : disciplinas, catalogo === "erro" ? 503 : 200);
+      }
+      else if (falhar) enviar({ detail: "Falha controlada" }, 503);
       else if (termo === "vazio") enviar([]);
+      else if (termo === "homonimos") enviar([professores[0], { ...professores[1], nome: professores[0].nome }]);
       else if (url.pathname === "/api/professores") enviar(termo === "nova" || termo === "lenta" ? [{ ...professor, nome: termo }] : professores);
       else enviar(url.searchParams.has("codigo") ? disciplinas.slice(0, 2) : disciplinas.slice(1));
     } else if (url.pathname === `/api/professores/${professor.id}`) enviar(professor);
-    else if (url.pathname === `/api/professores/${professor.id}/disciplinas`) enviar([disciplina]);
+    else if (url.pathname === `/api/professores/${professor.id}/disciplinas`) enviar(falharDisciplinas ? { detail: "Falha nas disciplinas" } : [disciplina], falharDisciplinas ? 503 : 200);
+    else if (url.pathname === `/api/professores/${professores[0].id}/disciplinas`) enviar([disciplinas[1]]);
     else if (/^\/api\/professores\/[^/]+\/disciplinas$/.test(url.pathname)) enviar([]);
     else if (url.pathname === `/api/professores/${professor.id}/disciplinas/${disciplina.id}`) enviar(falharContexto ? { detail: "Falha auxiliar controlada" } : agregado, falharContexto ? 503 : 200);
     else if (url.pathname === `/api/disciplinas/${disciplina.id}`) enviar(disciplina);
@@ -107,7 +115,7 @@ export function criarCenarioBusca(professor, disciplina) {
         await aguardarTexto("3 resultado(s)");
         await contexto(tipo, termoAntesDaHidratacao, "nome", true);
       }
-      for (const width of [320, 768, 1280]) {
+      for (const width of [320, 390, 768, 1280, 1440]) {
         await cdp("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: width === 320 });
         for (const tema of ["light", "dark"]) {
           await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
@@ -116,8 +124,24 @@ export function criarCenarioBusca(professor, disciplina) {
           assert.equal(await avaliar("document.querySelectorAll('main h1').length"), 1);
           assert.equal(await avaliar("document.querySelector('[aria-current=step]') === null"), true);
           assert.equal(await avaliar("document.querySelector('main form').checkValidity()"), false);
+          await aguardarTexto("Explore as disciplinas");
+          assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('[aria-label=\"Disciplinas do catálogo\"] h3')).map(e => e.textContent)"), ["Álgebra Teste", "Biologia Teste", "Zoologia Teste"]);
           await semTransbordar();
-          if (width === 320 || width === 1280) await capturar(`entrada-${width}-${tema}`);
+          if (width === 320 || width === 1440) await capturar(`203-entrada-${width}-${tema}`);
+          await clicar("Ver unidades");
+          await aguardarTexto("Explore qualquer unidade acadêmica");
+          await aguardar(async () => await avaliar("document.querySelectorAll('[aria-label=\"Disciplinas da unidade\"] > li').length === 3"), "catálogo das unidades");
+          await semTransbordar();
+          await avaliar("Array.from(document.querySelectorAll('nav[aria-label=\"Unidades acadêmicas\"] a')).find(a => a.textContent === 'Matemática').click()");
+          await aguardar(async () => await avaliar("new URL(location.href).searchParams.get('unidade') === 'Matemática' && document.querySelectorAll('[aria-label=\"Disciplinas da unidade\"] > li').length === 1"), "unidade selecionada pela URL");
+          await semTransbordar();
+          if (width === 320 || width === 1440) await capturar(`203-unidades-${width}-${tema}`);
+          await cdp("Page.reload");
+          await aguardar(async () => await avaliar("document.querySelector('nav[aria-label=\"Unidades acadêmicas\"] [aria-current=page]')?.textContent === 'Matemática' && document.querySelectorAll('[aria-label=\"Disciplinas da unidade\"] > li').length === 1"), "unidade preservada na recarga");
+          await avaliar("history.back()");
+          await aguardar(async () => await avaliar("location.pathname === '/departamentos' && !location.search && document.querySelectorAll('[aria-label=\"Disciplinas da unidade\"] > li').length === 3"), "histórico da unidade");
+          await avaliar("history.forward()");
+          await aguardar(async () => await avaliar("new URL(location.href).searchParams.get('unidade') === 'Matemática' && document.querySelectorAll('[aria-label=\"Disciplinas da unidade\"] > li').length === 1"), "avançar para unidade selecionada");
           for (const tipo of ["professores", "disciplinas"]) {
             await navegar("/", "Encontre professores e disciplinas");
             await aguardar(async () => await avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
@@ -144,17 +168,22 @@ export function criarCenarioBusca(professor, disciplina) {
             await avaliar("document.querySelector('main input[type=search]').focus()");
             await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
             await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+            assert.equal(await avaliar("document.activeElement.closest('nav')?.getAttribute('aria-label')"), "Tipo de busca");
+            for (let tab = 0; tab < 2; tab += 1) {
+              await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+              await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+            }
             assert.equal(await avaliar("document.activeElement === document.querySelector('main select')"), true);
             assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle !== 'none'"), true);
             assert.equal(await avaliar("document.querySelector('main select').labels[0].textContent.includes('Ordenar resultados')"), true);
             assert.deepEqual(await itens(), tipo === "professores" ? ["Álvaro Teste", "Ana Teste", "Zélia Teste"] : ["Álgebra Teste", "Biologia Teste", "Zoologia Teste"]);
-            assert.equal(await avaliar("getComputedStyle(document.querySelector('section[aria-label=\"Resultados da busca\"] > ul')).gridTemplateColumns.split(' ').length"), width < 640 ? 1 : 2);
+            assert.equal(await avaliar("getComputedStyle(document.querySelector('section[aria-label=\"Resultados da busca\"] > ul')).gridTemplateColumns.split(' ').length"), tipo === "professores" || width < 640 ? 1 : width < 1024 ? 2 : 3);
             const total = consultas;
             await ordenar("unidade");
             assert.equal(consultas, total, "Trocar ordem não refaz a busca");
             assert.deepEqual(await itens(), tipo === "professores" ? ["Zélia Teste", "Ana Teste", "Álvaro Teste"] : ["Zoologia Teste", "Biologia Teste", "Álgebra Teste"]);
             await semTransbordar();
-            if (width === 320 || width === 1280) await capturar(`${tipo}-${width}-${tema}`);
+            if (width === 320 || width === 1440) await capturar(`203-${tipo}-${width}-${tema}`);
             await avaliar("history.back()");
             await aguardar(async () => await avaliar("document.querySelector('main select').value === 'nome'"), "histórico da ordenação");
             await avaliar("history.forward()");
@@ -222,6 +251,49 @@ export function criarCenarioBusca(professor, disciplina) {
           }
         }
       }
+      for (const rota of ["/", "/departamentos"]) {
+        catalogo = "lento";
+        await navegar(rota, "Carregando catálogo");
+        await aguardarTexto("Zoologia Teste");
+        catalogo = "vazio";
+        await cdp("Page.reload");
+        await aguardarTexto("Catálogo vazio");
+        assert.equal(await avaliar("document.querySelectorAll('[aria-label=\"Disciplinas do catálogo\"] li, [aria-label=\"Disciplinas da unidade\"] li').length"), 0);
+        catalogo = "erro";
+        await clicar("Tentar novamente");
+        await aguardarTexto("Catálogo temporariamente indisponível");
+        assert.equal(await avaliar("!!document.querySelector('main [role=alert]')"), true);
+        assert.equal(await avaliar("document.body.innerText.includes('Catálogo vazio')"), false);
+        catalogo = "sucesso";
+        await clicar("Tentar novamente");
+        await aguardarTexto("Zoologia Teste");
+      }
+      await navegar("/departamentos?unidade=Inexistente", "Nenhuma disciplina encontrada nesta unidade");
+      await clicar("Ver todas as unidades");
+      await aguardar(async () => await avaliar("!location.search && document.querySelectorAll('[aria-label=\"Disciplinas da unidade\"] > li').length === 3"), "retorno a todas as unidades");
+      await navegar("/professores?q=homonimos&ordem=unidade", "2 resultado(s)");
+      const homonimos = await avaliar("Array.from(document.querySelectorAll('[aria-label=\"Lista de resultados\"] > li')).map(e => ({nome:e.querySelector('h2').textContent, perfil:e.querySelector('h2 a').pathname, unidade:e.querySelector('h2 + p').textContent}))");
+      assert.equal(homonimos[0].nome, homonimos[1].nome);
+      assert.notEqual(homonimos[0].perfil, homonimos[1].perfil);
+      assert.notEqual(homonimos[0].unidade, homonimos[1].unidade);
+      await aguardar(async () => await avaliar("Array.from(document.querySelectorAll('[aria-label=\"Lista de resultados\"] > li a')).filter(a => ['Consultar', 'Avaliar'].includes(a.textContent)).length === 4"), "disciplinas dos dois homônimos");
+      const acoes = await avaliar(`Array.from(document.querySelectorAll('[aria-label="Lista de resultados"] > li')).map(e => Array.from(e.querySelectorAll('a')).filter(a => ['Consultar', 'Avaliar'].includes(a.textContent)).map(a => ({acao:a.textContent, url:a.getAttribute('href')})))`);
+      assert.equal(acoes.length, 2);
+      for (const [i, links] of acoes.entries()) {
+        assert.equal(links.length, 2);
+        for (const link of links) {
+          const url = new URL(link.url, "http://local");
+          assert.ok(url.pathname.startsWith(`${homonimos[i].perfil}/disciplinas/`));
+          assert.equal(url.searchParams.get("busca"), "professores");
+          assert.equal(url.searchParams.get("q"), "homonimos");
+          assert.equal(url.searchParams.get("ordem"), "unidade");
+        }
+      }
+      falharDisciplinas = true;
+      await navegar("/professores?q=Teste&ordem=nome", "Não foi possível carregar as disciplinas deste professor");
+      falharDisciplinas = false;
+      await avaliar("document.querySelector('button[aria-label^=\"Tentar novamente disciplinas\"]').click()");
+      await aguardarTexto("Disciplina de teste");
       const consultasAntesDaCorrida = consultas;
       await navegar("/professores?q=lenta&ordem=nome", "Buscando…");
       await aguardar(() => Promise.resolve(consultas > consultasAntesDaCorrida), "consulta lenta");
@@ -263,7 +335,7 @@ export function criarCenarioBusca(professor, disciplina) {
       await avaliar("document.querySelector('[name=email]').value='teste@aluno.unb.br'; document.querySelector('[name=senha]').value='senha-apenas-teste'; document.querySelector('main button[type=submit]').click()");
       await aguardarTexto("Sua sessão está ativa");
       assert.equal(logins, 1);
-      console.log("#155: buscas, ordenação sem HTTP, ida/retorno, histórico, recarga, vazio, erro/recuperação em 320/768/1280 e claro/escuro; componentes de #157/#158, corrida de respostas, senha por teclado e login via serviço controlado aprovados. Este runner usa HTTP controlado e viewport emulado.");
+      console.log("#155/#203: busca direta, ordem sem HTTP, contexto/histórico/recarga, catálogo e unidades da API, vazio, erro/nova tentativa, homônimos e ações Consultar/Avaliar em 320/390/768/1280/1440; teclado, corrida de respostas e acesso aprovados. HTTP controlado e viewport emulado; temas do sistema sobre dark fixo.");
     } finally { ativo = false; }
   }
   return { responder, verificar };

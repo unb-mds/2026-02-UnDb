@@ -185,8 +185,11 @@ try {
         if (alvo) {
           const seletor = seletorRota(alvo);
           await avaliar(`document.querySelector(${JSON.stringify(seletor)}).closest('li').querySelector('a').focus()`);
-          await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
-          await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+          // Nome da disciplina → Consultar (ação explícita da #203) → Avaliar.
+          for (let tab = 0; tab < 2; tab += 1) {
+            await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+            await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+          }
           assert.equal(await avaliar(`document.activeElement.pathname === ${JSON.stringify(alvo)} && document.activeElement.matches(':focus-visible') && getComputedStyle(document.activeElement).outlineStyle !== 'none'`), true, "Foco de Avaliar");
           await avaliar("document.activeElement.blur(); window.scrollTo(0, 0)");
         }

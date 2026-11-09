@@ -365,7 +365,9 @@ async function verificarCorrecoesInterface() {
   await cdp("Page.navigate", { url: "about:blank" });
   await aguardar(async () => await avaliar('location.href === "about:blank"'), "navegação anterior finalizada");
   await cdp("Network.setCacheDisabled", { cacheDisabled: true });
-  await cdp("Fetch.enable", { patterns: [{ resourceType: "Script", requestStage: "Request" }] });
+  // Atrasa os bundles da aplicação. Scripts externos de segurança do navegador
+  // podem bloquear o parser antes do body e não representam hidratação do React.
+  await cdp("Fetch.enable", { patterns: [{ urlPattern: "http://localhost:3100/_next/*", resourceType: "Script", requestStage: "Request" }] });
   const scriptsAtrasados = [];
   let liberarScripts;
   const permitirScripts = new Promise((resolve) => { liberarScripts = resolve; });
