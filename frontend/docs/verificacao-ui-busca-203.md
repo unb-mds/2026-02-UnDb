@@ -57,3 +57,33 @@ Quatro evidências do build final estão versionadas para revisão no PR:
 Os testes de navegador usam API controlada e viewport emulado. A integração FastAPI/PostgreSQL real e o reteste com alunos da #166 não foram executados nesta tarefa. `tests/resultados-browser.mjs` foi adaptado à nova sequência de foco e validado sintaticamente; seu runner com banco isolado permanece não executado. Não houve alteração de backend, modelo de dados, autenticação, permissões ou infraestrutura de produção.
 
 A revisão local confrontou o diff e os componentes novos com as fontes acima e os contratos existentes, sem findings confirmados pendentes no escopo inspecionado. A integração em `develop` depende dos checks remotos e da revisão humana exigida em `CONTRIBUTING.md`.
+
+## Revisão complementar e inicialização da demonstração — 09/11/2026
+
+Revisão integral dos 22 arquivos da PR #209 sobre `495718d`, incluindo contratos,
+estados, navegação e testes. Nenhum defeito funcional adicional foi confirmado na
+UI. A pedido do responsável, o mesmo commit complementar inclui a correção da
+inicialização da API no Render e `pool_pre_ping` para conexões ociosas do Neon.
+O módulo novo é executado sem shell; sua configuração e os limites do deploy
+estão no [guia de inicialização](../../docs/inicializacao-render.md).
+
+Verificações complementares, Windows, Node 24.22.1 e Python 3.12:
+
+- ESLint e TypeScript (`tsc --noEmit`): aprovados.
+- Runner de testes do frontend: 65 testes aprovados.
+- Builds padrão com Turbopack e com webpack: aprovados nesta execução.
+- Quatro suítes de navegador: avaliação/busca/protótipo, moderação,
+  denúncias/agradecimentos e comentários aprovadas, com API controlada.
+- Backend: 164 testes aprovados em SQLite em memória, incluindo os três testes
+  novos de inicialização; dependências de `backend/requirements.txt` instaladas
+  em diretório temporário isolado para Python 3.12.
+- Compilação Python de `app` e `alembic`, e `git diff --check`: aprovados.
+
+A primeira execução de navegador terminou com timeout no cenário de login com
+contexto auxiliar; a repetição com diagnóstico passou sem alteração do produto.
+O timeout permanece registrado como intermitente, sem causa confirmada. Uma
+execução de backend restrita deixou de avançar; a execução fora do sandbox passou.
+Não houve afrouxamento de asserções nem alteração da UI para contornar esses eventos.
+
+Não foram executados migrações em PostgreSQL, deploy no Render/Neon ou reteste com
+alunos nesta revisão. Os checks remotos precisam confirmar o commit complementar.
