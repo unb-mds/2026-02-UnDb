@@ -44,7 +44,8 @@ flowchart LR
     API --> WEB
 ```
 
-O scraper **grava** no banco; a API apenas **lê**. Nenhum endpoint dispara importação em
+O scraper **grava dados institucionais** no banco; a API **consulta esse catálogo**
+e também persiste contas, sessões, avaliações e moderação. Nenhum endpoint dispara importação em
 tempo real, para que a resposta ao usuário não dependa da disponibilidade do SIGAA.
 
 ---
@@ -494,6 +495,27 @@ Resultados reproduzíveis desta entrega ficam em
 ---
 
 ## 8. Riscos técnicos
+
+### Ambiente público observado em 09–10/11/2026
+
+A configuração executada pelo PO usa frontend Next.js na Vercel, API Docker no
+Render, PostgreSQL no Neon, envio pelo Resend e DNS no Registro.br. O
+[registro de hospedagem](hospedagem.md) documenta escolha, alternativas discutidas,
+configuração, responsabilidades, evidências e pendências das #169–#171, sem
+promover os ADRs/RNFs ainda propostos. O Compose do ADR 08 continua sendo o
+ambiente local; sua aprovação não representava decisão sobre hosting público.
+
+As PRs #214/#215 acrescentam apresentação institucional e `departamento_nome`
+opcional, obtido de `Unidade.nome` na origem SIGAA, preservando `departamento`
+como código. A associação ORM é somente de leitura; não houve nova coluna ou
+migração nessa correção. O frontend não acessa o Neon diretamente.
+
+O [resultado manual SIGAA](estudos/importacao-neon-2026-11-10.md) comprova a carga
+informada nesta sessão. Não comprova agendamento nem o worker contínuo de
+descarte da moderação no ambiente hospedado. Esses processos precisam de
+operação independente do servidor HTTP e de suas suspensões por inatividade.
+
+### Riscos e mitigação
 
 | Risco | Impacto | Mitigação |
 |---|---|---|

@@ -2,6 +2,13 @@
 
 ## Decisão operacional vigente
 
+**Atualização de 10/11/2026:** a carga manual de graduação 2026.2 no Neon terminou
+com sucesso, com 6.571 ofertas extraídas/processadas e sem erro, conforme o
+resumo fornecido pelo operador. [Resultado, contagens e limites](estudos/importacao-neon-2026-11-10.md).
+Não houve comprovação de cron remoto ou workflow SIGAA instalado; os perfis
+abaixo são orientação operacional, não evidência de agendamento ativo. O
+[guia de hospedagem](hospedagem.md) descreve a configuração pública e os segredos.
+
 A importação é executada fora da API pelo comando
 `python -m app.commands.importar_sigaa_agendado`. O script
 `scripts/cron/sigaa-import.sh` permite integrá-lo ao cron.

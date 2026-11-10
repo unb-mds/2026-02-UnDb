@@ -4,6 +4,7 @@ from sqlalchemy import SmallInteger, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.models.unidade import Unidade
 
 
 class Disciplina(Base):
@@ -16,6 +17,18 @@ class Disciplina(Base):
     nome_normalizado: Mapped[str] = mapped_column(String(150), nullable=False, default="")
     departamento: Mapped[str] = mapped_column(String(100), nullable=False)
     creditos: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+
+    unidade_institucional: Mapped[Unidade | None] = relationship(
+        primaryjoin=(
+            "and_(foreign(Disciplina.departamento) == Unidade.codigo, Unidade.fonte == 'SIGAA')"
+        ),
+        viewonly=True,
+        lazy="joined",
+    )
+
+    @property
+    def departamento_nome(self) -> str | None:
+        return self.unidade_institucional.nome if self.unidade_institucional else None
 
     turmas = relationship("Turma", back_populates="disciplina")
     avaliacoes = relationship("Avaliacao", back_populates="disciplina")

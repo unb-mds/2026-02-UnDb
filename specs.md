@@ -65,6 +65,17 @@ referência vigente; o recorte histórico não é uma nova definição de contra
 
 ## 3. Modelo de dados
 
+**Complemento técnico da PR #215 (10/11/2026):** respostas institucionais de
+professor/disciplina, agregado e comparação podem incluir `departamento_nome`
+(`string | null`), obtido do `nome` da unidade vinculada à fonte `SIGAA`.
+`departamento` continua sendo o código de identidade/filtro. A associação ORM é
+somente de leitura, com carregamento junto à entidade; não cria campo físico ou
+migração. Ausência de correspondência preserva o registro e produz nome nulo.
+No frontend, `departamentoNome` é opcional: nome institucional válido tem
+preferência; código textual permanece como fallback e código numérico aparece
+como `Unidade <código>`. Não inventar siglas nem unir pessoas/unidades por nome.
+Publicar API e frontend para obter o nome completo no ambiente público.
+
 Esta seção preserva o recorte do modelo da Release 1 e da base RF20 da #156.
 RF21/RF22 foram entregues pela [PR #192](https://github.com/unb-mds/2026-02-UnDb/pull/192),
 integrada em `81e54be`; seus modelos e contratos estão no

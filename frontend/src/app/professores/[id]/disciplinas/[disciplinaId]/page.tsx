@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -39,10 +40,10 @@ export default async function AvaliacaoAgregadaPage({
 
       <div className="rounded-xl border border-accent/30 bg-accent/5 p-5 break-words">
         <h1 className="text-2xl font-semibold">{avaliacao.professor.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica do professor: {avaliacao.professor.departamento}</p>
+        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica do professor: {nomeUnidade(avaliacao.professor)}</p>
         <p className="mt-3 font-medium">{avaliacao.disciplina.nome}</p>
         <p className="text-sm text-foreground/70">Código da disciplina: <span className="font-mono">{avaliacao.disciplina.codigo}</span></p>
-        <p className="text-sm text-foreground/70">Unidade acadêmica: {avaliacao.disciplina.departamento}</p>
+        <p className="text-sm text-foreground/70">Unidade acadêmica: {nomeUnidade(avaliacao.disciplina)}</p>
       </div>
 
       <p className="text-sm text-foreground/70">
@@ -68,7 +69,7 @@ export default async function AvaliacaoAgregadaPage({
       </p>
       <Link
         href={comContextoBusca(`/professores/${id}/disciplinas/${disciplinaId}/avaliar`, contexto)}
-        className="self-start rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90"
+        className="button primary self-start"
       >
         Avaliar este professor na disciplina
       </Link>

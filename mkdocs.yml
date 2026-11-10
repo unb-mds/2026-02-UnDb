@@ -47,11 +47,16 @@ nav:
       - Modelos de dados: modelos.md
       - Importação do SIGAA: importacao-sigaa.md
       - Operação do SIGAA: operacao-importacao-sigaa.md
+      - Hospedagem e operação pública: hospedagem.md
+      - Inicialização no Render: inicializacao-render.md
   - Releases:
       - Release 1.0.0: releases/1.0.0.md
+      - Release 1.1.0: releases/1.1.0.md
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:
+      - Importação no Neon — 10/11/2026: estudos/importacao-neon-2026-11-10.md
+      - Identidade, conta e catálogo — PRs 214 e 215: estudos/identidade-conta-catalogo-2026-11-10.md
       - Lint e tipos — Issue 189: estudos/verificacao-lint-tipos-issue-189.md
       - Denúncia e agradecimentos: estudos/denuncia-agradecimentos-issue-193.md
       - Fila de moderação: estudos/fila-moderacao-issue-162.md

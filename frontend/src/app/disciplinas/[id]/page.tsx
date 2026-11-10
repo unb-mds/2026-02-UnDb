@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -45,7 +46,7 @@ export default async function DetalheDisciplinaPage({
       <div className="rounded-xl border border-accent/30 bg-accent/5 p-5 break-words">
         <h1 className="text-2xl font-semibold">{disciplina.nome}</h1>
         <p className="mt-1 text-sm text-foreground/70">Código da disciplina: <span className="font-mono">{disciplina.codigo}</span></p>
-        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {disciplina.departamento}</p>
+        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {nomeUnidade(disciplina)}</p>
       </div>
 
       <div>
@@ -64,7 +65,7 @@ export default async function DetalheDisciplinaPage({
                     {avaliacao.professor.nome}
                   </Link>
                 </h3>
-                <p className="text-sm text-foreground/70">Unidade acadêmica: {avaliacao.professor.departamento}</p>
+                <p className="text-sm text-foreground/70">Unidade acadêmica: {nomeUnidade(avaliacao.professor)}</p>
                 {avaliacao.dadosSuficientes ? (
                   <CriteriosAgregados avaliacao={avaliacao} />
                 ) : (

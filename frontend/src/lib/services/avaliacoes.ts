@@ -29,8 +29,8 @@ export async function enviarAvaliacaoComComentario(dados: AvaliacaoInput, signal
 interface AvaliacaoAgregadaWireBase {
   professor_id: string;
   disciplina_id: string;
-  professor: ProfessorInstitucional;
-  disciplina: DisciplinaInstitucional;
+  professor: Omit<ProfessorInstitucional, "departamentoNome"> & { departamento_nome?: string | null };
+  disciplina: Omit<DisciplinaInstitucional, "departamentoNome"> & { departamento_nome?: string | null };
   total_avaliacoes: number;
 }
 
@@ -55,8 +55,19 @@ function paraAvaliacaoAgregada(wire: AvaliacaoAgregadaWire): AvaliacaoAgregada {
   const base = {
     professorId: wire.professor_id,
     disciplinaId: wire.disciplina_id,
-    professor: wire.professor,
-    disciplina: wire.disciplina,
+    professor: {
+      id: wire.professor.id,
+      nome: wire.professor.nome,
+      departamento: wire.professor.departamento,
+      departamentoNome: wire.professor.departamento_nome ?? null,
+    },
+    disciplina: {
+      id: wire.disciplina.id,
+      codigo: wire.disciplina.codigo,
+      nome: wire.disciplina.nome,
+      departamento: wire.disciplina.departamento,
+      departamentoNome: wire.disciplina.departamento_nome ?? null,
+    },
     totalAvaliacoes: wire.total_avaliacoes,
   };
 

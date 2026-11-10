@@ -1,0 +1,16 @@
+{
+  "fonte": "Resumo final fornecido por Nicolas na revisao da PR #213, em 2026-11-10; extrato, nao lista integral de unidades",
+  "status": "sucesso",
+  "iniciada_em": "2026-11-10T00:11:57.177921+00:00",
+  "finalizada_em": "2026-11-10T03:53:17.975093+00:00",
+  "ofertas_extraidas": 6571,
+  "ofertas_processadas": 6571,
+  "erro": null,
+  "resultado": {
+    "sucesso": true,
+    "ano": "2026",
+    "periodo": "2",
+    "inicio": "2026-11-10T00:12:29.464713+00:00",
+    "fim": "2026-11-10T03:53:17.975093+00:00"
+  }
+}

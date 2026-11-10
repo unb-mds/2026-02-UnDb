@@ -84,7 +84,7 @@ conclusão de implementação são evidências distintas.
 Os cinco critérios e seus agregados permanecem independentes da moderação do texto;
 substitutos passam novamente pela moderação vigente antes de publicar.
 
-**Estado reconciliado em 09/11/2026 — fonte: issues encerradas e PRs integradas em `develop`.**
+**Estado reconciliado em 10/11/2026 — fonte: issues e PRs integradas em `develop`.**
 A navegação, resultados, formulário e apresentação visual das #155/#157/#158/#186
 foram integrados pelas PRs #185/#183/#184/#187. A base de comentários e as APIs de
 denúncia/moderação vieram das PRs #191/#192; as interfaces #159/#162/#193 das PRs
@@ -92,6 +92,14 @@ denúncia/moderação vieram das PRs #191/#192; as interfaces #159/#162/#193 das
 com limites registrados; isso não equivale ao reteste qualitativo com alunos #166,
 que continua aberto e deve usar a versão efetivamente integrada das telas atuais.
 Fontes e hashes estão na [matriz de reconciliação da R2](releases/2.0.0-reconciliacao.md).
+
+A v1.1.0 foi publicada em 09/11 (#210). Depois dela, #214 entregou verde,
+logo/favicon e #215 integrou conta/avaliação dark, nomes institucionais das
+unidades e expansão do catálogo. Essas entregas estão em `develop`, ainda fora
+da tag pública. Domínio/HTTPS e confirmação institucional foram demonstrados;
+a importação manual 2026.2 terminou com sucesso em 10/11. A
+[operação pública](hospedagem.md) mantém os limites de backup, agendamento e
+descarte contínuo visíveis, sem tratar publicação como aceite da R2.
 
 ## 7. Limites de escopo da Release 1
 
@@ -150,7 +158,8 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
 - manter a cobertura de todas as unidades com turmas de graduação nas importações
   manuais da Release 1; a verificação operacional da rotina na Release 2 permanece
   na [#164](https://github.com/unb-mds/2026-02-UnDb/issues/164), ainda aberta;
-- definir a estratégia de execução e deploy do frontend;
+- acompanhar a execução e publicação pública conforme o [registro de hospedagem](hospedagem.md),
+  incluindo recuperação, tarefas contínuas e promoção das entregas de `develop`;
 - validar os requisitos não-funcionais ainda propostos, exceto o RNF02 já validado.
 - definir a lista do filtro de termos; enquanto isso, manter aprovação humana prévia;
 - avaliar futuramente a moderação por IA sem aprovação humana prévia, sem considerar
