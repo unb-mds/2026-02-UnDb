@@ -157,7 +157,7 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 700));
     assert.ok((await avaliar("document.querySelector('[aria-label=\"Análise do comentário\"]').innerText")).includes(uuid(2)), "resposta antiga não substitui seleção");
     atrasos = {};
-    for (const tema of ["light", "dark"]) for (const largura of [320, 768, 1280]) {
+    for (const tema of ["light", "dark"]) for (const largura of [320, 390, 768, 1440]) {
       await cdp("Emulation.setDeviceMetricsOverride", { width: largura, height: 900, deviceScaleFactor: 1, mobile: largura === 320 });
       await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
       for (const [id, opcoes] of [[uuid(1), ["APROVAR", "REJEITAR"]], [uuid(2), ["MANTER", "REMOVER"]], [uuid(3), ["RESTAURAR", "REMOVER"]]]) {
@@ -208,14 +208,14 @@ try {
     await esperarTexto("Decisão registrada"); await esperarTexto("Não foi possível carregar");
     assert.equal(await avaliar("document.querySelectorAll('[aria-label=\"Comentários na fila\"] button').length"), 0, "não mantém fila obsoleta quando a atualização falha");
     assert.equal(await avaliar("localStorage.length + sessionStorage.length"), 0);
-    console.log("Fila controlada: acesso, três estados, filtros, seis ações, motivo, 403/409/422/503, concorrência de consultas, teclado e 18 combinações de estado/largura/tema aprovados.");
+    console.log("Fila controlada: acesso, três estados, filtros, seis ações, motivo, 403/409/422/503, concorrência de consultas, teclado e 24 combinações de estado/largura/tema aprovados.");
   } else {
     for (const [token, esperado] of [[null, "Entre na sua conta"], [real.comum, "Acesso não permitido"], [real.naoConfirmado, "Acesso não permitido"]]) {
       await cookie(token); await navegar(); await esperarTexto(esperado);
       assert.ok(!(await texto()).includes("Autor real de teste"));
     }
     await cookie(real.moderador); await navegar(); await esperarTexto("Selecione um comentário");
-    for (const tema of ["light", "dark"]) for (const largura of [320, 768, 1280]) {
+    for (const tema of ["light", "dark"]) for (const largura of [320, 390, 768, 1440]) {
       await cdp("Emulation.setDeviceMetricsOverride", { width: largura, height: 900, deviceScaleFactor: 1, mobile: largura === 320 });
       await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
       await selecionar(real.casos[0].id);
@@ -234,7 +234,7 @@ try {
     assert.equal(estado.estado, "PENDENTE");
     await selecionar(real.denunciaPropria); await preencher("MANTER"); await clicar("Confirmar decisão"); await esperarTexto("outro moderador");
     await esperarTexto("Selecione um comentário");
-    console.log("Fila real: navegador → FastAPI/PostgreSQL, visitante/conta comum/não confirmada, seis ações, impedimento próprio e seis combinações de largura/tema aprovados.");
+    console.log("Fila real: navegador → FastAPI/PostgreSQL, visitante/conta comum/não confirmada, seis ações, impedimento próprio e oito combinações de largura/tema aprovados.");
   }
   assert.ok(!consultas.some(({ url, metodo }) => {
     const caminho = new URL(url).pathname;
