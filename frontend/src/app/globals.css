@@ -77,6 +77,14 @@ input, select, textarea { accent-color: var(--primary); }
 .footer nav { display: flex; flex-wrap: wrap; gap: 20px; }
 .footer a:hover { color: var(--accent); }
 
+/* Estados de exibição e ilustrações */
+.states-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 20px; }
+.state-card { padding: 24px; }
+.state-card h2 { font-size: 20px; margin: 12px 0 8px; }
+.state-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.placeholder-list { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; padding: 0; }
+.placeholder-list div { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+
 /* Badges e tags */
 .badge { display: inline-flex; align-items: center; width: fit-content; font-size: 11px; line-height: 1.3; border-radius: 99px; padding: 5px 11px; background: var(--raised); color: var(--muted); }
 .badge.blue { background: rgba(36, 103, 232, 0.18); color: var(--accent); }
@@ -151,6 +159,7 @@ tbody tr:last-child > * { border-bottom: 0; }
   .profile-actions p { width: 100%; }
   .profile-actions .button { width: auto; }
   .two-columns { grid-template-columns: 1fr; gap: 18px; }
+  .states-grid { grid-template-columns: 1fr; gap: 16px; }
   .comparison-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
 }
 @media (max-width: 760px) {
