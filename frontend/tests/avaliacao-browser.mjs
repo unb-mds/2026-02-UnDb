@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import { verificarPrototipo } from "./prototipo-browser.mjs";
 import { criarCenarioBusca } from "./busca-browser.mjs";
 import { verificarIdentidade } from "./identidade-browser.mjs";
+import { capturarContaDark, verificarContaDark } from "./conta-dark-browser.mjs";
 
 const navegador = process.env.BROWSER_PATH ?? "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";
 assert.ok(existsSync(navegador), "Informe BROWSER_PATH com o executável Edge/Chromium.");
@@ -281,8 +282,10 @@ try {
       assert.ok(!(await texto()).includes("Avaliação registrada com sucesso"));
     }
     statusEnvio = 200;
-    await enviar();
+    const enviosAntes = envios.length;
+    await avaliar('document.querySelector("main form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true})); document.querySelector("main form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
     await aguardarTexto("Avaliação registrada com sucesso");
+    assert.equal(envios.length, enviosAntes + 1, "duas submissões consecutivas não duplicam o envio");
     assert.ok(envios.at(-1).cookie.includes("undb_session="));
     assert.ok(!("usuario_id" in envios.at(-1).body));
     assert.ok(consultasSessao > 0);
@@ -305,9 +308,10 @@ try {
   assert.equal(await avaliar("document.activeElement.name"), "dificuldade");
   for (const tema of ["light", "dark"]) {
     await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
-    for (const width of [320, 768, 1280]) {
+    for (const width of [320, 390, 768, 1280, 1440]) {
       await cdp("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
       assert.equal(await avaliar("document.documentElement.scrollWidth <= window.innerWidth"), true, `${tema}, ${width}px`);
+      if ([320, 390, 768, 1440].includes(width)) await capturarContaDark(cdp, `avaliacao-${tema}-${width}`);
     }
   }
   assert.equal(await avaliar('document.querySelectorAll("textarea[name=comentario]").length'), 1);
@@ -315,8 +319,12 @@ try {
   if (!real) await cenarioBusca.verificar({ cdp, avaliar, aguardar, aguardarTexto });
   if (!real) await verificarIdentidade({ cdp, avaliar, aguardar });
   if (!real) await verificarCorrecoesInterface();
+  if (!real) {
+    autenticado = false;
+    await verificarContaDark({ cdp, avaliar, aguardar });
+  }
   if (!real) await verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto, aguardarValidacaoLocal, socket });
-  console.log("Interface aprovada: cinco critérios, escalas, validação local, respostas preservadas, teclado, acesso direto e 6 combinações de tema/largura.");
+  console.log("Interface aprovada: cinco critérios, escalas, validação local, respostas preservadas, teclado, acesso direto e 10 combinações de tema/largura.");
 } finally {
   if (socket?.readyState === WebSocket.OPEN) {
     await cdp("Browser.close").catch(() => {});
