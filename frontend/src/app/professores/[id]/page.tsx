@@ -29,21 +29,45 @@ export default async function DetalheProfessorPage({
   const disciplinas = await listarDisciplinasDoProfessor(id);
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
-      <Caminho itens={[{ nome: "Início", href: "/" }, { nome: "Professores", href: contexto ? urlBusca(contexto) : "/professores", retornoBusca: !!contexto }, { nome: professor.nome }]} />
-      <Link href={contexto ? urlBusca(contexto) : "/professores"} className="self-start text-sm text-accent underline underline-offset-4">
+    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
+      <Caminho
+        itens={[
+          { nome: "Início", href: "/" },
+          {
+            nome: contexto ? "Resultados da busca" : "Professores",
+            href: contexto ? urlBusca(contexto) : "/professores",
+            retornoBusca: !!contexto,
+          },
+          { nome: professor.nome },
+        ]}
+      />
+      <Link
+        href={contexto ? urlBusca(contexto) : "/professores"}
+        className="self-start text-sm text-accent underline underline-offset-4"
+      >
         {contexto ? "← Voltar aos resultados da busca" : "← Buscar outro professor"}
       </Link>
 
-      <div className="rounded-xl border border-accent/30 bg-accent/5 p-5 break-words">
-        <h1 className="text-2xl font-semibold">{professor.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {professor.departamento}</p>
+      <div className="panel p-6 break-words">
+        <div className="badges mb-3">
+          <span className="badge">{professor.departamento}</span>
+        </div>
+        <h1 className="text-2xl font-bold">{professor.nome}</h1>
+        <p className="mt-1 text-sm text-foreground/70">
+          Unidade acadêmica: {professor.departamento}
+        </p>
       </div>
 
       <div>
-        <h2 className="text-sm font-medium text-foreground/70">Disciplinas lecionadas</h2>
-        <p className="mt-2 text-sm text-foreground/70">Escolha a matéria abaixo. Você pode avaliar diretamente ou comparar os professores antes.</p>
-        <DisciplinasProfessor professorId={id} disciplinas={disciplinas} contexto={contexto} />
+        <h2 className="text-lg font-semibold">Disciplinas lecionadas</h2>
+        <p className="mt-1 text-sm text-foreground/70">
+          Escolha a matéria abaixo. Você pode avaliar diretamente ou comparar os professores antes.
+        </p>
+        <DisciplinasProfessor
+          professorId={id}
+          disciplinas={disciplinas}
+          contexto={contexto}
+        />
       </div>
     </main>
   );
