@@ -1,53 +1,25 @@
 # Inicialização da API no Render
 
-Correção complementar à revisão da PR #209, solicitada para desbloquear a
-demonstração em `undb.app.br` (#169). Não altera contratos da UI #203.
+A [PR #209](https://github.com/unb-mds/2026-02-UnDb/pull/209) incluiu o módulo
+`app.commands.iniciar_servidor` para resolver os deploys que falhavam com status
+127 ao interpretar uma sequência de shell inteira como nome de programa.
 
-O build Docker terminou, mas os dois deploys observados falharam com status 127:
-o shell tentou executar toda a sequência `alembic ... && ... uvicorn ...` como
-um único nome de programa. A inicialização agora fica em um módulo Python,
-sem shell ou aspas no campo Docker Command.
-
-## Configuração
-
-Depois de integrar a correção na branch selecionada pelo serviço, configure:
+No painel, **Docker Command** deve conter exatamente:
 
 ```text
 python -m app.commands.iniciar_servidor
 ```
 
-Use esse valor em **Settings → Build & Deploy → Docker Command**. O módulo
-já é incluído pelo `COPY app ./app` do Dockerfile existente. Root Directory:
-`backend`; Dockerfile Path: `./Dockerfile`; Docker Build Context: `.`.
-Selecione plano Free e região Virginia; deixe Pre-Deploy Command vazio.
+O comando aplica `alembic upgrade head` antes do Uvicorn, valida `PORT` e não
+inicia o servidor se a migração falhar. Usa `os.execv` para entregar sinais ao
+processo HTTP. O CMD original do Dockerfile continua preservado para uso local;
+o override é configuração explícita do serviço hospedado.
 
-Configure `DATABASE_URL` com a conexão direta do Neon, prefixo
-`postgresql+psycopg2://` e TLS (`sslmode=require`), `SECRET_KEY` gerada no painel,
-`DEBUG=False`, `CORS_ORIGINS=https://undb.app.br` e
-`FRONTEND_URL=https://undb.app.br`. Não envie credenciais ao Git.
-`EMAIL_BACKEND=console` permite testar a infraestrutura, mas não envia e-mails;
-o cadastro só poderá ser validado com Resend e domínio verificado configurados.
+Configuração de caminhos, variáveis, driver Neon e diagnóstico estão no
+[guia de hospedagem](hospedagem.md#api-no-render-e-conexao-neon).
+Health `/health` verifica apenas o processo, e não o banco. Os três testes de
+inicialização conferem ordem, falha de migração e porta inválida; o sucesso real
+do deploy e das migrações foi observado posteriormente na v1.1.0 pelo PO.
 
-O comando valida `PORT` (padrão 10000), aplica `alembic upgrade head` e inicia
-Uvicorn em `0.0.0.0` na porta configurada pelo Render. Uma falha nas migrações
-impede o servidor de iniciar. O processo é substituído por Uvicorn para receber
-sinais de encerramento diretamente. O fluxo local de Docker Compose é preservado.
-`pool_pre_ping=True` detecta conexões encerradas antes de reutilizá-las; não
-recupera transações interrompidas.
-
-## Verificação
-
-Os testes `tests.test_iniciar_servidor` verificam a ordem migração/servidor,
-o bloqueio do servidor quando a migração falha e a rejeição de porta inválida
-antes de qualquer migração. Eles não substituem o teste no Render com Neon.
-
-Após o deploy, confira os logs de migração, o retorno de `/health` e uma busca
-real para verificar acesso ao banco. `/health` verifica apenas o processo.
-Não execute downgrade automaticamente para reverter um deploy; migrações e
-código precisam ser avaliados separadamente. Antes de migrar uma base com dados,
-faça backup em armazenamento privado do time.
-
-A PR tem destino `develop`, enquanto o serviço observado usa `main`. O comando
-novo só estará disponível após a correção chegar à branch publicada. Não troque
-a branch do ambiente ou considere a PR integrada antes de seguir o fluxo humano
-de revisão e release.
+Antes de atualizar uma base com dados, obter backup privado e verificar sua
+recuperação. Reverter deploy não reverte schema; não fazer downgrade automático.

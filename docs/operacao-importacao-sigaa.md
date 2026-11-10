@@ -2,6 +2,15 @@
 
 ## Decisão operacional vigente
 
+**Atualização de 10/11/2026:** a carga manual de graduação 2026.2 no Neon terminou
+com sucesso, com 6.571 ofertas extraídas/processadas e sem erro, conforme o
+resumo fornecido pelo operador. [Resultado, contagens e limites](estudos/importacao-neon-2026-11-10.md).
+Não houve comprovação de cron remoto ou workflow SIGAA ativo. A #164 acrescenta
+um workflow versionado e auditoria de cobertura; publicação/configuração e uma
+execução automática real ainda precisam de evidência. Os perfis
+abaixo não representam comprovação de agendamento ativo. O
+[guia de hospedagem](hospedagem.md) descreve a configuração pública e os segredos.
+
 A importação é executada fora da API pelo comando
 `python -m app.commands.importar_sigaa_agendado`. O script
 `scripts/cron/sigaa-import.sh` permite integrá-lo ao cron.
@@ -21,6 +30,96 @@ ativa o perfil diário no início da matrícula e retorna ao perfil semanal quan
 
 Cada execução cria uma linha em `importacao_execucoes` com status `em_andamento` e a atualiza
 para `sucesso` ou `falha`, incluindo timestamps, contadores, erros e o resultado detalhado.
+
+## Workflow GitHub Actions preparado na #164
+
+O arquivo `.github/workflows/sigaa-importacao.yml` executa o importador fora da
+API, sem depender de um processo contínuo no Render. Não executa migrations.
+Agendamento e disparo manual estão restritos a `main`; integrar em `develop`
+não ativa a rotina. O job fica desabilitado para agendamento enquanto
+`SIGAA_PERFIL` não for configurado. O disparo manual é uma ação explícita do
+operador e não depende do perfil. A execução sempre usa `--todas-unidades`.
+
+Configurar em **Settings → Secrets and variables → Actions**:
+
+| Tipo | Nome | Configuração privada ou operacional |
+|---|---|---|
+| Secret | `SIGAA_DATABASE_URL` | Conexão direta/TLS do importador no banco correto; nunca usar `undb_api` |
+| Secret | `SIGAA_SECRET_KEY` | Configuração privada exigida pelo backend |
+| Variable | `SIGAA_ANO` | Ano acadêmico com quatro dígitos, confirmado pelo operador |
+| Variable | `SIGAA_PERIODO` | `1` ou `2`, confirmado pelo operador |
+| Variable | `SIGAA_PERFIL` | `diario` na matrícula ou `semanal` fora dela; ausente/outro valor não executa por agenda |
+
+Os dois eventos de agenda usam `America/Sao_Paulo`, às 03:00, um diário e outro
+aos domingos. A condição do job seleciona somente o evento correspondente ao
+perfil, inclusive no domingo: não há duas importações no mesmo dia por causa
+dos dois eventos. Manter desativado qualquer cron externo para o mesmo banco.
+A concorrência do workflow serializa suas execuções, sem cancelar a que já está
+em andamento; não protege contra uma importação iniciada fora do GitHub.
+
+Os [eventos agendados do GitHub](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onschedule)
+usam a branch padrão e podem sofrer atrasos. O job tem limite de 350 minutos;
+a carga manual registrada levou cerca de 221 minutos. Timeout, cancelamento ou
+indisponibilidade do banco podem deixar o histórico `em_andamento`; verificar a
+execução antes de repetir. O processo persiste por unidade, portanto uma
+interrupção não desfaz automaticamente unidades já comitadas.
+
+### Papel do importador
+
+Usar um papel separado da API e das migrações. Criar uma vez como administrador:
+
+```sql
+CREATE ROLE undb_importador WITH LOGIN
+  NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+```
+
+Definir senha por mecanismo privado e aplicar os GRANTs versionados em
+`scripts/sql/164-acesso-importador.sql`. Eles permitem escrever no catálogo e no
+histórico, e substituir vínculos docentes de turmas; não permitem acessar
+contas, avaliações, comentários ou alterar schema. Conferir também privilégios
+herdados e `PUBLIC`. Guardar a conexão resultante apenas em `SIGAA_DATABASE_URL`.
+O papel `undb_api` da #170 permanece sem essas permissões administrativas de dados.
+
+### Auditoria e histórico
+
+A lista esperada é enumerada antes da coleta e comitada em
+`importacao_execucoes.departamentos`. O JSON registra `origem_unidades` como
+`formulario_sigaa` ou `lista_explicita`. Não há constante de 211 unidades: o
+denominador é o formulário efetivamente enumerado naquela execução.
+
+O workflow pede `--auditoria <arquivo>` ao comando existente. Ao finalizar,
+compara os códigos esperados com o resultado completo e falha se houver unidade
+ausente, inesperada, repetida, com falha, contagem inválida/divergente ou período
+incompatível. Unidades consultadas com sucesso e zero ofertas são válidas.
+O relatório inclui a lista esperada, lacunas, ID e timestamps da execução; não
+inclui mensagens de exceção privadas, credenciais, contas ou avaliações.
+
+O artefato `sigaa-cobertura-<run_id>-<tentativa>` guarda o relatório por 30 dias,
+inclusive nas falhas que chegaram a produzir auditoria. O arquivo bruto de logs
+não é publicado; detalhes de falha ficam no histórico privado do banco. Falhas
+antes da conexão/registro ou encerramento forçado podem não gerar artefato.
+Baixar a evidência necessária e preservar seu vínculo ao run antes de expirar.
+
+Também é possível auditar **um ID explícito** de uma execução anterior, sem
+reimportar, acessar o SIGAA ou alterar o banco, a partir de `backend/`:
+
+```bash
+python -m app.commands.auditar_importacao_sigaa \
+  --execucao <UUID_DO_HISTORICO> --saida cobertura.json
+```
+
+Código 0 significa correspondência completa entre a lista registrada e o
+resultado; código 1 sinaliza divergências ou execução não bem-sucedida. Em
+históricos antigos sem `origem_unidades`, a auditoria informa `nao_registrada` e
+`cobertura_formulario_verificada=false`, mesmo que a lista registrada confira.
+Isso não deve ser interpretado como prova independente de que o formulário
+inteiro foi enumerado. A comparação da carga manual anterior ainda precisa da
+lista e do resultado completos do operador. Não versionar dumps nem logs brutos.
+
+Para concluir a #164: publicar em `main`, configurar segredos/perfil/período,
+validar um disparo manual e depois uma execução **agendada**, conferir histórico
+e auditoria e registrar as evidências. Os testes locais usam dados simulados e
+não concluem a cobertura da carga real de novembro.
 
 ## Execução manual
 

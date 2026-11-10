@@ -13,7 +13,7 @@ type Props = {
   aoDecidir: (id: string, dados: AcaoModeracaoInput) => Promise<void>;
   aoNegarAcesso: (erro: unknown) => void;
 };
-const campo = "w-full rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base";
+const campo = "w-full rounded-lg border border-foreground/20 bg-background px-4 py-3 text-base";
 const formatarData = (valor: string) => new Date(valor).toLocaleString("pt-BR");
 
 export default function DetalheModeracao({ comentario, executando, impedido, aoDecidir, aoNegarAcesso }: Props) {
@@ -117,7 +117,7 @@ export default function DetalheModeracao({ comentario, executando, impedido, aoD
               <textarea id="motivo-moderacao" required rows={4} value={motivo} onChange={(evento) => setMotivo(evento.target.value)} className={`${campo} mt-1`} />
             </label>
             {erroFormulario && <p role="alert" className="text-sm">{erroFormulario}</p>}
-            <button type="submit" disabled={executando || !acao || !motivo.trim()} className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent hover:opacity-90 disabled:opacity-50">{executando ? "Registrando decisão…" : "Confirmar decisão"}</button>
+            <button type="submit" disabled={executando || !acao || !motivo.trim()} className="button primary min-h-11 disabled:opacity-50">{executando ? "Registrando decisão…" : "Confirmar decisão"}</button>
           </fieldset>
         </form> : <p className="text-sm text-foreground/70">Nenhuma ação disponível com o estado e os relatos consultados. Atualize a fila se o conteúdo mudou.</p>}
     </div>

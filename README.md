@@ -8,7 +8,13 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 
 ## Documentação do produto
 
-- [Release 1.1.0 — candidata e instruções de atualização](docs/releases/1.1.0.md)
+Aplicação pública: [undb.app.br](https://undb.app.br). API:
+[health](https://api.undb.app.br/health) (verifica o processo HTTP).
+[Hospedagem e operação](docs/hospedagem.md),
+[v1.1.0 publicada](docs/releases/1.1.0.md),
+[candidata 1.2.0](docs/releases/1.2.0.md) e
+[estado da R2](docs/releases/2.0.0-reconciliacao.md) distinguem publicação,
+integrações em develop e verificações ainda pendentes.
 
 - [Documento de visão](docs/visao.md)
 - [Engenharia de requisitos](docs/requisitos.md)
@@ -186,9 +192,9 @@ A aplicação sobe em `http://localhost:3000` e consome por padrão a API em
 publicado em outro endereço. Os comandos disponíveis para lint, build de produção e execução
 do build estão documentados em [`frontend/README.md`](frontend/README.md).
 
-A estratégia implementada para revisão na [Issue #36](../../issues/36) usa servidor
+A estratégia implementada para revisão na [Issue #36](https://github.com/unb-mds/2026-02-UnDb/issues/36) usa servidor
 Next.js, sem exportação estática. A justificativa, as alternativas e as consequências
-estão no [ADR 08](docs/arquitetura.md#adr-08--execução-e-containerização-do-frontend).
+estão no [ADR 08](docs/arquitetura.md).
 
 ## Fluxo de contribuição
 
@@ -198,7 +204,7 @@ Lint e formatação Python usam Ruff, fixado em `backend/requirements-dev.txt`, 
 aplicação, testes, migrações e scripts. O frontend preserva ESLint e oferece
 `npm run typecheck` (`next typegen && tsc --noEmit`) sem depender de build anterior.
 Instalação, comandos de verificação/correção e escopo estão no
-[guia de contribuição](CONTRIBUTING.md#verificações-de-qualidade-locais).
+[guia de contribuição](CONTRIBUTING.md).
 
 O check `Backend` executa os testes determinísticos com `python -m unittest discover -s tests -v`,
 sob instrumentação do coverage.py. O job também valida aplicação e migrações em um PostgreSQL 16

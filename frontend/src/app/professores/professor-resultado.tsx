@@ -1,5 +1,7 @@
 "use client";
 
+import { nomeUnidade } from "@/lib/unidade";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import DisciplinasProfessor from "@/components/disciplinas-professor";
@@ -46,7 +48,7 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
               {professor.nome}
             </Link>
           </h2>
-          <p className="mt-2 text-sm text-(--muted)">Unidade acadêmica: {professor.departamento}</p>
+          <p className="mt-2 text-sm text-(--muted)">Unidade acadêmica: {nomeUnidade(professor)}</p>
         </div>
       </div>
       <h3 className="mt-6 text-xs font-medium tracking-wide text-(--muted) uppercase">Disciplinas lecionadas</h3>

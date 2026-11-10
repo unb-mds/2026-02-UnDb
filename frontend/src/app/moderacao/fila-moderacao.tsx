@@ -15,7 +15,7 @@ const filtros: { valor: EstadoFila | ""; rotulo: string }[] = [
   { valor: "", rotulo: "Todos os estados" }, { valor: "PENDENTE", rotulo: "Pendentes de aprovação" },
   { valor: "PUBLICADO", rotulo: "Publicados com denúncias" }, { valor: "SUSPENSO", rotulo: "Suspensos" },
 ];
-const botao = "rounded-lg border border-foreground/20 px-4 py-2.5 text-sm font-medium text-accent hover:bg-accent/5 disabled:opacity-50";
+const botao = "button min-h-11 disabled:opacity-50";
 
 export default function FilaModeracao() {
   const [filtro, setFiltro] = useState<EstadoFila | "">("");
@@ -114,16 +114,16 @@ export default function FilaModeracao() {
 
   return (
     <>
-      <div className="flex flex-wrap items-end gap-3">
-        <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm font-medium" htmlFor="estado-fila">Estado dos comentários
+      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-end">
+        <label className="flex w-full min-w-0 flex-col gap-1 text-sm font-medium sm:flex-1" htmlFor="estado-fila">Estado dos comentários
           <select id="estado-fila" value={filtro} disabled={executando} onChange={(evento) => {
             const valor = filtros.find((item) => item.valor === evento.target.value)?.valor;
             if (valor !== undefined) { setFiltro(valor); atualizar(); }
-          }} className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base">
+          }} className="min-h-11 rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base">
             {filtros.map((item) => <option key={item.valor} value={item.valor}>{item.rotulo}</option>)}
           </select>
         </label>
-        <button type="button" className={botao} disabled={executando} onClick={() => atualizar()}>Atualizar fila</button>
+        <button type="button" className={`${botao} self-start sm:self-auto`} disabled={executando} onClick={() => atualizar()}>Atualizar fila</button>
       </div>
       {aviso && <p role={aviso.tipo === "erro" ? "alert" : "status"} className="rounded-lg border border-foreground/20 bg-accent/5 p-4 text-sm">{aviso.mensagem}</p>}
       {fila.tipo === "carregando" && <p role="status">Carregando fila de moderação…</p>}
@@ -139,7 +139,7 @@ export default function FilaModeracao() {
             <p className="mb-3 text-sm text-foreground/70">Selecione um comentário para analisar.</p>
             <ul className="space-y-3">{fila.itens.map((item) => <li key={item.id}>
               <button type="button" disabled={executando} aria-pressed={detalhe?.tipo === "pronto" && detalhe.comentario.id === item.id} onClick={() => void selecionar(item.id)}
-                className="w-full min-w-0 rounded-xl border border-foreground/20 p-4 text-left hover:border-accent aria-pressed:border-accent aria-pressed:bg-accent/5 disabled:opacity-50">
+                className="min-h-24 w-full min-w-0 rounded-xl border border-foreground/20 bg-background p-4 text-left transition-colors hover:border-accent aria-pressed:border-accent aria-pressed:bg-accent/5 disabled:opacity-50">
                 <span className="text-sm font-semibold text-accent">{item.estado === "PUBLICADO" ? "Publicado com denúncias" : rotulosEstado[item.estado]}</span>
                 {item.estado === "PENDENTE" && item.substitui_id && <span className="mt-1 block text-sm text-foreground/70">Substituto em análise</span>}
                 <span className="mt-2 line-clamp-3 whitespace-pre-wrap [overflow-wrap:anywhere]">{item.texto ?? "Texto descartado"}</span>

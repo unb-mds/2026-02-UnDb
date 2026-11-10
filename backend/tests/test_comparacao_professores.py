@@ -25,11 +25,12 @@ def disciplina(disciplina_id):
         codigo="CIC0001",
         nome="INTRODUCAO A CIENCIA DA COMPUTACAO",
         departamento="CIC",
+        departamento_nome=None,
     )
 
 
 def professor(professor_id, nome):
-    return SimpleNamespace(id=professor_id, nome=nome, departamento="CIC")
+    return SimpleNamespace(id=professor_id, nome=nome, departamento="CIC", departamento_nome=None)
 
 
 def avaliacao(recomenda: bool):

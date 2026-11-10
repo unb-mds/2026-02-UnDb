@@ -20,14 +20,14 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex min-w-0 flex-col gap-6">
       <fieldset disabled={disabled} className="flex min-w-0 flex-col gap-4">
         <legend className="text-lg font-semibold">Sobre as aulas</legend>
 
         {!ocultarDidatica && (
-          <fieldset className={destacarDidatica ? "flex min-w-0 flex-col gap-2 rounded-lg bg-accent/5 p-4" : "flex min-w-0 flex-col gap-2"}>
+          <fieldset className={destacarDidatica ? "flex min-w-0 flex-col gap-3 rounded-xl bg-(--raised) p-2 sm:p-4" : "flex min-w-0 flex-col gap-3"}>
             <legend className="text-sm font-medium">Didática</legend>
-            <div className="flex flex-wrap gap-2" aria-label="Nota de Didática">
+            <div className="flex flex-wrap gap-0.5 min-[375px]:gap-2" aria-label="Nota de Didática">
               {criterioDidatica.opcoes.map(([valor, rotulo]) => (
                 <label key={valor} className="cursor-pointer">
                   <input
@@ -39,13 +39,13 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
                     required
                     onChange={() => alterarDidatica(valor)}
                   />
-                  <span className="flex h-12 min-w-12 items-center justify-center rounded-lg border border-foreground/20 px-4 text-base font-semibold transition hover:border-foreground/40 peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:text-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2">
+                  <span className="flex h-12 min-w-11 items-center justify-center rounded-lg border border-(--control-border) bg-(--panel) px-4 text-base font-semibold transition hover:border-accent peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:text-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-(--panel) peer-disabled:cursor-not-allowed peer-disabled:bg-(--disabled-surface) peer-disabled:text-(--on-disabled)">
                     {rotulo}
                   </span>
                 </label>
               ))}
             </div>
-            <p aria-live="polite" aria-atomic="true" className="min-h-5 text-sm text-foreground/70">
+            <p aria-live="polite" aria-atomic="true" className="min-h-5 text-sm text-(--muted)">
               {didatica ? `Nota selecionada: ${didatica} de 5.` : "Escolha uma nota de 1 a 5."}
             </p>
           </fieldset>
@@ -60,7 +60,7 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
               defaultValue=""
               onChange={onChange}
               aria-describedby={criterio.nome === "dificuldade" || criterio.nome === "chamada" ? "criterios-neutros" : undefined}
-              className="w-full rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base focus:border-foreground/50 focus-visible:ring-2 focus-visible:ring-accent"
+              className="min-h-11 w-full min-w-0 rounded-lg border border-(--control-border) bg-(--raised) px-4 py-3 text-base text-foreground focus:border-accent focus-visible:ring-2 focus-visible:ring-accent disabled:bg-(--disabled-surface) disabled:text-(--on-disabled)"
             >
               <option value="" disabled>Selecione uma opção</option>
               {criterio.opcoes.map(([valor, rotulo]) => <option key={valor} value={valor}>
@@ -78,7 +78,7 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
         {demaisCriterios.filter((criterio) => criterio.nome === "recomenda").map((criterio) => (
           <label key={criterio.nome} className="flex min-w-0 flex-col gap-2">
             <span className="text-sm font-medium">{criterio.rotulo}</span>
-            <select name={criterio.nome} required defaultValue="" onChange={onChange} className="w-full rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base focus:border-foreground/50 focus-visible:ring-2 focus-visible:ring-accent">
+            <select name={criterio.nome} required defaultValue="" onChange={onChange} className="min-h-11 w-full min-w-0 rounded-lg border border-(--control-border) bg-(--raised) px-4 py-3 text-base text-foreground focus:border-accent focus-visible:ring-2 focus-visible:ring-accent disabled:bg-(--disabled-surface) disabled:text-(--on-disabled)">
               <option value="" disabled>Selecione uma opção</option>
               {criterio.opcoes.map(([valor, rotulo]) => <option key={valor} value={valor}>
                 {rotulosExplicitos
@@ -90,7 +90,7 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
         ))}
       </fieldset>
 
-      <p id="criterios-neutros" className="text-sm text-foreground/70">
+      <p id="criterios-neutros" className="text-sm leading-relaxed text-(--muted)">
         Dificuldade e Chamada são informações neutras, sem indicação de bom ou ruim.
       </p>
     </div>

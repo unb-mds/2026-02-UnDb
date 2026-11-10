@@ -55,4 +55,4 @@ fi
 python -m app.commands.importar_sigaa_agendado \
   "${argumentos_origem[@]}" \
   --ano "${SIGAA_ANO}" \
-  --periodo "${SIGAA_PERIODO}"
+  --periodo "${SIGAA_PERIODO}" "$@"

@@ -38,6 +38,7 @@ function executarTestes() {
       "tests/moderacao.test.mjs",
       "tests/denuncia.test.mjs",
       "tests/browser-navigation.test.mjs",
+      "tests/paleta.test.mjs",
     ], { ...process.env, AVALIACAO_TEST_BUILD: join(fontesCompiladas, "lib") });
   } finally {
     rmSync(destino, { recursive: true, force: true });

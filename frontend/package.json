@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,6 +14,7 @@
     "test:moderacao": "node tests/moderacao-browser.mjs",
     "test:denuncia": "node tests/denuncia-browser.mjs",
     "test:comentarios": "node tests/comentarios-browser.mjs",
+    "test:perfil": "node tests/perfil-browser.mjs",
     "test:fluxo-moderacao": "node tests/fluxo-moderacao-browser.mjs"
   },
   "dependencies": {

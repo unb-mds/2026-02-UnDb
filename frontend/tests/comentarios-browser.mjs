@@ -93,7 +93,7 @@ await comNavegador({ fixture:real?null:fixture, executar:async ({cdp,avaliar,agu
   await preencher('Tentativa não confirmada'); await clicar('Enviar avaliação'); await esperar('O envio não foi autorizado');
   await login(autor); await navegar(caminho+'/avaliar'); await esperar('Meus comentários');
   if(!real){for(const t of ['Em análise','Publicado','Temporariamente indisponível','Removido','Retirado','Substituído','Rejeitado','O texto desta versão não está mais disponível'])await esperar(t);}
-  for(const tema of ['light','dark'])for(const largura of [320,768,1280]){
+  for(const tema of ['light','dark'])for(const largura of [320,390,768,1440]){
     await cdp('Emulation.setDeviceMetricsOverride',{width:largura,height:900,deviceScaleFactor:1,mobile:largura===320});
     await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:tema}]});
     assert.equal(await avaliar('document.documentElement.scrollWidth<=innerWidth'),true,`${tema}/${largura}`);
@@ -140,5 +140,5 @@ await comNavegador({ fixture:real?null:fixture, executar:async ({cdp,avaliar,agu
     await new Promise(r=>setTimeout(r,600)); assert.ok(!(await texto()).includes('Meus comentários'),'resposta antiga não reaparece');
     conta=autor.email; itens=[]; await avaliar(`window.dispatchEvent(new Event('undb:sessao-alterada'))`); await esperar('Você ainda não possui comentários');
   }
-  console.log(`RF20 aprovado (${real?'API/PostgreSQL reais':'HTTP controlado'}): permissões, estados, texto descartado, envio/substituição/retirada, critérios preservados, erros e seis combinações de tema/largura.`);
+  console.log(`RF20 aprovado (${real?'API/PostgreSQL reais':'HTTP controlado'}): permissões, estados, texto descartado, envio/substituição/retirada, critérios preservados, erros e oito combinações de tema/largura.`);
 }});

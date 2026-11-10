@@ -44,7 +44,7 @@ export default function MeusComentarios({ comentarios, aoRetirar, disabled }: Me
             </p>
             {["PENDENTE", "PUBLICADO", "SUSPENSO"].includes(comentario.estado) && (
               <button type="button" disabled={disabled} onClick={() => aoRetirar(comentario.id)}
-                aria-label={`Retirar comentário ${comentario.id}`} className="mt-3 text-sm text-accent underline disabled:opacity-60">Retirar comentário</button>
+                aria-label={`Retirar comentário ${comentario.id}`} className="button mt-3 min-h-11 disabled:opacity-60">Retirar comentário</button>
             )}
           </li>
         ))}

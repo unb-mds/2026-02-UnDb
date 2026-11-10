@@ -335,7 +335,7 @@ try {
 
   // Cada viewport testa leitura e denúncia, sem reutilizar um agradecimento consumido.
   for (const tema of ["light", "dark"]) {
-    for (const largura of [1280, 320]) {
+    for (const largura of [1440, 768, 390, 320]) {
       await cdp("Emulation.setDeviceMetricsOverride", {width:largura, height:800, deviceScaleFactor:1, mobile:largura === 320});
       await cdp("Emulation.setEmulatedMedia", {features:[{name:"prefers-color-scheme", value:tema}]});
       await navegar(); await esperarTexto("Comentário publicado para verificação de denúncia RF21.");

@@ -4,6 +4,7 @@ from sqlalchemy import Boolean, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.models.unidade import Unidade
 
 
 class Professor(Base):
@@ -16,6 +17,18 @@ class Professor(Base):
     siape: Mapped[str | None] = mapped_column(String(30), nullable=True, unique=True)
     identidade_origem: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
     identidade_confirmada: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+    unidade_institucional: Mapped[Unidade | None] = relationship(
+        primaryjoin=(
+            "and_(foreign(Professor.departamento) == Unidade.codigo, Unidade.fonte == 'SIGAA')"
+        ),
+        viewonly=True,
+        lazy="joined",
+    )
+
+    @property
+    def departamento_nome(self) -> str | None:
+        return self.unidade_institucional.nome if self.unidade_institucional else None
 
     turmas = relationship("Turma", secondary="turmas_professores", back_populates="professores")
     avaliacoes = relationship("Avaliacao", back_populates="professor")
