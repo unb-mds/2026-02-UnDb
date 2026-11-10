@@ -13,10 +13,16 @@
   --muted: #94a3bd;
   --accent: #75a7ff;
   --on-accent: #0b0f17;
-  --primary: #2467e8;
-  --primary-hover: #1d58cb;
+  /* Proposta #212: tons e distribuição aguardam alinhamento com Yasmin (#211). */
+  --primary: #15803d;
+  --primary-hover: #166534;
+  --primary-active: #14532d;
+  --primary-border: #4ade80;
   --on-primary: #ffffff;
-  --focus: #a3c4ff;
+  --focus: #86efac;
+  --control-border: #667b99;
+  --disabled-surface: #253247;
+  --on-disabled: #b7c6db;
   --danger: #fca5a5;
   --radius: 16px;
 }
@@ -50,11 +56,14 @@ input, select, textarea { accent-color: var(--primary); }
 .main-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; font-size: 13px; color: var(--muted); }
 .main-nav a:hover { color: var(--foreground); }
 .header-actions { display: flex; flex-shrink: 0; gap: 10px; margin-left: auto; }
-.button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border: 1px solid var(--border); border-radius: 9px; padding: 10px 18px; background: var(--panel); color: var(--foreground); font-size: 13px; font-weight: 600; text-align: center; }
-.button:hover { border-color: var(--accent); }
-.button.primary { border-color: var(--primary); background: var(--primary); color: var(--on-primary); }
-.button.primary:hover { background: var(--primary-hover); }
-.button:disabled { opacity: .55; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border: 1px solid var(--control-border); border-radius: 9px; padding: 10px 18px; background: var(--panel); color: var(--foreground); font-size: 13px; font-weight: 600; text-align: center; transition: background-color .15s, border-color .15s, color .15s; }
+.button:not(:disabled):not([aria-disabled="true"]):hover { border-color: var(--accent); background: var(--raised); }
+.button:not(:disabled):not([aria-disabled="true"]):active { border-color: var(--accent); background: var(--background); }
+.button:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+.button.primary { border-color: var(--primary-border); background: var(--primary); color: var(--on-primary); }
+.button.primary:not(:disabled):not([aria-disabled="true"]):hover { border-color: var(--primary-border); background: var(--primary-hover); }
+.button.primary:not(:disabled):not([aria-disabled="true"]):active { border-color: var(--primary-border); background: var(--primary-active); }
+.button:disabled, .button[aria-disabled="true"] { border-color: var(--control-border); background: var(--disabled-surface); color: var(--on-disabled); opacity: 1; }
 .panel { border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }
 .search { display: flex; align-items: center; gap: 10px; min-width: 0; border: 1px solid var(--accent); border-radius: 14px; padding: 8px; background: var(--panel); }
 .search select { width: 112px; min-width: 0; min-height: 44px; flex-shrink: 0; border-radius: 9px; padding: 10px; background: var(--raised); color: var(--foreground); font-size: 12px; }
