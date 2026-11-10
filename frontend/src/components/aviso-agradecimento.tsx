@@ -48,7 +48,7 @@ function MensagemAgradecimento({ item, dispensar }: {
         <p className="font-medium">{item.mensagem}</p>
       </div>
       <button type="button" onClick={() => dispensar(item.id)} aria-label="Dispensar agradecimento"
-        className="rounded-md px-2 py-1 text-xs font-semibold text-accent hover:bg-accent/10 transition">
+        className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg px-3 text-xs font-semibold text-accent transition hover:bg-accent/10">
         Entendido
       </button>
     </div>

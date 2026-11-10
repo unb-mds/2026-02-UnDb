@@ -80,7 +80,7 @@ function ConteudoModalDenuncia({
     <dialog
       ref={dialogRef}
       onCancel={tratarCancel}
-      className="fixed inset-0 z-50 m-auto w-full max-w-lg rounded-2xl border border-foreground/15 bg-background p-6 text-foreground shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-xs"
+      className="fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-foreground/15 bg-background p-5 text-foreground shadow-2xl backdrop:bg-black/60 sm:p-6"
       aria-labelledby="titulo-denuncia"
     >
       <div className="flex flex-col gap-4">
@@ -98,7 +98,7 @@ function ConteudoModalDenuncia({
             onClick={aoFechar}
             disabled={enviando}
             aria-label="Fechar diálogo de denúncia"
-            className="rounded-lg p-1.5 text-foreground/60 transition hover:bg-foreground/10 hover:text-foreground disabled:opacity-50"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-foreground/70 transition hover:bg-foreground/10 hover:text-foreground disabled:opacity-50"
           >
             ✕
           </button>
@@ -112,7 +112,7 @@ function ConteudoModalDenuncia({
             <button
               type="button"
               onClick={aoFechar}
-              className="self-end rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition hover:opacity-90"
+              className="button primary self-end"
             >
               Fechar
             </button>
@@ -163,14 +163,14 @@ function ConteudoModalDenuncia({
                 type="button"
                 onClick={aoFechar}
                 disabled={enviando}
-                className="rounded-lg border border-foreground/20 px-4 py-2 text-sm font-medium text-foreground transition hover:bg-foreground/5 disabled:opacity-50"
+                className="button min-h-11 disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={!motivoSelecionado || enviando}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-red-400 bg-red-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-red-400 disabled:cursor-not-allowed disabled:border-foreground/20 disabled:bg-foreground/10 disabled:text-foreground/60"
               >
                 {enviando ? "Enviando..." : "Confirmar denúncia"}
               </button>
