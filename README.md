@@ -11,7 +11,8 @@ Aplicação web para avaliação de professores da UnB, com dados de disciplinas
 Aplicação pública: [undb.app.br](https://undb.app.br). API:
 [health](https://api.undb.app.br/health) (verifica o processo HTTP).
 [Hospedagem e operação](docs/hospedagem.md),
-[v1.1.0](docs/releases/1.1.0.md) e
+[v1.1.0 publicada](docs/releases/1.1.0.md),
+[candidata 1.2.0](docs/releases/1.2.0.md) e
 [estado da R2](docs/releases/2.0.0-reconciliacao.md) distinguem publicação,
 integrações em develop e verificações ainda pendentes.
 
