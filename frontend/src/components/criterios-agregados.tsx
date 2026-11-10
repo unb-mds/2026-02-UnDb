@@ -1,22 +1,62 @@
 import type { AvaliacaoAgregadaSuficiente } from "@/lib/types/avaliacao";
 
-const rotulos = { FACIL: "Fácil", MEDIO: "Médio", DIFICIL: "Difícil", RUIM: "Ruim", BOM: "Bom" } as const;
+const rotulos = {
+  FACIL: "Fácil",
+  MEDIO: "Médio",
+  DIFICIL: "Difícil",
+  RUIM: "Ruim",
+  BOM: "Bom",
+} as const;
 
-// Apresenta os valores já agregados pelo backend; não recalcula critérios.
-export default function CriteriosAgregados({ avaliacao }: { avaliacao: AvaliacaoAgregadaSuficiente }) {
-  const material = avaliacao.disponibilizaMaterial === "CONFLITANTE" ? "Conflitante"
-    : !avaliacao.disponibilizaMaterial ? "Não disponibiliza"
-    : avaliacao.qualidadeMaterial ? rotulos[avaliacao.qualidadeMaterial] : "Disponibiliza";
+// Apresenta os valores já agregados pelo backend em cartões; não recalcula critérios.
+export default function CriteriosAgregados({
+  avaliacao,
+}: {
+  avaliacao: AvaliacaoAgregadaSuficiente;
+}) {
+  const material =
+    avaliacao.disponibilizaMaterial === "CONFLITANTE"
+      ? "Conflitante"
+      : !avaliacao.disponibilizaMaterial
+        ? "Não disponibiliza"
+        : avaliacao.qualidadeMaterial
+          ? `Sim · ${rotulos[avaliacao.qualidadeMaterial]}`
+          : "Disponibiliza";
+
   const criterios = [
-    ["Didática", `${avaliacao.didatica.toFixed(1)} / 5`],
-    ["Dificuldade", rotulos[avaliacao.dificuldade]],
-    ["Faz chamada", avaliacao.chamada === "CONFLITANTE" ? "Conflitante" : avaliacao.chamada ? "Sim" : "Não"],
-    ["Material", material],
-    ["Recomenda a matéria", `${avaliacao.recomenda}%`],
-  ];
-  return <dl className="mt-4 flex flex-col divide-y divide-foreground/10">
-    {criterios.map(([rotulo, valor]) => <div key={rotulo} className="flex flex-wrap justify-between gap-x-4 gap-y-1 py-2 text-sm">
-      <dt className="text-foreground/70">{rotulo}</dt><dd className="font-medium">{valor}</dd>
-    </div>)}
-  </dl>;
+    [
+      "Didática",
+      `${avaliacao.didatica.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} / 5`,
+      `média de ${avaliacao.totalAvaliacoes} avaliações`,
+    ],
+    ["Dificuldade", rotulos[avaliacao.dificuldade], "resposta mais frequente"],
+    [
+      "Faz chamada",
+      avaliacao.chamada === "CONFLITANTE"
+        ? "Conflitante"
+        : avaliacao.chamada
+          ? "Sim"
+          : "Não",
+      "maioria das respostas",
+    ],
+    ["Material", material, "disponibilidade e qualidade"],
+    [
+      "Recomenda a matéria",
+      `${avaliacao.recomenda}%`,
+      "recomendam a matéria",
+    ],
+  ] as const;
+
+  return (
+    <dl className="metrics">
+      {criterios.map(([rotulo, valor, nota]) => (
+        <div key={rotulo} className="panel metric">
+          <div className="metric-dash" aria-hidden="true" />
+          <dt>{rotulo}</dt>
+          <dd>{valor}</dd>
+          <p>{nota}</p>
+        </div>
+      ))}
+    </dl>
+  );
 }
