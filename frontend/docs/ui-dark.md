@@ -5,7 +5,7 @@ A aplicação oficial usa agora os tokens e a navegação compartilhada da propo
 ## Contrato para as próximas entregas
 
 - O tema dark é fixo: o layout aplica `.dark` em `html` e `globals.css` associa as variantes `dark:` a essa classe. Cores de erro, sucesso e demais estados devem acompanhar o tema da aplicação, inclusive quando o sistema prefere o tema claro. Não reintroduzir dependência de `prefers-color-scheme` para essas variantes.
-- `src/app/globals.css` contém os tokens e as classes comuns. Use os pares de superfície/texto abaixo; `accent` continua azul para texto/realce e `primary` passa a verde nas ações da proposta #212. Essa direção foi autorizada pelo PO; tons e distribuição ainda dependem do alinhamento com Yasmin na #211. Preserve os pares de contraste.
+- `src/app/globals.css` contém os tokens e as classes comuns. Use os pares de superfície/texto abaixo; `accent` continua azul para texto/realce e `primary` é verde nas ações integradas pela #212/PR #214. O PO solicitou o verde UnB e a logo; o refinamento geral da #211 usa essa base após #204/#206, sem bloquear retroativamente a #212. Preserve os pares de contraste.
 - `.container` limita a largura compartilhada a 1280 px, com recuo lateral responsivo. `.panel` oferece superfície com bordas arredondadas. `.button` é a ação secundária e `.button.primary` a principal. Use elementos semânticos `button`/`Link`, labels e estados reais de `disabled`.
 - `Cabecalho` e `Rodape` são montados uma vez no layout. O cabeçalho usa links existentes na home e busca compacta nas páginas internas; telas de conta ficam sem busca. Não repita esses componentes em cada página.
 - `BuscaNavegacao` recebe `id` (obrigatório e único), `tipo`, `termo`, `ordem` e `compacta`. É formulário GET para `/busca`, cujo redirecionamento existente resolve a rota de resultados. `BuscaCabecalho` lê contexto da URL e remonta o formulário quando modalidade, termo ou ordenação mudam. Não adicionar outra rota de busca ou outra barra de etapas.
@@ -23,18 +23,19 @@ A #202 importou esse material para permitir acesso direto a partir de `develop`;
 
 Executar os scripts atuais de `frontend/package.json`: lint, typecheck, test e build. Conferir busca por professor/disciplina, alteração de consulta/ordem, navegação interna, retorno seguro de conta e foco de teclado. Verificar 320, 390, 768 e 1440 px. Os testes técnicos não substituem o reteste com alunos da #166.
 
-## Proposta de verde — Issue #212
+## Verde, logo e favicon — Issue #212 / PR #214
 
-**Estado:** proposta de tons e distribuição para alinhamento com Yasmin (#211).
+**Estado:** integrado em `develop` pela PR #214, merge `ea7c39c`, aceito pelo PO;
+issue #212 encerrada. Revisão adicional `73a535b`. Fora da tag v1.1.0.
 Fonte: [direção do PO de 09/11/2026 na #212](https://github.com/unb-mds/2026-02-UnDb/issues/212).
 Não se declara homologação da paleta pela UnB. A base dark é mantida e o azul
 continua em links secundários, critérios e realces informativos.
 
-| Token | Hex | Uso proposto |
+| Token | Hex | Uso integrado |
 |---|---|---|
-| `--primary` | `#15803d` | Superfície de ação principal e detalhes já ligados a primary |
-| `--primary-hover` | `#166534` | Hover habilitado das ações principais |
-| `--primary-active` | `#14532d` | Ação principal pressionada |
+| `--primary` | `#00822e` | Verde RGB 0, 130, 46 do manual UnB |
+| `--primary-hover` | `#006b26` | Hover habilitado das ações principais |
+| `--primary-active` | `#005a1c` | Ação principal pressionada |
 | `--primary-border` | `#4ade80` | Limite visível da ação principal, inclusive hover/active |
 | `--on-primary` | `#ffffff` | Texto/ícone sobre as três superfícies principais |
 | `--focus` | `#86efac` | Contorno de teclado com offset de 4 px |
@@ -57,7 +58,7 @@ continua em links secundários, critérios e realces informativos.
   para `.button.primary`. Labels, handlers, permissões e estados reais são preservados.
 - `OpcoesAcesso`: opção atual verde e sublinhada com `aria-current` preservado; opção alternativa
   secundária. Logout e acesso antes de avaliar usam `.button` secundária.
-- Detalhes existentes que usam `--primary`: marca “U”, gradiente da home, painel de
+- Detalhes existentes que usam `--primary`: gradiente da home, painel de
   convite a avaliar, fundos de código da disciplina e iniciais do professor. Os
   textos/links desses cartões continuam com foreground/accent; não há nota verde
   ou novo significado para Dificuldade/Chamada.
@@ -82,9 +83,9 @@ isso não comprova contraste renderizado de cada combinação/transparência da 
 
 | Par calculado | Razão |
 |---|---|
-| on-primary / primary normal | 5,02:1 |
-| on-primary / primary-hover | 7,13:1 |
-| on-primary / primary-active | 9,11:1 |
+| on-primary / primary normal | 4,96:1 |
+| on-primary / primary-hover | 6,71:1 |
+| on-primary / primary-active | 8,47:1 |
 | on-disabled / disabled-surface | 7,45:1 |
 | focus / background, panel, raised | 13,66:1 / 12,64:1 / 10,95:1 |
 | primary-border / background, panel, raised | 11,01:1 / 10,19:1 / 8,82:1 |
@@ -94,20 +95,33 @@ Os testes exigem 4,5:1 para texto das ações e links nas superfícies dark e 3:
 para foco/limites dos controles nas superfícies adjacentes. Não se afirma
 conformidade WCAG de toda a aplicação a partir desses cálculos.
 
-### Coordenação e comparação visual pendente
+### Coordenação e comparação visual realizada
 
-Na consulta às issues/PRs antes das alterações, #204/#205/#206 estavam abertas,
-#211 aguardava as integrações anteriores e o único PR aberto retornado era o
-documental #213. As mudanças desta proposta se limitam a tokens e classes; os
-responsáveis por #204–#206 devem reaproveitar essas classes ao integrar suas telas.
+O texto inicial descrevia a proposta de Tiago e navegador indisponível naquele
+ambiente. A revisão posterior executou os checks e a inspeção de navegador em
+320/390/768/1440 px. #205 também foi integrada e encerrada; #204/#206 permanecem
+com entregas próprias. #211 deve aguardar essas integrações para o refinamento final.
 
 Antes: primary azul `#2467e8`, hover `#1d58cb`, foco `#a3c4ff`, enquanto formulários
-usavam fundo accent azul claro. Depois proposto: ações principais compartilham
+usavam fundo accent azul claro. Depois integrado: ações principais compartilham
 primary verde; ações secundárias, superfícies dark e azul accent são preservados.
 
-**Capturas antes/depois e inspeção visual em 320, 390, 768 e 1440 px pendentes.**
-Não foi encontrado Edge/Chromium neste ambiente; não se instalaram dependências
-para contornar isso. A comparação acima é de tokens/uso, não de capturas geradas.
-Revisar em navegador os textos longos, foco por Tab, hover/active/disabled, estados
-da conta/avaliação e ausência de overflow. A proposta depende desse exame e do
-alinhamento dos tons/distribuição com Yasmin; o PR deve usar `Refs #212`.
+O verde vem do [Manual de Identidade Visual da UnB, p. 65](https://fcte.unb.br/wp-content/uploads/2025/05/Manual_Identidade_Visual_UnB.pdf):
+RGB 0, 130, 46; a indicação WebSafe `#006633` é outra representação do manual.
+Hover/active são derivações do projeto. Isso não declara homologação do produto
+ou da marca UnDb pela universidade.
+
+A logo fornecida pelo PO foi otimizada em `public/brand/undb-logo.png` (600×201).
+O cabeçalho usa `next/image`, largura 140 px no desktop e 108 px no celular,
+com link “UnDb — início”; a imagem tem `alt=""` para não duplicar o nome acessível.
+O símbolo à esquerda foi isolado em imagem quadrada transparente com auxílio de
+geração de imagem e reduzido para `src/app/favicon.ico` (16/32/48 px) e
+`src/app/icon.png` (192 px). O favicon pode exigir recarga por cache do navegador.
+
+`tests/identidade-browser.mjs` verifica imagem carregada, assinatura real de
+ICO/PNG, estados normal/hover/active/disabled, foco e contraste renderizado nas
+quatro larguras. A revisão passou por 68 testes unitários do frontend, lint,
+tipos, build e suíte de navegador; todos os checks remotos passaram.
+Os resultados são históricos da PR #214, não reexecução nesta PR documental.
+[Comparações, capturas e limites](../../docs/estudos/identidade-conta-catalogo-2026-11-10.md).
+Testes e emulação não substituem o reteste com alunos #166.

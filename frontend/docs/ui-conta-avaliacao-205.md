@@ -1,92 +1,82 @@
-# Conta e avaliação no tema dark — Issue #205
+# Conta, avaliação e catálogo — revisão da PR #215
 
-**Base:** `develop` em `ea7c39c`, incluindo #202/PR #208 e verde aceito da
-#212/PR #214. **Escopo:** apresentação da conta e do formulário de avaliação.
-Não representa validação com usuários da #166.
+**Estado em 10/11/2026:** PR #215 integrada em `develop` (`f1f0d00`), incluindo a
+revisão adicional `85eab6a`; #205 encerrada pelo PO. A versão pública v1.1.0 é
+anterior. Fontes: critérios da #205, solicitação do PO de incluir nomes e
+“Mostrar mais”, [tokens](ui-dark.md), [requisitos](../../docs/requisitos.md) e
+[referência da #205](../../docs/referencias/ui-dark/issues/205.md).
 
-## Fontes e coordenação
+## Conta e avaliação
 
-- [Issue #205](https://github.com/unb-mds/2026-02-UnDb/issues/205): critérios da integração.
-- [Guia e índice da referência](../../docs/referencias/ui-dark/issues/205.md),
-  consultados também no commit imutável `0b1ee93dfab29627af3927b36ebdcc3efd399c59`
-  após buscar esse objeto do remoto. O material serve apenas para consulta.
-- [Contrato de tokens e componentes](ui-dark.md): a aplicação usa as classes
-  `.container`, `.panel`, `.button` e os tokens existentes. A cor vigente foi
-  conferida em `globals.css`: `--primary: #00822e`. Não foi editado o CSS global;
-  a atualização histórica do guia da #212 permanece na entrega documental própria.
-- Consulta anterior às edições: PR #208 integrado; #204 e #206 abertas; #212
-  encerrada pela aceitação do PO. A busca de PRs abertos retornou apenas #213,
-  documental. Não foram alterados perfil/comparação ou componentes de comentários.
+- Login/cadastro em painel dark com padding responsivo, labels, autocomplete,
+  limites de senha e mensagens preservados. Mostrar/ocultar senha tem área de
+  toque, `aria-controls` e `aria-pressed`; opções mantêm `aria-current`.
+- Confirmação mantém token, tentativa, erros e retorno seguro; painel informa
+  `aria-busy`. Sucesso exige resposta HTTP, sem confirmação simulada.
+- Destino professor/disciplina recolhível preserva contexto e `returnTo` seguro.
+  Falha ao buscar detalhes não bloqueia autenticação.
+- Formulário usa superfícies e ações comuns, sem nota inicial. Os cinco valores
+  de Didática cabem em uma linha a 320 px, inclusive com scrollbar clássica,
+  mantendo área mínima de 44 px. Dificuldade/Chamada continuam neutras.
+- Comentário opcional, retirada e acompanhamento privado mantêm serviços/regras;
+  redesenho de comentários/moderação pertence à #206.
 
-## Apresentação integrada
+Sessão, permissões, escalas, agregações, mínimo de três avaliações, anonimato e
+proteção contra envio repetido não foram redefinidos por essa integração visual.
 
-- Login/cadastro: contêiner limitado, painel dark com padding responsivo, campos
-  sobre `raised`, bordas de controle, texto auxiliar `muted` e ações compartilhadas.
-  A navegação entre as duas opções usa duas colunas e mantém `aria-current`.
-- Senha: input com largura mínima flexível e botão de mostrar/ocultar com área de
-  toque da classe `.button`. Labels, `aria-controls`, `aria-pressed`, autocomplete
-  e limites da senha permanecem os existentes.
-- Confirmação: painel consistente com a conta, mensagens existentes e `aria-busy`
-  durante a consulta. Token inválido, falha transitória, nova tentativa e retorno
-  para login/avaliação mantêm o mesmo comportamento.
-- Destino: contexto público recolhível em painel; falha de detalhes continua sem
-  bloquear autenticação nem perder o destino seguro. O sumário preserva seu
-  comportamento nativo de teclado.
-- Avaliação: contexto professor/disciplina/código/unidade em painel com duas colunas
-  a partir de `sm`; formulário com campos e critérios nas superfícies dark. Os
-  cinco botões de Didática continuam quebrando linha quando necessário, sem nota
-  inicial; Dificuldade/Chamada permanecem neutras e os rótulos não foram alterados.
-- Comentário opcional permanece dentro do formulário. Acompanhamento, retirada,
-  estados e dados privados continuam nos componentes e serviços já existentes da
-  #206; não foram redesenhados. Sucesso só decorre da confirmação HTTP existente.
+## Nome institucional e identidade preservada
 
-Não se alteraram endpoints, helpers de retorno, permissões, estado de sessão,
-validações, handlers, escalas, valores negativos ou a proteção de envio repetido.
-As mudanças de produção são de classes e duas melhorias semânticas: status de
-verificação de sessão e estado ocupado da confirmação. Nenhuma etapa de pesquisa,
-conta simulada, dado de demonstração ou infraestrutura paralela foi acrescentada.
+A revisão complementar alterou a API de forma aditiva: respostas de professores,
+disciplinas, agregado e comparação admitem `departamento_nome` opcional/nulo.
+A origem é `Unidade.nome`, associada ao código e à fonte SIGAA por relacionamento
+ORM somente de leitura, carregado junto à entidade. Sem nova coluna, migração,
+escrita ou mapa manual de siglas; registros legados sem unidade continuam
+retornando. `departamento` permanece como identidade e filtro.
 
-## Verificações e limites
+Serviços frontend mapeiam para `departamentoNome`; `src/lib/unidade.ts` prefere
+nome não vazio/não numérico, preserva código textual e usa `Unidade <código>`
+quando só há código numérico. Home, catálogo, buscas, perfil, disciplina,
+comparação e contexto da avaliação usam o helper. A correção não une docentes
+homônimos/provisórios: reconciliação de identidade continua na #207.
 
-Ambiente local: Node 24.14.1 e npm 11.11.0.
+## Expansão do catálogo
 
-| Verificação | Resultado observado |
+`ListaProgressiva` mostra inicialmente 12 disciplinas e acrescenta 12 por clique.
+As opções mostram “Todas” e até oito unidades; “Mostrar mais unidades” acrescenta
+oito. A unidade selecionada permanece visível. Trocar filtro reinicia o limite;
+os códigos continuam na URL e recarga/histórico preservam a seleção.
+
+A expansão anuncia contagem e move foco ao primeiro link novo, sem exibir botão
+após o fim. A API entrega a coleção completa: é apresentação progressiva no
+cliente, não paginação de rede ou solução de desempenho do importador.
+
+## Evidências e limites
+
+Na revisão adicional em Windows, Python 3.12, Node 24.22.1 e Edge headless:
+
+| Verificação | Resultado da PR #215 |
 |---|---|
-| `npm run lint` | Aprovado |
-| `npm run typecheck` | Aprovado; geração de rotas e TypeScript |
-| `npm run test:coverage` | 68 testes aprovados; relatório gerado |
-| `npm run build` | Aprovado |
-| `git diff --check` | Aprovado |
-| `npm run test:browser` | Interrompido antes dos cenários: falta executável Edge/Chromium em `BROWSER_PATH` |
+| Backend unitário | 168 testes aprovados |
+| Frontend unitário/cobertura | 71 testes aprovados |
+| Ruff lint/formatação, ESLint, TypeScript | Aprovados |
+| Build Next.js | Aprovado |
+| Suítes de navegador | Aprovadas; conta, avaliação, catálogo, identidade, foco e overflow |
+| CI remoto | Todos os checks passaram, incluindo integração real com PostgreSQL e Compose |
 
-A suíte existente cobre retorno seguro, escalas, 401/403/404/409/422/429/503,
-falha de rede e respostas preservadas. O runner de avaliação mantém os testes
-de visitante, conta não confirmada, criação/substituição com a mesma linha quando
-usado com API/PostgreSQL reais e validação do formulário por teclado.
+Esses resultados superam a limitação de navegador do ambiente inicial do autor;
+não são novas execuções desta PR documental. O catálogo controlado de 27 itens
+verifica expansão 12/24/27, nomes, filtros, recarga e histórico. Quatro larguras:
+320/390/768/1440 px. Capturas usam dados sintéticos, não contas/avaliações reais.
+[Comparações versionadas](../../docs/estudos/identidade-conta-catalogo-2026-11-10.md).
 
-O cenário controlado passa a testar duas submissões consecutivas com apenas um
-envio. A matriz de avaliação acrescenta 390/1440 px, preservando 320/768/1280 e
-as asserções existentes. `conta-dark-browser.mjs` acrescenta login/cadastro e
-confirmação incompleta em 320/390/768/1440 px, senha, Tab/foco, contraste de texto,
-campo com altura mínima e ausência de overflow/etapas antigas. Sua execução local
-não foi possível; os resultados remotos devem ser consultados no PR desta entrega.
-
-### Reprodução de capturas com o método existente
-
-Após build, com Edge/Chromium instalado e as portas usadas pelo runner livres:
+Reproduzir com o runner existente, após instalar dependências e disponibilizar
+Edge/Chromium nas portas previstas por ele, a partir de `frontend/`:
 
 ```sh
 BROWSER_PATH=/caminho/para/chrome PREVIEW_DIR=/tmp/undb-conta-205 npm run test:browser
 ```
 
-É exemplo de reprodução, não comando executado nesta sessão. Usa o navegador CDP
-e o servidor HTTP controlado do próprio projeto, com dados sintéticos de teste.
-`PREVIEW_DIR` recebe capturas prefixadas `205-` para as quatro larguras solicitadas
-e para a avaliação nos dois temas de sistema; não são dados de produção. Os
-outros cenários existentes também podem gerar suas capturas nesse diretório.
-
-**Pendência:** capturas e inspeção visual humana das telas/estados em 320, 390,
-768 e 1440 px não foram realizadas localmente. A captura da referência consultada
-não é evidência da implementação. Não se instalaram dependências novas, não se
-afrouxaram asserções e não se declara aceite da #205; usar `Refs #205` enquanto
-essa evidência faltar. As verificações técnicas não substituem o reteste #166.
+É exemplo, não comando executado por esta PR. Os cenários controlados não
+comprovam usabilidade com alunos nem todos os fluxos hospedados. #166 permanece
+com reteste qualitativo. API e frontend precisam ser promovidos juntos para
+exibir os nomes completos em produção.
