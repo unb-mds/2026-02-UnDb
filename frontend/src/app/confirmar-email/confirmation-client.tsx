@@ -43,11 +43,12 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
   }, [token, tentativa]);
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-4 px-4 py-10 text-center">
-      <h1 className="text-2xl font-semibold">Confirmação de e-mail</h1>
+    <main className="container flex max-w-xl min-w-0 flex-1 flex-col gap-6 py-10 sm:py-14">
+      <h1 className="text-3xl font-semibold tracking-tight">Confirmação de e-mail</h1>
+      <section className="panel flex min-w-0 flex-col gap-5 p-4 break-words sm:p-6" aria-label="Resultado da confirmação" aria-busy={estado === "carregando"}>
       <p
         aria-live="polite"
-        className={estado === "erro" ? "text-red-600 dark:text-red-400" : "text-foreground/70"}
+        className={estado === "erro" ? "text-red-600 dark:text-red-400" : "text-sm leading-relaxed text-(--muted)"}
       >
         {mensagem}
       </p>
@@ -60,7 +61,7 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
         }}>Tentar novamente</button>
       )}
       {estado !== "carregando" && (
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-start gap-4">
           {estado === "sucesso" && retorno && (
             <Link
               href={`/login?returnTo=${encodeURIComponent(retorno)}`}
@@ -74,6 +75,7 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
           </Link>
         </div>
       )}
+      </section>
     </main>
   );
 }
