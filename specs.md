@@ -68,7 +68,7 @@ referência vigente; o recorte histórico não é uma nova definição de contra
 Esta seção preserva o recorte do modelo da Release 1 e da base RF20 da #156.
 RF21/RF22 foram entregues pela [PR #192](https://github.com/unb-mds/2026-02-UnDb/pull/192),
 integrada em `81e54be`; seus modelos e contratos estão no
-[contrato publicado](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolução-pelo-po-e-contrato-de-implementação),
+[contrato publicado](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolucao-pelo-po-e-contrato-de-implementacao),
 referenciado na seção 12. As tabelas deste recorte não representam todo o modelo R2.
 
 ### `usuarios`
@@ -524,7 +524,7 @@ Isso não altera o schema público, que continua retornando somente textos publi
 #### Contratos compartilhados de denúncias e moderação (#160/#161)
 
 Contrato, rotas, schemas, transições, permissões, retenção, operação e evidências
-em [Contrato compartilhado das #160/#161](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolução-pelo-po-e-contrato-de-implementação).
+em [Contrato compartilhado das #160/#161](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolucao-pelo-po-e-contrato-de-implementacao).
 Essa referência complementa RF20; a fonte de produto permanece `docs/requisitos.md`.
 
 Migrations posteriores à #156: `20261101_01` (papel, decisões e descarte de texto),

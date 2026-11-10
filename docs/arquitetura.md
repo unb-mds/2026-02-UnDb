@@ -180,7 +180,7 @@ entregou a base RF20 (`4126897`); a
 [PR #192](https://github.com/unb-mds/2026-02-UnDb/pull/192) entregou RF21/RF22
 (`81e54be`), incluindo modelo físico, contratos, concessão/revogação operacional
 de moderador e descarte contínuo. O
-[contrato publicado](estudos/alinhamento-denuncias-issues-160-161.md#resolução-pelo-po-e-contrato-de-implementação)
+[contrato publicado](estudos/alinhamento-denuncias-issues-160-161.md#resolucao-pelo-po-e-contrato-de-implementacao)
 é a referência técnica dessas entregas; não há detalhamento pendente dessas APIs.
 As interfaces #159/#162/#193 e a verificação técnica #163 também foram integradas;
 as PRs, hashes e limites constam da [matriz R2](releases/2.0.0-reconciliacao.md).
