@@ -55,13 +55,32 @@ class EstadoComentario(str, Enum):
 Ordinalidade aprovada para desempate de moda:
 `DIFICIL > MEDIO > FACIL` e `BOM > MEDIO > RUIM`.
 
+O recorte de `EstadoComentario` acima registra a base da #156, anterior à moderação.
+O contrato publicado pela [PR #192](https://github.com/unb-mds/2026-02-UnDb/pull/192)
+e o acompanhamento integrado pela [PR #197](https://github.com/unb-mds/2026-02-UnDb/pull/197)
+também contemplam `REJEITADO` e descarte de texto. Consulte a seção 12 para a
+referência vigente; o recorte histórico não é uma nova definição de contrato.
+
 ---
 
 ## 3. Modelo de dados
 
-Esta seção descreve o modelo da Release 1 e da Release 2 (RF20). As regras de RF21 e
-RF22 (denúncia e moderação) ainda dependem das issues #160/#161; seus modelos
-físicos e contratos não estão definidos aqui.
+**Complemento técnico da PR #215 (10/11/2026):** respostas institucionais de
+professor/disciplina, agregado e comparação podem incluir `departamento_nome`
+(`string | null`), obtido do `nome` da unidade vinculada à fonte `SIGAA`.
+`departamento` continua sendo o código de identidade/filtro. A associação ORM é
+somente de leitura, com carregamento junto à entidade; não cria campo físico ou
+migração. Ausência de correspondência preserva o registro e produz nome nulo.
+No frontend, `departamentoNome` é opcional: nome institucional válido tem
+preferência; código textual permanece como fallback e código numérico aparece
+como `Unidade <código>`. Não inventar siglas nem unir pessoas/unidades por nome.
+Publicar API e frontend para obter o nome completo no ambiente público.
+
+Esta seção preserva o recorte do modelo da Release 1 e da base RF20 da #156.
+RF21/RF22 foram entregues pela [PR #192](https://github.com/unb-mds/2026-02-UnDb/pull/192),
+integrada em `81e54be`; seus modelos e contratos estão no
+[contrato publicado](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolucao-pelo-po-e-contrato-de-implementacao),
+referenciado na seção 12. As tabelas deste recorte não representam todo o modelo R2.
 
 ### `usuarios`
 | Campo | Tipo | Regra |
@@ -357,12 +376,16 @@ Não implementar nem inventar valor para os itens abaixo.
 
 | Item | Situação |
 |---|---|
-| Estratégia de povoamento inicial da base | Não decidido |
 | Lista de termos do filtro de comentários | Solicitante definirá depois; moderação humana até então |
 | IA sem aprovação humana prévia | Objetivo futuro condicionado, sem mecanismo/provedor aprovado; não substituir moderação humana nesta etapa |
-| Dados e contratos de RF20–RF22 | RF20 implementado em #156: migration `comentario_versoes`, endpoints de
-  leitura pública, acompanhamento do autor e retirada. RF21/RF22 ainda dependem
-  de #160/#161 — modelos e contratos de denúncia e moderação não definidos. |
+
+**Itens já resolvidos — fontes:** a seção 11 de `docs/requisitos.md` aprova a
+importação inicial manual na R1; sua operação/cobertura na R2 é verificada na
+[#164](https://github.com/unb-mds/2026-02-UnDb/issues/164), ainda aberta.
+Os dados e contratos RF20–RF22 foram entregues pelas PRs
+[#191](https://github.com/unb-mds/2026-02-UnDb/pull/191) e
+[#192](https://github.com/unb-mds/2026-02-UnDb/pull/192), ambas integradas em `develop`.
+Não são mais decisões técnicas pendentes; ver seção 12, sem alterar os contratos.
 
 ---
 
@@ -383,7 +406,14 @@ Não implementar nem inventar valor para os itens abaixo.
 **Fonte:** detalhamento de RF20–RF22 e decisões R2-DEC-01 a R2-DEC-15 em
 [`docs/requisitos.md`](docs/requisitos.md), definidos nas respostas humanas da #154.
 Este resumo não substitui as tabelas de estados, retenção, erros e critérios AC20/21/22
-da fonte. O restante deste documento mantém os contratos entregues na R1.
+da fonte. Os contratos da R1 são preservados; as referências abaixo registram a
+evolução R2 já integrada.
+
+**Estado de entrega — fonte: PRs integradas e issues encerradas, consultadas em 09/11/2026.**
+As APIs #156/#160/#161 foram integradas pelas PRs #191/#192. As interfaces
+#159/#162/#193 foram integradas pelas PRs #197/#194/#196. A verificação técnica
+#163 foi concluída pela PR #198; o reteste qualitativo #166 continua pendente.
+Consulte [evidências e limites por release](docs/releases/2.0.0-reconciliacao.md).
 
 ### Escrita, consulta e substituição de comentário
 
@@ -437,8 +467,10 @@ da fonte. O restante deste documento mantém os contratos entregues na R1.
 
 ### Contratos definidos em #156 (RF20)
 
-> Implementação limitada à RF20. RF21 (denúncia) e RF22 (moderação) permanecem
-> em #160/#161; seus contratos não são definidos aqui.
+> Recorte histórico da entrega RF20 pela PR #191. RF21/RF22 foram entregues
+> posteriormente pela PR #192; seus contratos compartilhados estão referenciados
+> ao final desta seção. Não usar a descrição da migration inicial como retrato
+> completo do schema após as migrations de moderação.
 
 #### Migration
 
@@ -503,7 +535,7 @@ Isso não altera o schema público, que continua retornando somente textos publi
 #### Contratos compartilhados de denúncias e moderação (#160/#161)
 
 Contrato, rotas, schemas, transições, permissões, retenção, operação e evidências
-em [Contrato compartilhado das #160/#161](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolução-pelo-po-e-contrato-de-implementação).
+em [Contrato compartilhado das #160/#161](docs/estudos/alinhamento-denuncias-issues-160-161.md#resolucao-pelo-po-e-contrato-de-implementacao).
 Essa referência complementa RF20; a fonte de produto permanece `docs/requisitos.md`.
 
 Migrations posteriores à #156: `20261101_01` (papel, decisões e descarte de texto),

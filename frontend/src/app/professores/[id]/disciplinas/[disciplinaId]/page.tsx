@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -85,8 +86,8 @@ export default async function AvaliacaoAgregadaPage({
         <div className="profile-info">
           <div className="badges">
             <span className="badge blue">{avaliacao.disciplina.codigo}</span>
-            <span className="badge">{avaliacao.professor.departamento}</span>
-            <span className="badge">{avaliacao.disciplina.departamento}</span>
+            <span className="badge">{nomeUnidade(avaliacao.professor)}</span>
+            <span className="badge">{nomeUnidade(avaliacao.disciplina)}</span>
           </div>
           <h1>{avaliacao.professor.nome}</h1>
           <p className="subtitle">{avaliacao.disciplina.nome}</p>
@@ -150,6 +151,7 @@ export default async function AvaliacaoAgregadaPage({
           <CriteriosAgregados avaliacao={avaliacao} />
         </section>
       )}
+
 
       <div className="two-columns profile-explanation">
         <section className="panel related">

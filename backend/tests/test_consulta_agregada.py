@@ -40,6 +40,7 @@ def professor(professor_id):
         id=professor_id,
         nome="PROFESSORA TESTE",
         departamento="CIC",
+        departamento_nome=None,
     )
 
 
@@ -49,6 +50,7 @@ def disciplina(disciplina_id):
         codigo="CIC0001",
         nome="INTRODUCAO A CIENCIA DA COMPUTACAO",
         departamento="CIC",
+        departamento_nome=None,
     )
 
 

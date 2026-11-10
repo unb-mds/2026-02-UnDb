@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import DisciplinasProfessor from "@/components/disciplinas-professor";
@@ -18,10 +19,8 @@ export default async function DetalheProfessorPage({
   const contexto = lerContextoBusca(await searchParams);
   if (!identificadorValido(id)) notFound();
 
-  // Sequencial, não Promise.all: o backend também consulta o professor antes
-  // de listar suas disciplinas, então um id inexistente faz as duas chamadas
-  // rejeitarem com 404 — buscando em paralelo, o erro da segunda escapava do
-  // catch da primeira e virava 500 em vez de notFound().
+  // Consultar primeiro o professor mantém o 404 institucional antes das
+  // consultas de disciplinas vinculadas.
   const professor = await obterProfessor(id).catch((erro) => {
     if (erro instanceof ApiError && erro.naoEncontrado) notFound();
     throw erro;
@@ -49,12 +48,9 @@ export default async function DetalheProfessorPage({
       </Link>
 
       <div className="panel p-6 break-words">
-        <div className="badges mb-3">
-          <span className="badge">{professor.departamento}</span>
-        </div>
         <h1 className="text-2xl font-bold">{professor.nome}</h1>
         <p className="mt-1 text-sm text-foreground/70">
-          Unidade acadêmica: {professor.departamento}
+          Unidade acadêmica: {nomeUnidade(professor)}
         </p>
       </div>
 

@@ -53,6 +53,12 @@ SIGAA.
 A [Release 1.0.0](releases/1.0.0.md) usa importação manual dos dados do SIGAA.
 A atualização periódica está prevista para a Release 2.
 
+A [v1.1.0](releases/1.1.0.md) foi publicada em 09/11/2026 e a aplicação está em
+[undb.app.br](https://undb.app.br). Consulte o [guia de hospedagem](hospedagem.md),
+o [resultado da carga manual no Neon](estudos/importacao-neon-2026-11-10.md) e a
+[reconciliação da R2](releases/2.0.0-reconciliacao.md) para distinguir essa versão
+das entregas posteriores de `develop` e dos aceites pendentes.
+
 !!! info "Fonte de verdade"
 
     [`docs/requisitos.md`](requisitos.md) é a fonte de verdade dos requisitos. Esta página

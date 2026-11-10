@@ -9,6 +9,8 @@ const { listarProfessores } = await carregar("services/professores.js");
 const { listarDisciplinas } = await carregar("services/disciplinas.js");
 const { unidadesDoCatalogo, urlUnidade } = await carregar("catalogo.js");
 const { retornoAvaliacaoSeguro } = await carregar("retorno-avaliacao.js");
+const { nomeUnidade } = await carregar("unidade.js");
+const { consultarAvaliacaoAgregada } = await carregar("services/avaliacoes.js");
 
 test("retorno autenticado permite apenas rota da avaliação e contexto autorizado, até 2048 caracteres", () => {
   const destino = "/professores/11111111-1111-4111-8111-111111111111/disciplinas/22222222-2222-4222-8222-222222222222/avaliar";
@@ -124,4 +126,37 @@ test("unidades vêm apenas do catálogo, sem unir nomes parecidos e com URL reve
     assert.equal(url.searchParams.get("unidade"), nome);
   }
   assert.deepEqual(disciplinas.map((d) => d.departamento), nomes);
+});
+
+test("nomes institucionais chegam da API sem substituir os códigos dos filtros", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => Response.json([
+    { id: "1", nome: "Disciplina A", codigo: "A01", departamento: "672", departamento_nome: "Saúde", creditos: null, identificador_externo: null },
+    { id: "2", nome: "Disciplina B", codigo: "B01", departamento: "673", departamento_nome: "Engenharia", creditos: null, identificador_externo: null },
+  ]));
+  const disciplinas = await listarDisciplinas();
+  assert.equal(nomeUnidade(disciplinas[0]), "Saúde");
+  assert.equal(disciplinas[0].departamento, "672");
+  assert.deepEqual(unidadesDoCatalogo(disciplinas), ["673", "672"]);
+  assert.deepEqual(ordenarResultados(disciplinas, "unidade").map(d => d.departamento), ["673", "672"]);
+  assert.equal(new URL(urlUnidade(disciplinas[0].departamento), "http://local").searchParams.get("unidade"), "672");
+});
+
+test("nome ausente usa código identificável e unidades homônimas continuam distintas", () => {
+  assert.equal(nomeUnidade({ departamento: "672" }), "Unidade 672");
+  assert.equal(nomeUnidade({ departamento: "672", departamentoNome: "672" }), "Unidade 672");
+  assert.equal(nomeUnidade({ departamento: "CIC", departamentoNome: "  " }), "CIC");
+  const disciplinas = ["672", "673"].map((departamento, i) => ({ id: String(i), nome: "Disciplina", departamento, departamentoNome: "Mesmo nome" }));
+  assert.deepEqual(unidadesDoCatalogo(disciplinas), ["672", "673"]);
+});
+
+test("contexto da avaliação e confirmação mantém os nomes institucionais da API", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => Response.json({
+    professor_id: "p", disciplina_id: "d", total_avaliacoes: 0, dados_suficientes: false,
+    professor: { id: "p", nome: "Docente", departamento: "672", departamento_nome: "Saúde" },
+    disciplina: { id: "d", codigo: "FCE001", nome: "Disciplina", departamento: "672", departamento_nome: "Saúde" },
+  }));
+  const resultado = await consultarAvaliacaoAgregada("p", "d");
+  assert.equal(nomeUnidade(resultado.professor), "Saúde");
+  assert.equal(nomeUnidade(resultado.disciplina), "Saúde");
+  assert.equal(resultado.disciplina.departamento, "672");
 });

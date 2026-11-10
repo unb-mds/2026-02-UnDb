@@ -9,6 +9,7 @@ class ProfessorInstitucionalResponse(BaseModel):
     id: UUID
     nome: str
     departamento: str
+    departamento_nome: str | None = None
 
 
 class DisciplinaInstitucionalResponse(BaseModel):
@@ -18,6 +19,7 @@ class DisciplinaInstitucionalResponse(BaseModel):
     codigo: str
     nome: str
     departamento: str
+    departamento_nome: str | None = None
 
 
 class ProfessorDetalheResponse(ProfessorInstitucionalResponse):

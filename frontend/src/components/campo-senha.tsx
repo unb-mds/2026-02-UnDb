@@ -18,12 +18,12 @@ export default function CampoSenha({ cadastro = false }: { cadastro?: boolean })
         minLength={cadastro ? 8 : undefined}
         maxLength={128}
         aria-describedby={cadastro ? ajudaId : undefined}
-        className="min-w-0 rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
+        className="min-h-11 w-full min-w-0 rounded-lg border border-(--control-border) bg-(--raised) px-4 py-3 text-base text-foreground focus:border-accent"
       />
-      <button type="button" aria-controls={id} aria-pressed={visivel} onClick={() => setVisivel((valor) => !valor)} className="self-start rounded-lg px-2 py-2 text-sm font-medium text-accent underline underline-offset-4">
+      <button type="button" aria-controls={id} aria-pressed={visivel} onClick={() => setVisivel((valor) => !valor)} className="button self-start underline underline-offset-4">
         {visivel ? "Ocultar senha" : "Mostrar senha"}
       </button>
-      {cadastro && <span id={ajudaId} className="text-xs text-foreground/60">Use entre 8 e 128 caracteres.</span>}
+      {cadastro && <span id={ajudaId} className="text-xs text-(--muted)">Use entre 8 e 128 caracteres.</span>}
     </div>
   );
 }

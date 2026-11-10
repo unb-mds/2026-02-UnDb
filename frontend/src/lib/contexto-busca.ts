@@ -1,3 +1,5 @@
+import { nomeUnidade } from "./unidade";
+
 export type TipoBusca = "professores" | "disciplinas";
 export type OrdemBusca = "nome" | "unidade";
 export type ParametrosBusca = Record<string, string | string[] | undefined>;
@@ -36,11 +38,11 @@ export function comContextoBusca(caminho: string, contexto: ContextoBusca | null
 const colacao = new Intl.Collator("pt-BR", { sensitivity: "base" });
 
 /** As buscas atuais retornam o conjunto completo, sem paginação no servidor. */
-export function ordenarResultados<T extends { id: string; nome: string; departamento: string }>(
+export function ordenarResultados<T extends { id: string; nome: string; departamento: string; departamentoNome?: string | null }>(
   resultados: readonly T[], ordem: OrdemBusca,
 ): T[] {
   return [...resultados].sort((a, b) =>
-    (ordem === "unidade" ? colacao.compare(a.departamento, b.departamento) : 0)
+    (ordem === "unidade" ? colacao.compare(nomeUnidade(a), nomeUnidade(b)) : 0)
     || colacao.compare(a.nome, b.nome)
     || colacao.compare(a.departamento, b.departamento)
     || a.id.localeCompare(b.id),

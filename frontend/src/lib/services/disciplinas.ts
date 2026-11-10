@@ -8,6 +8,7 @@ interface DisciplinaInstitucionalWire {
   codigo: string;
   nome: string;
   departamento: string;
+  departamento_nome?: string | null;
 }
 
 interface DisciplinaDetalheWire extends DisciplinaInstitucionalWire {
@@ -19,6 +20,7 @@ interface ProfessorInstitucionalWire {
   id: string;
   nome: string;
   departamento: string;
+  departamento_nome?: string | null;
 }
 
 interface ProfessorDetalheWire extends ProfessorInstitucionalWire {
@@ -70,6 +72,7 @@ function paraDisciplina(wire: DisciplinaDetalheWire): DisciplinaDetalhe {
     codigo: wire.codigo,
     nome: wire.nome,
     departamento: wire.departamento,
+    departamentoNome: wire.departamento_nome ?? null,
     identificadorExterno: wire.identificador_externo,
     creditos: wire.creditos,
   };
@@ -86,6 +89,7 @@ function paraTurma(wire: TurmaInstitucionalWire): TurmaInstitucional {
       id: professor.id,
       nome: professor.nome,
       departamento: professor.departamento,
+      departamentoNome: professor.departamento_nome ?? null,
       siape: professor.siape,
       identidadeConfirmada: professor.identidade_confirmada,
     })),
@@ -100,12 +104,14 @@ function paraAvaliacaoAgregada(wire: AvaliacaoAgregadaWire): AvaliacaoAgregada {
       id: wire.professor.id,
       nome: wire.professor.nome,
       departamento: wire.professor.departamento,
+      departamentoNome: wire.professor.departamento_nome ?? null,
     },
     disciplina: {
       id: wire.disciplina.id,
       codigo: wire.disciplina.codigo,
       nome: wire.disciplina.nome,
       departamento: wire.disciplina.departamento,
+      departamentoNome: wire.disciplina.departamento_nome ?? null,
     },
     totalAvaliacoes: wire.total_avaliacoes,
   };
@@ -174,6 +180,7 @@ export async function compararProfessoresDaDisciplina(id: string): Promise<Compa
       codigo: wire.disciplina.codigo,
       nome: wire.disciplina.nome,
       departamento: wire.disciplina.departamento,
+      departamentoNome: wire.disciplina.departamento_nome ?? null,
     },
     professores: wire.professores.map(paraAvaliacaoAgregada),
   };

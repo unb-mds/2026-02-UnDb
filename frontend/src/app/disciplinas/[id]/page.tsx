@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -22,10 +23,8 @@ export default async function DetalheDisciplinaPage({
   const contexto = lerContextoBusca(await searchParams);
   if (!identificadorValido(id)) notFound();
 
-  // Sequencial, não Promise.all: mesmo motivo de professores/[id]/page.tsx —
-  // o backend consulta a disciplina antes de listar as turmas, então um id
-  // inexistente rejeita as duas chamadas, e a segunda escapava do catch da
-  // primeira, virando 500 em vez de notFound().
+  // Consultar primeiro a disciplina faz com que um ID inexistente vire 404
+  // antes das consultas dependentes de turmas e agregados.
   const disciplina = await obterDisciplina(id).catch((erro) => {
     if (erro instanceof ApiError && erro.naoEncontrado) notFound();
     throw erro;
@@ -50,6 +49,16 @@ export default async function DetalheDisciplinaPage({
         ]}
       />
 
+      <div className="rounded-xl border border-accent/30 bg-accent/5 p-5 break-words">
+        <h1 className="text-2xl font-semibold">{disciplina.nome}</h1>
+        <p className="mt-1 text-sm text-foreground/70">
+          Código da disciplina: <span className="font-mono">{disciplina.codigo}</span>
+        </p>
+        <p className="mt-1 text-sm text-foreground/70">
+          Unidade acadêmica: {nomeUnidade(disciplina)}
+        </p>
+      </div>
+
       <div className="flex flex-wrap gap-4 text-sm">
         {contexto ? (
           <Link href={urlBusca(contexto)} className="text-accent underline underline-offset-4">
@@ -60,16 +69,6 @@ export default async function DetalheDisciplinaPage({
             ← Buscar outra disciplina
           </Link>
         )}
-      </div>
-
-      <div className="comparison-heading">
-        <div>
-          <div className="badges mb-3">
-            <span className="badge blue">{disciplina.codigo}</span>
-            <span className="badge">{disciplina.departamento}</span>
-          </div>
-          <h1 className="text-2xl font-bold">Quem ensina {disciplina.nome}</h1>
-        </div>
       </div>
 
       <ComparacaoDark

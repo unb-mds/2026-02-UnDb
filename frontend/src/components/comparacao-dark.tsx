@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { nomeUnidade } from "@/lib/unidade";
 import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
 import type { AvaliacaoAgregada } from "@/lib/types/avaliacao";
 import type { TurmaInstitucional } from "@/lib/types/institucional";
@@ -116,7 +117,7 @@ export default function ComparacaoDark({
                       </Link>
                     </div>
                     <span className="table-unit">
-                      Unidade acadêmica: {a.professor.departamento}
+                      Unidade acadêmica: {nomeUnidade(a.professor)}
                     </span>
                     {nomesRepetidos.has(a.professor.nome) && (
                       <span className="table-unit text-accent font-medium">
