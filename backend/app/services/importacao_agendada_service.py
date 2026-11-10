@@ -24,6 +24,7 @@ def executar_importacao_agendada(
     *,
     ano: str,
     periodo: str,
+    origem_unidades: str = "lista_explicita",
 ) -> ImportacaoExecucao:
     registro = ImportacaoExecucao(
         status="em_andamento",
@@ -32,7 +33,7 @@ def executar_importacao_agendada(
         departamentos=[],
         ofertas_extraidas=0,
         ofertas_processadas=0,
-        resultado_json={},
+        resultado_json={"origem_unidades": origem_unidades},
     )
 
     db.add(registro)
@@ -48,6 +49,8 @@ def executar_importacao_agendada(
             }
             for item in solicitacoes
         ]
+        # Preserva o denominador mesmo se o processo for interrompido durante a coleta.
+        db.commit()
         resultado = executar_importacao(
             db,
             solicitacoes,
@@ -61,7 +64,7 @@ def executar_importacao_agendada(
         registro.finalizada_em = datetime.now(UTC)
         registro.ofertas_extraidas = extraidas
         registro.ofertas_processadas = processadas
-        registro.resultado_json = resultado.to_dict()
+        registro.resultado_json = {**resultado.to_dict(), "origem_unidades": origem_unidades}
 
         if resultado.sucesso:
             registro.erro = None
@@ -82,6 +85,7 @@ def executar_importacao_agendada(
         registro.finalizada_em = datetime.now(UTC)
         registro.erro = f"{type(erro).__name__}: {erro}"
         registro.resultado_json = {
+            "origem_unidades": origem_unidades,
             "sucesso": False,
             "ano": ano,
             "periodo": periodo,
