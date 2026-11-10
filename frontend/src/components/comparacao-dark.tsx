@@ -38,17 +38,16 @@ export default function ComparacaoDark({
       .map((a) => a.professor.nome)
   );
 
-  const ordenados = [...professores].sort((a, b) => {
+  // A API já aplica os desempates vigentes. Na ordem crescente, altere somente
+  // a recomendação e preserve a ordem recebida nos empates e na insuficiência.
+  const ordenados = !ascendente ? professores : [...professores].sort((a, b) => {
     if (a.dadosSuficientes !== b.dadosSuficientes) {
       return a.dadosSuficientes ? -1 : 1;
     }
     if (a.dadosSuficientes && b.dadosSuficientes && a.recomenda !== b.recomenda) {
-      return (ascendente ? 1 : -1) * (a.recomenda - b.recomenda);
+      return a.recomenda - b.recomenda;
     }
-    return (
-      b.totalAvaliacoes - a.totalAvaliacoes ||
-      a.professor.nome.localeCompare(b.professor.nome, "pt-BR")
-    );
+    return 0;
   });
 
   return (

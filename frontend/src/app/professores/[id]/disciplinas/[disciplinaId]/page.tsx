@@ -156,7 +156,11 @@ export default async function AvaliacaoAgregadaPage({
       <div className="two-columns profile-explanation">
         <section className="panel related">
           <h2>Outros professores desta disciplina</h2>
-          {outrosProfessores.length > 0 ? (
+          {comparacao === null ? (
+            <p role="alert" className="text-sm mt-2">
+              Não foi possível carregar os outros professores. Recarregue a página para tentar novamente.
+            </p>
+          ) : outrosProfessores.length > 0 ? (
             outrosProfessores.map((p) => (
               <Link
                 key={p.professorId}
