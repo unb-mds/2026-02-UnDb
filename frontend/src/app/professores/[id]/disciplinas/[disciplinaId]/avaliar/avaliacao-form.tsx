@@ -147,7 +147,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
       <form onSubmit={enviar} className="flex min-w-0 flex-col gap-6 rounded-xl border border-foreground/10 p-5" aria-busy={enviando}>
         <div className="flex flex-col items-start gap-3 rounded-lg bg-foreground/[0.03] p-4">
           <p className="text-sm text-foreground/70">Você pode entrar antes de preencher. Para enviar, é necessário ter uma sessão ativa e confirmar seu e-mail institucional.</p>
-          <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="rounded-lg border border-foreground/20 px-4 py-2.5 text-sm font-medium text-accent">Entrar ou criar conta antes de avaliar</Link>
+          <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="button">Entrar ou criar conta antes de avaliar</Link>
         </div>
         <CriteriosAvaliacao rotulosExplicitos destacarDidatica disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
         <label className="flex min-w-0 flex-col gap-2">
@@ -155,7 +155,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
           <textarea name="comentario" value={texto} disabled={enviando} rows={5} aria-describedby="orientacao-comentario" onChange={(e) => { setTexto(e.target.value); setSucesso(false); setAvisoComentario(null); }} className="w-full min-w-0 rounded-lg border border-foreground/20 bg-background p-3 text-base" />
           <span id="orientacao-comentario" className="text-sm text-foreground/70">De 1 a 500 caracteres após remover espaços nas extremidades. Críticas acadêmicas são permitidas; não publique ofensas, ameaças, discriminação, dados pessoais ou spam. Todo texto novo depende de aprovação humana. Deixe vazio para manter o comentário existente. Para retirar, use a ação explícita abaixo.</span>
         </label>
-        <button type="submit" disabled={enviando} className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent disabled:opacity-60">{enviando ? "Enviando…" : "Enviar avaliação"}</button>
+        <button type="submit" disabled={enviando} className="button primary">{enviando ? "Enviando…" : "Enviar avaliação"}</button>
         <div aria-live="polite" aria-atomic="true">
           {sucesso && <p role="status" className="rounded-lg border border-green-600/30 p-4 text-sm">Avaliação registrada com sucesso. Se você já tinha uma avaliação para este professor nesta disciplina, ela foi substituída por este envio.</p>}
           {avisoComentario && <p role="status" className="mt-2 text-sm">{avisoComentario}</p>}
