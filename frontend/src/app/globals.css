@@ -13,10 +13,10 @@
   --muted: #94a3bd;
   --accent: #75a7ff;
   --on-accent: #0b0f17;
-  /* Proposta #212: tons e distribuição aguardam alinhamento com Yasmin (#211). */
-  --primary: #15803d;
-  --primary-hover: #166534;
-  --primary-active: #14532d;
+  /* Verde UnB: RGB 0, 130, 46 (Manual de Identidade Visual, p. 65). */
+  --primary: #00822e;
+  --primary-hover: #006b26;
+  --primary-active: #005a1c;
   --primary-border: #4ade80;
   --on-primary: #ffffff;
   --focus: #86efac;
@@ -50,9 +50,8 @@ input, select, textarea { accent-color: var(--primary); }
 .skip-link:focus { top: 12px; }
 .header { border-bottom: 1px solid var(--border); background: var(--panel); }
 .header-inner { display: flex; align-items: center; gap: 28px; min-height: 72px; padding-block: 12px; }
-.brand { display: inline-flex; flex-shrink: 0; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; }
-.brand-mark { display: grid; place-items: center; width: 34px; height: 36px; border-radius: 9px; background: var(--primary); color: var(--on-primary); }
-.brand-accent { color: var(--accent); }
+.brand { display: inline-flex; flex-shrink: 0; align-items: center; min-height: 44px; }
+.brand-logo { display: block; width: 140px; height: auto; }
 .main-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; font-size: 13px; color: var(--muted); }
 .main-nav a:hover { color: var(--foreground); }
 .header-actions { display: flex; flex-shrink: 0; gap: 10px; margin-left: auto; }
@@ -97,8 +96,7 @@ input, select, textarea { accent-color: var(--primary); }
   .main-nav { order: 3; width: 100%; font-size: 12px; gap: 18px; }
   .header-actions { gap: 8px; }
   .header-actions .button { padding-inline: 10px; font-size: 12px; }
-  .brand { font-size: 20px; gap: 8px; }
-  .brand-mark { width: 30px; height: 32px; }
+  .brand-logo { width: 108px; }
   .search { gap: 8px; flex-wrap: wrap; }
   .search select { width: 100px; }
   .search-field { gap: 8px; }
