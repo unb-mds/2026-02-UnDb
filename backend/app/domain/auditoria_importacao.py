@@ -47,12 +47,19 @@ def auditar_cobertura(
         coletadas, persistidas = contagens
         soma_extraidas += coletadas
         soma_processadas += persistidas
-        if coletadas != persistidas or (
-            item.get("total_reportado") is not None
-            and (type(item["total_reportado"]) is not int or item["total_reportado"] != coletadas)
+        total_reportado = item.get("total_reportado")
+        if (
+            coletadas != persistidas
+            or type(total_reportado) is not int
+            or total_reportado != coletadas
         ):
             inconsistentes.append(codigo)
-        if coletadas == 0 and item.get("sucesso") is True and item.get("erros") == []:
+        if (
+            coletadas == persistidas == total_reportado == 0
+            and type(total_reportado) is int
+            and item.get("sucesso") is True
+            and item.get("erros") == []
+        ):
             sem_ofertas.append(codigo)
 
     totais_conferem = soma_extraidas == extraidas and soma_processadas == processadas

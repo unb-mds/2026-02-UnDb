@@ -94,6 +94,27 @@ class AuditoriaImportacaoTest(unittest.TestCase):
         del self.resultado["departamentos"][1]["ofertas_extraidas"]
         self.assertFalse(self.audit()["completa"])
 
+    def test_total_reportado_ausente_ou_invalido_nao_comprova_extracao(self):
+        unidade = self.resultado["departamentos"][0]
+        for total in (None, "3", True, -1, 2):
+            with self.subTest(total=total):
+                unidade["total_reportado"] = total
+                relatorio = self.audit()
+                self.assertFalse(relatorio["completa"])
+                self.assertEqual(relatorio["contagens_inconsistentes"], ["CIC"])
+        del unidade["total_reportado"]
+        self.assertFalse(self.audit()["completa"])
+
+    def test_zero_sem_total_confirmado_nao_e_classificado_como_unidade_sem_ofertas(self):
+        unidade = self.resultado["departamentos"][1]
+        for total in (None, False, 1):
+            with self.subTest(total=total):
+                unidade["total_reportado"] = total
+                relatorio = self.audit()
+                self.assertFalse(relatorio["completa"])
+                self.assertEqual(relatorio["contagens_inconsistentes"], ["ZERO"])
+                self.assertEqual(relatorio["sem_ofertas"], [])
+
     def test_lista_vazia_ou_resultado_sem_detalhes_nao_comprovam_cobertura(self):
         self.esperadas = []
         self.assertFalse(self.audit()["completa"])
