@@ -55,7 +55,7 @@ continua em links secundários, critérios e realces informativos.
 - Formulários oficiais de login/cadastro e avaliação, ação de avaliar no detalhe
   professor/disciplina e ações principais da confirmação: migram apenas as classes
   para `.button.primary`. Labels, handlers, permissões e estados reais são preservados.
-- `OpcoesAcesso`: opção atual verde com `aria-current` preservado; opção alternativa
+- `OpcoesAcesso`: opção atual verde e sublinhada com `aria-current` preservado; opção alternativa
   secundária. Logout e acesso antes de avaliar usam `.button` secundária.
 - Detalhes existentes que usam `--primary`: marca “U”, gradiente da home, painel de
   convite a avaliar, fundos de código da disciplina e iniciais do professor. Os

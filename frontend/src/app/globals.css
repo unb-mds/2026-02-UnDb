@@ -60,6 +60,7 @@ input, select, textarea { accent-color: var(--primary); }
 .button:not(:disabled):not([aria-disabled="true"]):hover { border-color: var(--accent); background: var(--raised); }
 .button:not(:disabled):not([aria-disabled="true"]):active { border-color: var(--accent); background: var(--background); }
 .button:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+.button[aria-current="page"] { text-decoration: underline; text-underline-offset: 4px; }
 .button.primary { border-color: var(--primary-border); background: var(--primary); color: var(--on-primary); }
 .button.primary:not(:disabled):not([aria-disabled="true"]):hover { border-color: var(--primary-border); background: var(--primary-hover); }
 .button.primary:not(:disabled):not([aria-disabled="true"]):active { border-color: var(--primary-border); background: var(--primary-active); }
