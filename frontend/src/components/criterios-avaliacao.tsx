@@ -25,9 +25,9 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
         <legend className="text-lg font-semibold">Sobre as aulas</legend>
 
         {!ocultarDidatica && (
-          <fieldset className={destacarDidatica ? "flex min-w-0 flex-col gap-3 rounded-xl bg-(--raised) p-3 sm:p-4" : "flex min-w-0 flex-col gap-3"}>
+          <fieldset className={destacarDidatica ? "flex min-w-0 flex-col gap-3 rounded-xl bg-(--raised) p-2 sm:p-4" : "flex min-w-0 flex-col gap-3"}>
             <legend className="text-sm font-medium">Didática</legend>
-            <div className="flex flex-wrap gap-2" aria-label="Nota de Didática">
+            <div className="flex flex-wrap gap-0.5 min-[375px]:gap-2" aria-label="Nota de Didática">
               {criterioDidatica.opcoes.map(([valor, rotulo]) => (
                 <label key={valor} className="cursor-pointer">
                   <input
@@ -39,7 +39,7 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
                     required
                     onChange={() => alterarDidatica(valor)}
                   />
-                  <span className="flex h-12 min-w-12 items-center justify-center rounded-lg border border-(--control-border) bg-(--panel) px-4 text-base font-semibold transition hover:border-accent peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:text-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-(--panel) peer-disabled:cursor-not-allowed peer-disabled:bg-(--disabled-surface) peer-disabled:text-(--on-disabled)">
+                  <span className="flex h-12 min-w-11 items-center justify-center rounded-lg border border-(--control-border) bg-(--panel) px-4 text-base font-semibold transition hover:border-accent peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:text-accent peer-focus-visible:ring-2 peer-focus-visible:ring-accent peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-(--panel) peer-disabled:cursor-not-allowed peer-disabled:bg-(--disabled-surface) peer-disabled:text-(--on-disabled)">
                     {rotulo}
                   </span>
                 </label>

@@ -144,7 +144,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
-      <form onSubmit={enviar} className="panel flex min-w-0 flex-col gap-6 p-4 sm:p-6" aria-busy={enviando}>
+      <form onSubmit={enviar} className="panel flex min-w-0 flex-col gap-6 p-3 sm:p-6" aria-busy={enviando}>
         <div className="flex min-w-0 flex-col items-start gap-3 rounded-xl border border-(--border) bg-(--raised) p-4">
           <p className="text-sm leading-relaxed text-(--muted)">Você pode entrar antes de preencher. Para enviar, é necessário ter uma sessão ativa e confirmar seu e-mail institucional.</p>
           <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="button">Entrar ou criar conta antes de avaliar</Link>

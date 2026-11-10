@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { verificarCatalogoProgressivo } from "./catalogo-progressivo-browser.mjs";
 
 // Cenário isolado do runner já existente. Dados controlados só no processo de teste.
 export function criarCenarioBusca(professor, disciplina) {
@@ -13,6 +14,15 @@ export function criarCenarioBusca(professor, disciplina) {
   let lentasConcluidas = 0;
   let catalogo = "sucesso";
   let falharDisciplinas = false;
+  let extenso = false;
+  const disciplinasExtensas = Array.from({ length: 27 }, (_, i) => ({
+    ...disciplina,
+    id: `77777777-7777-4777-8777-${String(i).padStart(12, "0")}`,
+    codigo: `TEST${String(i).padStart(4, "0")}`,
+    nome: `Disciplina Teste ${String(i).padStart(2, "0")}`,
+    departamento: String(5000 + i % 12),
+    departamento_nome: `Unidade Acadêmica Teste ${String(i % 12).padStart(2, "0")}`,
+  }));
   const professores = [
     { ...professor, id: "33333333-3333-4333-8333-333333333333", nome: "Zélia Teste", departamento: "Administração" },
     { ...professor, nome: "Álvaro Teste", departamento: "Matemática" },
@@ -41,7 +51,7 @@ export function criarCenarioBusca(professor, disciplina) {
       }
       if (url.pathname === "/api/disciplinas" && !termo) {
         if (catalogo === "lento") await new Promise(resolve => setTimeout(resolve, 900));
-        enviar(catalogo === "erro" ? { detail: "Falha do catálogo" } : catalogo === "vazio" ? [] : disciplinas, catalogo === "erro" ? 503 : 200);
+        enviar(catalogo === "erro" ? { detail: "Falha do catálogo" } : catalogo === "vazio" ? [] : extenso ? disciplinasExtensas : disciplinas, catalogo === "erro" ? 503 : 200);
       }
       else if (falhar) enviar({ detail: "Falha controlada" }, 503);
       else if (termo === "vazio") enviar([]);
@@ -325,7 +335,12 @@ export function criarCenarioBusca(professor, disciplina) {
       falharContexto = true;
       const retorno = `/professores/${professor.id}/disciplinas/${disciplina.id}/avaliar?busca=disciplinas&q=Teste&ordem=unidade`;
       await navegar(`/login?returnTo=${encodeURIComponent(retorno)}`, "Use sua conta institucional");
-      await aguardar(async () => await avaliar("!!document.querySelector('[name=email]') && !!document.querySelector('main details')"), "acesso disponível apesar de falha auxiliar");
+      try {
+        await aguardar(async () => await avaliar("!!document.querySelector('[name=email]') && !!document.querySelector('main details')"), "acesso disponível apesar de falha auxiliar");
+      } catch (erro) {
+        const estado = await avaliar("({caminho:location.pathname, texto:document.body.innerText.slice(0,1200)})");
+        throw new Error(`${erro.message}: ${JSON.stringify(estado)}`, { cause: erro });
+      }
       await avaliar("document.querySelector('main summary').click()");
       await aguardarTexto("Não foi possível carregar seus detalhes agora");
       assert.equal(await avaliar("new URL(document.querySelector('main a[href^=\"/cadastro?returnTo=\"]').href).searchParams.get('returnTo')"), retorno);
@@ -338,5 +353,10 @@ export function criarCenarioBusca(professor, disciplina) {
       console.log("#155/#203: busca direta, ordem sem HTTP, contexto/histórico/recarga, catálogo e unidades da API, vazio, erro/nova tentativa, homônimos e ações Consultar/Avaliar em 320/390/768/1280/1440; teclado, corrida de respostas e acesso aprovados. HTTP controlado e viewport emulado; temas do sistema sobre dark fixo.");
     } finally { ativo = false; }
   }
-  return { responder, verificar };
+  return { responder, verificar, async verificarProgressivo(contexto) {
+    ativo = true;
+    extenso = true;
+    try { await verificarCatalogoProgressivo(contexto); }
+    finally { ativo = false; extenso = false; }
+  } };
 }

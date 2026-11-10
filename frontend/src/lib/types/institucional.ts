@@ -7,6 +7,7 @@ export interface ProfessorInstitucional {
   id: string;
   nome: string;
   departamento: string;
+  departamentoNome?: string | null;
 }
 
 export interface ProfessorDetalhe extends ProfessorInstitucional {
@@ -19,6 +20,7 @@ export interface DisciplinaInstitucional {
   codigo: string;
   nome: string;
   departamento: string;
+  departamentoNome?: string | null;
 }
 
 export interface DisciplinaDetalhe extends DisciplinaInstitucional {

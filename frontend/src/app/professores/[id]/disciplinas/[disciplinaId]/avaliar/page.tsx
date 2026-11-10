@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -51,7 +52,7 @@ export default async function AvaliarPage({ params, searchParams }: {
             </div>
             <div>
               <dt className="text-sm text-(--muted)">Unidade acadêmica</dt>
-              <dd className="font-medium">{avaliacao.disciplina.departamento}</dd>
+              <dd className="font-medium">{nomeUnidade(avaliacao.disciplina)}</dd>
             </div>
           </dl>
           <AvaliacaoForm professorId={avaliacao.professorId} disciplinaId={avaliacao.disciplinaId} retornoHref={retornoHref} />

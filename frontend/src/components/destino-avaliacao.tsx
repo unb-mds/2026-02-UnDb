@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { retornoAvaliacaoSeguro } from "@/lib/retorno-avaliacao";
 import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
 
@@ -14,7 +15,7 @@ export default async function DestinoAvaliacao({ retorno }: { retorno: string | 
         <div><dt className="text-(--muted)">Professor</dt><dd className="font-semibold">{contexto.professor.nome}</dd></div>
         <div><dt className="text-(--muted)">Disciplina</dt><dd className="font-semibold">{contexto.disciplina.nome}</dd></div>
         <div><dt className="text-(--muted)">Código da disciplina</dt><dd className="font-mono">{contexto.disciplina.codigo}</dd></div>
-        <div><dt className="text-(--muted)">Unidade acadêmica</dt><dd>{contexto.disciplina.departamento}</dd></div>
+        <div><dt className="text-(--muted)">Unidade acadêmica</dt><dd>{nomeUnidade(contexto.disciplina)}</dd></div>
       </dl> : <p className="mt-3 text-sm text-(--muted)">O destino de retorno foi mantido. Não foi possível carregar seus detalhes agora.</p>}
     </details>
   );

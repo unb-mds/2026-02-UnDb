@@ -311,12 +311,18 @@ try {
     for (const width of [320, 390, 768, 1280, 1440]) {
       await cdp("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
       assert.equal(await avaliar("document.documentElement.scrollWidth <= window.innerWidth"), true, `${tema}, ${width}px`);
+      if (width === 320) {
+        const notas = await avaliar(`Array.from(document.querySelectorAll('[aria-label="Nota de Didática"] label > span')).map(e => { const r=e.getBoundingClientRect(); return {top:r.top,width:r.width,height:r.height}; })`);
+        assert.equal(new Set(notas.map(n => n.top)).size, 1, "cinco notas na mesma linha em 320 px");
+        assert.ok(notas.every(n => n.width >= 44 && n.height >= 44), "alvos das notas têm ao menos 44 px");
+      }
       if ([320, 390, 768, 1440].includes(width)) await capturarContaDark(cdp, `avaliacao-${tema}-${width}`);
     }
   }
   assert.equal(await avaliar('document.querySelectorAll("textarea[name=comentario]").length'), 1);
   assert.equal(await avaliar('document.querySelectorAll("[name=historico]").length'), 0);
   if (!real) await cenarioBusca.verificar({ cdp, avaliar, aguardar, aguardarTexto });
+  if (!real) await cenarioBusca.verificarProgressivo({ cdp, avaliar, aguardar });
   if (!real) await verificarIdentidade({ cdp, avaliar, aguardar });
   if (!real) await verificarCorrecoesInterface();
   if (!real) {
