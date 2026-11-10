@@ -52,7 +52,7 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
         {mensagem}
       </p>
       {estado === "erro" && podeTentar && (
-        <button className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent hover:opacity-90" onClick={() => {
+        <button className="button primary" onClick={() => {
           setEstado("carregando");
           setMensagem("Confirmando seu e-mail…");
           setPodeTentar(false);
@@ -64,7 +64,7 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
           {estado === "sucesso" && retorno && (
             <Link
               href={`/login?returnTo=${encodeURIComponent(retorno)}`}
-              className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="button primary"
             >
               Continuar para a avaliação
             </Link>

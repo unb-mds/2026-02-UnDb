@@ -118,7 +118,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
             <button
               type="submit"
               disabled={carregando}
-              className="rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="button primary"
             >
               {carregando ? "Entrando…" : "Entrar"}
             </button>
@@ -132,7 +132,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
               type="button"
               onClick={encerrarSessao}
               disabled={carregando}
-              className="rounded-lg border border-foreground/20 px-4 py-2.5 font-medium transition hover:border-foreground/40 disabled:cursor-not-allowed disabled:opacity-60"
+              className="button"
             >
               {carregando ? "Saindo…" : "Sair"}
             </button>

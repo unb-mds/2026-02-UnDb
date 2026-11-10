@@ -68,7 +68,7 @@ export default async function AvaliacaoAgregadaPage({
       </p>
       <Link
         href={comContextoBusca(`/professores/${id}/disciplinas/${disciplinaId}/avaliar`, contexto)}
-        className="self-start rounded-lg bg-accent px-4 py-2.5 font-medium text-on-accent transition hover:opacity-90"
+        className="button primary self-start"
       >
         Avaliar este professor na disciplina
       </Link>
