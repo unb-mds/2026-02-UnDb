@@ -96,6 +96,8 @@ alimenta a comparação (RF12).
 
 O modelo abaixo retrata a Release 1. O detalhamento de requisitos da R2 na #154
 não adiciona automaticamente campos, tabelas ou privilégios a este modelo.
+A evolução efetivamente integrada está referenciada na subseção RF20–RF22 abaixo;
+as tabelas da R1 são preservadas como recorte histórico.
 
 ### `usuarios`
 | Campo | Tipo | Observação |
@@ -165,7 +167,7 @@ banco, e não apenas na aplicação.
 ### Limites para a evolução de RF20–RF22
 
 As regras de produto estão definidas em [`requisitos.md`](requisitos.md), no detalhamento
-de RF20–RF22 e nas decisões R2-DEC-01 a R2-DEC-15. A implementação posterior precisa
+de RF20–RF22 e nas decisões R2-DEC-01 a R2-DEC-15. A implementação deve
 representar versões publicadas e substitutos pendentes sem contornar suspensão, separar
 denúncias autenticadas/anônimas, restringir ações a moderadores designados e preservar
 os cinco critérios. Também deve cumprir a retenção/descarte definidos pela fonte,
@@ -173,9 +175,16 @@ sem transformar registros privados em arquivo permanente de texto ou denúncias 
 
 Nesta etapa a aprovação de textos novos e substitutos é humana. A lista do filtro é
 pendente e a IA é objetivo futuro condicionado, sem aprovação de tecnologia/provedor.
-Modelo físico, contratos, concessão operacional do papel e execução do descarte serão
-detalhados nas #156/#160/#161, com a aprovação própria para mudanças substanciais.
-Esta seção consome requisitos; não cria ADR, diagrama de dados da R2 ou decisão técnica.
+**Estado integrado — fontes:** a [PR #191](https://github.com/unb-mds/2026-02-UnDb/pull/191)
+entregou a base RF20 (`4126897`); a
+[PR #192](https://github.com/unb-mds/2026-02-UnDb/pull/192) entregou RF21/RF22
+(`81e54be`), incluindo modelo físico, contratos, concessão/revogação operacional
+de moderador e descarte contínuo. O
+[contrato publicado](estudos/alinhamento-denuncias-issues-160-161.md#resolução-pelo-po-e-contrato-de-implementação)
+é a referência técnica dessas entregas; não há detalhamento pendente dessas APIs.
+As interfaces #159/#162/#193 e a verificação técnica #163 também foram integradas;
+as PRs, hashes e limites constam da [matriz R2](releases/2.0.0-reconciliacao.md).
+Esta atualização registra entregas verificadas, sem criar ADR ou aprovar propostas.
 
 ---
 
@@ -343,7 +352,12 @@ recebe o token, evitando que pré-visualizadores consumam o link por uma requisi
 
 Na Release 1, a confirmação é demonstrada exclusivamente pelo adaptador `console`. O envio
 real para endereços arbitrários depende de domínio remetente verificado no Resend e fica
-planejado para ativação na Release 2; essa dependência não bloqueia os testes locais.
+planejado para ativação na Release 2; essa era a dependência da entrega R1 e não
+bloqueava os testes locais. Como evidência operacional posterior, a
+[#165](https://github.com/unb-mds/2026-02-UnDb/issues/165) foi encerrada após
+recebimento institucional, confirmação e login em 09/11/2026. Isso não aprova uma
+nova estratégia arquitetural nem conclui as issues ainda abertas de hospedagem
+#169, banco #170 e verificação da publicação #171.
 
 **Evidência.** Reunião presencial de 09/09/2026 nas mesas do UAC, convocada pelo grupo de
 WhatsApp. Participaram Nicolas, Vinicius, Gabriel, Tiago e Warlley; Yasmin não participou.

@@ -37,7 +37,7 @@ O objetivo é permitir uma decisão de matrícula mais fundamentada,
 | **Veterano que já teve experiências relevantes** | Transformar experiência individual em dado útil e comparável | Principal colaborador |
 | **Visitante** | Consultar professores, disciplinas e resultados sem criar conta | Consumidor |
 | **Estudante autenticado** | Consultar e registrar avaliação estruturada | Consumidor e colaborador |
-| **Moderador** | Fazer curadoria de conteúdo textual denunciado | Release 2 |
+| **Moderador** | Aprovar textos novos/substitutos e analisar comentários denunciados ou suspensos, conforme RF22/R2-DEC-04/10 | Release 2 |
 | **Product Owner e equipe** | Priorizar, desenvolver e validar o produto | Governança e entrega |
 
 ## 5. Proposta de valor
@@ -79,9 +79,19 @@ O objetivo é permitir uma decisão de matrícula mais fundamentada,
   impedimentos sobre casos próprios e registros privados de retenção limitada.
 
 Essas regras foram aprovadas pelo solicitante na discussão da #154 e detalhadas em
-`docs/requisitos.md` (RF20–RF22 e R2-DEC-01 a R2-DEC-15). Não afirmam implementação.
+`docs/requisitos.md` (RF20–RF22 e R2-DEC-01 a R2-DEC-15). Aprovação de regra e
+conclusão de implementação são evidências distintas.
 Os cinco critérios e seus agregados permanecem independentes da moderação do texto;
 substitutos passam novamente pela moderação vigente antes de publicar.
+
+**Estado reconciliado em 09/11/2026 — fonte: issues encerradas e PRs integradas em `develop`.**
+A navegação, resultados, formulário e apresentação visual das #155/#157/#158/#186
+foram integrados pelas PRs #185/#183/#184/#187. A base de comentários e as APIs de
+denúncia/moderação vieram das PRs #191/#192; as interfaces #159/#162/#193 das PRs
+#197/#194/#196. A verificação técnica integrada #163 foi concluída pela PR #198,
+com limites registrados; isso não equivale ao reteste qualitativo com alunos #166,
+que continua aberto e deve usar a versão efetivamente integrada das telas atuais.
+Fontes e hashes estão na [matriz de reconciliação da R2](releases/2.0.0-reconciliacao.md).
 
 ## 7. Limites de escopo da Release 1
 
@@ -131,12 +141,15 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
 ### Riscos e decisões pendentes
 
 - alcançar massa crítica de avaliações suficiente para gerar valor;
-- obter, na Release 2, domínio remetente verificado para ativar o envio externo pelo Resend;
-  a Release 1 usa apenas o modo local definido para a Issue #48;
+- a prontidão do envio externo pelo Resend foi verificada na
+  [#165](https://github.com/unb-mds/2026-02-UnDb/issues/165), encerrada com relato de
+  recebimento institucional, confirmação e login em 09/11/2026; a Release 1 mantém
+  seu limite histórico de adaptador local. Esse resultado não encerra a publicação #171;
 - reconciliar identidades provisórias de docentes quando um identificador externo se tornar
   disponível; o modelo de homônimos, múltiplos docentes e reimportação foi definido na #25;
 - manter a cobertura de todas as unidades com turmas de graduação nas importações
-  manuais da Release 1 e operacionalizar a atualização periódica na Release 2;
+  manuais da Release 1; a verificação operacional da rotina na Release 2 permanece
+  na [#164](https://github.com/unb-mds/2026-02-UnDb/issues/164), ainda aberta;
 - definir a estratégia de execução e deploy do frontend;
 - validar os requisitos não-funcionais ainda propostos, exceto o RNF02 já validado.
 - definir a lista do filtro de termos; enquanto isso, manter aprovação humana prévia;
@@ -149,6 +162,10 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
 |---|---|---|
 | **Release 1** | 28/09/2026 | Consulta, comparação, avaliação estruturada e dados do SIGAA |
 | **Release 2** | 25/11/2026 | Comentários, denúncia e moderação |
+
+O fechamento da release continua na [#168](https://github.com/unb-mds/2026-02-UnDb/issues/168),
+aberta e dependente do reteste #166 e da reconciliação #167. Implementação e
+verificação técnica integradas não representam aceite geral da Release 2.
 
 ## 11. Artefatos relacionados
 
