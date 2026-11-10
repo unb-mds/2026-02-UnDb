@@ -141,6 +141,24 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
             [("CIC", "DEPTO CIÊNCIAS DA COMPUTAÇÃO"), ("672", "CAMPUS CEILÂNDIA")],
         )
 
+    @patch("app.services.importacao_agendada_service.executar_importacao")
+    def test_interrupcao_preserva_lista_esperada_antes_da_coleta(self, executar):
+        executar.side_effect = KeyboardInterrupt()
+        with Session(self.engine) as db:
+            with self.assertRaises(KeyboardInterrupt):
+                executar_importacao_agendada(
+                    db,
+                    self.departamentos,
+                    ano="2026",
+                    periodo="2",
+                    origem_unidades="formulario_sigaa",
+                )
+        with Session(self.engine) as db:
+            registro = db.scalar(select(ImportacaoExecucao))
+            self.assertEqual(registro.status, "em_andamento")
+            self.assertEqual(registro.departamentos[0]["departamento"], "CIC")
+            self.assertEqual(registro.resultado_json["origem_unidades"], "formulario_sigaa")
+
 
 if __name__ == "__main__":
     unittest.main()

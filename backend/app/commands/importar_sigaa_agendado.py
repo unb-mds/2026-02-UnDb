@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
@@ -12,6 +13,7 @@ from app.services.importacao_agendada_service import (
     executar_importacao_agendada,
 )
 from app.services.sigaa_import_service import DepartamentoImportacao, FONTE_SIGAA
+from app.services.auditoria_importacao_service import auditar_registro
 
 
 def _todas_unidades(db: Session) -> list[DepartamentoImportacao]:
@@ -45,6 +47,11 @@ def main() -> None:
 
     parser.add_argument("--ano", required=True)
     parser.add_argument("--periodo", required=True)
+    parser.add_argument(
+        "--auditoria",
+        type=Path,
+        help="Grava a auditoria de cobertura sem mensagens de erro privadas.",
+    )
 
     args = parser.parse_args()
 
@@ -62,6 +69,7 @@ def main() -> None:
                 departamentos,
                 ano=args.ano,
                 periodo=args.periodo,
+                origem_unidades="formulario_sigaa" if args.todas_unidades else "lista_explicita",
             )
 
         resultado = {
@@ -78,6 +86,14 @@ def main() -> None:
         }
 
         print(json.dumps(resultado, ensure_ascii=False, indent=2))
+
+        if args.auditoria:
+            auditoria = auditar_registro(registro)
+            args.auditoria.write_text(
+                json.dumps(auditoria, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            if not auditoria["completa"]:
+                raise SystemExit(1)
 
         if registro.status != "sucesso":
             raise SystemExit(1)

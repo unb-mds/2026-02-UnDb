@@ -82,6 +82,7 @@ sequência `alembic ... && uvicorn ...` no campo: isso causou status 127 no depl
 | Variável do Render | Configuração |
 |---|---|
 | `DATABASE_URL` | Conexão direta Neon, `postgresql+psycopg2://`, com `sslmode=require`; valor secreto |
+| `MIGRATION_DATABASE_URL` | Após publicar o suporte da #170, conexão administrativa privada para Alembic; `DATABASE_URL` passa a usar o papel limitado `undb_api`, no mesmo banco/branch |
 | `SECRET_KEY` | Valor aleatório privado, mantido no painel |
 | `DEBUG` | `False` |
 | `CORS_ORIGINS` | Lista separada por vírgulas; origem principal `https://undb.app.br`. Incluir outras origens apenas quando usadas e verificadas |
@@ -176,6 +177,15 @@ Esse fluxo não comprova envio de toda mensagem futura nem o restante da #171.
 | E-mail não chega | `EMAIL_BACKEND`, domínio/chave/remetente e eventos do Resend; não publicar o link/token |
 | `ClientRead` / `idle` no PostgreSQL | Servidor aguardando cliente; isoladamente não prova importação travada |
 
+## Acesso mínimo da API — #170
+
+A separação das conexões da API e do Alembic está detalhada no
+[roteiro da #170](acesso-postgresql-api.md). Criar o papel no Neon não altera
+automaticamente as variáveis do Render. Publicar o suporte antes de substituir
+`DATABASE_URL`; sem `MIGRATION_DATABASE_URL`, o Alembic preserva o comportamento
+anterior e usa `DATABASE_URL`. A troca pública e seu reteste ainda precisam ser
+registrados pelo operador.
+
 ## Backup e restauração — roteiro ainda não executado
 
 A #170 exige verificação de recuperação. Não foi obtida evidência de dump,
@@ -200,8 +210,9 @@ ou backup externo automático. Roteiro para o operador, em ambiente isolado:
 ## Tarefas fora do servidor HTTP
 
 O povoamento manual terminou com sucesso: ver [relatório da importação](estudos/importacao-neon-2026-11-10.md).
-O agendamento por GitHub Actions foi discutido, mas **não existe workflow SIGAA
-versionado nesta base** nem evidência de instalação de cron remoto. O guia
+O workflow SIGAA foi preparado na #164, mas sua presença no código não comprova
+execução automática instalada: depende de promoção a `main`, configuração dos
+segredos e variáveis e evidência da agenda. Não há evidência de cron remoto. O guia
 [Operação SIGAA](operacao-importacao-sigaa.md) descreve o comando e os perfis
 previstos; #164 ainda exige demonstrar execução periódica e histórico.
 
