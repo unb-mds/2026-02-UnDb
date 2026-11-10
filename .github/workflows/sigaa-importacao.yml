@@ -1,0 +1,64 @@
+name: Importacao periodica SIGAA
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'
+      timezone: America/Sao_Paulo
+    - cron: '0 3 * * 0'
+      timezone: America/Sao_Paulo
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sigaa-importacao
+  cancel-in-progress: false
+
+jobs:
+  importar:
+    # Um único perfil executa a coleta. Variável ausente mantém automação desativada.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (vars.SIGAA_PERFIL == 'diario' && github.event.schedule == '0 3 * * *') ||
+       (vars.SIGAA_PERFIL == 'semanal' && github.event.schedule == '0 3 * * 0'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Instalar dependencias
+        run: pip install -r backend/requirements.txt
+      - name: Importar graduacao e conferir cobertura
+        env:
+          DATABASE_URL: ${{ secrets.SIGAA_DATABASE_URL }}
+          SECRET_KEY: ${{ secrets.SIGAA_SECRET_KEY }}
+          SIGAA_ANO: ${{ vars.SIGAA_ANO }}
+          SIGAA_PERIODO: ${{ vars.SIGAA_PERIODO }}
+          SIGAA_TODAS_UNIDADES: '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/sigaa-evidencias"
+          # Detalhes de exceções ficam no histórico privado do banco, não em logs públicos.
+          if bash scripts/cron/sigaa-import.sh \
+            --auditoria "$RUNNER_TEMP/sigaa-evidencias/cobertura.json" \
+            > "$RUNNER_TEMP/sigaa-importacao.log" 2>&1; then
+            echo "Importacao e auditoria concluidas."
+          else
+            echo "::error::Importacao ou auditoria falhou. Conferir configuracao, artefato de cobertura e historico privado no banco."
+            exit 1
+          fi
+      - name: Preservar auditoria sem credenciais
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigaa-cobertura-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/sigaa-evidencias/cobertura.json
+          if-no-files-found: warn
+          retention-days: 30
