@@ -6,6 +6,7 @@ interface ProfessorDetalheWire {
   id: string;
   nome: string;
   departamento: string;
+  departamento_nome?: string | null;
   siape: string | null;
   identidade_confirmada: boolean;
 }
@@ -15,6 +16,7 @@ interface DisciplinaDetalheWire {
   codigo: string;
   nome: string;
   departamento: string;
+  departamento_nome?: string | null;
   identificador_externo: string | null;
   creditos: number | null;
 }
@@ -24,6 +26,7 @@ function paraProfessor(wire: ProfessorDetalheWire): ProfessorDetalhe {
     id: wire.id,
     nome: wire.nome,
     departamento: wire.departamento,
+    departamentoNome: wire.departamento_nome ?? null,
     siape: wire.siape,
     identidadeConfirmada: wire.identidade_confirmada,
   };
@@ -35,6 +38,7 @@ function paraDisciplina(wire: DisciplinaDetalheWire): DisciplinaDetalhe {
     codigo: wire.codigo,
     nome: wire.nome,
     departamento: wire.departamento,
+    departamentoNome: wire.departamento_nome ?? null,
     identificadorExterno: wire.identificador_externo,
     creditos: wire.creditos,
   };

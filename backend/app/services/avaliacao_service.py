@@ -108,6 +108,7 @@ class ProfessorInstitucional:
     id: UUID
     nome: str
     departamento: str
+    departamento_nome: str | None = None
 
 
 @dataclass(frozen=True)
@@ -116,6 +117,7 @@ class DisciplinaInstitucional:
     codigo: str
     nome: str
     departamento: str
+    departamento_nome: str | None = None
 
 
 @dataclass(frozen=True)
@@ -153,12 +155,14 @@ def consultar_agregado(
         id=professor.id,
         nome=professor.nome,
         departamento=professor.departamento,
+        departamento_nome=professor.departamento_nome,
     )
     disciplina_institucional = DisciplinaInstitucional(
         id=disciplina.id,
         codigo=disciplina.codigo,
         nome=disciplina.nome,
         departamento=disciplina.departamento,
+        departamento_nome=disciplina.departamento_nome,
     )
 
     registros = avaliacao_repository.listar_por_professor_e_disciplina(
@@ -237,6 +241,7 @@ def comparar_professores(
         codigo=disciplina.codigo,
         nome=disciplina.nome,
         departamento=disciplina.departamento,
+        departamento_nome=disciplina.departamento_nome,
     )
     comparacao = [
         consultar_agregado(db, professor.id, disciplina_id)

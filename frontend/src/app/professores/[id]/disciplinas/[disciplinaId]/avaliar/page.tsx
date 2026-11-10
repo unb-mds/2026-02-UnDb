@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,35 +24,35 @@ export default async function AvaliarPage({ params, searchParams }: {
   });
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+    <main className="container flex max-w-3xl min-w-0 flex-1 flex-col gap-6 py-10 sm:py-14">
       <Caminho itens={[{ nome: "Início", href: "/" }, ...(contexto ? [{ nome: "Resultados", href: urlBusca(contexto), retornoBusca: true }] : []), { nome: "Consulta", href: consultaHref }, { nome: "Avaliar" }]} />
       {contexto && <Link href={urlBusca(contexto)} className="text-sm text-accent underline underline-offset-4">← Voltar aos resultados da busca</Link>}
       <Link href={consultaHref} className="self-start text-sm text-accent underline underline-offset-4">
         ← Voltar para a consulta
       </Link>
       <div>
-        <h1 className="text-2xl font-semibold">Avaliar professor na disciplina</h1>
-        <p className="mt-1 text-sm text-foreground/70">Confira o contexto e responda aos cinco critérios.</p>
+        <h1 className="text-3xl font-semibold tracking-tight">Avaliar professor na disciplina</h1>
+        <p className="mt-2 text-sm leading-relaxed text-(--muted)">Confira o contexto e responda aos cinco critérios.</p>
       </div>
       {avaliacao ? (
         <>
-          <dl className="flex flex-col gap-3 break-words rounded-xl border border-accent/30 bg-accent/5 p-5">
+          <dl className="panel grid min-w-0 gap-5 p-4 break-words sm:grid-cols-2 sm:p-6">
             <div>
-              <dt className="text-sm text-foreground/70">Professor</dt>
+              <dt className="text-sm text-(--muted)">Professor</dt>
               <dd className="font-semibold">{avaliacao.professor.nome}</dd>
             </div>
             <div>
-              <dt className="text-sm text-foreground/70">Disciplina</dt>
+              <dt className="text-sm text-(--muted)">Disciplina</dt>
               <dd className="font-medium">
                 <span className="block">{avaliacao.disciplina.nome}</span>
-                <span className="mt-1 block text-sm font-normal text-foreground/70">
+                <span className="mt-1 block text-sm font-normal text-(--muted)">
                   Código da disciplina: <span className="font-mono">{avaliacao.disciplina.codigo}</span>
                 </span>
               </dd>
             </div>
             <div>
-              <dt className="text-sm text-foreground/70">Unidade acadêmica</dt>
-              <dd className="font-medium">{avaliacao.disciplina.departamento}</dd>
+              <dt className="text-sm text-(--muted)">Unidade acadêmica</dt>
+              <dd className="font-medium">{nomeUnidade(avaliacao.disciplina)}</dd>
             </div>
           </dl>
           <AvaliacaoForm professorId={avaliacao.professorId} disciplinaId={avaliacao.disciplinaId} retornoHref={retornoHref} />

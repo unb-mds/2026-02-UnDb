@@ -84,22 +84,22 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-10">
+    <main className="container flex max-w-xl min-w-0 flex-1 flex-col gap-6 py-10 sm:py-14">
       <div>
-        <h1 className="text-2xl font-semibold">Entrar</h1>
-        <p className="mt-1 text-sm text-foreground/70">
+        <h1 className="text-3xl font-semibold tracking-tight">Entrar</h1>
+        <p className="mt-2 text-sm leading-relaxed text-(--muted)">
           Use sua conta institucional para registrar avaliações. As consultas continuam públicas.
         </p>
       </div>
 
       {contexto}
-      <section className="flex flex-col gap-5 rounded-xl border border-foreground/10 p-5" aria-label="Acesso à conta">
+      <section className="panel flex min-w-0 flex-col gap-6 p-4 sm:p-6" aria-label="Acesso à conta">
         <OpcoesAcesso atual="login" retorno={retorno} />
         {!sessaoCarregada ? (
-          <p className="text-sm text-foreground/70">Verificando sessão…</p>
+          <p className="text-sm text-(--muted)" role="status">Verificando sessão…</p>
         ) : !autenticado ? (
-          <form onSubmit={enviar} className="flex flex-col gap-4">
-            <label className="flex flex-col gap-2">
+          <form onSubmit={enviar} className="flex min-w-0 flex-col gap-5">
+            <label className="flex min-w-0 flex-col gap-2">
               <span className="text-sm font-medium">E-mail institucional</span>
               <input
                 name="email"
@@ -109,7 +109,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
                 required
                 maxLength={150}
                 placeholder="seu-email@aluno.unb.br"
-                className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
+                className="min-h-11 w-full min-w-0 rounded-lg border border-(--control-border) bg-(--raised) px-4 py-3 text-base text-foreground placeholder:text-(--muted) focus:border-accent"
               />
             </label>
 
@@ -124,8 +124,8 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
             </button>
           </form>
         ) : (
-          <div className="flex flex-col gap-4 rounded-xl border border-foreground/10 p-5">
-            <p className="text-sm text-foreground/70">
+          <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-(--border) bg-(--raised) p-4">
+            <p className="text-sm text-(--muted)">
               Sua sessão está ativa neste navegador.
             </p>
             <button
@@ -139,14 +139,14 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
           </div>
         )}
 
-        <p className="text-sm text-foreground/70">
+        <p className="text-sm leading-relaxed text-(--muted)">
           Ainda não possui conta?{" "}
           <Link href={retorno ? `/cadastro?returnTo=${encodeURIComponent(retorno)}` : "/cadastro"} className="font-medium text-accent hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
             Criar conta
           </Link>
         </p>
 
-        <div aria-live="polite">
+        <div aria-live="polite" className="min-w-0 break-words">
           {mensagem && (
             <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-4 text-sm">{mensagem}</p>
           )}

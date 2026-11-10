@@ -48,19 +48,19 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-10">
+    <main className="container flex max-w-xl min-w-0 flex-1 flex-col gap-6 py-10 sm:py-14">
       <div>
-        <h1 className="text-2xl font-semibold">Criar conta</h1>
-        <p className="mt-1 text-sm text-foreground/70">
+        <h1 className="text-3xl font-semibold tracking-tight">Criar conta</h1>
+        <p className="mt-2 text-sm leading-relaxed text-(--muted)">
           Use seu e-mail institucional de estudante. Você precisará confirmá-lo antes de registrar avaliações.
         </p>
       </div>
 
       {contexto}
-      <section className="flex flex-col gap-5 rounded-xl border border-foreground/10 p-5" aria-label="Cadastro de conta">
+      <section className="panel flex min-w-0 flex-col gap-6 p-4 sm:p-6" aria-label="Cadastro de conta">
         <OpcoesAcesso atual="cadastro" retorno={retorno} />
-        <form onSubmit={enviar} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-2">
+        <form onSubmit={enviar} className="flex min-w-0 flex-col gap-5">
+          <label className="flex min-w-0 flex-col gap-2">
             <span className="text-sm font-medium">Nome</span>
             <input
               name="nome"
@@ -71,12 +71,12 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
               aria-invalid={erroNome}
               aria-describedby={erroNome ? "nome-erro" : undefined}
               onChange={() => setErroNome(false)}
-              className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
+              className="min-h-11 w-full min-w-0 rounded-lg border border-(--control-border) bg-(--raised) px-4 py-3 text-base text-foreground focus:border-accent aria-invalid:border-(--danger)"
             />
             {erroNome && <span id="nome-erro" role="alert" className="text-sm text-red-600 dark:text-red-400">Informe seu nome; ele não pode conter apenas espaços.</span>}
           </label>
 
-          <label className="flex flex-col gap-2">
+          <label className="flex min-w-0 flex-col gap-2">
             <span className="text-sm font-medium">E-mail institucional</span>
             <input
               name="email"
@@ -87,7 +87,7 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
               maxLength={150}
               pattern="[^@]+@[aA][lL][uU][nN][oO][.][uU][nN][bB][.][bB][rR]"
               placeholder="seu-email@aluno.unb.br"
-              className="rounded-lg border border-foreground/20 bg-background px-4 py-2.5 outline-none focus:border-foreground/50"
+              className="min-h-11 w-full min-w-0 rounded-lg border border-(--control-border) bg-(--raised) px-4 py-3 text-base text-foreground placeholder:text-(--muted) focus:border-accent"
             />
           </label>
 
@@ -102,7 +102,7 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
           </button>
         </form>
 
-        <p className="text-sm text-foreground/70">
+        <p className="text-sm leading-relaxed text-(--muted)">
           Já possui uma conta?{" "}
           <Link
             href={retorno ? `/login?returnTo=${encodeURIComponent(retorno)}` : "/login"}
@@ -112,7 +112,7 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
           </Link>
         </p>
 
-        <div aria-live="polite">
+        <div aria-live="polite" className="min-w-0 break-words">
           {mensagem && <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-4 text-sm">{mensagem} {retorno ? "O link de confirmação permitirá retomar esta avaliação." : "Depois de confirmar o e-mail, entre na conta para avaliar."}</p>}
           {erro && <p className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">{erro}</p>}
         </div>

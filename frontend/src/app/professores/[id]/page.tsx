@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import { lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import DisciplinasProfessor from "@/components/disciplinas-professor";
@@ -37,7 +38,7 @@ export default async function DetalheProfessorPage({
 
       <div className="rounded-xl border border-accent/30 bg-accent/5 p-5 break-words">
         <h1 className="text-2xl font-semibold">{professor.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {professor.departamento}</p>
+        <p className="mt-1 text-sm text-foreground/70">Unidade acadêmica: {nomeUnidade(professor)}</p>
       </div>
 
       <div>

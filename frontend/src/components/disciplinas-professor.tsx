@@ -1,3 +1,4 @@
+import { nomeUnidade } from "@/lib/unidade";
 import Link from "next/link";
 import type { DisciplinaDetalhe } from "@/lib/types/institucional";
 import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
@@ -25,7 +26,7 @@ export default function DisciplinasProfessor({ professorId, disciplinas, context
               <span className="mt-1 block text-sm text-(--muted)">
                 Código da disciplina: <span className="font-mono">{disciplina.codigo}</span>
               </span>
-              <span className="mt-1 block text-sm text-(--muted)">Unidade acadêmica: {disciplina.departamento}</span>
+              <span className="mt-1 block text-sm text-(--muted)">Unidade acadêmica: {nomeUnidade(disciplina)}</span>
             </Link>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3 text-sm lg:max-w-64">
