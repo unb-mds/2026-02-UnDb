@@ -15,6 +15,7 @@ os.environ.setdefault("SECRET_KEY", "teste-reconciliacao")
 
 from sqlalchemy import create_engine, event, func, select
 from sqlalchemy.engine import make_url
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
@@ -344,6 +345,34 @@ class ReconciliacaoTest(unittest.TestCase):
         self.assertEqual(avaliacao.professor_id, self.origem.id)
         self.assertEqual(resolver_id(self.db, self.origem.id), self.origem.id)
         self.assertEqual([p.id for p in self.t1.professores], [self.origem.id])
+
+    def test_postgres_timeout_de_lock_desfaz_e_permite_nova_tentativa(self):
+        if not self.postgres:
+            self.skipTest("Exige PostgreSQL descartável undb_207_test.")
+        avaliacao = self.avaliar(self.origem)
+        origem_id, destino_id = self.origem.id, self.destino.id
+        # Um escritor segura a última tabela bloqueada pela manutenção. O timeout
+        # deve desfazer também os locks adquiridos antes dela e não mover dados.
+        with self.engine.connect() as escritor:
+            transacao = escritor.begin()
+            try:
+                escritor.exec_driver_sql(
+                    "LOCK TABLE professor_correspondencias IN ROW EXCLUSIVE MODE"
+                )
+                with self.assertRaises(OperationalError) as falha:
+                    aplicar(self.db, origem_id, destino_id, "Fixture de contenção")
+                self.assertEqual(falha.exception.orig.pgcode, "55P03")
+                self.db.rollback()
+            finally:
+                transacao.rollback()
+        self.assertEqual(avaliacao.professor_id, origem_id)
+        self.assertEqual(resolver_id(self.db, origem_id), origem_id)
+        self.assertEqual([p.id for p in self.t1.professores], [origem_id])
+        self.assertEqual(self.db.scalar(select(func.count(ProfessorCorrespondencia.origem_id))), 0)
+        self.assertEqual(self.aplicar()["estado"], "aplicada")
+        self.db.expire_all()
+        self.assertEqual(avaliacao.professor_id, destino_id)
+        self.assertEqual([p.id for p in self.t1.professores], [destino_id])
 
     def test_ids_antigos_api_e_limiar_de_privacidade(self):
         self.avaliar(self.origem)
