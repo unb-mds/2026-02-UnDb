@@ -86,6 +86,20 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
   await evento("pageshow");
   await conectado();
 
+  // Depois de perder a sessão, não manter Minha conta enquanto a consulta aguarda.
+  autenticado = false;
+  segurarProxima = true;
+  await evento("undb:sessao-alterada");
+  await aguardar(async () => !!respostaRetida, "revalidação após logout retida");
+  await aguardar(() => avaliar(`document.querySelector('${conta} [role=status]')?.textContent === 'Verificando sessão…'`), "carregamento neutro após perder a sessão");
+  await visitante();
+  respostaRetida();
+  respostaRetida = null;
+  await aguardar(() => avaliar(`!document.querySelector('${conta} [role=status]')`), "logout revalidado");
+  autenticado = true;
+  await evento("undb:sessao-alterada");
+  await conectado();
+
   // Uma resposta visitante antiga não pode desfazer o login já validado.
   autenticado = false;
   segurarProxima = true;
