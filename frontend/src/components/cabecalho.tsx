@@ -32,6 +32,7 @@ function ContaComRetorno() {
     let ativo = true;
     const atualizar = async () => {
       const atual = ++geracao;
+      setSessao("carregando");
       try {
         const resposta = await consultarSessao();
         if (ativo && atual === geracao) setSessao(resposta.autenticado ? "autenticado" : "visitante");
