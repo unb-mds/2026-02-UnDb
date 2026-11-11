@@ -42,3 +42,40 @@ Não há alteração de autenticação, permissões, confirmação de e-mail ou 
 ![Cabeçalho visitante no celular](evidencias/issue-207/cabecalho-visitante-320-dark.png)
 
 Esta entrega não encerra a #211 nem substitui reteste com alunos ou implantação.
+
+## Revisão da PR #223 — 11/11/2026
+
+Escopo: diff da PR em `4f5448e`, com base `develop` `1b979a9`, incluindo
+os consumidores do cabeçalho e os runners existentes. Fontes de comportamento:
+item de sessão da #211 e descrição da PR. Dois findings foram confirmados:
+
+- Uma sessão anteriormente validada continuava mostrando **Minha conta** enquanto
+  uma nova consulta ficava pendente, inclusive depois do logout. O cabeçalho agora
+  entra em `carregando` a cada revalidação, mantendo a chamada neutra até receber
+  a resposta atual. O controle de geração continua descartando respostas antigas.
+  A regressão retém a resposta após a perda da sessão: falhou antes da correção
+  e passou depois.
+- `busca-browser.mjs` e `acesso-browser.mjs` ainda procuravam o atributo
+  `aria-label="Conta: entrar ou criar conta"`, removido nesta PR. A suíte de
+  navegador interrompia na busca; a integração real interrompia no acesso ao
+  link de conta. Ambos agora localizam a navegação **Conta**, aguardam a sessão
+  visitante validada e preservam suas verificações de unicidade e `returnTo`.
+
+Verificações desta revisão, Node 24/Edge no Windows:
+
+- `npm test`: 71 testes aprovados; lint e typecheck aprovados.
+- Build `npm run build -- --webpack` aprovado. O build padrão Turbopack falhou
+  neste ambiente ao iniciar o processo de transformação de CSS; a configuração
+  versionada não foi alterada. O build padrão Linux não foi repetido nesta revisão.
+- `npm run test:cabecalho` e a sequência completa `npm run test:browser` aprovados,
+  incluindo busca, catálogo, protótipo, avaliação, moderação, denúncias e comentários.
+- `python -m tests.integration_acesso`, com FastAPI e PostgreSQL 16 exclusivos:
+  o runner de navegador aprovou as 54 combinações de tela/tema/largura, cadastro,
+  confirmação, login, persistência e retorno independente em duas abas. Depois
+  disso o wrapper Python terminou com `WinError 32` ao remover seu `api.log`
+  temporário. Portanto o comando completo não é registrado como aprovado.
+
+Os commits desta revisão são locais, na branch `codex/review-pr-223`, por
+solicitação de Gabriel. Não houve push, review publicado ou merge. A verificação
+da reconciliação e os limites da suíte de backend estão no
+[registro da #207](reconciliacao-professores-issue-207.md).
