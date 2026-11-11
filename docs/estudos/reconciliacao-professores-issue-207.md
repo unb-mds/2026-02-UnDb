@@ -129,3 +129,41 @@ conforme [relatório próprio](cabecalho-sessao-issue-211.md). A solicitação a
 commit, push, abertura de PR e revisão por `ViniGvdo`; merge e implantação permanecem
 fora desta execução. As menções anteriores à ausência de publicação descrevem o
 estado dos respectivos ensaios locais.
+
+### Revisão da PR #223 — 11/11/2026
+
+Revisado o diff `1b979a9..4f5448e` da reconciliação, incluindo migration,
+comando, repositories, serviços, testes e este procedimento, contra a #207,
+o ADR 07 e os contratos existentes. Não foi confirmado defeito adicional na
+reconciliação. Aprovação e aplicação operacional continuam pendentes.
+
+Foi acrescentado o teste
+`test_postgres_timeout_de_lock_desfaz_e_permite_nova_tentativa`. Um escritor
+independente bloqueia `professor_correspondencias`, a última tabela adquirida
+pela manutenção. A aplicação atinge o timeout real de cinco segundos
+(`SQLSTATE 55P03`); após rollback, avaliações, vínculos e correspondências
+permanecem intactos. Liberado o escritor, uma nova aplicação termina com sucesso.
+O teste é pulado na suíte SQLite e executado com a configuração PostgreSQL
+descartável documentada acima.
+
+Resultados desta revisão:
+
+- PostgreSQL 16 em container exclusivo, sem dados reais: cadeia completa de
+  migrations e `alembic check` aprovados; **15 testes de reconciliação aprovados**,
+  incluindo timeout/rollback; `tests.integration_reconciliacao` aprovado no
+  fluxo HTTP/CLI. O ensaio de contenção antes pendente foi executado nesta revisão.
+- Ruff, formatação de 119 arquivos e compilação aprovados.
+- Suíte completa em Linux/Python 3.12: 203 testes, **201 aprovados, um pulado**
+  (o teste exclusivo de PostgreSQL) e uma falha em
+  `test_explicit_migration_connection_does_not_migrate_runtime_database`.
+  Essa mesma falha foi reproduzida em snapshot limpo de `develop` `1b979a9`,
+  com a mesma imagem/dependências. Os arquivos de configuração, Alembic e esse
+  teste não foram alterados pela PR; não é um finding introduzido por ela.
+- No Windows/Python 3.14, a suíte completa também encontrou erro de limpeza
+  `WinError 32` em `test_without_override_preserves_existing_database_url_behavior`:
+  200 aprovados, um pulado, uma falha e um erro. Não se declara a suíte inteira verde.
+
+O banco isolado foi usado apenas para fixtures. Não houve migration,
+reconciliação ou escrita em produção, nem novo ensaio de backup/restauração.
+As evidências anteriores de backup preservam seu escopo histórico. As correções
+do cabeçalho e dos runners estão no [registro da #211](cabecalho-sessao-issue-211.md).
