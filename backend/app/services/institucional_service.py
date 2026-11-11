@@ -6,6 +6,7 @@ from app.models.disciplina import Disciplina
 from app.models.professor import Professor
 from app.models.turma import Turma
 from app.repositories import disciplina_repository, professor_repository
+from app.repositories.reconciliacao_professor_repository import resolver_id
 
 
 class RecursoInstitucionalNaoEncontradoError(Exception):
@@ -17,15 +18,15 @@ def listar_professores(db: Session, nome: str | None = None) -> list[Professor]:
 
 
 def obter_professor(db: Session, professor_id: UUID) -> Professor:
-    professor = db.get(Professor, professor_id)
+    professor = db.get(Professor, resolver_id(db, professor_id))
     if professor is None:
         raise RecursoInstitucionalNaoEncontradoError("professor nao encontrado")
     return professor
 
 
 def listar_disciplinas_do_professor(db: Session, professor_id: UUID) -> list[Disciplina]:
-    obter_professor(db, professor_id)
-    return professor_repository.listar_disciplinas(db, professor_id)
+    professor = obter_professor(db, professor_id)
+    return professor_repository.listar_disciplinas(db, professor.id)
 
 
 def listar_disciplinas(

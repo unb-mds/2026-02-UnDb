@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from app.domain.texto import normalizar_busca
 from app.models.disciplina import Disciplina
 from app.models.professor import Professor
+from app.models.professor_correspondencia import ProfessorCorrespondencia
+from app.repositories.reconciliacao_professor_repository import resolver_id
 from app.models.turma import Turma, turmas_professores
 
 
@@ -28,6 +30,9 @@ def get_or_create_provisorio(
         db.add(professor)
         db.flush()
     else:
+        destino_id = resolver_id(db, professor.id)
+        if destino_id != professor.id:
+            return db.get(Professor, destino_id)
         professor.nome = nome
         professor.nome_normalizado = normalizar_busca(nome)
         professor.departamento = departamento
@@ -53,7 +58,11 @@ def listar_por_disciplina(db: Session, disciplina_id: UUID) -> list[Professor]:
 
 
 def listar(db: Session, nome: str | None = None) -> list[Professor]:
-    consulta = select(Professor).order_by(Professor.nome, Professor.id)
+    consulta = (
+        select(Professor)
+        .where(~Professor.id.in_(select(ProfessorCorrespondencia.origem_id)))
+        .order_by(Professor.nome, Professor.id)
+    )
     if nome is not None:
         termos = normalizar_busca(nome).split()
         if termos:
