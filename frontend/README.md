@@ -431,3 +431,11 @@ O CI mantém um job específico com PostgreSQL 16 para o fluxo completo.
 
 Veja escopo, resultados e limites em
 [`verificacao-formulario-avaliacao.md`](../docs/estudos/verificacao-formulario-avaliacao.md).
+
+## Identidades de professores — #207
+
+A rota `/moderacao/identidades`, acessível pela área de moderação, usa a permissão
+específica `reconciliador`, independente do papel de comentários. Exibe a fila,
+candidatos institucionais, prévia, decisões com justificativa e estados de aplicação.
+Confirmar não executa união de avaliações no navegador. Fluxo e implantação em
+[identidades docentes](../docs/identidades-docentes.md).

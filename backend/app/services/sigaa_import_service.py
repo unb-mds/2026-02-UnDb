@@ -81,8 +81,13 @@ def salvar_oferta(
     oferta: Oferta,
     departamento: str,
     unidade_nome: str | None = None,
+    consulta_docentes=None,
 ) -> Turma:
     """Sincroniza uma oferta e seus zero ou vários vínculos docentes."""
+    if consulta_docentes is not None:
+        from app.repositories.identidade_docente_repository import bloquear
+
+        bloquear(db)
     departamento = departamento.strip()
     if not departamento:
         raise OfertaNaoPersistivelError("A oferta não informa o departamento.")
@@ -124,6 +129,19 @@ def salvar_oferta(
         if not nome_normalizado or nome_normalizado in nomes_vistos:
             continue
         nomes_vistos.add(nome_normalizado)
+        if consulta_docentes is not None:
+            from app.services.identidade_docente_service import resolver
+
+            professor = resolver(
+                db,
+                nome,
+                departamento,
+                _identidade_provisoria(oferta, unidade, nome),
+                oferta,
+                consulta_docentes,
+            )
+            professores.append(professor)
+            continue
         professores.append(
             professor_repository.get_or_create_provisorio(
                 db,
@@ -249,6 +267,7 @@ def _importar_departamento(
     ano: str,
     periodo: str,
     coletor: ColetorOfertas,
+    consulta_docentes=None,
 ) -> ResultadoDepartamento:
     departamento = solicitacao.departamento.strip()
     unidade_sigaa = solicitacao.unidade_sigaa.strip()
@@ -287,6 +306,7 @@ def _importar_departamento(
                     oferta,
                     departamento,
                     unidade_nome=unidade_sigaa,
+                    consulta_docentes=consulta_docentes,
                 )
                 ids_observados.add(turma.id)
             processadas += quantidade
@@ -356,9 +376,13 @@ def executar_importacao(
     if not departamentos:
         raise ValueError("ao menos um departamento deve ser informado")
 
+    from app.scrapers.docentes import ConsultaDocentes
+
+    consulta_docentes = ConsultaDocentes() if coletor is coletar_ofertas_reais else None
     inicio = datetime.now(UTC)
     resultados = tuple(
-        _importar_departamento(db, item, ano, periodo, coletor) for item in departamentos
+        _importar_departamento(db, item, ano, periodo, coletor, consulta_docentes)
+        for item in departamentos
     )
     fim = datetime.now(UTC)
     return ResultadoImportacao(

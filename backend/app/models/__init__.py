@@ -13,6 +13,9 @@ from app.models.decisao_moderacao import DecisaoModeracao
 from app.models.denuncia import Denuncia, Agradecimento
 
 __all__ = [
+    "IdentidadeDocente",
+    "PendenciaIdentidade",
+    "DecisaoIdentidade",
     "Avaliacao",
     "ComentarioVersao",
     "Disciplina",
@@ -28,3 +31,5 @@ __all__ = [
     "Denuncia",
     "Agradecimento",
 ]
+
+from app.models.identidade_docente import IdentidadeDocente, PendenciaIdentidade, DecisaoIdentidade

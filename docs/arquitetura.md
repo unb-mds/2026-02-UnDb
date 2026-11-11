@@ -435,6 +435,34 @@ avaliações a um homônimo. Agendamento e histórico durável ficam fora da API
 
 ---
 
+### Evolução do ADR 07 — RF23 / #207, autorizada em 11/11/2026
+
+Nicolas autorizou nesta conversa a implementação da associação institucional e
+fila de dúvidas. Além da ocorrência provisória, o importador consulta a busca
+global de docentes e seus perfis. Nome completo único, disciplina/código/ID de
+componente e semestre compatíveis permitem reutilizar a identidade do perfil.
+Homônimos e consultas incompletas não geram associação automática.
+
+`identidades_docentes` mantém identificador do perfil → UUID canônico (ambos
+únicos). `pendencias_identidade` preserva chave de ocorrência única, contexto,
+fonte/candidatos, estado e versão; também documenta associações automáticas já
+aplicadas. `decisoes_identidade` registra as decisões humanas com responsável,
+justificativa e versão. Esses dados não contêm valores individuais de avaliações.
+O campo de perfil não altera silenciosamente o SIAPE/identidade_confirmada existente.
+
+A API, com o novo papel `usuarios.reconciliador`, registra decisões e consulta
+prévia; não adquire escrita administrativa no catálogo. O importador aplica
+vínculos que não movem dependentes. A rotina administrativa reutiliza a #223
+para unir UUIDs em manutenção, revalidando todo o grupo e recusando colisões.
+Um advisory lock transacional serializa decisões/importações de identidades;
+as uniões mantêm os locks e a janela sem escritores exigidos pela #223.
+
+Ausência em consultas atuais não desfaz identidades históricas. Avaliações,
+versões e privacidade mantêm as regras vigentes. A associação é inferência
+institucional com o risco residual debatido e aceito na conversa; não é união
+por nome nem uma prova direta de identidade por turma. Documentação operacional:
+[identidades docentes](identidades-docentes.md).
+
 ### ADR 08 — Execução e containerização do frontend
 
 **Estado.** Aprovado pelo responsável em 19/09/2026, após revisão do resumo da

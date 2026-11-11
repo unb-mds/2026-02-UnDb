@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import FilaModeracao from "./fila-moderacao";
 
@@ -13,6 +14,7 @@ export default function ModeracaoPage() {
         <h1 className="text-2xl font-semibold">Fila de moderação</h1>
         <p className="mt-2 text-sm text-foreground/70">Analise comentários pendentes, denunciados e suspensos. As decisões sobre o texto preservam os critérios da avaliação.</p>
       </div>
+      <nav aria-label="Filas de moderação" className="flex flex-wrap gap-4"><span aria-current="page">Comentários</span><Link href="/moderacao/identidades">Identidades de professores</Link></nav>
       <FilaModeracao />
     </main>
   );
