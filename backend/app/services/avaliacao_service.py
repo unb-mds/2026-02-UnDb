@@ -82,8 +82,11 @@ def registrar_avaliacao(
     usuario: Usuario,
     dados: AvaliacaoCreate,
 ) -> Avaliacao:
-    if avaliacao_repository.obter_professor(db, dados.professor_id) is None:
+    professor = avaliacao_repository.obter_professor(db, dados.professor_id)
+    if professor is None:
         raise RecursoNaoEncontradoError("professor nao encontrado")
+    if professor.id != dados.professor_id:
+        dados = dados.model_copy(update={"professor_id": professor.id})
     if avaliacao_repository.obter_disciplina(db, dados.disciplina_id) is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
     if not turma_repository.existe_vinculo_professor_disciplina(
@@ -145,6 +148,7 @@ def consultar_agregado(
     professor = avaliacao_repository.obter_professor(db, professor_id)
     if professor is None:
         raise RecursoNaoEncontradoError("professor nao encontrado")
+    professor_id = professor.id
     disciplina = avaliacao_repository.obter_disciplina(db, disciplina_id)
     if disciplina is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")

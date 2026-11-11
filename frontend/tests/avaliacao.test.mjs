@@ -102,6 +102,7 @@ test("consulta a sessão existente com credenciais do navegador", async (t) => {
   t.mock.method(globalThis, "fetch", async (url, init) => {
     assert.equal(new URL(url).pathname, "/api/auth/sessao");
     assert.equal(init.credentials, "include");
+    assert.equal(init.cache, "no-store");
     return Response.json({ autenticado: false });
   });
   assert.deepEqual(await consultarSessao(), { autenticado: false });

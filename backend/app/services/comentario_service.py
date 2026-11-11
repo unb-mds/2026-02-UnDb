@@ -13,6 +13,7 @@ from app.repositories import (
     denuncia_repository,
     moderacao_repository,
 )
+from app.repositories.reconciliacao_professor_repository import resolver_id
 from app.services.moderacao_service import agora_utc, RETENCAO
 
 
@@ -26,6 +27,7 @@ class ComentarioNaoAutorizadoError(Exception):
 
 def listar_publicados(db: Session, professor_id: UUID, disciplina_id: UUID):
     """Lista textos publicados de um professor/disciplina (visitante)."""
+    professor_id = resolver_id(db, professor_id)
     if avaliacao_repository.obter_professor(db, professor_id) is None:
         raise RecursoNaoEncontradoError("professor nao encontrado")
     if avaliacao_repository.obter_disciplina(db, disciplina_id) is None:
@@ -43,6 +45,8 @@ def listar_do_autor(
 ):
     """Lista os comentarios do autor autenticado (todos os estados)."""
     moderacao_repository.descartar_vencidos(db, agora_utc())
+    if professor_id is not None:
+        professor_id = resolver_id(db, professor_id)
     resultado = comentario_repository.listar_por_usuario(
         db, usuario.id, professor_id, disciplina_id
     )
