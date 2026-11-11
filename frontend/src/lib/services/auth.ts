@@ -43,7 +43,7 @@ export async function entrar(dados: LoginInput): Promise<MensagemResponse> {
 }
 
 export async function consultarSessao(): Promise<SessaoResponse> {
-  return apiClient.request<SessaoResponse>("/api/auth/sessao");
+  return apiClient.request<SessaoResponse>("/api/auth/sessao", {}, { cache: "no-store" });
 }
 
 export async function sair(): Promise<MensagemResponse> {

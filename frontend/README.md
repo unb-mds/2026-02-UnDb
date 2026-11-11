@@ -31,6 +31,10 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
   fazem o comando falhar. Use `npm ci` para reproduzir as dependências do lockfile.
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
+- `npm run test:cabecalho`: após o build local, verifica no Edge/Chromium o
+  cabeçalho autenticado/visitante, login/logout, recarga, navegação, erros e
+  respostas atrasadas, retorno à avaliação e responsividade. Usa HTTP controlado;
+  também integra `npm run test:browser`. Veja as [evidências da #211](../docs/estudos/cabecalho-sessao-issue-211.md).
 - `npm test` gera os tipos de rotas, compila `src` em um diretório temporário e
   executa a suíte com o runner nativo do Node.
 - `npm run test:coverage` mede a mesma suíte com c8 e gera resumo, HTML e LCOV.
