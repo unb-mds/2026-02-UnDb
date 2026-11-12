@@ -8,7 +8,10 @@ export type PendenciaIdentidade = {
   disciplina: string; turma: string; motivo: string; estado: EstadoIdentidade;
   candidatos: Candidato[]; identificador_destino: string | null; versao: number;
 };
-export type PreviaIdentidade = { colisoes: number; uniao_necessaria: boolean; bloqueada: boolean; turmas?: number; avaliacoes?: number };
+export type PreviaIdentidade = { colisoes: number; bloqueada: boolean } & (
+  | { uniao_necessaria: true; turmas: number; avaliacoes: number }
+  | { uniao_necessaria: false; turmas?: number | null; avaliacoes?: number | null }
+);
 export type DecisaoIdentidade = { id: string; usuario_id: string; acao: string; justificativa: string; identificador: string | null; versao: number; created_at: string };
 const base = "/api/moderacao/identidades";
 const opcoes = (signal?: AbortSignal) => ({ cache: "no-store" as const, signal });
@@ -38,7 +41,9 @@ export async function listarIdentidades(estado: EstadoIdentidade, offset: number
 export async function consultarPrevia(id: string, perfil: string, signal?: AbortSignal): Promise<PreviaIdentidade> {
   const v = await apiClient.request<unknown>(`${caminho(id)}/previa`, { identificador: perfil }, opcoes(signal));
   if (!registro(v) || !numero(v.colisoes) || typeof v.uniao_necessaria !== "boolean" || typeof v.bloqueada !== "boolean"
-    || (v.turmas !== undefined && !numero(v.turmas)) || (v.avaliacoes !== undefined && !numero(v.avaliacoes))) throw new Error("Prévia incompatível.");
+    || (v.uniao_necessaria
+      ? !numero(v.turmas) || !numero(v.avaliacoes)
+      : (v.turmas != null && !numero(v.turmas)) || (v.avaliacoes != null && !numero(v.avaliacoes)))) throw new Error("Prévia incompatível.");
   return v as PreviaIdentidade;
 }
 export async function decidirIdentidade(item: PendenciaIdentidade, acao: "CONFIRMAR" | "SEPARAR", justificativa: string, perfil?: string): Promise<PendenciaIdentidade> {

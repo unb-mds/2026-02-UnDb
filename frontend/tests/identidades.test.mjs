@@ -27,6 +27,17 @@ test("contrato inválido não vira fila vazia nem decisão aceita",async t => {
   t.mock.method(globalThis,"fetch",async () => Response.json([{...item,candidatos:[{...item.candidatos[0],identificador:"javascript:alert(1)"}]}]));
   await assert.rejects(service.listarIdentidades("PENDENTE",0));
 });
+test("prévia sem união aceita as contagens nulas serializadas pela API", async t => {
+  const previa = { colisoes: 0, uniao_necessaria: false, bloqueada: false, turmas: null, avaliacoes: null };
+  t.mock.method(globalThis, "fetch", async () => Response.json(previa));
+  assert.deepEqual(await service.consultarPrevia(id, "123"), previa);
+});
+test("prévia com união recusa contagens ausentes ou inválidas", async t => {
+  for (const valor of [null, -1, "1", undefined]) {
+    t.mock.method(globalThis, "fetch", async () => Response.json({ colisoes: 0, uniao_necessaria: true, bloqueada: false, turmas: valor, avaliacoes: 1 }));
+    await assert.rejects(service.consultarPrevia(id, "123"), /Prévia incompatível/);
+  }
+});
 test("403 e 409 preservam o status sem simular sucesso",async t => {
   for (const status of [403,409]) {
     t.mock.method(globalThis,"fetch",async () => Response.json({detail:"Solicitação recusada"},{status}));
