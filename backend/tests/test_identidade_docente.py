@@ -302,6 +302,60 @@ class IdentidadeTest(unittest.TestCase):
 
 
 class FonteTest(unittest.TestCase):
+    @patch("app.scrapers.docentes.time.sleep")
+    @patch("app.scrapers.docentes.ler")
+    def test_busca_sem_docente_e_ausencia_nao_indisponibilidade(self, ler, sleep):
+        from app.scrapers.sigaa_poc import Oferta
+
+        ler.side_effect = [
+            "<html>Portal</html>",
+            '<input type="hidden" name="javax.faces.ViewState" value="estado">'
+            '<select name="form:departamento"><option value="0">Todos</option></select>',
+            "Nenhum docente foi encontrado de acordo com os critérios de busca informados",
+        ]
+        motivo, candidatos = ConsultaDocentes().consultar(
+            "TESTE", Oferta("IFD0173", "Física", "01", "2026.2", ("TESTE",), "1")
+        )
+        self.assertEqual(motivo, "PERFIL_AUSENTE")
+        self.assertEqual(candidatos, [])
+
+    @patch("app.scrapers.docentes.time.sleep")
+    @patch("app.scrapers.docentes.coletar_perfil")
+    @patch("app.scrapers.docentes.buscar")
+    def test_verao_preserva_perfil_e_exige_periodo_exato(self, buscar, perfil, sleep):
+        from app.scrapers.sigaa_poc import Oferta
+
+        parser = Disciplinas()
+        parser.feed(
+            '<div id="turmas-graduacao">'
+            '<tr><td class="anoPeriodo">2026.2</td></tr>'
+            '<tr><td class="codigo">IFD0173</td>'
+            '<td><a href="/visualizarComponente/1">Física</a></td></tr>'
+            '<tr><td class="anoPeriodo">2025.4</td></tr>'
+            '<tr><td class="codigo">IFD0173</td>'
+            '<td><a href="/visualizarComponente/1">Física</a></td></tr></div>'
+        )
+        self.assertEqual([r["periodo"] for r in parser.rows], ["2026.2", "2025.4"])
+        docente = {
+            "nome": "TESTE",
+            "identificador_url": "1234",
+            "perfil_url": "https://sigaa.unb.br",
+        }
+        buscar.return_value = ([], {"docentes": [docente]})
+        perfil.return_value = docente | {"disciplinas": parser.rows}
+        consulta = ConsultaDocentes()
+        for periodo, esperado in [
+            ("2026.2", "COMPATIVEL"),
+            ("2025.4", "COMPATIVEL"),
+            ("2025.1", "DISCIPLINA_NAO_CONFIRMADA"),
+            ("2025.2", "DISCIPLINA_NAO_CONFIRMADA"),
+        ]:
+            with self.subTest(periodo=periodo):
+                motivo, _ = consulta.consultar(
+                    "TESTE", Oferta("IFD0173", "Física", "01", periodo, ("TESTE",), "1")
+                )
+                self.assertEqual(motivo, esperado)
+
     def test_ano_isolado_nao_vira_semestre(self):
         p = Disciplinas()
         p.feed(
