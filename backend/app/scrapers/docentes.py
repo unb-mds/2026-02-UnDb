@@ -77,6 +77,8 @@ class Pagina(HTMLParser):
             r"Docentes encontrados\s*\((\d+)\)|\b(\d+)\s+docentes encontrados", texto, re.I
         )
         numeros = {int(a or b) for a, b in totais}
+        if "Nenhum docente foi encontrado de acordo com os critérios de busca informados" in texto:
+            numeros.add(0)
         if len(numeros) > 1:
             raise ValueError("Totais divergentes na página; investigar antes de usar.")
         return next(iter(numeros), None)
@@ -177,7 +179,9 @@ class Disciplinas(HTMLParser):
             if self.cell == "anoPeriodo":
                 # A fonte também possui blocos históricos só com o ano.
                 # Preservar literalmente: 2019 não comprova 2019.1 ou 2019.2.
-                if not re.fullmatch(r"\d{4}(?:\.[12])?", value):
+                # O período .4 é de verão; manter literal, sem convertê-lo
+                # em .1/.2 nem descartar as demais disciplinas do perfil.
+                if not re.fullmatch(r"\d{4}(?:\.[124])?", value):
                     raise ValueError("Formato de período desconhecido no perfil.")
                 self.periodo = value
             elif self.cell in ("codigo", "nome"):
