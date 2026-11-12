@@ -140,7 +140,9 @@ async function encerrar(p) {
 }
 async function preencherAvaliacao(tab) {
   assert.equal(await tab.avaliar("document.querySelector('[name=didatica]:checked') === null"), true);
-  await preencher(tab, { dificuldade: "MEDIO", chamada: "false", material: "NAO_DISPONIBILIZA", recomenda: "false" });
+  // Critérios são rádios (#211): marcar a opção, não atribuir value.
+  await aguardar(async () => await tab.avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "formulário hidratado");
+  await tab.avaliar(`Object.entries(${JSON.stringify({ dificuldade: "MEDIO", chamada: "false", material: "NAO_DISPONIBILIZA", recomenda: "false" })}).forEach(([nome, valor]) => document.querySelector('[name="'+nome+'"][value="'+valor+'"]').click())`);
   await tab.avaliar("document.querySelector('[name=didatica][value=\"1\"]').focus()");
   for (const type of ["keyDown", "keyUp"]) await tab.cdp("Input.dispatchKeyEvent", { type, key: "ArrowRight", code: "ArrowRight", windowsVirtualKeyCode: 39 });
   assert.equal(await tab.avaliar("document.querySelector('[name=didatica]:checked').value"), "2");
