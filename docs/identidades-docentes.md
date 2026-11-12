@@ -38,6 +38,11 @@ a fila mostra `APLICACAO_BLOQUEADA`, mantendo a confirmação e sua auditoria.
 A prévia de uma ocorrência não garante ausência de colisão entre outras origens
 do grupo, que é conferida novamente pelo comando.
 
+Decisões aguardam o lock da importação por até cinco segundos. Em caso de
+contenção, a API faz rollback e retorna 409 para atualizar a fila e tentar
+novamente; nenhuma decisão parcial é registrada. A
+[revisão da PR #225](estudos/revisao-pr-225.md) registra as correções e verificações.
+
 ## Implantação, permissão e aplicação operacional
 
 1. Publicar backend/frontend compatíveis e aplicar a migration `20261111_01` com
