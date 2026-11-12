@@ -1,0 +1,54 @@
+{
+  "ambiente": "Brave headless, HTTP controlado; sem dados reais",
+  "cenarios": [
+    {
+      "largura": 320,
+      "previa": true,
+      "teclado": true,
+      "sem_overflow": true,
+      "confirmacao": true
+    },
+    {
+      "largura": 768,
+      "previa": true,
+      "teclado": true,
+      "sem_overflow": true,
+      "confirmacao": true
+    },
+    {
+      "largura": 1280,
+      "previa": true,
+      "teclado": true,
+      "sem_overflow": true,
+      "confirmacao": true
+    }
+  ],
+  "403_limpa_dados": true,
+  "409_sem_sucesso": true,
+  "envios": [
+    {
+      "acao": "CONFIRMAR",
+      "versao": 1,
+      "justificativa": "Perfil conferido na fixture",
+      "identificador": "1234"
+    },
+    {
+      "acao": "CONFIRMAR",
+      "versao": 1,
+      "justificativa": "Perfil conferido na fixture",
+      "identificador": "1234"
+    },
+    {
+      "acao": "CONFIRMAR",
+      "versao": 1,
+      "justificativa": "Perfil conferido na fixture",
+      "identificador": "1234"
+    },
+    {
+      "acao": "SEPARAR",
+      "versao": 2,
+      "justificativa": "Pessoas distintas",
+      "identificador": null
+    }
+  ]
+}

@@ -46,6 +46,7 @@ nav:
       - ADR 09 — estratégia de qualidade: adrs/09-estrategia-qualidade.md
       - Modelos de dados: modelos.md
       - Importação do SIGAA: importacao-sigaa.md
+      - Identidades docentes: identidades-docentes.md
       - Operação do SIGAA: operacao-importacao-sigaa.md
       - Hospedagem e operação pública: hospedagem.md
       - Acesso PostgreSQL da API: acesso-postgresql-api.md

@@ -662,3 +662,36 @@ homônimos são sempre apresentados separadamente.
 - **Sub-issues:** #38 a #43 e derivadas do story map
 - **Governança:** `skills/governance/project-governance/` define quais decisões exigem
   aprovação humana explícita
+
+
+## Evolução autorizada em 11/11/2026 — identidades docentes (#207)
+
+Fonte: na conversa de revisão da #207, Nicolas autorizou a implementação da
+associação institucional automática e do encaminhamento de dúvidas à moderação,
+com reaproveitamento das decisões. A autorização inclui a permissão específica,
+a preservação de dados e o bloqueio de colisões discutidos imediatamente antes.
+
+- **[RF23] Identidades docentes entre importações — validado pelo PO nesta conversa:**
+  o sistema deve reutilizar a identidade institucional do docente entre turmas,
+  disciplinas, unidades e semestres quando os critérios institucionais conferirem.
+  Dúvidas devem ficar disponíveis na área de moderação a pessoas com permissão
+  específica, com evidências, prévia, confirmação de associação, decisão de manter
+  separados ou permanência como pendente. Registrar responsável e justificativa,
+  reaproveitando as decisões nas importações seguintes. Ser moderador de comentários
+  não concede automaticamente essa permissão.
+- A associação automática exige busca global completa, um único perfil com o nome
+  completo normalizado e a disciplina/código/ID de componente no mesmo semestre.
+  Nome por si só, lotação da unidade ou ano sem semestre não confirmam a identidade.
+  Homônimos, fontes indisponíveis e dados divergentes continuam pendentes.
+- Associação confirmada é distinta de migração de dados aplicada. Uniões de
+  registros existentes exigem revalidação do grupo, sem perder IDs antigos,
+  comentários ou avaliações. Colisão de RF03 bloqueia o grupo inteiro; não escolher,
+  somar ou excluir avaliações. Preservar RNF02.
+- A ausência em consultas atuais, especialmente de turmas antigas encerradas,
+  não desfaz identidades nem avaliações históricas.
+
+Critérios de aceite de RF23: reutilizar um UUID em novo semestre/unidade; preservar
+as decisões de separação; negar acesso sem papel específico; rejeitar decisão de
+uma versão obsoleta; apresentar prévia e histórico; bloquear colisões sem alterações
+parciais; distinguir fonte indisponível de ausência de perfil. A implantação e o
+lote real de reconciliação continuam sujeitos ao procedimento operacional da #207.

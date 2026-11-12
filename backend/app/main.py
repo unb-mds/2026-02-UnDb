@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import CORS_ORIGINS
 from app.routers import (
+    identidade_docente,
     auth,
     avaliacoes,
     comentarios,
@@ -22,6 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(identidade_docente.router)
 app.include_router(avaliacoes.router)
 app.include_router(auth.router)
 app.include_router(professores.router)
