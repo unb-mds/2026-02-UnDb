@@ -80,10 +80,13 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     await capturar("04-comparacao");
     await clicar("Avaliar Ana");
     await aguardarTexto("Conferir prévia da avaliação");
-    await aguardar(async () => await avaliar('document.querySelectorAll("select").length === 4'), "didática em botões e quatro seletores");
-    assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('select')).map(s => Array.from(s.options).slice(1).map(o => o.textContent))"), [
-      ["Fácil", "Médio", "Difícil"], ["Faz chamada", "Não faz chamada"], ["Não disponibiliza", "Ruim", "Médio", "Bom"], ["Recomendo", "Não recomendo"],
-    ]);
+    await aguardar(async () => await avaliar('document.querySelectorAll("input[type=radio][name=dificuldade]").length === 3'), "didática em botões e quatro grupos de opções");
+    assert.deepEqual(await avaliar("Object.fromEntries(['dificuldade','chamada','material','recomenda'].map(nome => [nome, Array.from(document.querySelectorAll('input[type=radio][name='+nome+']')).map(r => r.closest('label').innerText.trim())]))"), {
+      dificuldade: ["Fácil", "Médio", "Difícil"],
+      chamada: ["Faz chamada", "Não faz chamada"],
+      material: ["Não disponibiliza", "Ruim", "Médio", "Bom"],
+      recomenda: ["Recomendo", "Não recomendo"],
+    });
     assert.equal(await avaliar("document.querySelector('form').checkValidity()"), false);
     assert.equal(await avaliar("!!document.querySelector('textarea')"), false);
     assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('[name=didatica]')).map(r => r.value)"), ["1", "2", "3", "4", "5"]);
@@ -97,7 +100,7 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle"), "solid");
     assert.match(await avaliar("getComputedStyle(document.activeElement).boxShadow"), /2px/);
     assert.equal(await avaliar("getComputedStyle(document.activeElement).getPropertyValue('--tw-ring-color').trim() === getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()"), true);
-    await avaliar("document.querySelector('[name=didatica][value=\"1\"]').click(); Array.from(document.querySelectorAll('select')).forEach(s => { s.value=s.options[1].value; s.dispatchEvent(new Event('change',{bubbles:true})); }); document.querySelector('form').requestSubmit()");
+    await avaliar("document.querySelector('[name=didatica][value=\"1\"]').click(); Object.entries({dificuldade:'MEDIO',chamada:'false',material:'RUIM',recomenda:'true'}).forEach(([nome,valor]) => document.querySelector('[name='+nome+'][value=\"'+valor+'\"]').click()); document.querySelector('form').requestSubmit()");
     await aguardarTexto("Prévia conferida.");
     assert.equal(await avaliar("document.querySelector('[name=didatica]:checked').value"), "1");
     await avaliar("document.querySelector('[name=didatica][value=\"3\"]').focus(); document.querySelector('[name=didatica][value=\"3\"]').click()");
