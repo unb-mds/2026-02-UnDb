@@ -36,6 +36,7 @@ function executarTestes() {
       "tests/busca.test.mjs",
       "tests/comentarios.test.mjs",
       "tests/moderacao.test.mjs",
+      "tests/identidades.test.mjs",
       "tests/denuncia.test.mjs",
       "tests/browser-navigation.test.mjs",
       "tests/paleta.test.mjs",

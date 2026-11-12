@@ -10,10 +10,11 @@ from app.models.avaliacao import Avaliacao
 from app.models.disciplina import Disciplina
 from app.models.enums import Dificuldade, QualidadeMaterial
 from app.models.professor import Professor
+from app.repositories.reconciliacao_professor_repository import resolver_id
 
 
 def obter_professor(db: Session, professor_id: UUID) -> Professor | None:
-    return db.get(Professor, professor_id)
+    return db.get(Professor, resolver_id(db, professor_id))
 
 
 def obter_disciplina(db: Session, disciplina_id: UUID) -> Disciplina | None:

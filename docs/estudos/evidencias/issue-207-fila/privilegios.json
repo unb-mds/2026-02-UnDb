@@ -1,0 +1,6 @@
+{
+  "banco": "PostgreSQL 16 descartável undb_207_test",
+  "fila_com_papel_limitado": true,
+  "decisao_auditada": true,
+  "escrita_catalogo_recusada": "42501"
+}

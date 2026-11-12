@@ -31,6 +31,16 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
   fazem o comando falhar. Use `npm ci` para reproduzir as dependências do lockfile.
 - `npm run build`: gera o build de produção.
 - `npm run start`: serve um build de produção já gerado.
+- `npm run test:cabecalho`: após o build local, verifica no Edge/Chromium o
+  cabeçalho autenticado/visitante, login/logout, recarga, navegação, erros e
+  respostas atrasadas, retorno à avaliação e responsividade. Usa HTTP controlado;
+  também integra `npm run test:browser`. Veja as [evidências da #211](../docs/estudos/cabecalho-sessao-issue-211.md).
+- `npm run test:identidades`: após o build local, verifica a fila de RF23 com
+  HTTP controlado: prévia sem união com contagens nulas, descarte de decisão
+  atrasada após troca de seleção, perda de permissão, teclado e ausência de
+  overflow em 320/768/1280 px com preferências clara/escura do sistema. O tema
+  atual da aplicação permanece escuro. Integra `npm run test:browser`;
+  `PREVIEW_DIR` permite salvar capturas locais. Não usa dados reais.
 - `npm test` gera os tipos de rotas, compila `src` em um diretório temporário e
   executa a suíte com o runner nativo do Node.
 - `npm run test:coverage` mede a mesma suíte com c8 e gera resumo, HTML e LCOV.
@@ -427,3 +437,11 @@ O CI mantém um job específico com PostgreSQL 16 para o fluxo completo.
 
 Veja escopo, resultados e limites em
 [`verificacao-formulario-avaliacao.md`](../docs/estudos/verificacao-formulario-avaliacao.md).
+
+## Identidades de professores — #207
+
+A rota `/moderacao/identidades`, acessível pela área de moderação, usa a permissão
+específica `reconciliador`, independente do papel de comentários. Exibe a fila,
+candidatos institucionais, prévia, decisões com justificativa e estados de aplicação.
+Confirmar não executa união de avaliações no navegador. Fluxo e implantação em
+[identidades docentes](../docs/identidades-docentes.md).

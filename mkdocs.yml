@@ -46,6 +46,7 @@ nav:
       - ADR 09 — estratégia de qualidade: adrs/09-estrategia-qualidade.md
       - Modelos de dados: modelos.md
       - Importação do SIGAA: importacao-sigaa.md
+      - Identidades docentes: identidades-docentes.md
       - Operação do SIGAA: operacao-importacao-sigaa.md
       - Hospedagem e operação pública: hospedagem.md
       - Acesso PostgreSQL da API: acesso-postgresql-api.md
@@ -53,7 +54,8 @@ nav:
   - Releases:
       - Release 1.0.0: releases/1.0.0.md
       - Release 1.1.0: releases/1.1.0.md
-      - Release 1.2.0 — candidata: releases/1.2.0.md
+      - Release 1.2.0: releases/1.2.0.md
+      - Release 1.3.0 — candidata: releases/1.3.0.md
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:

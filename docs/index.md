@@ -63,3 +63,11 @@ das entregas posteriores de `develop` e dos aceites pendentes.
 
     [`docs/requisitos.md`](requisitos.md) é a fonte de verdade dos requisitos. Esta página
     apenas organiza o acesso aos artefatos existentes e não redefine o escopo do produto.
+
+
+### Próxima promoção intermediária
+
+A [candidata 1.3.0](releases/1.3.0.md) reúne a reconciliação e associação institucional
+de professores, fila de identidades e cabeçalho conforme a sessão, após a
+[v1.2.0 publicada](releases/1.2.0.md). A conclusão da Release 2 acadêmica e a
+reconciliação dos dados públicos permanecem separadas desta promoção de código.

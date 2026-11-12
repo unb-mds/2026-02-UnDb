@@ -3,24 +3,65 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { retornoAvaliacaoSeguro } from "@/lib/retorno-avaliacao";
+import { consultarSessao, EVENTO_SESSAO_ALTERADA } from "@/lib/services/auth";
 import BuscaCabecalho from "./busca-cabecalho";
 
-function LinksConta({ retorno }: { retorno?: string | null }) {
+type EstadoSessao = "carregando" | "autenticado" | "visitante" | "erro";
+
+function LinksConta({ retorno, sessao = "carregando" }: { retorno?: string | null; sessao?: EstadoSessao }) {
   const query = retorno ? `?returnTo=${encodeURIComponent(retorno)}` : "";
-  return <div className="header-actions">
-    <Link href={`/login${query}`} aria-label="Conta: entrar ou criar conta" className="button">Entrar</Link>
-    <Link href={`/cadastro${query}`} className="button primary">Criar conta</Link>
-  </div>;
+  return <nav aria-label="Conta" className="header-actions">
+    {sessao === "autenticado" ? (
+      <Link href="/login" className="button primary">Minha conta</Link>
+    ) : <>
+      <Link href={`/login${query}`} className="button">Entrar ou criar conta</Link>
+      {sessao !== "visitante" && <span className="sr-only" role="status">{sessao === "carregando" ? "Verificando sessão…" : "Não foi possível verificar a sessão. Acesse a conta para tentar novamente."}</span>}
+    </>}
+  </nav>;
 }
 
 function ContaComRetorno() {
   const caminho = usePathname();
   const parametros = useSearchParams();
+  const [sessao, setSessao] = useState<EstadoSessao>("carregando");
+
+  useEffect(() => {
+    let geracao = 0;
+    let ativo = true;
+    const atualizar = async () => {
+      const atual = ++geracao;
+      setSessao("carregando");
+      try {
+        const resposta = await consultarSessao();
+        if (ativo && atual === geracao) setSessao(resposta.autenticado ? "autenticado" : "visitante");
+      } catch {
+        if (ativo && atual === geracao) setSessao("erro");
+      }
+    };
+    const aoFicarVisivel = () => {
+      if (document.visibilityState === "visible") void atualizar();
+      else ++geracao;
+    };
+    void atualizar();
+    window.addEventListener(EVENTO_SESSAO_ALTERADA, atualizar);
+    window.addEventListener("focus", atualizar);
+    window.addEventListener("pageshow", atualizar);
+    document.addEventListener("visibilitychange", aoFicarVisivel);
+    return () => {
+      ativo = false;
+      ++geracao;
+      window.removeEventListener(EVENTO_SESSAO_ALTERADA, atualizar);
+      window.removeEventListener("focus", atualizar);
+      window.removeEventListener("pageshow", atualizar);
+      document.removeEventListener("visibilitychange", aoFicarVisivel);
+    };
+  }, [caminho]);
+
   const retorno = (["/login", "/cadastro"].includes(caminho) ? retornoAvaliacaoSeguro(parametros.get("returnTo")) : null)
     ?? retornoAvaliacaoSeguro(`${caminho}${parametros.size ? `?${parametros}` : ""}`);
-  return <LinksConta retorno={retorno} />;
+  return <LinksConta retorno={retorno} sessao={sessao} />;
 }
 
 export default function Cabecalho() {

@@ -542,3 +542,29 @@ Migrations posteriores à #156: `20261101_01` (papel, decisões e descarte de te
 `20261101_02` (denúncias abertas e agradecimentos), `20261101_03` (retenção de
 retiradas legadas). Somente versões `PUBLICADO` aceitam denúncias. Denúncias
 encerradas são apagadas na transação da decisão/retirada/substituição.
+
+
+## Extensão de identidades docentes — RF23 / #207
+
+Derivado de `docs/requisitos.md`, evolução autorizada em 11/11/2026.
+UUID interno preservado; `identidades_docentes.identificador` representa a chave
+externa do perfil SIGAA/UnB, sem inventar SIAPE ou promover `identidade_confirmada`.
+A chave provisória continua preservada por ocorrência em `pendencias_identidade`.
+
+| Endpoint | Método | Auth | Resultado |
+|---|---|---|---|
+| `/api/moderacao/identidades?estado=PENDENTE&offset=0` | GET | confirmado + reconciliador | Até 50 ocorrências ordenadas por criação/ID; estados PENDENTE, CONFIRMADA, SEPARADA, APLICADA |
+| `/api/moderacao/identidades/{id}/previa?identificador=...` | GET | confirmado + reconciliador | Necessidade de união e contagens de turmas/avaliações/colisões, sem expor valores individuais |
+| `/api/moderacao/identidades/{id}/decisoes` | GET | confirmado + reconciliador | Histórico de ação, responsável, justificativa, perfil, versão e data |
+| `/api/moderacao/identidades/{id}/decisoes` | POST | confirmado + reconciliador | Ação CONFIRMAR ou SEPARAR, versão atual, justificativa de 1–500 caracteres; CONFIRMAR exige candidato apresentado |
+
+Todas as leituras privadas são `no-store`. Erros: 401 sem sessão, 403 sem
+confirmação/papel específico, 404 pendência inexistente, 409 versão/estado obsoleto
+ou conflito, 422 entrada inválida. Identidade do decisor vem da sessão.
+Não há endpoint público de concessão do papel nem de migração de avaliações.
+
+CONFIRMADA significa aguardando aplicação: o importador pode registrar a identidade
+quando isso não exige união de UUIDs; a rotina administrativa aplica as uniões em
+janela sem escritores. APROVAÇÃO não significa operação de dados concluída.
+SEPARADA preserva a ocorrência e não generaliza essa decisão para nomes iguais
+em outros semestres. Casos seguros futuros são rechecados automaticamente.
