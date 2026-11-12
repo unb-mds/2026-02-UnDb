@@ -115,7 +115,7 @@ export function criarCenarioBusca(professor, disciplina) {
           await cdp("Page.navigate", { url: "http://localhost:3100/" });
           await aguardar(async () => await avaliar("!!document.querySelector('main form input[name=q]')"), "formulário HTML da entrada");
           assert.equal(await avaliar("Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), false, "O envio deve ocorrer antes da hidratação");
-          await avaliar(`document.querySelector('main select[name=busca]').value="${tipo}"; document.querySelector('[name=q]').value=${JSON.stringify(termoAntesDaHidratacao)}; document.querySelector('main form').requestSubmit()`);
+          await avaliar(`document.querySelector('main [name=busca][value=${tipo}]').checked=true; document.querySelector('[name=q]').value=${JSON.stringify(termoAntesDaHidratacao)}; document.querySelector('main form').requestSubmit()`);
           await aguardar(async () => await avaliar(`location.pathname === '/${tipo}' && new URLSearchParams(location.search).get('q') === ${JSON.stringify(termoAntesDaHidratacao)} && new URLSearchParams(location.search).get('ordem') === 'nome'`), "modalidade e termo preservados sem scripts");
         } finally {
           await cdp("Network.setBlockedURLs", { urls: [] });
@@ -155,7 +155,7 @@ export function criarCenarioBusca(professor, disciplina) {
           for (const tipo of ["professores", "disciplinas"]) {
             await navegar("/", "Encontre professores e disciplinas");
             await aguardar(async () => await avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "entrada hidratada");
-            await avaliar(`document.querySelector('main select[name=busca]').value="${tipo}"`);
+            await avaliar(`document.querySelector('main [name=busca][value=${tipo}]').checked=true`);
             assert.equal(await avaliar("new FormData(document.querySelector('main form')).get('busca')"), tipo);
             await avaliar("document.querySelector('main input[type=search]').focus()");
             await cdp("Input.insertText", { text: "Teste" });

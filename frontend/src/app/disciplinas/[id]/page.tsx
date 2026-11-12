@@ -11,6 +11,8 @@ import {
 import { ApiError } from "@/lib/services/http-error";
 import ComparacaoDark from "@/components/comparacao-dark";
 import Caminho from "@/components/caminho";
+import FundoLiquido from "@/components/fundo-liquido";
+import Icone from "@/components/icone";
 
 export default async function DetalheDisciplinaPage({
   params,
@@ -35,68 +37,66 @@ export default async function DetalheDisciplinaPage({
   ]);
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
-      <Caminho
-        itens={[
-          { nome: "Início", href: "/" },
-          {
-            nome: contexto ? "Resultados da busca" : "Disciplinas",
-            href: contexto ? urlBusca(contexto) : "/disciplinas",
-            retornoBusca: !!contexto,
-          },
-          { nome: disciplina.codigo },
-          { nome: "Comparar professores" },
-        ]}
-      />
+    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+      <FundoLiquido />
+      <div className="container flex flex-col gap-8 py-8 sm:py-12">
+        <Caminho
+          itens={[
+            { nome: "Início", href: "/" },
+            {
+              nome: contexto ? "Resultados da busca" : "Disciplinas",
+              href: contexto ? urlBusca(contexto) : "/disciplinas",
+              retornoBusca: !!contexto,
+            },
+            { nome: disciplina.codigo },
+            { nome: "Comparar professores" },
+          ]}
+        />
 
-      <div className="rounded-xl border border-accent/30 bg-accent/5 p-5 break-words">
-        <h1 className="text-2xl font-semibold">{disciplina.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">
-          Código da disciplina: <span className="font-mono">{disciplina.codigo}</span>
-        </p>
-        <p className="mt-1 text-sm text-foreground/70">
-          Unidade acadêmica: {nomeUnidade(disciplina)}
-        </p>
+        <header className="flex flex-wrap items-start justify-between gap-4 break-words">
+          <div className="flex max-w-3xl flex-col items-start gap-3">
+            <span className="code-chip"><span className="sr-only">Código da disciplina: </span>{disciplina.codigo}</span>
+            <h1 className="page-title">{disciplina.nome}</h1>
+            <p className="lead">Unidade acadêmica: {nomeUnidade(disciplina)}</p>
+          </div>
+          {contexto ? (
+            <Link href={urlBusca(contexto)} className="back-link">
+              <Icone nome="arrow-left" pequeno /> Voltar aos resultados da busca
+            </Link>
+          ) : (
+            <Link href="/disciplinas" className="back-link">
+              <Icone nome="arrow-left" pequeno /> Buscar outra disciplina
+            </Link>
+          )}
+        </header>
+
+        <ComparacaoDark
+          professores={comparacao.professores}
+          disciplinaId={id}
+          contexto={contexto}
+          turmas={turmas}
+        />
+
+        <details className="glass institutional-details rounded-2xl!">
+          <summary>Turmas ativas e ofertas ({turmas.length})</summary>
+          {turmas.length === 0 ? (
+            <p className="text-sm text-(--ink-soft)">
+              Nenhuma turma ativa registrada no momento.
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-1 text-sm text-(--ink-soft) list-disc">
+              {turmas.map((turma) => (
+                <li key={turma.id}>
+                  {turma.semestre} · turma {turma.codigo} ·{" "}
+                  {turma.professores.length === 0
+                    ? "sem docente informado"
+                    : turma.professores.map((professor) => professor.nome).join(", ")}
+                </li>
+              ))}
+            </ul>
+          )}
+        </details>
       </div>
-
-      <div className="flex flex-wrap gap-4 text-sm">
-        {contexto ? (
-          <Link href={urlBusca(contexto)} className="text-accent underline underline-offset-4">
-            ← Voltar aos resultados da busca
-          </Link>
-        ) : (
-          <Link href="/disciplinas" className="text-accent underline underline-offset-4">
-            ← Buscar outra disciplina
-          </Link>
-        )}
-      </div>
-
-      <ComparacaoDark
-        professores={comparacao.professores}
-        disciplinaId={id}
-        contexto={contexto}
-        turmas={turmas}
-      />
-
-      <details className="panel institutional-details mt-6">
-        <summary>Turmas ativas e ofertas ({turmas.length})</summary>
-        {turmas.length === 0 ? (
-          <p className="text-sm text-foreground/60">
-            Nenhuma turma ativa registrada no momento.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-1 text-sm text-foreground/70 list-disc">
-            {turmas.map((turma) => (
-              <li key={turma.id}>
-                {turma.semestre} · turma {turma.codigo} ·{" "}
-                {turma.professores.length === 0
-                  ? "sem docente informado"
-                  : turma.professores.map((professor) => professor.nome).join(", ")}
-              </li>
-            ))}
-          </ul>
-        )}
-      </details>
     </main>
   );
 }

@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { iniciaisProfessor } from "@/lib/iniciais";
 import { nomeUnidade } from "@/lib/unidade";
 import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
 import type { AvaliacaoAgregada } from "@/lib/types/avaliacao";
 import type { TurmaInstitucional } from "@/lib/types/institucional";
+import EstrelasDidatica, { formatarDidatica } from "./estrelas-didatica";
+import Icone from "./icone";
 
 const labels = {
   FACIL: "Fácil",
@@ -14,6 +17,10 @@ const labels = {
   RUIM: "Ruim",
   BOM: "Bom",
 } as const;
+
+function textoAvaliacoes(total: number) {
+  return `${total} ${total === 1 ? "avaliação" : "avaliações"}`;
+}
 
 export default function ComparacaoDark({
   professores,
@@ -27,6 +34,8 @@ export default function ComparacaoDark({
   turmas?: TurmaInstitucional[];
 }) {
   const [ascendente, setAscendente] = useState(false);
+  const trilho = useRef<HTMLUListElement>(null);
+  const [limites, setLimites] = useState({ inicio: true, fim: true });
 
   const nomesRepetidos = new Set(
     professores
@@ -50,10 +59,44 @@ export default function ComparacaoDark({
     return 0;
   });
 
+  useEffect(() => {
+    const elemento = trilho.current;
+    if (!elemento) return;
+    const atualizar = () => setLimites({
+      inicio: elemento.scrollLeft <= 4,
+      fim: elemento.scrollLeft + elemento.clientWidth >= elemento.scrollWidth - 4,
+    });
+    atualizar();
+    elemento.addEventListener("scroll", atualizar, { passive: true });
+    const observador = new ResizeObserver(atualizar);
+    observador.observe(elemento);
+    return () => { elemento.removeEventListener("scroll", atualizar); observador.disconnect(); };
+  }, [professores.length]);
+
+  function rolar(direcao: 1 | -1) {
+    const elemento = trilho.current;
+    const cartao = elemento?.querySelector("li");
+    if (!elemento || !cartao) return;
+    const reduzido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    elemento.scrollBy({ left: direcao * (cartao.getBoundingClientRect().width + 20), behavior: reduzido ? "auto" : "smooth" });
+  }
+
   return (
-    <section className="comparison-section">
-      <div className="section-heading">
-        <h2>Comparação de professores</h2>
+    <section className="comparison-section glass p-5 sm:p-8" aria-labelledby="comparacao-titulo">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="max-w-2xl">
+          <span className="kicker">Comparação</span>
+          <h2 id="comparacao-titulo" className="section-title mt-2">Comparação de professores</h2>
+          <p className="lead mt-3">
+            {professores.length}{" "}
+            {nomesRepetidos.size > 0
+              ? "registros de professores"
+              : professores.length === 1
+                ? "professor"
+                : "professores"}{" "}
+            com oferta registrada para esta matéria. Cada cartão mostra sua própria base de respostas.
+          </p>
+        </div>
         {professores.some((p) => p.dadosSuficientes) && (
           <button
             type="button"
@@ -66,150 +109,134 @@ export default function ComparacaoDark({
         )}
       </div>
 
-      <p className="mb-4 text-sm text-foreground/70">
-        {professores.length}{" "}
-        {nomesRepetidos.size > 0
-          ? "registros de professores"
-          : professores.length === 1
-            ? "professor"
-            : "professores"}{" "}
-        com oferta registrada para esta matéria.
-      </p>
-
       {!professores.length ? (
-        <div className="panel p-5 text-sm text-foreground/70">
+        <div className="state-box mt-8">
           <p>Nenhum professor com turma ativa registrada para esta disciplina no momento.</p>
         </div>
       ) : (
-        <div
-          className="table-scroll"
-          role="region"
-          aria-label="Comparação de professores; role para ver todas as colunas"
-          tabIndex={0}
-        >
-          <table>
-            <caption className="sr-only">
-              Comparação de professores por recomendação. Dados insuficientes ficam ao final.
-            </caption>
-            <thead>
-              <tr>
-                {["#", "Professor", "Avaliações", "Didática", "Dificuldade", "Chamada", "Material", "Recomenda"].map(
-                  (coluna) => (
-                    <th key={coluna} scope="col">
-                      {coluna}
-                    </th>
-                  )
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {ordenados.map((a, i) => (
-                <tr key={a.professorId}>
-                  <td className="muted">{i + 1}</td>
-                  <th scope="row">
-                    <div>
-                      <Link
-                        className="hover:text-accent underline-offset-2 hover:underline"
-                        href={comContextoBusca(`/professores/${a.professorId}`, contexto)}
-                      >
-                        {a.professor.nome}
-                      </Link>
+        <>
+          <ul
+            ref={trilho}
+            id="comparacao-cartoes"
+            className="carousel mt-8"
+            aria-label="Comparação de professores por recomendação; dados insuficientes ficam ao final"
+            tabIndex={0}
+          >
+            {ordenados.map((a, i) => (
+              <li key={a.professorId} aria-label={`${i + 1} de ${ordenados.length}: ${a.professor.nome}`}>
+                <article className="pro-card">
+                  <header className="pro-card-head">
+                    <span className="avatar-initials" aria-hidden="true">{iniciaisProfessor(a.professor.nome)}</span>
+                    <div className="min-w-0">
+                      <h3 className="break-words">
+                        <Link href={comContextoBusca(`/professores/${a.professorId}`, contexto)}>{a.professor.nome}</Link>
+                      </h3>
+                      <small className="label-mono text-[11px]!">{textoAvaliacoes(a.totalAvaliacoes)}</small>
                     </div>
-                    <span className="table-unit">
-                      Unidade acadêmica: {nomeUnidade(a.professor)}
-                    </span>
+                  </header>
+                  <p className="-mt-2 text-xs text-(--muted)">
+                    Unidade acadêmica: {nomeUnidade(a.professor)}
                     {nomesRepetidos.has(a.professor.nome) && (
-                      <span className="table-unit text-accent font-medium">
+                      <span className="mt-1 block font-medium text-accent">
                         {turmas
                           .filter((t) => t.professores.some((p) => p.id === a.professorId))
                           .map((t) => `Turma ${t.codigo} · ${t.semestre}`)
                           .join(" / ") || "Turma em registro separado"}
                       </span>
                     )}
-                    <div className="table-actions">
-                      <Link
-                        href={comContextoBusca(
-                          `/professores/${a.professorId}/disciplinas/${disciplinaId}`,
-                          contexto
-                        )}
-                      >
-                        Consultar critérios
-                      </Link>
-                      <Link
-                        href={comContextoBusca(
-                          `/professores/${a.professorId}`,
-                          contexto
-                        )}
-                      >
+                  </p>
+                  {a.dadosSuficientes ? (
+                    <>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <EstrelasDidatica valor={a.didatica} />
+                        <span className="text-sm text-(--ink-soft)"><strong className="text-2xl font-medium text-foreground tabular-nums">{formatarDidatica(a.didatica)}</strong> de 5 · Didática</span>
+                      </div>
+                      <dl className="pro-card-stats">
+                        <div>
+                          <dt className="label-mono">Dificuldade</dt>
+                          <dd>{labels[a.dificuldade]}</dd>
+                        </div>
+                        <div>
+                          <dt className="label-mono">Chamada</dt>
+                          <dd>{a.chamada === "CONFLITANTE" ? "Conflitante" : a.chamada ? "Sim" : "Não"}</dd>
+                        </div>
+                        <div>
+                          <dt className="label-mono">Material</dt>
+                          <dd>
+                            {a.disponibilizaMaterial === "CONFLITANTE"
+                              ? "Conflitante"
+                              : !a.disponibilizaMaterial
+                                ? "Não"
+                                : `Sim${a.qualidadeMaterial ? ` · ${labels[a.qualidadeMaterial]}` : ""}`}
+                          </dd>
+                        </div>
+                      </dl>
+                      <div className="pro-card-recommend">
+                        <span className="label-mono">Recomendam</span>
+                        <strong>{a.recomenda}%</strong>
+                        <span className="meter" aria-hidden="true">
+                          <span style={{ width: `${a.recomenda}%` }} />
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="state-box my-auto">
+                      <strong>{a.totalAvaliacoes === 0 ? "Sem avaliações ainda" : "Dados insuficientes"}</strong>
+                      <span>
+                        {a.totalAvaliacoes === 0
+                          ? "Isso não é uma avaliação negativa."
+                          : "Mínimo de 3 avaliações para exibir os critérios."}
+                      </span>
+                    </div>
+                  )}
+                  <div className="pro-card-actions">
+                    <Link
+                      className="button"
+                      href={comContextoBusca(`/professores/${a.professorId}/disciplinas/${disciplinaId}`, contexto)}
+                    >
+                      Consultar critérios <Icone nome="arrow-right" pequeno />
+                    </Link>
+                    <div className="pro-card-links">
+                      <Link className="link" href={comContextoBusca(`/professores/${a.professorId}`, contexto)}>
                         Ver disciplinas
                       </Link>
                       <Link
-                        href={comContextoBusca(
-                          `/professores/${a.professorId}/disciplinas/${disciplinaId}/avaliar`,
-                          contexto
-                        )}
+                        className="link"
+                        href={comContextoBusca(`/professores/${a.professorId}/disciplinas/${disciplinaId}/avaliar`, contexto)}
                       >
-                        Avaliar nesta disciplina →
+                        Avaliar nesta disciplina
                       </Link>
                     </div>
-                  </th>
-                  <td>{a.totalAvaliacoes}</td>
-                  {a.dadosSuficientes ? (
-                    <>
-                      <td>
-                        {a.didatica.toLocaleString("pt-BR", {
-                          minimumFractionDigits: 1,
-                          maximumFractionDigits: 1,
-                        })}
-                      </td>
-                      <td>{labels[a.dificuldade]}</td>
-                      <td>
-                        {a.chamada === "CONFLITANTE"
-                          ? "Conflitante"
-                          : a.chamada
-                            ? "Sim"
-                            : "Não"}
-                      </td>
-                      <td>
-                        {a.disponibilizaMaterial === "CONFLITANTE"
-                          ? "Conflitante"
-                          : !a.disponibilizaMaterial
-                            ? "Não"
-                            : `Sim${a.qualidadeMaterial ? ` · ${labels[a.qualidadeMaterial]}` : ""}`}
-                      </td>
-                      <td>
-                        <div className="recommend">
-                          <strong>{a.recomenda}%</strong>
-                          <span className="bar" aria-hidden="true">
-                            <span style={{ width: `${a.recomenda}%` }} />
-                          </span>
-                        </div>
-                      </td>
-                    </>
-                  ) : (
-                    <td colSpan={5}>
-                      <div className="insufficient">
-                        {a.totalAvaliacoes === 0
-                          ? "Sem avaliações ainda — isso não é uma avaliação negativa"
-                          : "Dados insuficientes — mínimo de 3 avaliações para exibir os critérios"}
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+          {!(limites.inicio && limites.fim) && (
+            <div className="carousel-controls">
+              <button type="button" className="carousel-arrow" aria-label="Professores anteriores" aria-controls="comparacao-cartoes" disabled={limites.inicio} onClick={() => rolar(-1)}>
+                <Icone nome="arrow-left" />
+              </button>
+              <button type="button" className="carousel-arrow" aria-label="Próximos professores" aria-controls="comparacao-cartoes" disabled={limites.fim} onClick={() => rolar(1)}>
+                <span className="inline-flex rotate-180"><Icone nome="arrow-left" /></span>
+              </button>
+            </div>
+          )}
+        </>
       )}
 
+      <div className="note mt-8">
+        <Icone nome="info" />
+        <p>
+          <strong>Como interpretar estes dados</strong>
+          Só a recomendação ordena a comparação. Empate: mais avaliações primeiro, depois nome. Dificuldade e Chamada são informações neutras; o UnDb não cria nota geral.
+        </p>
+      </div>
       {nomesRepetidos.size > 0 && (
         <p className="fine-print">
           Nomes iguais aparecem separados quando a origem mantém registros distintos. Confira a turma; esses registros não foram unidos automaticamente.
         </p>
       )}
-      <p className="fine-print">
-        Só a recomendação ordena a comparação. Empate: mais avaliações primeiro, depois nome. Dificuldade e Chamada são informações neutras.
-      </p>
     </section>
   );
 }

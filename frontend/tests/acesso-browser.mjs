@@ -170,7 +170,7 @@ try {
     await navegar(tab, "/", "Encontre professores e disciplinas");
     if (i === 0) await matriz(tab, "entrada");
     await aguardar(async () => await tab.avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "busca inicial hidratada");
-    await tab.avaliar(`document.querySelector('main select[name=busca]').value="${contexto.busca}"; document.querySelector('[name=q]').value=${JSON.stringify(contexto.q)}`);
+    await tab.avaliar(`document.querySelector('main [name=busca][value=${contexto.busca}]').checked=true; document.querySelector('[name=q]').value=${JSON.stringify(contexto.q)}`);
     assert.equal(await tab.avaliar("new FormData(document.querySelector('main form')).get('busca')"), contexto.busca);
     await tab.avaliar("document.querySelector('main form').requestSubmit()");
     await esperarTexto(tab, "resultado(s)");

@@ -154,16 +154,16 @@ try {
     } },
     { nome: "detalhe-professor", abrir: () => navegar(`/professores/${p0}`, d1.nome) },
     { nome: "comparacao", abrir: () => navegar(`/disciplinas/${d0.id}`, "Comparação de professores"), verificar: async () => {
-      assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('main tbody th > div:first-child a')).map(a => a.pathname.split('/').at(-1))"), [p0, p1, p2, p3, p4, p5]);
+      assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('#comparacao-cartoes h3 a')).map(a => a.pathname.split('/').at(-1))"), [p0, p1, p2, p3, p4, p5]);
       for (const id of [p4, p5]) {
-        const card = await avaliar(`document.querySelector('tbody th a[href="/professores/${id}"]').closest('tr').innerText`);
+        const card = await avaliar(`document.querySelector('#comparacao-cartoes h3 a[href="/professores/${id}"]').closest('li').innerText`);
         assert.doesNotMatch(card, /%|Didática|Dificuldade|Faz chamada/);
       }
       assert.ok((await texto()).includes("Conflitante"));
     } },
     { nome: "agregado", abrir: () => navegar(`/professores/${p0}/disciplinas/${d0.id}`, "Baseado em 4 avaliações.") },
-    { nome: "insuficiente", abrir: () => navegar(`/professores/${p4}/disciplinas/${d0.id}`, "Dados insuficientes"), verificar: async () => assert.equal(await avaliar("document.querySelectorAll('main .metrics').length"), 0) },
-    { nome: "sem-avaliacoes", abrir: () => navegar(`/professores/${p5}/disciplinas/${d0.id}`, "Ainda não há avaliações"), verificar: async () => assert.equal(await avaliar("document.querySelectorAll('main .metrics').length"), 0) },
+    { nome: "insuficiente", abrir: () => navegar(`/professores/${p4}/disciplinas/${d0.id}`, "Dados insuficientes"), verificar: async () => assert.equal(await avaliar("document.querySelectorAll('main .bento').length"), 0) },
+    { nome: "sem-avaliacoes", abrir: () => navegar(`/professores/${p5}/disciplinas/${d0.id}`, "Ainda não há avaliações"), verificar: async () => assert.equal(await avaliar("document.querySelectorAll('main .bento').length"), 0) },
     { nome: "sem-turmas", abrir: () => navegar(`/professores/${p6}`, "Nenhuma turma ativa registrada") },
   ];
   for (const tema of ["light", "dark"]) {
@@ -178,7 +178,7 @@ try {
         await avaliar("document.fonts.ready.then(() => true)");
         assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true, `${tela.nome}/${tema}/${largura}: rolagem horizontal`);
         assert.equal(await avaliar("document.querySelectorAll('main h1').length"), 1);
-        if (tela.nome === "comparacao") assert.equal(await avaliar("getComputedStyle(document.querySelector('main .table-scroll')).overflowX"), "auto");
+        if (tela.nome === "comparacao") assert.equal(await avaliar("getComputedStyle(document.querySelector('#comparacao-cartoes')).overflowX"), "auto");
         // Tab real deve chegar aos atalhos e produzir foco visível.
         const alvo = tela.nome === "busca-professores" || tela.nome === "detalhe-professor"
           ? `/professores/${p0}/disciplinas/${d0.id}/avaliar` : null;

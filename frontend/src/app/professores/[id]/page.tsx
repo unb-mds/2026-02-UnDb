@@ -1,6 +1,7 @@
 import { nomeUnidade } from "@/lib/unidade";
 import { lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
+import { iniciaisProfessor } from "@/lib/iniciais";
 import DisciplinasProfessor from "@/components/disciplinas-professor";
 import { notFound } from "next/navigation";
 import { identificadorValido } from "@/lib/identificador";
@@ -28,7 +29,7 @@ export default async function DetalheProfessorPage({
   const disciplinas = await listarDisciplinasDoProfessor(id);
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
+    <main className="container flex max-w-[928px]! flex-1 flex-col gap-6 py-8 sm:py-12">
       <Caminho
         itens={[
           { nome: "Início", href: "/" },
@@ -42,21 +43,25 @@ export default async function DetalheProfessorPage({
       />
       <Link
         href={contexto ? urlBusca(contexto) : "/professores"}
-        className="self-start text-sm text-accent underline underline-offset-4"
+        className="back-link"
       >
         {contexto ? "← Voltar aos resultados da busca" : "← Buscar outro professor"}
       </Link>
 
-      <div className="panel p-6 break-words">
-        <h1 className="text-2xl font-bold">{professor.nome}</h1>
-        <p className="mt-1 text-sm text-foreground/70">
+      <div className="flex min-w-0 items-center gap-5 break-words">
+        <span className="avatar-initials large" aria-hidden="true">{iniciaisProfessor(professor.nome)}</span>
+        <div className="min-w-0">
+        <span className="kicker">Professor</span>
+        <h1 className="page-title mt-1">{professor.nome}</h1>
+        <p className="lead mt-2">
           Unidade acadêmica: {nomeUnidade(professor)}
         </p>
+        </div>
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold">Disciplinas lecionadas</h2>
-        <p className="mt-1 text-sm text-foreground/70">
+        <h2 className="section-title">Disciplinas lecionadas</h2>
+        <p className="mt-2 text-sm text-(--ink-soft)">
           Escolha a matéria abaixo. Você pode avaliar diretamente ou comparar os professores antes.
         </p>
         <DisciplinasProfessor

@@ -1,6 +1,7 @@
 "use client";
 
 import CampoSenha from "@/components/campo-senha";
+import MolduraConta from "@/components/moldura-conta";
 import OpcoesAcesso from "@/components/opcoes-acesso";
 
 import Link from "next/link";
@@ -84,23 +85,14 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
   }
 
   return (
-    <main className="container flex max-w-xl min-w-0 flex-1 flex-col gap-6 py-10 sm:py-14">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Entrar</h1>
-        <p className="mt-2 text-sm leading-relaxed text-(--muted)">
-          Use sua conta institucional para registrar avaliações. As consultas continuam públicas.
-        </p>
-      </div>
-
-      {contexto}
-      <section className="panel flex min-w-0 flex-col gap-6 p-4 sm:p-6" aria-label="Acesso à conta">
+    <MolduraConta titulo="Entrar" descricao="Use sua conta institucional para registrar avaliações. As consultas continuam públicas." retorno={retorno} contexto={contexto} rotulo="Acesso à conta">
         <OpcoesAcesso atual="login" retorno={retorno} />
         {!sessaoCarregada ? (
           <p className="text-sm text-(--muted)" role="status">Verificando sessão…</p>
         ) : !autenticado ? (
           <form onSubmit={enviar} className="flex min-w-0 flex-col gap-5">
-            <label className="flex min-w-0 flex-col gap-2">
-              <span className="text-sm font-medium">E-mail institucional</span>
+            <label className="underline-field">
+              <span className="label-mono">E-mail institucional</span>
               <input
                 name="email"
                 type="email"
@@ -109,7 +101,6 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
                 required
                 maxLength={150}
                 placeholder="seu-email@aluno.unb.br"
-                className="min-h-11 w-full min-w-0 rounded-lg border border-(--control-border) bg-(--raised) px-4 py-3 text-base text-foreground placeholder:text-(--muted) focus:border-accent"
               />
             </label>
 
@@ -118,13 +109,13 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
             <button
               type="submit"
               disabled={carregando}
-              className="button primary"
+              className="button primary mt-2"
             >
               {carregando ? "Entrando…" : "Entrar"}
             </button>
           </form>
         ) : (
-          <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-(--border) bg-(--raised) p-4">
+          <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-(--border) bg-(--panel) p-4">
             <p className="text-sm text-(--muted)">
               Sua sessão está ativa neste navegador.
             </p>
@@ -139,20 +130,19 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
           </div>
         )}
 
-        <p className="text-sm leading-relaxed text-(--muted)">
+        <p className="text-center text-sm leading-relaxed text-(--ink-soft)">
           Ainda não possui conta?{" "}
-          <Link href={retorno ? `/cadastro?returnTo=${encodeURIComponent(retorno)}` : "/cadastro"} className="font-medium text-accent hover:underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+          <Link href={retorno ? `/cadastro?returnTo=${encodeURIComponent(retorno)}` : "/cadastro"} className="link font-medium">
             Criar conta
           </Link>
         </p>
 
         <div aria-live="polite" className="min-w-0 break-words">
           {mensagem && (
-            <p className="rounded-lg border border-green-600/30 bg-green-600/10 p-4 text-sm">{mensagem}</p>
+            <p className="status-box success">{mensagem}</p>
           )}
-          {erro && <p className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">{erro}</p>}
+          {erro && <p className="status-box error">{erro}</p>}
         </div>
-      </section>
-    </main>
+    </MolduraConta>
   );
 }

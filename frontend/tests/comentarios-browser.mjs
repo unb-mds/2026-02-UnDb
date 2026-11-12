@@ -82,7 +82,7 @@ await comNavegador({ fixture:real?null:fixture, executar:async ({cdp,avaliar,agu
     await clicar('Entrar'); await esperar('Sua sessão está ativa');
   }
   async function preencher(comentario=''){
-    await avaliar(`document.querySelector('input[name="didatica"][value="4"]').click();for(const [nome,valor] of Object.entries({dificuldade:'MEDIO',chamada:'true',material:'BOM',recomenda:'true'})){const s=document.querySelector('select[name="'+nome+'"]');s.value=valor;s.dispatchEvent(new Event('change',{bubbles:true}));}const t=document.querySelector('textarea');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,${JSON.stringify(comentario)});t.dispatchEvent(new Event('input',{bubbles:true}));`);
+    await avaliar(`document.querySelector('input[name="didatica"][value="4"]').click();for(const [nome,valor] of Object.entries({dificuldade:'MEDIO',chamada:'true',material:'BOM',recomenda:'true'})){document.querySelector('input[name="'+nome+'"][value="'+valor+'"]').click();}const t=document.querySelector('textarea');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,${JSON.stringify(comentario)});t.dispatchEvent(new Event('input',{bubbles:true}));`);
   }
   await navegar(caminho+'/avaliar'); await esperar('Enviar avaliação');
   await aguardar(async()=>!(await texto()).includes('Carregando seus comentários'),'consulta visitante');

@@ -125,3 +125,14 @@ tipos, build e suíte de navegador; todos os checks remotos passaram.
 Os resultados são históricos da PR #214, não reexecução nesta PR documental.
 [Comparações, capturas e limites](../../docs/estudos/identidade-conta-catalogo-2026-11-10.md).
 Testes e emulação não substituem o reteste com alunos #166.
+
+## Refinamento visual — Issue #211
+
+A #211 aplicou a direção do protótipo no Figma Make sobre esta base. Detalhes, decisões e evidências em [ui-refinamento-211.md](ui-refinamento-211.md). Contratos adicionados para as próximas entregas:
+
+- Tokens novos em `globals.css`: `--ink-soft`, `--surface-accent`, `--border-strong`, `--accent-hover`, `--accent-soft`, `--brand-blue`, `--brand-green`, `--success`, `--success-soft` e `--danger-soft`. O fundo passou a preto; `--primary` continua verde e exclusivo das ações principais.
+- Classes compartilhadas: `.kicker`, `.eyebrow`, `.label-mono`, `.code-chip`, `.page-title`, `.section-title`, `.lead`, `.glass`, `.tile`, `.note`, `.state-box`, `.pill-count`, `.avatar-initials`, `.field`, `.choice`/`.choice-grid`, `.underline-field`, `.status-box`, `.back-link`, `.link`, `.button.ghost` e `.button.pill`.
+- `BuscaNavegacao` aceita `segmentada`, que troca o select pelos rádios do mesmo campo `busca` (usado na home). O cabeçalho e os resultados continuam com o select.
+- `ResultadoBento` apresenta critérios já agregados; não recalcula valores nem cria nota geral. `EstrelasDidatica` representa somente a média de Didática.
+- A comparação da disciplina usa cartões em `#comparacao-cartoes` (rolagem com snap e setas). Não reintroduzir dependência de carrossel.
+- Os critérios do formulário de avaliação são rádios com os mesmos `name`/`value`; testes devem marcá-los por `[name][value]`, não atribuir `value`.

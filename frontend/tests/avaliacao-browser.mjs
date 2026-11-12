@@ -197,7 +197,7 @@ try {
   await cdp("Page.navigate", { url: `http://localhost:3100${caminho}` });
   await aguardarTexto("Avaliar este professor na disciplina");
   await avaliar('Array.from(document.querySelectorAll("a")).find(a => a.textContent.includes("Avaliar este professor")).click()');
-  await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("main select").length === 4'), "formulário");
+  await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("main input[type=radio]").length === 16'), "formulário");
   assert.match(await texto(), /Professor de teste/);
   assert.match(await texto(), /Disciplina de teste/);
   assert.ok((await texto()).includes(`Código da disciplina: ${real?.disciplinaCodigo ?? "CIC0001"}`));
@@ -209,7 +209,7 @@ try {
   await enviar();
   assert.equal(await avaliar('document.querySelector("main form").checkValidity()'), false);
   assert.equal(envios.length, 0);
-  await avaliar(`document.querySelector('[name="didatica"][value="5"]').click(); Object.entries({dificuldade:"DIFICIL", chamada:"false", material:"NAO_DISPONIBILIZA", recomenda:"false"}).forEach(([nome, valor]) => { const campo = document.querySelector('[name="'+nome+'"]'); campo.value = valor; campo.dispatchEvent(new Event("change", {bubbles:true})); })`);
+  await avaliar(`document.querySelector('[name="didatica"][value="5"]').click(); Object.entries({dificuldade:"DIFICIL", chamada:"false", material:"NAO_DISPONIBILIZA", recomenda:"false"}).forEach(([nome, valor]) => { document.querySelector('[name="'+nome+'"][value="'+valor+'"]').click(); })`);
   assert.equal(await avaliar('document.querySelector("main form").checkValidity()'), true);
   assert.equal(await avaliar('document.querySelector("main button[type=submit]").disabled'), false);
   const respostas = () => avaliar('Object.fromEntries(new FormData(document.querySelector("main form")))');
@@ -292,7 +292,7 @@ try {
   }
   // Acesso direto não predefine respostas e mantém os cinco campos obrigatórios.
   await cdp("Page.navigate", { url: `http://localhost:3100${caminho}/avaliar` });
-  await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("main select").length === 4'), "formulário direto");
+  await aguardar(async () => await avaliar('document.querySelectorAll("[name=didatica][type=radio]").length === 5 && document.querySelectorAll("main input[type=radio]").length === 16'), "formulário direto");
   assert.equal(await avaliar('document.querySelector("main form").reportValidity()'), false);
   // Assim como na entrada por link, aguarda a hidratação com dados inválidos.
   // Um único evento antes do React estar pronto pode ser perdido no acesso direto.
@@ -495,7 +495,7 @@ async function verificarCorrecoesInterface() {
   await aguardar(async () => await avaliar('location.pathname === ' + JSON.stringify(destino)), "retorno após confirmação de e-mail");
   await aguardar(async () => await avaliar('!!document.querySelector("[name=didatica]")'), "formulário após confirmação");
   assert.equal(await avaliar('document.querySelector("[name=didatica]:checked")'), null);
-  await avaliar(`document.querySelector('[name="didatica"][value="5"]').click(); Object.entries({dificuldade:"MEDIO", chamada:"false", material:"BOM", recomenda:"false"}).forEach(([nome, valor]) => { const campo = document.querySelector('[name="'+nome+'"]'); campo.value = valor; campo.dispatchEvent(new Event("change", {bubbles:true})); })`);
+  await avaliar(`document.querySelector('[name="didatica"][value="5"]').click(); Object.entries({dificuldade:"MEDIO", chamada:"false", material:"BOM", recomenda:"false"}).forEach(([nome, valor]) => { document.querySelector('[name="'+nome+'"][value="'+valor+'"]').click(); })`);
   await enviar();
   await aguardarTexto("Avaliação registrada com sucesso");
   console.log("Regressões de interface: IDs malformados, indisponibilidade e recuperação, cadastro com hidratação atrasada sem navegação/envio indevido, domínio maiúsculo, nome em branco, 422, confirmação transitória/token inválido e contraste claro/escuro.");
