@@ -52,12 +52,13 @@ def resolver(db, nome, departamento, chave, oferta, consulta):
         origem = destino or professor_repository.get_or_create_provisorio(
             db, nome, departamento, chave
         )
-    if identificador and destino is None:
+    if identificador:
         try:
             destino = repo.vincular(db, identificador, origem)
         except ValueError:
             motivo = "CONFLITO_INSTITUCIONAL"
             identificador = None
+            destino = None
     estado = (
         "APLICADA"
         if destino and destino.id == origem.id

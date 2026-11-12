@@ -203,6 +203,19 @@ class IdentidadeTest(unittest.TestCase):
             repo.vincular(self.db, "9999", a.professores[0])
         self.assertIsNone(repo.identidade(self.db, "9999"))
 
+    def test_reimportacao_nao_confirma_troca_para_outro_destino_existente(self):
+        self.salvar("02", motivo="HOMONIMOS")
+        repo.vincular(self.db, "9999", self.origem)
+        destino, _ = self.salvar("04")
+        self.salvar("02")
+        item = self.item("02")
+        self.assertEqual(item.estado, "PENDENTE")
+        self.assertEqual(item.motivo, "CONFLITO_INSTITUCIONAL")
+        self.assertIsNone(item.identificador_destino)
+        self.assertEqual(self.t1.professores[0].id, self.origem.id)
+        self.assertEqual(repo.identidade(self.db, "9999").professor_id, self.origem.id)
+        self.assertEqual(repo.identidade(self.db, "1234").professor_id, destino.professores[0].id)
+
 
 class FonteTest(unittest.TestCase):
     def test_ano_isolado_nao_vira_semestre(self):
