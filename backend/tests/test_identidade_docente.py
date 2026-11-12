@@ -216,6 +216,38 @@ class IdentidadeTest(unittest.TestCase):
         self.assertEqual(repo.identidade(self.db, "9999").professor_id, self.origem.id)
         self.assertEqual(repo.identidade(self.db, "1234").professor_id, destino.professores[0].id)
 
+    def test_lote_revalida_identidade_de_todas_as_origens(self):
+        self.salvar("04", motivo="HOMONIMOS")
+        self.salvar("05", motivo="HOMONIMOS")
+        a, b = self.item("04"), self.item("05")
+        origem_b = repo.professor(self.db, b.professor_id)
+        avaliacao = self.avaliar(origem_b)
+        usuario = self.revisor()
+        for item in (a, b):
+            service.decidir(
+                self.db,
+                usuario,
+                item.id,
+                DecidirRequest(
+                    acao="CONFIRMAR",
+                    versao=item.versao,
+                    identificador="1234",
+                    justificativa="Perfil conferido",
+                ),
+            )
+        # Outra ocorrência definiu uma identidade após a prévia/decisão.
+        repo.vincular(self.db, "9999", origem_b)
+        self.db.commit()
+        resultado = service.aplicar_confirmadas(self.db)
+        self.assertEqual(resultado[0]["estado"], "BLOQUEADA")
+        self.assertEqual(a.estado, "CONFIRMADA")
+        self.assertEqual(b.estado, "CONFIRMADA")
+        self.assertIsNone(repo.identidade(self.db, "1234"))
+        self.assertEqual(repo.identidade(self.db, "9999").professor_id, origem_b.id)
+        self.assertEqual(reconciliacao_tests.resolver_id(self.db, origem_b.id), origem_b.id)
+        self.db.refresh(avaliacao)
+        self.assertEqual(avaliacao.professor_id, origem_b.id)
+
 
 class FonteTest(unittest.TestCase):
     def test_ano_isolado_nao_vira_semestre(self):

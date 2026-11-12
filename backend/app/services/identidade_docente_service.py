@@ -141,6 +141,10 @@ def aplicar_confirmadas(db):
                 reconciliacao._bloquear_escritas(db)
                 origem = repo.professor(db, itens[0].professor_id)
                 destino = repo.vincular(db, identificador, origem)
+                # A identidade pode ter mudado desde a confirmação. Conferir cada
+                # origem antes de mover qualquer turma ou avaliação do grupo.
+                for item in itens:
+                    repo.vincular(db, identificador, repo.professor(db, item.professor_id))
                 origens = sorted(
                     {repo.professor(db, i.professor_id).id for i in itens} - {destino.id}, key=str
                 )
