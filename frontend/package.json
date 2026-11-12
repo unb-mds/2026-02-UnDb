@@ -12,6 +12,7 @@
     "test:coverage": "node tests/run-tests.mjs --coverage",
     "test:browser": "node tests/avaliacao-browser.mjs && node tests/moderacao-browser.mjs && node tests/denuncia-browser.mjs && node tests/comentarios-browser.mjs && node tests/cabecalho-browser.mjs",
     "test:cabecalho": "node tests/cabecalho-browser.mjs",
+    "test:identidades": "node tests/identidades-browser.mjs",
     "test:moderacao": "node tests/moderacao-browser.mjs",
     "test:denuncia": "node tests/denuncia-browser.mjs",
     "test:comentarios": "node tests/comentarios-browser.mjs",

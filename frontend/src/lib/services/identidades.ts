@@ -46,8 +46,8 @@ export async function consultarPrevia(id: string, perfil: string, signal?: Abort
       : (v.turmas != null && !numero(v.turmas)) || (v.avaliacoes != null && !numero(v.avaliacoes)))) throw new Error("Prévia incompatível.");
   return v as PreviaIdentidade;
 }
-export async function decidirIdentidade(item: PendenciaIdentidade, acao: "CONFIRMAR" | "SEPARAR", justificativa: string, perfil?: string): Promise<PendenciaIdentidade> {
-  const v = await apiClient.post<unknown, object>(`${caminho(item.id)}/decisoes`, { acao, versao: item.versao, justificativa, identificador: perfil ?? null }, opcoes());
+export async function decidirIdentidade(item: PendenciaIdentidade, acao: "CONFIRMAR" | "SEPARAR", justificativa: string, perfil?: string, signal?: AbortSignal): Promise<PendenciaIdentidade> {
+  const v = await apiClient.post<unknown, object>(`${caminho(item.id)}/decisoes`, { acao, versao: item.versao, justificativa, identificador: perfil ?? null }, opcoes(signal));
   if (!pendencia(v) || v.id !== item.id) throw new Error("Decisão incompatível.");
   return v;
 }

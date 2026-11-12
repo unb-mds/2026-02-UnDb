@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EVENTO_SESSAO_ALTERADA } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
 import { listarIdentidades, consultarPrevia, decidirIdentidade, historicoIdentidade } from "@/lib/services/identidades";
@@ -16,13 +16,18 @@ function Detalhe({ item, concluido, negar }: { item: PendenciaIdentidade; conclu
   const [historico, setHistorico] = useState<DecisaoIdentidade[]>([]);
   const [erro, setErro] = useState("");
   const [ocupado, setOcupado] = useState(false);
+  const decisao = useRef<AbortController | null>(null);
+  useEffect(() => () => decisao.current?.abort(), []);
   useEffect(() => { const c = new AbortController(); void historicoIdentidade(item.id, c.signal).then(v => { if (!c.signal.aborted) setHistorico(v); }).catch(e => { if (!c.signal.aborted) { if (e instanceof ApiError && [401,403].includes(e.status)) negar(e); else setErro(mensagem(e)); } }); return () => c.abort(); }, [item.id, negar]);
   useEffect(() => { if (!perfil) return; const c = new AbortController(); void consultarPrevia(item.id, perfil, c.signal).then(v => { if (!c.signal.aborted) setPrevia(v); }).catch(e => { if (!c.signal.aborted) { if (e instanceof ApiError && [401,403].includes(e.status)) negar(e); else setErro(mensagem(e)); } }); return () => c.abort(); }, [item.id, perfil, negar]);
   async function decidir(acao: "CONFIRMAR" | "SEPARAR") {
+    decisao.current?.abort();
+    const c = new AbortController();
+    decisao.current = c;
     setOcupado(true); setErro("");
-    try { await decidirIdentidade(item, acao, justificativa.trim(), acao === "CONFIRMAR" ? perfil : undefined); concluido(acao === "CONFIRMAR" ? "Associação confirmada e aguardando aplicação operacional." : "Registros mantidos separados para esta ocorrência."); }
-    catch(e) { if (e instanceof ApiError && [401,403].includes(e.status)) negar(e); else setErro(mensagem(e)); }
-    finally { setOcupado(false); }
+    try { await decidirIdentidade(item, acao, justificativa.trim(), acao === "CONFIRMAR" ? perfil : undefined, c.signal); if (!c.signal.aborted) concluido(acao === "CONFIRMAR" ? "Associação confirmada e aguardando aplicação operacional." : "Registros mantidos separados para esta ocorrência."); }
+    catch(e) { if (!c.signal.aborted) { if (e instanceof ApiError && [401,403].includes(e.status)) negar(e); else setErro(mensagem(e)); } }
+    finally { if (!c.signal.aborted) setOcupado(false); }
   }
   return <section aria-label={`Análise de ${item.nome}`} className="rounded-xl border border-foreground/20 p-4">
     <h2 className="text-xl font-semibold break-words">{item.nome}</h2>

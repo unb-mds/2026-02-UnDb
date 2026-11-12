@@ -16,12 +16,14 @@ test("fila de identidades usa paginação, credenciais, no-store e cancelamento"
   assert.deepEqual(await service.listarIdentidades("PENDENTE",50,c.signal),[item]);
 });
 test("decisão transmite a versão, o perfil e a justificativa sem papel fornecido pelo cliente",async t => {
+  const c = new AbortController();
   t.mock.method(globalThis,"fetch",async (url,init) => {
     assert.equal(init.method,"POST");
+    assert.equal(init.signal, c.signal);
     assert.deepEqual(JSON.parse(init.body),{acao:"CONFIRMAR",versao:1,justificativa:"Perfil conferido",identificador:"123"});
     return Response.json({...item,estado:"CONFIRMADA",versao:2});
   });
-  assert.equal((await service.decidirIdentidade(item,"CONFIRMAR","Perfil conferido","123")).estado,"CONFIRMADA");
+  assert.equal((await service.decidirIdentidade(item,"CONFIRMAR","Perfil conferido","123", c.signal)).estado,"CONFIRMADA");
 });
 test("contrato inválido não vira fila vazia nem decisão aceita",async t => {
   t.mock.method(globalThis,"fetch",async () => Response.json([{...item,candidatos:[{...item.candidatos[0],identificador:"javascript:alert(1)"}]}]));
