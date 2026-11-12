@@ -248,6 +248,58 @@ class IdentidadeTest(unittest.TestCase):
         self.db.refresh(avaliacao)
         self.assertEqual(avaliacao.professor_id, origem_b.id)
 
+    def test_postgres_decisao_nao_espera_lock_da_importacao_indefinidamente(self):
+        if not self.postgres:
+            self.skipTest("Exige PostgreSQL descartável para verificar contenção real.")
+        from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+        from sqlalchemy.orm import Session
+
+        self.salvar(motivo="HOMONIMOS")
+        item = self.item()
+        usuario = self.revisor()
+        self.db.commit()
+        id_item, id_usuario, versao = item.id, usuario.id, item.versao
+
+        def decidir_em_outra_conexao():
+            with Session(self.engine) as concorrente:
+                try:
+                    service.decidir(
+                        concorrente,
+                        concorrente.get(Usuario, id_usuario),
+                        id_item,
+                        DecidirRequest(
+                            acao="SEPARAR", versao=versao, justificativa="Pessoas distintas"
+                        ),
+                    )
+                except service.IdentidadeError as erro:
+                    return erro.status_code
+                return 200
+
+        with Session(self.engine) as importacao:
+            repo.bloquear(importacao)
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                futuro = executor.submit(decidir_em_outra_conexao)
+                try:
+                    status = futuro.result(timeout=8)
+                except FutureTimeout:
+                    importacao.rollback()
+                    futuro.result(timeout=5)
+                    self.fail("A decisão ficou aguardando indefinidamente o lock da importação.")
+                finally:
+                    importacao.rollback()
+        self.assertEqual(status, 409)
+        self.db.refresh(item)
+        self.assertEqual(item.estado, "PENDENTE")
+        self.assertEqual(repo.decisoes(self.db, id_item), [])
+        service.decidir(
+            self.db,
+            usuario,
+            id_item,
+            DecidirRequest(acao="SEPARAR", versao=versao, justificativa="Pessoas distintas"),
+        )
+        self.assertEqual(item.estado, "SEPARADA")
+        self.assertEqual(len(repo.decisoes(self.db, id_item)), 1)
+
 
 class FonteTest(unittest.TestCase):
     def test_ano_isolado_nao_vira_semestre(self):

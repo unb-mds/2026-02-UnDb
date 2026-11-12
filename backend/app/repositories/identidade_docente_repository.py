@@ -9,6 +9,9 @@ from app.repositories.reconciliacao_professor_repository import resolver_id
 
 def bloquear(db):
     if db.bind.dialect.name == "postgresql":
+        # Mesmo limite da reconciliação: importações consultam rede enquanto
+        # mantêm este lock, portanto uma decisão não pode esperar sem limite.
+        db.execute(text("SET LOCAL lock_timeout = '5s'"))
         db.execute(text("SELECT pg_advisory_xact_lock(2071101)"))
 
 

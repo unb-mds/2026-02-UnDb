@@ -1,4 +1,5 @@
 from collections import defaultdict
+from sqlalchemy.exc import OperationalError
 from app.models.identidade_docente import PendenciaIdentidade, DecisaoIdentidade
 from app.repositories import identidade_docente_repository as repo, professor_repository
 from app.repositories import reconciliacao_professor_repository as reconciliacao
@@ -122,6 +123,13 @@ def decidir(db, usuario, id, dados):
         item.versao += 1
         db.commit()
         return item
+    except OperationalError as erro:
+        db.rollback()
+        if getattr(erro.orig, "pgcode", None) == "55P03":
+            raise IdentidadeError(
+                409, "Fila em atualização. Aguarde e atualize a fila antes de decidir."
+            ) from erro
+        raise
     except Exception:
         db.rollback()
         raise
