@@ -98,8 +98,9 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
     await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
     assert.equal(await avaliar("document.activeElement.name"), "dificuldade");
     assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle"), "solid");
-    assert.match(await avaliar("getComputedStyle(document.activeElement).boxShadow"), /2px/);
-    assert.equal(await avaliar("getComputedStyle(document.activeElement).getPropertyValue('--tw-ring-color').trim() === getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()"), true);
+    assert.equal(await avaliar("getComputedStyle(document.activeElement.nextElementSibling).outlineStyle"), "solid");
+    assert.ok(await avaliar("parseFloat(getComputedStyle(document.activeElement.nextElementSibling).outlineWidth) >= 2"));
+    assert.equal(await avaliar("(() => { const referencia=document.createElement('span'); referencia.style.color='var(--focus)'; document.body.append(referencia); const esperado=getComputedStyle(referencia).color; referencia.remove(); return getComputedStyle(document.activeElement.nextElementSibling).outlineColor === esperado; })()"), true);
     await avaliar("document.querySelector('[name=didatica][value=\"1\"]').click(); Object.entries({dificuldade:'MEDIO',chamada:'false',material:'RUIM',recomenda:'true'}).forEach(([nome,valor]) => document.querySelector('[name='+nome+'][value=\"'+valor+'\"]').click()); document.querySelector('form').requestSubmit()");
     await aguardarTexto("Prévia conferida.");
     assert.equal(await avaliar("document.querySelector('[name=didatica]:checked').value"), "1");
