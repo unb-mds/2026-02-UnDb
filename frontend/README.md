@@ -35,6 +35,12 @@ O App Router está em `src/app/`. Para alterar a página inicial, edite
   cabeçalho autenticado/visitante, login/logout, recarga, navegação, erros e
   respostas atrasadas, retorno à avaliação e responsividade. Usa HTTP controlado;
   também integra `npm run test:browser`. Veja as [evidências da #211](../docs/estudos/cabecalho-sessao-issue-211.md).
+- `npm run test:identidades`: após o build local, verifica a fila de RF23 com
+  HTTP controlado: prévia sem união com contagens nulas, descarte de decisão
+  atrasada após troca de seleção, perda de permissão, teclado e ausência de
+  overflow em 320/768/1280 px com preferências clara/escura do sistema. O tema
+  atual da aplicação permanece escuro. Integra `npm run test:browser`;
+  `PREVIEW_DIR` permite salvar capturas locais. Não usa dados reais.
 - `npm test` gera os tipos de rotas, compila `src` em um diretório temporário e
   executa a suíte com o runner nativo do Node.
 - `npm run test:coverage` mede a mesma suíte com c8 e gera resumo, HTML e LCOV.

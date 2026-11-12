@@ -1,6 +1,8 @@
 // RF23: contrato real da prévia e decisões que terminam após trocar a seleção.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { comNavegador } from "./browser-session.mjs";
 
 const uuid = i => `${String(i).padStart(8, "0")}-1111-4111-8111-111111111111`;
@@ -79,6 +81,11 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
     for (const largura of [320, 768, 1280]) {
       await cdp("Emulation.setDeviceMetricsOverride", { width: largura, height: 900, deviceScaleFactor: 1, mobile: false });
       assert.ok(await avaliar("document.documentElement.scrollWidth <= innerWidth"), `sem overflow: ${tema}/${largura}`);
+      if (process.env.PREVIEW_DIR) {
+        await mkdir(process.env.PREVIEW_DIR, { recursive: true });
+        const captura = await cdp("Page.captureScreenshot", { format: "png", captureBeyondViewport: true });
+        await writeFile(join(process.env.PREVIEW_DIR, `identidades-${tema}-${largura}.png`), Buffer.from(captura.data, "base64"));
+      }
     }
   }
   await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
@@ -88,5 +95,5 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
   await clicar("Atualizar fila");
   await esperar("permissão específica de identidades");
   assert.doesNotMatch(await texto(), /Docente Alfa|Docente Beta|Histórico de decisões/);
-  console.log("Identidades: prévia nula, POST obsoleto, permissão, teclado e 320/768/1280 nos dois temas aprovados.");
+  console.log("Identidades: prévia nula, POST obsoleto, permissão, teclado e 320/768/1280 aprovados com preferências clara/escura do sistema; aplicação em tema escuro.");
 } });
