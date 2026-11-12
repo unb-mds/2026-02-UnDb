@@ -250,7 +250,7 @@ try {
     assert.equal(primeira[0].usuario_id, real.usuarioId);
     assert.equal(primeira[0].didatica, 5);
     assert.equal(primeira[0].qualidade_material, null);
-    await avaliar('document.querySelector("[name=didatica][value=\\"2\\"]").click(); document.querySelector("[name=material]").value="BOM"; document.querySelector("[name=material]").dispatchEvent(new Event("change", {bubbles:true}))');
+    await avaliar('document.querySelector("[name=didatica][value=\\"2\\"]").click(); document.querySelector("[name=material][value=BOM]").click()');
     await enviar();
     await aguardarTexto("Avaliação registrada com sucesso");
     const segunda = banco();

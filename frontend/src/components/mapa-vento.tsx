@@ -117,7 +117,7 @@ export default function MapaVento({ className = "" }: { className?: string }) {
     const laco = (agora: number) => {
       if (!visivel || document.hidden) { raf = 0; return; }
       raf = requestAnimationFrame(laco);
-      if (grosso && agora - ultimo < 30) return;
+      if (agora - ultimo < 33) return; // ~30 qps: suficiente para o efeito e leve sem GPU.
       ultimo = agora;
       redimensionar();
       ponteiro.s += (ponteiro.alvo - ponteiro.s) * 0.04;

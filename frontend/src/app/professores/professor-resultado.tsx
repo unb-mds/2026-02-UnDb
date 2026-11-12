@@ -51,7 +51,7 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
           <p className="mt-2 text-sm text-(--muted)">Unidade acadêmica: {nomeUnidade(professor)}</p>
         </div>
       </div>
-      <h3 className="label-mono mt-6">Disciplinas lecionadas</h3>
+      <h3 className="label-mono mt-6 normal-case!">Disciplinas lecionadas</h3>
       {consulta.estado === "carregando" && <p role="status" className="mt-2 text-sm text-(--muted)">Carregando disciplinas…</p>}
       {consulta.estado === "erro" && (
         <div className="mt-3 flex flex-col items-start gap-3">

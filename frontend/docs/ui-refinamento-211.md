@@ -47,6 +47,7 @@ Componentes novos: `Icone`, `MapaVento`, `FundoLiquido`, `EstrelasDidatica`, `Re
 - Fundos animados (`MapaVento`, `FundoLiquido`) são `aria-hidden`, não recebem foco, pausam fora da tela e ficam estáticos com `prefers-reduced-motion`.
 - As estrelas têm `role="img"` com a média por extenso; os demais critérios continuam em `dl`.
 - Os critérios da avaliação continuam com os mesmos `name`/`value`, `required` e navegação por setas entre rádios; o foco visível é desenhado no rótulo.
+- Fundos decorativos não usam `filter`/`backdrop-filter` animados (custo alto sem GPU); o mapa de vento roda a ~30 quadros por segundo.
 - Os campos sublinhados trocam o contorno pelo sublinhado de 2 px em gradiente azul/verde, com contraste acima de 3:1 sobre o fundo.
 - Estados cobertos: carregamento, vazio, erro, insuficiente, sem avaliações, sucesso e falha de envio, sessão autenticada e visitante.
 
@@ -65,7 +66,7 @@ Ambiente: macOS, Node 24.21.0, Next 16.3.5, Chrome (o CI usa Edge no Windows).
 | `tests/comentarios-browser.mjs` | Aprovado; preenche o formulário pelos novos rádios |
 | `tests/cabecalho-browser.mjs` | Aprovado: visitante, sessão, “Minha conta”, retorno e 320/768/1280 px |
 | `tests/identidades-browser.mjs` | Aprovado |
-| `tests/avaliacao-browser.mjs` | **Inconclusivo localmente.** 1ª execução: passos do formulário (rádios, validação, envio, foco por teclado, notas em uma linha a 320 px) aprovados; parou depois, em `busca-browser.mjs:177` (“conta visitante validada”). 2ª execução: tempo esgotado no CDP (`Runtime.evaluate`) em outro ponto. Uma sonda isolada na mesma rota mostrou o cabeçalho de visitante correto. Depende de confirmação no CI |
+| `tests/avaliacao-browser.mjs` | Primeira execução no CI (PR #230) revelou duas falhas, corrigidas: um passo ainda atribuía `value` ao campo `material` (agora clica o rádio) e os rótulos dos campos de conta ficavam em caixa alta no `innerText` (agora sem `text-transform`). **Localmente inconclusivo:** 1ª execução: passos do formulário (rádios, validação, envio, foco por teclado, notas em uma linha a 320 px) aprovados; parou depois, em `busca-browser.mjs:177` (“conta visitante validada”). 2ª execução: tempo esgotado no CDP (`Runtime.evaluate`) em outro ponto. Uma sonda isolada na mesma rota mostrou o cabeçalho de visitante correto. Depende de confirmação no CI |
 | Transbordamento horizontal | Nenhum nas 10 rotas capturadas em 320, 390, 768 e 1440 px (`scrollWidth <= innerWidth`) |
 | `git diff --check` | Aprovado |
 
