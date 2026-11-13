@@ -8,6 +8,8 @@ import { ApiError } from "@/lib/services/http-error";
 import { caminhoAvaliacao } from "@/lib/retorno-avaliacao";
 import AvaliacaoForm from "./avaliacao-form";
 import Caminho from "@/components/caminho";
+import FundoLiquido from "@/components/fundo-liquido";
+import Icone from "@/components/icone";
 
 export default async function AvaliarPage({ params, searchParams }: {
   searchParams: Promise<ParametrosBusca>;
@@ -24,44 +26,48 @@ export default async function AvaliarPage({ params, searchParams }: {
   });
 
   return (
-    <main className="container flex max-w-3xl min-w-0 flex-1 flex-col gap-6 py-10 sm:py-14">
-      <Caminho itens={[{ nome: "Início", href: "/" }, ...(contexto ? [{ nome: "Resultados", href: urlBusca(contexto), retornoBusca: true }] : []), { nome: "Consulta", href: consultaHref }, { nome: "Avaliar" }]} />
-      {contexto && <Link href={urlBusca(contexto)} className="text-sm text-accent underline underline-offset-4">← Voltar aos resultados da busca</Link>}
-      <Link href={consultaHref} className="self-start text-sm text-accent underline underline-offset-4">
-        ← Voltar para a consulta
-      </Link>
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Avaliar professor na disciplina</h1>
-        <p className="mt-2 text-sm leading-relaxed text-(--muted)">Confira o contexto e responda aos cinco critérios.</p>
+    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
+      <FundoLiquido />
+      <div className="container flex min-w-0 flex-col gap-6 py-8 sm:py-12">
+        <Caminho itens={[{ nome: "Início", href: "/" }, ...(contexto ? [{ nome: "Resultados", href: urlBusca(contexto), retornoBusca: true }] : []), { nome: "Consulta", href: consultaHref }, { nome: "Avaliar" }]} />
+        <div className="-mt-2 flex flex-wrap gap-x-6">
+          {contexto && <Link href={urlBusca(contexto)} className="back-link"><Icone nome="arrow-left" pequeno /> Voltar aos resultados da busca</Link>}
+          <Link href={consultaHref} className="back-link"><Icone nome="arrow-left" pequeno /> Voltar para a consulta</Link>
+        </div>
+        <div>
+          <span className="kicker">Sua experiência</span>
+          <h1 className="page-title mt-2">Avaliar professor na disciplina</h1>
+          <p className="lead mt-2">Confira o contexto e responda aos cinco critérios. Suas respostas serão exibidas apenas de forma agregada.</p>
+        </div>
+        {avaliacao ? (
+          <>
+            <dl className="grid min-w-0 gap-5 rounded-2xl border-l-2 border-accent bg-(--surface-accent)/70 p-4 break-words sm:grid-cols-3 sm:p-5">
+              <div>
+                <dt className="kicker text-(--ink-soft)!">Professor</dt>
+                <dd className="mt-1 font-medium">{avaliacao.professor.nome}</dd>
+              </div>
+              <div>
+                <dt className="kicker text-(--ink-soft)!">Disciplina</dt>
+                <dd className="mt-1 font-medium">
+                  <span className="block">{avaliacao.disciplina.nome}</span>
+                  <span className="mt-1 block text-sm font-normal text-(--ink-soft)">
+                    Código da disciplina: <span className="font-mono">{avaliacao.disciplina.codigo}</span>
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt className="kicker text-(--ink-soft)!">Unidade acadêmica</dt>
+                <dd className="mt-1 font-medium">{nomeUnidade(avaliacao.disciplina)}</dd>
+              </div>
+            </dl>
+            <AvaliacaoForm professorId={avaliacao.professorId} disciplinaId={avaliacao.disciplinaId} retornoHref={retornoHref} />
+          </>
+        ) : (
+          <p role="alert" className="status-box error">
+            Não foi possível carregar o professor e a disciplina. Tente recarregar esta página em instantes.
+          </p>
+        )}
       </div>
-      {avaliacao ? (
-        <>
-          <dl className="panel grid min-w-0 gap-5 p-4 break-words sm:grid-cols-2 sm:p-6">
-            <div>
-              <dt className="text-sm text-(--muted)">Professor</dt>
-              <dd className="font-semibold">{avaliacao.professor.nome}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-(--muted)">Disciplina</dt>
-              <dd className="font-medium">
-                <span className="block">{avaliacao.disciplina.nome}</span>
-                <span className="mt-1 block text-sm font-normal text-(--muted)">
-                  Código da disciplina: <span className="font-mono">{avaliacao.disciplina.codigo}</span>
-                </span>
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-(--muted)">Unidade acadêmica</dt>
-              <dd className="font-medium">{nomeUnidade(avaliacao.disciplina)}</dd>
-            </div>
-          </dl>
-          <AvaliacaoForm professorId={avaliacao.professorId} disciplinaId={avaliacao.disciplinaId} retornoHref={retornoHref} />
-        </>
-      ) : (
-        <p role="alert" className="rounded-lg border border-red-600/30 bg-red-600/10 p-4 text-sm">
-          Não foi possível carregar o professor e a disciplina. Tente recarregar esta página em instantes.
-        </p>
-      )}
     </main>
   );
 }

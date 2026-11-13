@@ -1,5 +1,9 @@
 import BuscaNavegacao from "./busca-navegacao";
+import Icone from "./icone";
 
 export default function BuscaEntrada() {
-  return <div><BuscaNavegacao id="entrada" /><p className="search-help">Informe ao menos 2 caracteres. Você pode buscar em qualquer unidade acadêmica.</p></div>;
+  return <div>
+    <BuscaNavegacao id="entrada" segmentada />
+    <p className="search-help"><Icone nome="shield" pequeno />Informe ao menos 2 caracteres. A consulta é pública em qualquer unidade acadêmica; entre apenas para avaliar.</p>
+  </div>;
 }

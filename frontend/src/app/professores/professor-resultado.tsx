@@ -3,6 +3,7 @@
 import { nomeUnidade } from "@/lib/unidade";
 
 import Link from "next/link";
+import { iniciaisProfessor } from "@/lib/iniciais";
 import { useEffect, useState } from "react";
 import DisciplinasProfessor from "@/components/disciplinas-professor";
 import { listarDisciplinasDoProfessor } from "@/lib/services/professores";
@@ -36,12 +37,11 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
     setTentativa((valor) => valor + 1);
   }
 
-  const iniciais = professor.nome.split(/\s+/).filter(Boolean).slice(0, 2).map((parte) => parte[0]).join("");
 
   return (
-    <li className="min-w-0 rounded-2xl border border-(--border) bg-(--panel) p-5 break-words sm:p-6">
+    <li className="tile min-w-0 rounded-2xl! p-5 break-words sm:p-6">
       <div className="flex items-start gap-4">
-        <span aria-hidden="true" className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-(--primary)/20 text-sm font-bold text-accent">{iniciais}</span>
+        <span aria-hidden="true" className="avatar-initials rounded-xl!">{iniciaisProfessor(professor.nome)}</span>
         <div className="min-w-0">
           <h2 className="text-xl font-semibold">
             <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="hover:text-accent">
@@ -51,7 +51,7 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
           <p className="mt-2 text-sm text-(--muted)">Unidade acadêmica: {nomeUnidade(professor)}</p>
         </div>
       </div>
-      <h3 className="mt-6 text-xs font-medium tracking-wide text-(--muted) uppercase">Disciplinas lecionadas</h3>
+      <h3 className="label-mono mt-6 normal-case!">Disciplinas lecionadas</h3>
       {consulta.estado === "carregando" && <p role="status" className="mt-2 text-sm text-(--muted)">Carregando disciplinas…</p>}
       {consulta.estado === "erro" && (
         <div className="mt-3 flex flex-col items-start gap-3">

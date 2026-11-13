@@ -113,15 +113,15 @@ try {
   await cdp("Page.enable");
   await cdp("Runtime.enable");
   const contexto = "?busca=disciplinas&q=TEST&ordem=nome";
-  const ordem = () => avaliar("Array.from(document.querySelectorAll('tbody tr')).map(r => r.querySelector('a').pathname.split('/').at(-1))");
+  const ordem = () => avaliar("Array.from(document.querySelectorAll('#comparacao-cartoes > li')).map(r => r.dataset.professorId)");
   for (const width of [320, 390, 768, 1440]) {
     await cdp("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: width < 768 });
     await navegar(`/disciplinas/${disciplina.id}${contexto}`, "Comparação de professores");
     assert.deepEqual(await ordem(), professores.map((p) => p.professor_id), "Preserva desempates da API, inclusive acentos");
-    assert.equal(await avaliar("Array.from(document.querySelectorAll('tbody tr')).every(r => Array.from(r.cells).reduce((n,c) => n+c.colSpan,0) === 8)"), true, "Oito colunas em todas as linhas");
-    assert.ok((await avaliar("document.querySelector('tbody').innerText")).includes("Conflitante"));
-    assert.ok((await avaliar("document.querySelector('tbody').innerText")).includes("Turma 1"));
-    assert.ok((await avaliar("document.querySelector('tbody').innerText")).includes("Turma 2"));
+    assert.equal(await avaliar("Array.from(document.querySelectorAll('#comparacao-cartoes > li')).every(r => !!r.querySelector('.pro-card-stats, .state-box'))"), true, "Todo cartão mostra critérios ou insuficiência");
+    assert.ok((await avaliar("document.querySelector('#comparacao-cartoes').innerText")).includes("Conflitante"));
+    assert.ok((await avaliar("document.querySelector('#comparacao-cartoes').innerText")).includes("Turma 1"));
+    assert.ok((await avaliar("document.querySelector('#comparacao-cartoes').innerText")).includes("Turma 2"));
     assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true, "Tabela rola dentro da página");
     await aguardar(() => avaliar("Object.keys(document.querySelector('.sort')).some(k => k.startsWith('__reactProps'))"), "Hidratação");
     await avaliar("document.querySelector('.sort').focus()");
@@ -130,21 +130,24 @@ try {
     await aguardar(async () => (await ordem())[0] === id(3), "Recomendação crescente via teclado");
     assert.deepEqual(await ordem(), [3, 1, 2, 4, 5].map(id));
     assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle !== 'none'"), true);
-    const href = await avaliar("document.querySelector('.table-actions a').getAttribute('href')");
+    const href = await avaliar("document.querySelector('#consulta-selecionada a').getAttribute('href')");
     assert.ok(href.includes("busca=disciplinas") && href.includes("q=TEST"));
-    await navegar(href, "Os cinco critérios");
-    assert.equal(await avaliar("document.querySelectorAll('.metrics dt').length"), 5);
+    await avaliar("document.querySelector('#comparacao-cartoes > li:first-child > a').click()");
+    await aguardar(() => avaliar("document.querySelector('#consulta-nome').textContent === 'Álvaro'"), "Cartão seleciona professor");
+    assert.ok((await avaliar("document.querySelector('#consulta-selecionada a').href")).includes("busca=disciplinas"));
+    await navegar(`/professores/${id(1)}/disciplinas/${disciplina.id}${contexto}`, "Os cinco critérios");
+    assert.equal(await avaliar("document.querySelectorAll('.bento dt').length"), 5);
     assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true, "Perfil responsivo");
     for (const n of [4, 5]) {
       await navegar(`/professores/${id(n)}/disciplinas/${disciplina.id}`, n === 4 ? "Faltam 1" : "Ainda não há avaliações");
-      assert.equal(await avaliar("document.querySelectorAll('.metrics').length"), 0, "Não exibe critérios abaixo do mínimo");
+      assert.equal(await avaliar("document.querySelectorAll('.bento').length"), 0, "Não exibe critérios abaixo do mínimo");
     }
     console.log(`Perfil/comparação: ${width}px aprovado`);
   }
   falharComparacao = true;
   await navegar(`/professores/${id(1)}/disciplinas/${disciplina.id}`, "Não foi possível carregar os outros professores");
   assert.equal(await avaliar("document.querySelector('main').innerText.includes('Nenhum outro professor cadastrado')"), false);
-  assert.equal(await avaliar("document.querySelectorAll('.metrics dt').length"), 5, "Falha complementar preserva critérios");
+  assert.equal(await avaliar("document.querySelectorAll('.bento dt').length"), 5, "Falha complementar preserva critérios");
   falharComparacao = false; somenteAtual = true;
   await navegar(`/professores/${id(1)}/disciplinas/${disciplina.id}`, "Nenhum outro professor cadastrado");
   assert.deepEqual(erros, [], "Sem exceções no navegador");

@@ -52,8 +52,9 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
       <Caminho itens={[{ nome: "Início", href: "/" }, { nome: professor ? "Professores" : "Disciplinas" }]} />
       <div className="flex w-full flex-col gap-6">
         <div>
-          <h1 className="text-3xl font-semibold">{buscaValida ? `Resultados para “${termo}”` : `Buscar ${professor ? "professor" : "disciplina"}`}</h1>
-          <p className="mt-3 text-sm text-(--muted)">
+          <span className="kicker">Busca</span>
+          <h1 className="page-title mt-2">{buscaValida ? `Resultados para “${termo}”` : `Buscar ${professor ? "professor" : "disciplina"}`}</h1>
+          <p className="lead mt-3">
             {professor ? "Digite o nome, completo ou parcial — acentos e maiúsculas não importam." : "Digite o nome ou o código — ex.: algoritmos ou CIC0004."}
             {" "}A consulta é pública e abrange todas as unidades acadêmicas.
           </p>
@@ -66,7 +67,7 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
             value={termo}
             onChange={(evento) => window.history.replaceState(null, "", urlBusca({ ...contexto, termo: evento.target.value }))}
             placeholder={professor ? "Ex.: maria emilia" : "Ex.: fundamentos"}
-            className="min-w-0 rounded-xl border border-(--border) bg-(--raised) px-4 py-3 text-base"
+            className="field rounded-full! px-5!"
           />
         </label>
       </div>
@@ -83,7 +84,7 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
             value={ordem}
             aria-describedby="unidade-ajuda"
             onChange={(evento) => window.history.pushState(null, "", urlBusca({ ...contexto, ordem: ordemBusca(evento.target.value) }))}
-            className="w-full min-w-0 rounded-lg border border-(--border) bg-(--raised) px-3 py-3 text-sm"
+            className="field py-3! text-sm!"
           >
             <option value="nome">Nome do professor/da disciplina (A–Z)</option>
             <option value="unidade">Unidade acadêmica (A–Z)</option>
@@ -97,7 +98,7 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
           {!buscaValida && <p className="text-sm text-foreground/70">{termo.trim() ? "Continue digitando…" : "Digite ao menos 2 letras para começar."}</p>}
           {carregando && <p className="text-sm text-foreground/70">Buscando…</p>}
           {buscaValida && erro && (
-            <div className="flex flex-col items-start gap-3 rounded-2xl border border-(--border) bg-(--panel) p-6">
+            <div className="state-box p-6!">
               <p role="alert" className="text-sm">Não foi possível buscar {tipo} agora. Verifique sua conexão e tente novamente.</p>
               <button type="button" onClick={() => setTentativa((valor) => valor + 1)} className="button">Tentar novamente</button>
             </div>
