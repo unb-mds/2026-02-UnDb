@@ -9,6 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from app.core.database import Base
+from app.main import app
 from app.models.avaliacao import Avaliacao
 from app.models.disciplina import Disciplina
 from app.models.enums import Dificuldade, QualidadeMaterial
@@ -57,3 +58,19 @@ class DestaquesTest(unittest.TestCase):
             self.assertNotIn("didatica", dados[0].model_dump())
             self.assertNotIn("recomenda", dados[0].model_dump())
         engine.dispose()
+
+    def test_sem_avaliacoes_retorna_lista_vazia(self):
+        engine = create_engine("sqlite+pysqlite:///:memory:")
+        Base.metadata.create_all(engine)
+        with Session(engine) as db:
+            db.add(Disciplina(id=uuid4(), codigo="V0", nome="Sem avaliações", departamento="TEST"))
+            db.commit()
+            self.assertEqual(listar_destaques(db), [])
+        engine.dispose()
+
+    def test_rota_destaques_vem_antes_da_rota_por_id(self):
+        caminhos = [getattr(rota, "path", "") for rota in app.routes]
+        self.assertLess(
+            caminhos.index("/api/disciplinas/destaques"),
+            caminhos.index("/api/disciplinas/{disciplina_id}"),
+        )

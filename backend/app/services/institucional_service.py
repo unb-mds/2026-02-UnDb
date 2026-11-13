@@ -7,6 +7,7 @@ from app.models.professor import Professor
 from app.models.turma import Turma
 from app.repositories import disciplina_repository, professor_repository
 from app.repositories.reconciliacao_professor_repository import resolver_id
+from app.schemas.institucional import DisciplinaDestaqueResponse
 
 
 class RecursoInstitucionalNaoEncontradoError(Exception):
@@ -47,9 +48,7 @@ def listar_turmas_da_disciplina(db: Session, disciplina_id: UUID) -> list[Turma]
     return disciplina_repository.listar_turmas(db, disciplina_id)
 
 
-def listar_destaques(db: Session):
-    from app.schemas.institucional import DisciplinaDestaqueResponse
-
+def listar_destaques(db: Session) -> list[DisciplinaDestaqueResponse]:
     return [
         DisciplinaDestaqueResponse(
             id=d.id,
