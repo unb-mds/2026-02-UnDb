@@ -10,6 +10,7 @@ import { buscarDisciplinas } from "@/lib/services/disciplinas";
 import type { DisciplinaDetalhe, ProfessorDetalhe } from "@/lib/types/institucional";
 import ProfessorResultado from "@/app/professores/professor-resultado";
 import Caminho from "@/components/caminho";
+import MapaVento from "@/components/mapa-vento";
 import DisciplinaCatalogo from "./disciplina-catalogo";
 
 type Resultado = ProfessorDetalhe | DisciplinaDetalhe;
@@ -50,17 +51,18 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
   return (
     <main className="container flex flex-1 flex-col gap-8 py-8 sm:py-12">
       <Caminho itens={[{ nome: "Início", href: "/" }, { nome: professor ? "Professores" : "Disciplinas" }]} />
-      <div className="flex w-full flex-col gap-6">
-        <div>
-          <span className="kicker">Busca</span>
-          <h1 className="page-title mt-2">{buscaValida ? `Resultados para “${termo}”` : `Buscar ${professor ? "professor" : "disciplina"}`}</h1>
-          <p className="lead mt-3">
+      <div className="flex w-full flex-col items-center gap-2">
+        <div className="hero-intro search-hero-intro">
+          <MapaVento className="hero-wind" />
+          <span className="eyebrow">Busca</span>
+          <h1 className="hero-title hero-title-sm">{buscaValida ? `Resultados para “${termo}”` : `Buscar ${professor ? "professor" : "disciplina"}`}</h1>
+          <p className="hero-copy">
             {professor ? "Digite o nome, completo ou parcial — acentos e maiúsculas não importam." : "Digite o nome ou o código — ex.: algoritmos ou CIC0004."}
             {" "}A consulta é pública e abrange todas as unidades acadêmicas.
           </p>
         </div>
 
-        <label className="flex max-w-2xl flex-col gap-2">
+        <label className="flex w-full max-w-2xl flex-col gap-2 text-center">
           <span className="text-sm font-medium">{professor ? "Nome do professor" : "Nome ou código da disciplina"}</span>
           <input
             type="search"
