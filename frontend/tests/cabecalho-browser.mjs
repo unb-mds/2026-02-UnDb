@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { comNavegador } from "./browser-session.mjs";
 
 let autenticado = false;
+let moderador = false;
 let statusSessao = 200;
 let segurarProxima = false;
 let respostaRetida = null;
@@ -16,6 +17,7 @@ const fixture = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.setHeader("Content-Type", "application/json");
   if (req.method === "OPTIONS") { res.writeHead(204).end(); return; }
+  if (req.url.startsWith("/api/moderacao/comentarios")) { res.writeHead(autenticado && moderador ? 200 : 403).end(autenticado && moderador ? "[]" : "{}"); return; }
   if (req.url === "/api/auth/sessao") {
     const corpo = { autenticado };
     if (segurarProxima) {
@@ -151,6 +153,18 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
       }
     }
   }
+
+  const linkModeracao = () => avaliar("!!document.querySelector('footer a[href=\"/moderacao\"]')");
+  autenticado = true; moderador = false;
+  await evento("undb:sessao-alterada");
+  await conectado();
+  assert.equal(await linkModeracao(), false, "Estudante não vê moderação");
+  moderador = true;
+  await evento("undb:sessao-alterada");
+  await aguardar(linkModeracao, "Moderador vê o link após confirmação do servidor");
+  autenticado = false;
+  await evento("undb:sessao-alterada");
+  await aguardar(async () => !(await linkModeracao()), "Logout oculta moderação");
 
   autenticado = false;
   const destino = "/professores/11111111-1111-4111-8111-111111111111/disciplinas/22222222-2222-4222-8222-222222222222/avaliar?busca=professores&q=LINDOMAR&ordem=nome";

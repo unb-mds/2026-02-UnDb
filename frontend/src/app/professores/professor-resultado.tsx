@@ -41,7 +41,7 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
   return (
     <li className="tile min-w-0 rounded-2xl! p-5 break-words sm:p-6">
       <div className="flex items-start gap-4">
-        <span aria-hidden="true" className="avatar-initials">{iniciaisProfessor(professor.nome)}</span>
+        <span aria-hidden="true" className="avatar-initials rounded-xl!">{iniciaisProfessor(professor.nome)}</span>
         <div className="min-w-0">
           <h2 className="text-xl font-semibold">
             <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="hover:text-accent">

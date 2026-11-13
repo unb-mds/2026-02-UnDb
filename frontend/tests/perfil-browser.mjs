@@ -113,7 +113,7 @@ try {
   await cdp("Page.enable");
   await cdp("Runtime.enable");
   const contexto = "?busca=disciplinas&q=TEST&ordem=nome";
-  const ordem = () => avaliar("Array.from(document.querySelectorAll('#comparacao-cartoes > li')).map(r => r.querySelector('h3 a').pathname.split('/').at(-1))");
+  const ordem = () => avaliar("Array.from(document.querySelectorAll('#comparacao-cartoes > li')).map(r => r.dataset.professorId)");
   for (const width of [320, 390, 768, 1440]) {
     await cdp("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: width < 768 });
     await navegar(`/disciplinas/${disciplina.id}${contexto}`, "Comparação de professores");
@@ -130,9 +130,12 @@ try {
     await aguardar(async () => (await ordem())[0] === id(3), "Recomendação crescente via teclado");
     assert.deepEqual(await ordem(), [3, 1, 2, 4, 5].map(id));
     assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle !== 'none'"), true);
-    const href = await avaliar("document.querySelector('.pro-card-actions a').getAttribute('href')");
+    const href = await avaliar("document.querySelector('#consulta-selecionada a').getAttribute('href')");
     assert.ok(href.includes("busca=disciplinas") && href.includes("q=TEST"));
-    await navegar(href, "Os cinco critérios");
+    await avaliar("document.querySelector('#comparacao-cartoes > li:first-child > a').click()");
+    await aguardar(() => avaliar("document.querySelector('#consulta-nome').textContent === 'Álvaro'"), "Cartão seleciona professor");
+    assert.ok((await avaliar("document.querySelector('#consulta-selecionada a').href")).includes("busca=disciplinas"));
+    await navegar(`/professores/${id(1)}/disciplinas/${disciplina.id}${contexto}`, "Os cinco critérios");
     assert.equal(await avaliar("document.querySelectorAll('.bento dt').length"), 5);
     assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true, "Perfil responsivo");
     for (const n of [4, 5]) {

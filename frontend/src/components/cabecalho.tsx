@@ -65,7 +65,7 @@ function ContaComRetorno() {
   return <LinksConta retorno={retorno} sessao={sessao} />;
 }
 
-const LINKS = [["/professores", "Professores"], ["/disciplinas", "Disciplinas"], ["/departamentos", "Unidades acadêmicas"]] as const;
+const LINKS = [["/professores", "Professores"], ["/disciplinas", "Disciplinas"], ["/departamentos", "Unidades acadêmicas"], ["/sobre", "Sobre"]] as const;
 
 function NavegacaoPrincipal({ caminho }: { caminho: string }) {
   return <nav aria-label="Navegação principal" className="main-nav">
@@ -82,7 +82,7 @@ export default function Cabecalho() {
   return <header className="header"><div className="container header-inner">
     <Link href="/" aria-label="UnDb — início" className="brand"><Image src="/brand/undb-logo.png" alt="" width={600} height={201} className="brand-logo" loading="eager" /></Link>
     <div className="header-center">
-      {home || conta ? <NavegacaoPrincipal caminho={caminho} />
+      {home || conta || caminho === "/sobre" ? <NavegacaoPrincipal caminho={caminho} />
         : <Suspense fallback={<div className="search search-header" role="status">Carregando busca…</div>}><BuscaCabecalho /></Suspense>}
     </div>
     <Suspense fallback={<LinksConta />}><ContaComRetorno /></Suspense>

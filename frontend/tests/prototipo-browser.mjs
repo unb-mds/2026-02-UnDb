@@ -249,8 +249,9 @@ export async function verificarPrototipo({ cdp, avaliar, aguardar, aguardarTexto
             await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
             await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
             assert.equal(await avaliar("document.activeElement.name"), "dificuldade");
-            assert.match(await avaliar("getComputedStyle(document.activeElement).boxShadow"), /2px/);
-            assert.equal(await avaliar("getComputedStyle(document.activeElement).getPropertyValue('--tw-ring-color').trim() === getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()"), true);
+            assert.equal(await avaliar("getComputedStyle(document.activeElement.nextElementSibling).outlineStyle"), "solid");
+            assert.ok(await avaliar("parseFloat(getComputedStyle(document.activeElement.nextElementSibling).outlineWidth) >= 2"));
+            assert.equal(await avaliar("(() => { const probe = document.createElement('span'); probe.style.color = 'var(--focus)'; document.body.append(probe); const cor = getComputedStyle(probe).color; probe.remove(); return getComputedStyle(document.activeElement.nextElementSibling).outlineColor === cor; })()"), true);
           }
         }
         if (tema === "dark" && largura === 320) {

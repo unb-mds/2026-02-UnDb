@@ -154,9 +154,9 @@ try {
     } },
     { nome: "detalhe-professor", abrir: () => navegar(`/professores/${p0}`, d1.nome) },
     { nome: "comparacao", abrir: () => navegar(`/disciplinas/${d0.id}`, "Comparação de professores"), verificar: async () => {
-      assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('#comparacao-cartoes h3 a')).map(a => a.pathname.split('/').at(-1))"), [p0, p1, p2, p3, p4, p5]);
+      assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('#comparacao-cartoes > li')).map(a => a.dataset.professorId)"), [p0, p1, p2, p3, p4, p5]);
       for (const id of [p4, p5]) {
-        const card = await avaliar(`document.querySelector('#comparacao-cartoes h3 a[href="/professores/${id}"]').closest('li').innerText`);
+        const card = await avaliar(`document.querySelector('#comparacao-cartoes li[data-professor-id="${id}"]').innerText`);
         assert.doesNotMatch(card, /%|Didática|Dificuldade|Faz chamada/);
       }
       assert.ok((await texto()).includes("Conflitante"));

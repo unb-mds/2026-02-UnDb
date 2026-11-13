@@ -179,7 +179,11 @@ try {
     await tab.avaliar(`const s=document.querySelector('main select'); s.value=${JSON.stringify(contexto.ordem)}; s.dispatchEvent(new Event('change',{bubbles:true}))`);
     await aguardar(async () => await tab.avaliar(`location.pathname + location.search === ${JSON.stringify(lista)}`), "lista com contexto da entrada");
     await matriz(tab, `busca-${contexto.busca}`);
-    if (i === 1) await clicar(tab, `main a[href^="/disciplinas/${fixture.disciplinaId}?"]`, "Comparação de professores");
+    if (i === 1) {
+      await clicar(tab, `main a[href^="/disciplinas/${fixture.disciplinaId}?"]`, "Comparação de professores");
+      await clicar(tab, `#comparacao-cartoes li[data-professor-id="${fixture.professores[i]}"] > a`, "Ver perfil completo");
+      await aguardar(() => tab.avaliar(`!!document.querySelector('#consulta-selecionada a[href="${destinos[i]}"]')`), "avaliação acompanha professor selecionado");
+    }
     await clicar(tab, `main a[href="${destinos[i]}"]`, "Avaliar professor na disciplina");
     // O mesmo contexto acompanha o atalho direto da #157 e a entrada de conta.
     await aguardar(() => tab.avaliar("document.querySelector('header nav[aria-label=\"Conta\"] a')?.textContent === 'Entrar ou criar conta' && !document.querySelector('header nav[aria-label=\"Conta\"] [role=status]')"), "conta visitante validada");

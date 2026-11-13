@@ -28,7 +28,7 @@ export default async function AvaliarPage({ params, searchParams }: {
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
       <FundoLiquido />
-      <div className="container flex max-w-[928px]! min-w-0 flex-col gap-6 py-8 sm:py-12">
+      <div className="container flex min-w-0 flex-col gap-6 py-8 sm:py-12">
         <Caminho itens={[{ nome: "Início", href: "/" }, ...(contexto ? [{ nome: "Resultados", href: urlBusca(contexto), retornoBusca: true }] : []), { nome: "Consulta", href: consultaHref }, { nome: "Avaliar" }]} />
         <div className="-mt-2 flex flex-wrap gap-x-6">
           {contexto && <Link href={urlBusca(contexto)} className="back-link"><Icone nome="arrow-left" pequeno /> Voltar aos resultados da busca</Link>}

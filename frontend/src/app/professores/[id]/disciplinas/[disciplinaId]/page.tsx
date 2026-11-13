@@ -48,7 +48,7 @@ export default async function AvaliacaoAgregadaPage({
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
       <FundoLiquido />
-      <div className="container flex max-w-[1088px]! flex-col gap-8 py-8 sm:py-12">
+      <div className="container flex flex-col gap-8 py-8 sm:py-12">
         <Caminho
           itens={[
             { nome: "Início", href: "/" },
@@ -79,31 +79,11 @@ export default async function AvaliacaoAgregadaPage({
           </Link>
         </div>
 
-        <header className="flex min-w-0 items-center gap-5">
-          <span className="avatar-initials large" aria-hidden="true">{iniciaisProfessor(avaliacao.professor.nome)}</span>
-          <div className="min-w-0">
-            <span className="kicker">Professor</span>
-            <h1 className="page-title mt-1 break-words">{avaliacao.professor.nome}</h1>
-            <p className="lead mt-2">{nomeUnidade(avaliacao.professor)}</p>
-          </div>
+        <header className="grid items-center gap-6 rounded-2xl border border-(--border) bg-(--panel) p-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:p-7 lg:grid-cols-[auto_minmax(0,1fr)_240px]">
+          <span aria-hidden="true" className="grid h-28 w-24 place-items-center rounded-2xl bg-linear-to-br from-(--accent-soft) via-(--brand-blue) to-(--brand-green) text-3xl font-semibold sm:h-44 sm:w-36 sm:text-5xl">{iniciaisProfessor(avaliacao.professor.nome)}</span>
+          <div className="flex min-w-0 flex-col items-start gap-3"><div className="flex flex-wrap gap-2"><span className="code-chip">{avaliacao.disciplina.codigo}</span><span className="badge">{nomeUnidade(avaliacao.professor)}</span></div><h1 className="page-title break-words">{avaliacao.professor.nome}</h1><h2 className="text-xl text-(--ink-soft)">{avaliacao.disciplina.nome}</h2><p className="text-sm text-(--muted)">Unidade acadêmica: {nomeUnidade(avaliacao.disciplina)}</p><div className="flex flex-wrap gap-2"><span className="badge">{total} avaliações</span><span className="badge">{avaliacao.dadosSuficientes ? "Dados suficientes (mín. 3)" : "Dados insuficientes (mín. 3)"}</span></div></div>
+          <div className="flex flex-col gap-3 sm:col-span-2 lg:col-span-1"><Link className="button primary" href={avaliacaoHref}>Avaliar este professor na disciplina <Icone nome="arrow-right" pequeno /></Link><Link className="button" href={comContextoBusca(`/disciplinas/${disciplinaId}`, contexto)}>Comparar professores desta disciplina</Link><Link className="button text-accent!" href={comContextoBusca(`/professores/${id}`, contexto)}><Icone nome="user" pequeno />Ver perfil completo</Link><p className="text-xs text-(--muted)">Avaliar exige e-mail institucional confirmado.</p></div>
         </header>
-
-        <section aria-label="Disciplina consultada" className="glass flex flex-col items-start justify-between gap-5 rounded-2xl! p-5 sm:flex-row sm:items-center sm:px-6">
-          <div className="flex min-w-0 flex-col items-start gap-2 break-words">
-            <span className="code-chip"><span className="sr-only">Código da disciplina: </span>{avaliacao.disciplina.codigo}</span>
-            <h2 className="text-xl font-medium">{avaliacao.disciplina.nome}</h2>
-            <p className="text-sm text-(--ink-soft)">Unidade acadêmica: {nomeUnidade(avaliacao.disciplina)}</p>
-          </div>
-          <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto">
-            <Link className="button primary" href={avaliacaoHref}>
-              Avaliar este professor na disciplina <Icone nome="arrow-right" pequeno />
-            </Link>
-            <Link className="button" href={comContextoBusca(`/disciplinas/${disciplinaId}`, contexto)}>
-              Comparar professores desta disciplina
-            </Link>
-            <p className="text-xs text-(--muted)">Avaliar exige e-mail institucional confirmado.</p>
-          </div>
-        </section>
 
         {!avaliacao.dadosSuficientes ? (
           <section aria-labelledby="dados-titulo" className="glass flex flex-col items-start gap-3 p-6 sm:p-10">
@@ -161,6 +141,17 @@ export default async function AvaliacaoAgregadaPage({
           </section>
         )}
 
+        {comentarios === null ? (
+          <section aria-label="Comentários" className="border-t border-(--border) pt-6">
+            <h2 className="text-lg font-semibold">Comentários</h2>
+            <p role="alert" className="mt-3 text-sm text-(--ink-soft)">
+              Não foi possível carregar os comentários. Recarregue a página para tentar novamente.
+            </p>
+          </section>
+        ) : (
+          <SecaoComentarios comentarios={comentarios} />
+        )}
+
         <div className="two-columns profile-explanation">
           <section className="glass related rounded-2xl!">
             <h2>Outros professores desta disciplina</h2>
@@ -207,16 +198,7 @@ export default async function AvaliacaoAgregadaPage({
           </aside>
         </div>
 
-        {comentarios === null ? (
-          <section aria-label="Comentários" className="border-t border-(--border) pt-6">
-            <h2 className="text-lg font-semibold">Comentários</h2>
-            <p role="alert" className="mt-3 text-sm text-(--ink-soft)">
-              Não foi possível carregar os comentários. Recarregue a página para tentar novamente.
-            </p>
-          </section>
-        ) : (
-          <SecaoComentarios comentarios={comentarios} />
-        )}
+
       </div>
     </main>
   );

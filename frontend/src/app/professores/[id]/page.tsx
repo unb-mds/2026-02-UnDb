@@ -29,7 +29,7 @@ export default async function DetalheProfessorPage({
   const disciplinas = await listarDisciplinasDoProfessor(id);
 
   return (
-    <main className="container flex max-w-[928px]! flex-1 flex-col gap-6 py-8 sm:py-12">
+    <main className="container flex flex-1 flex-col gap-6 py-8 sm:py-12">
       <Caminho
         itens={[
           { nome: "Início", href: "/" },
@@ -49,7 +49,7 @@ export default async function DetalheProfessorPage({
       </Link>
 
       <div className="flex min-w-0 items-center gap-5 break-words">
-        <span className="avatar-initials large" aria-hidden="true">{iniciaisProfessor(professor.nome)}</span>
+        <span className="avatar-initials large rounded-2xl! h-28! w-24!" aria-hidden="true">{iniciaisProfessor(professor.nome)}</span>
         <div className="min-w-0">
         <span className="kicker">Professor</span>
         <h1 className="page-title mt-1">{professor.nome}</h1>

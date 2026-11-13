@@ -328,6 +328,8 @@ export function criarCenarioBusca(professor, disciplina) {
       await aguardarTexto("Comparação de professores");
       await contexto("disciplinas", "Teste", "unidade");
       await clicar("Professor de teste");
+      await aguardarTexto("Ver perfil completo");
+      await clicar("Ver perfil completo");
       await aguardarTexto("Disciplinas lecionadas");
       await clicar("Voltar aos resultados");
       await aguardarTexto("3 resultado(s)");

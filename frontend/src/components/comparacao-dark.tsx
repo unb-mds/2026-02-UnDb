@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import ConsultaSelecionada from "./consulta-selecionada";
 import { useEffect, useRef, useState } from "react";
 import { iniciaisProfessor } from "@/lib/iniciais";
 import { nomeUnidade } from "@/lib/unidade";
@@ -33,6 +34,8 @@ export default function ComparacaoDark({
   contexto: ContextoBusca | null;
   turmas?: TurmaInstitucional[];
 }) {
+  const [selecionadoId, setSelecionadoId] = useState<string | null>(null);
+  const selecionado = professores.find(p => p.professorId === selecionadoId) ?? professores[0];
   const [ascendente, setAscendente] = useState(false);
   const trilho = useRef<HTMLUListElement>(null);
   const [limites, setLimites] = useState({ inicio: true, fim: true });
@@ -97,6 +100,7 @@ export default function ComparacaoDark({
             com oferta registrada para esta matéria. Cada cartão mostra sua própria base de respostas.
           </p>
         </div>
+        {selecionado && <div className="flex flex-col items-start gap-2"><Link href={comContextoBusca(`/professores/${selecionado.professorId}/disciplinas/${disciplinaId}/avaliar`, contexto)} className="button primary">Avaliar este professor <Icone nome="arrow-right" pequeno /></Link><p className="text-xs text-(--muted)">{selecionado.professor.nome}</p></div>}
         {professores.some((p) => p.dadosSuficientes) && (
           <button
             type="button"
@@ -123,13 +127,13 @@ export default function ComparacaoDark({
             tabIndex={0}
           >
             {ordenados.map((a, i) => (
-              <li key={a.professorId} aria-label={`${i + 1} de ${ordenados.length}: ${a.professor.nome}`}>
-                <article className="pro-card">
+              <li data-professor-id={a.professorId} key={a.professorId} aria-label={`${i + 1} de ${ordenados.length}: ${a.professor.nome}`}>
+                <Link href="#consulta-selecionada" onClick={() => setSelecionadoId(a.professorId)} aria-current={selecionado?.professorId === a.professorId ? "true" : undefined} className={`pro-card transition-colors hover:border-accent ${selecionado?.professorId === a.professorId ? "border-accent!" : ""}`}>
                   <header className="pro-card-head">
                     <span className="avatar-initials" aria-hidden="true">{iniciaisProfessor(a.professor.nome)}</span>
                     <div className="min-w-0">
                       <h3 className="break-words">
-                        <Link href={comContextoBusca(`/professores/${a.professorId}`, contexto)}>{a.professor.nome}</Link>
+                        {a.professor.nome}
                       </h3>
                       <small className="label-mono text-[11px]!">{textoAvaliacoes(a.totalAvaliacoes)}</small>
                     </div>
@@ -189,26 +193,8 @@ export default function ComparacaoDark({
                       </span>
                     </div>
                   )}
-                  <div className="pro-card-actions">
-                    <Link
-                      className="button"
-                      href={comContextoBusca(`/professores/${a.professorId}/disciplinas/${disciplinaId}`, contexto)}
-                    >
-                      Consultar critérios <Icone nome="arrow-right" pequeno />
-                    </Link>
-                    <div className="pro-card-links">
-                      <Link className="link" href={comContextoBusca(`/professores/${a.professorId}`, contexto)}>
-                        Ver disciplinas
-                      </Link>
-                      <Link
-                        className="link"
-                        href={comContextoBusca(`/professores/${a.professorId}/disciplinas/${disciplinaId}/avaliar`, contexto)}
-                      >
-                        Avaliar nesta disciplina
-                      </Link>
-                    </div>
-                  </div>
-                </article>
+                  <span className="pro-card-actions text-sm text-accent">{selecionado?.professorId === a.professorId ? "✓ Selecionado" : "Selecionar professor →"}</span>
+                </Link>
               </li>
             ))}
           </ul>
@@ -225,6 +211,7 @@ export default function ComparacaoDark({
         </>
       )}
 
+      {selecionado && <ConsultaSelecionada key={`${selecionado.professorId}-${disciplinaId}`} avaliacao={selecionado} contexto={contexto} />}
       <div className="note mt-8">
         <Icone nome="info" />
         <p>
