@@ -1,0 +1,136 @@
+# Desenvolvimento local
+
+Guia operacional para uma instalação própria. Não execute comandos de importação,
+recriação de serviços ou migração sobre um ambiente compartilhado sem coordenar a operação.
+
+## Como rodar o projeto localmente
+
+### Ambiente completo com Docker Compose
+
+**Pré-requisito:** Docker Engine com o plugin Docker Compose disponível.
+
+O arquivo `backend/.env` deve definir `SECRET_KEY`, `DEBUG`, as credenciais locais do
+PostgreSQL (`POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_DB`) e a `DATABASE_URL` com
+o host `db`. O `.env` real nunca deve ser versionado.
+
+```bash
+# clonar o repositório
+git clone https://github.com/unb-mds/2026-02-UnDb.git
+cd 2026-02-UnDb
+
+# configurar variáveis de ambiente
+cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backend\.env
+# edite backend/.env e troque os valores de exemplo, principalmente as senhas
+
+# construir as imagens, iniciar PostgreSQL, API e frontend, e aplicar as migrações
+# usando as variáveis configuradas em backend/.env
+docker compose --env-file backend/.env up --build
+```
+
+A API sobe em `http://127.0.0.1:8000`, o health check em
+`http://127.0.0.1:8000/health` e a documentação interativa em
+`http://127.0.0.1:8000/docs`. O frontend fica em `http://localhost:3000`.
+Para encerrar os serviços, use `docker compose --env-file backend/.env down`.
+O volume `postgres_data` preserva os dados do banco entre recriações dos containers.
+
+O serviço `descarte-moderacao` acompanha a API e remove dados de moderação vencidos.
+Ao subir somente parte do Compose, inclua `backend db descarte-moderacao` para manter
+o descarte ativo. Sem Docker, execute `python -m app.commands.descartar_moderacao --continuo`
+no mesmo ambiente da API. O prazo aprovado é de sete dias; o worker verifica a cada
+60 segundos e consultas privadas/autor também limpam registros vencidos antes de responder.
+
+Por determinação do PO, o operador pode conceder ou revogar o papel de moderador
+de uma conta confirmada de membro da equipe:
+
+```bash
+docker compose --env-file backend/.env exec backend \
+  python -m app.commands.moderador membro@aluno.unb.br conceder
+# para retirar a permissão, use revogar no lugar de conceder
+```
+
+Não existe concessão pública de papel. Consulte o
+[contrato e as verificações das APIs de denúncia/moderação](estudos/alinhamento-denuncias-issues-160-161.md).
+
+O frontend executa o servidor Next.js com build otimizado, sem recarga automática no
+container. Depois de alterar seu código, execute novamente o comando com `--build`.
+O build precisa de acesso à internet para instalar dependências e baixar as fontes Geist
+usadas por `next/font/google`. Não precisa de dados do backend durante a compilação.
+
+O navegador acessa a API por `NEXT_PUBLIC_API_URL` (padrão `http://localhost:8000`),
+enquanto o servidor Next.js usa `API_INTERNAL_URL=http://backend:8000` na rede do Compose.
+Nunca use `http://backend:8000` como URL pública: esse nome só existe entre containers.
+Para personalizar a URL pública, adicione `NEXT_PUBLIC_API_URL` ao `backend/.env` passado
+ao Compose e reconstrua o frontend. Ajuste também `CORS_ORIGINS` com a origem do frontend
+aberta no navegador. `frontend/.env.local` é usado apenas na execução fora do Docker;
+nenhum `.env` entra na imagem do frontend.
+
+Por padrão, `EMAIL_BACKEND=console`: após um cadastro válido, o link de confirmação aparece
+nos logs do backend e pode ser aberto no navegador, sem domínio ou serviço externo. Para
+acompanhar o link:
+
+```bash
+docker compose --env-file backend/.env logs -f backend
+```
+
+O modo local não envia e-mail externo. Para envio real, com domínio remetente
+verificado, configure `EMAIL_BACKEND=resend`, `RESEND_API_KEY` e `EMAIL_FROM` no ambiente.
+Nunca versione a chave.
+
+Para verificar a composição e acompanhar a inicialização:
+
+```bash
+docker compose --env-file backend/.env config --quiet
+docker compose --env-file backend/.env ps
+docker compose --env-file backend/.env logs backend frontend
+```
+
+O health check do frontend verifica seu servidor HTTP. Aguarde também a conclusão das
+migrações e a API ficar disponível antes de consultar dados; a ordem de início dos
+containers não garante prontidão da API. A configuração atende ao ambiente local e não
+define hospedagem pública, TLS ou operação em produção.
+
+A decisão de persistência e as restrições do modelo estão registradas em
+[`sprints/sprint02/banco-de-dados.md`](https://github.com/unb-mds/2026-02-UnDb/blob/release/1.4.0/sprints/sprint02/banco-de-dados.md).
+
+Para carregar as turmas de graduação de todas as unidades para uma demonstração com dados reais, mantenha o Compose ativo e execute:
+
+```bash
+docker compose --env-file backend/.env exec backend \
+  python -m app.commands.importar_sigaa_agendado \
+  --todas-unidades --ano 2026 --periodo 2
+```
+
+Ajuste ano e período para o semestre consultado. O comando retorna sucesso somente
+quando todas as unidades são processadas; o resultado fica registrado no banco.
+As instruções de consulta do registro estão em
+[`docs/operacao-importacao-sigaa.md`](operacao-importacao-sigaa.md).
+
+O procedimento para coletar e persistir dados institucionais do SIGAA, incluindo o contrato
+de resultado consumível pela rotina de atualização, está em
+[`docs/importacao-sigaa.md`](importacao-sigaa.md).
+
+### Frontend com recarga automática, fora do Docker
+
+**Pré-requisitos:** Node.js 20.9 ou superior com npm (a imagem usa Node.js 24) e o backend
+acessível. Para usar apenas backend e banco no Compose, sem ocupar a porta 3000:
+
+```bash
+docker compose --env-file backend/.env up --build backend db
+```
+
+```bash
+cd frontend
+npm ci
+cp .env.example .env.local  # Windows: copy .env.example .env.local
+npm run dev
+```
+
+A aplicação sobe em `http://localhost:3000` e consome por padrão a API em
+`http://localhost:8000`. Ajuste `NEXT_PUBLIC_API_URL` em `.env.local` quando o backend estiver
+publicado em outro endereço. Os comandos disponíveis para lint, build de produção e execução
+do build estão documentados em [`frontend/README.md`](https://github.com/unb-mds/2026-02-UnDb/blob/release/1.4.0/frontend/README.md).
+
+A estratégia implementada para revisão na [Issue #36](https://github.com/unb-mds/2026-02-UnDb/issues/36) usa servidor
+Next.js, sem exportação estática. A justificativa, as alternativas e as consequências
+estão no [ADR 08](arquitetura.md).
+

@@ -43,31 +43,35 @@ SIGAA.
 
 </div>
 
-## Escopo das entregas
+## Plataforma e versão atual
 
-| Release | Data planejada | Foco |
-|---|---|---|
-| **Release 1** | 28/09/2026 | Consulta, comparação, avaliação estruturada e dados do SIGAA |
-| **Release 2** | 25/11/2026 | Comentários, denúncia e moderação |
+Use o [UnDb](https://undb.app.br) para buscar professores e disciplinas, consultar
+os cinco critérios e contribuir com sua experiência. A [página Sobre](https://undb.app.br/sobre)
+apresenta a equipe e suas redes.
 
-A [Release 1.0.0](releases/1.0.0.md) usa importação manual dos dados do SIGAA.
-A atualização periódica está prevista para a Release 2.
+A [1.4.0](releases/1.4.0.md) reúne a revisão visual integrada pela PR #230,
+com destaques por quantidade de avaliações, comparação por cartões e perfis completos.
+As notas distinguem a candidata da publicação final no GitHub. O histórico anterior
+inclui [1.3.0](releases/1.3.0.md) e [1.3.1](releases/1.3.1.md).
 
-A [v1.1.0](releases/1.1.0.md) foi publicada em 09/11/2026 e a aplicação está em
-[undb.app.br](https://undb.app.br). Consulte o [guia de hospedagem](hospedagem.md),
-o [resultado da carga manual no Neon](estudos/importacao-neon-2026-11-10.md) e a
-[reconciliação da R2](releases/2.0.0-reconciliacao.md) para distinguir essa versão
-das entregas posteriores de `develop` e dos aceites pendentes.
+## Desenvolver, validar e operar
+
+| Objetivo | Guia |
+|---|---|
+| Instalar e configurar | [Desenvolvimento local](desenvolvimento.md) |
+| Executar verificações | [Qualidade](qualidade.md) |
+| Publicar e acompanhar serviços | [Hospedagem](hospedagem.md) |
+| Atualizar dados institucionais | [Operação do SIGAA](operacao-importacao-sigaa.md) |
+| Revisar identidades docentes | [Identidades](identidades-docentes.md) |
+
+## Planejamento e evidências
+
+O planejamento original separa consulta e avaliação estruturada (R1) de comentários,
+denúncia e moderação (R2). As versões intermediárias do código não substituem os
+aceites desses marcos. Consulte a [visão](visao.md) e a
+[reconciliação da R2](releases/2.0.0-reconciliacao.md) para pendências e evidências.
 
 !!! info "Fonte de verdade"
 
-    [`docs/requisitos.md`](requisitos.md) é a fonte de verdade dos requisitos. Esta página
-    apenas organiza o acesso aos artefatos existentes e não redefine o escopo do produto.
-
-
-### Próxima promoção intermediária
-
-A [candidata 1.3.0](releases/1.3.0.md) reúne a reconciliação e associação institucional
-de professores, fila de identidades e cabeçalho conforme a sessão, após a
-[v1.2.0 publicada](releases/1.2.0.md). A conclusão da Release 2 acadêmica e a
-reconciliação dos dados públicos permanecem separadas desta promoção de código.
+    [Requisitos](requisitos.md) mantém as regras do produto. Esta página organiza
+    o acesso à documentação; estudos preservam a data e o contexto das verificações.
