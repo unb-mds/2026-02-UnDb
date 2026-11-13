@@ -6,7 +6,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { retornoAvaliacaoSeguro } from "@/lib/retorno-avaliacao";
 import { consultarSessao, EVENTO_SESSAO_ALTERADA } from "@/lib/services/auth";
-import BuscaCabecalho from "./busca-cabecalho";
 import Icone from "./icone";
 
 type EstadoSessao = "carregando" | "autenticado" | "visitante" | "erro";
@@ -17,7 +16,7 @@ function LinksConta({ retorno, sessao = "carregando" }: { retorno?: string | nul
     {sessao === "autenticado" ? (
       <Link href="/login" className="button ghost"><Icone nome="user" pequeno />Minha conta</Link>
     ) : <>
-      <Link href={`/login${query}`} className="button ghost">Entrar ou criar conta</Link>
+      <Link href={`/login${query}`} className="button ghost">Entrar</Link>
       {sessao !== "visitante" && <span className="sr-only" role="status">{sessao === "carregando" ? "Verificando sessão…" : "Não foi possível verificar a sessão. Acesse a conta para tentar novamente."}</span>}
     </>}
   </nav>;
@@ -76,14 +75,17 @@ function NavegacaoPrincipal({ caminho }: { caminho: string }) {
 
 export default function Cabecalho() {
   const caminho = usePathname();
+  // O menu do celular guarda a página em que foi aberto: ao navegar, deixa de valer e fecha sozinho.
+  const [abertoEm, setAbertoEm] = useState<string | null>(null);
+  const aberto = abertoEm === caminho;
   if (caminho === "/prototipo" || caminho.startsWith("/prototipo/")) return null;
-  const home = caminho === "/";
-  const conta = ["/login", "/cadastro", "/confirmar-email"].includes(caminho);
-  return <header className="header"><div className="container header-inner">
+  return <header className="header" data-aberto={aberto ? "true" : undefined}><div className="container header-inner">
     <Link href="/" aria-label="UnDb — início" className="brand"><Image src="/brand/undb-logo.png" alt="" width={600} height={201} className="brand-logo" loading="eager" /></Link>
-    <div className="header-center">
-      {home || conta || caminho === "/sobre" ? <NavegacaoPrincipal caminho={caminho} />
-        : <Suspense fallback={<div className="search search-header" role="status">Carregando busca…</div>}><BuscaCabecalho /></Suspense>}
+    <button type="button" className="menu-toggle" aria-expanded={aberto} aria-controls="menu-principal" aria-label={aberto ? "Fechar menu" : "Abrir menu"} onClick={() => setAbertoEm(aberto ? null : caminho)}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">{aberto ? <><path d="m6 6 12 12" /><path d="m18 6-12 12" /></> : <><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></>}</svg>
+    </button>
+    <div className="header-center" id="menu-principal">
+      <NavegacaoPrincipal caminho={caminho} />
     </div>
     <Suspense fallback={<LinksConta />}><ContaComRetorno /></Suspense>
   </div></header>;

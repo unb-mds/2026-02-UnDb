@@ -186,7 +186,7 @@ try {
     }
     await clicar(tab, `main a[href="${destinos[i]}"]`, "Avaliar professor na disciplina");
     // O mesmo contexto acompanha o atalho direto da #157 e a entrada de conta.
-    await aguardar(() => tab.avaliar("document.querySelector('header nav[aria-label=\"Conta\"] a')?.textContent === 'Entrar ou criar conta' && !document.querySelector('header nav[aria-label=\"Conta\"] [role=status]')"), "conta visitante validada");
+    await aguardar(() => tab.avaliar("document.querySelector('header nav[aria-label=\"Conta\"] a')?.textContent === 'Entrar' && !document.querySelector('header nav[aria-label=\"Conta\"] [role=status]')"), "conta visitante validada");
     assert.equal(await tab.avaliar("new URL(document.querySelector('header nav[aria-label=\"Conta\"] a').href).searchParams.get('returnTo')"), destinos[i]);
     await clicar(tab, 'main a[href*="?q="]', "resultado(s)");
     assert.equal(await tab.avaliar("location.pathname + location.search"), lista);

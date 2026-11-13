@@ -52,7 +52,7 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
   const navegar = rota => cdp("Page.navigate", { url: `http://localhost:3100${rota}` });
   const evento = nome => avaliar(`window.dispatchEvent(new Event(${JSON.stringify(nome)}))`);
   const visitante = async () => {
-    await esperar("Entrar ou criar conta");
+    await esperar("Entrar");
     assert.equal(await avaliar(`document.querySelectorAll('${conta} a').length`), 1);
     assert.doesNotMatch(await texto(), /Minha conta/);
   };

@@ -174,7 +174,7 @@ export function criarCenarioBusca(professor, disciplina) {
             assert.equal(consultas, antes);
             await preencher("Teste");
             await aguardarTexto("3 resultado(s)");
-            await aguardar(() => avaliar("document.querySelector('header nav[aria-label=\"Conta\"] a')?.textContent === 'Entrar ou criar conta' && !document.querySelector('header nav[aria-label=\"Conta\"] [role=status]')"), "conta visitante validada");
+            await aguardar(() => avaliar("document.querySelector('header nav[aria-label=\"Conta\"] a')?.textContent === 'Entrar' && !document.querySelector('header nav[aria-label=\"Conta\"] [role=status]')"), "conta visitante validada");
             assert.equal(await avaliar("document.querySelectorAll('header nav[aria-label=\"Conta\"] a').length"), 1);
             await avaliar("document.querySelector('main input[type=search]').focus()");
             await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
