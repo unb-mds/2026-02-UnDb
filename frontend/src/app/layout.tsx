@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import TransicaoPagina from "@/components/transicao-pagina";
 import Rodape from "@/components/rodape";
 import Cabecalho from "@/components/cabecalho";
 import AvisoAgradecimento from "@/components/aviso-agradecimento";
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#conteudo" className="skip-link">Pular para o conteúdo</a>
         <Cabecalho />
         <AvisoAgradecimento />
-        <div id="conteudo" tabIndex={-1} className="app-content">{children}</div>
+        <TransicaoPagina>{children}</TransicaoPagina>
         <Rodape />
       </body>
     </html>

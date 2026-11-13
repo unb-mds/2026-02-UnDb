@@ -38,8 +38,6 @@ export default function CriteriosAvaliacao({ disabled = false, onChange, rotulos
   onChange?: () => void;
   rotulosExplicitos?: boolean;
   ocultarDidatica?: boolean;
-  /** Mantido por compatibilidade: a didática já abre a seção em destaque. */
-  destacarDidatica?: boolean;
 }) {
   const [didatica, setDidatica] = useState("");
   const criterioDidatica = criteriosAvaliacao[0];

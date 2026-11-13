@@ -173,3 +173,105 @@ def aplicar(db: Session, origem_id: UUID, destino_id: UUID, evidencia: str) -> d
         )
         db.flush()
     return plano | {"estado": "aplicada"}
+
+
+def validar_grupo_em_lote(db, origem_ids, destino_id, evidencia):
+    """Mesmas barreiras de integridade, consultas por conjunto em vez de por origem."""
+    from app.models.identidade_docente import IdentidadeDocente
+
+    evidencia = evidencia.strip()
+    origens = set(origem_ids)
+    if not evidencia or len(evidencia) > 500 or not origens or destino_id in origens:
+        raise ReconciliacaoRecusada("Origens distintas do destino e evidência são obrigatórias.")
+    todos = origens | {destino_id}
+    docentes = {p.id: p for p in db.scalars(select(Professor).where(Professor.id.in_(todos)))}
+    if set(docentes) != todos:
+        raise ReconciliacaoRecusada("Professor não encontrado.")
+    correspondencias = list(
+        db.scalars(
+            select(ProfessorCorrespondencia).where(
+                ProfessorCorrespondencia.origem_id.in_(todos)
+                | ProfessorCorrespondencia.destino_id.in_(origens)
+            )
+        )
+    )
+    if any(c.origem_id in todos for c in correspondencias):
+        raise ReconciliacaoRecusada(
+            "Cadeias, ciclos ou correspondências prévias: escolher o destino final."
+        )
+    if any(
+        p.siape or p.identidade_confirmada or not p.identidade_origem
+        for id, p in docentes.items()
+        if id in origens
+    ):
+        raise ReconciliacaoRecusada("A origem deve ser provisória sem SIAPE.")
+    institucionais = list(
+        db.scalars(select(IdentidadeDocente).where(IdentidadeDocente.professor_id.in_(todos)))
+    )
+    if len(institucionais) > 1 or any(i.professor_id in origens for i in institucionais):
+        raise ReconciliacaoRecusada("Preservar a identidade institucional no destino.")
+    colisao = db.execute(
+        select(Avaliacao.usuario_id, Avaliacao.disciplina_id)
+        .where(Avaliacao.professor_id.in_(todos))
+        .group_by(Avaliacao.usuario_id, Avaliacao.disciplina_id)
+        .having(func.count() > 1)
+        .limit(1)
+    ).first()
+    if colisao:
+        raise ReconciliacaoRecusada("Colisão de avaliações: nada foi unido ou descartado.")
+
+
+def aplicar_grupo_em_lote(db, origem_ids, destino_id, evidencia):
+    """Executa o plano validado sob lock; caller mantém savepoint por grupo."""
+    from app.models.identidade_docente import IdentidadeLocal
+
+    _bloquear_escritas(db)
+    validar_grupo_em_lote(db, origem_ids, destino_id, evidencia)
+    origens = set(origem_ids)
+    evidencia = evidencia.strip()
+    # INSERT SELECT evita consultas e INSERTs individuais por vínculo de turma.
+    origem_turmas = (
+        select(turmas_professores.c.turma_id)
+        .where(turmas_professores.c.professor_id.in_(origens))
+        .distinct()
+    )
+    destino_turmas = select(turmas_professores.c.turma_id).where(
+        turmas_professores.c.professor_id == destino_id
+    )
+    from sqlalchemy import literal
+
+    origem_turmas = origem_turmas.subquery()
+    db.execute(
+        insert(turmas_professores).from_select(
+            ["turma_id", "professor_id"],
+            select(origem_turmas.c.turma_id, literal(destino_id, type_=Professor.id.type)).where(
+                ~origem_turmas.c.turma_id.in_(destino_turmas)
+            ),
+        )
+    )
+    db.execute(delete(turmas_professores).where(turmas_professores.c.professor_id.in_(origens)))
+    db.execute(
+        update(Avaliacao)
+        .where(Avaliacao.professor_id.in_(origens))
+        .values(professor_id=destino_id, updated_at=Avaliacao.updated_at)
+    )
+    db.execute(
+        update(IdentidadeLocal)
+        .where(IdentidadeLocal.professor_id.in_(origens))
+        .values(professor_id=destino_id)
+    )
+    # Se um cadastro local já consolidado recebe perfil de outro UUID, achatar os
+    # aliases anteriores preserva todos os links antigos sem criar cadeias.
+    db.execute(
+        update(ProfessorCorrespondencia)
+        .where(ProfessorCorrespondencia.destino_id.in_(origens))
+        .values(destino_id=destino_id)
+    )
+    db.execute(
+        insert(ProfessorCorrespondencia),
+        [
+            {"origem_id": id, "destino_id": destino_id, "evidencia": evidencia}
+            for id in sorted(origens, key=str)
+        ],
+    )
+    db.flush()

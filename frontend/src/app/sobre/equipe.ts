@@ -11,7 +11,7 @@ export type Integrante = {
 // Nomes e perfis conforme a seção Equipe do README do projeto.
 export const equipe: Integrante[] = [
   { nome: "Nicolas", github: "nicolaszanin06", linkedin: "https://www.linkedin.com/in/nicolas-zanin/", foto: "/equipe/nicolaszanin06.png", apresentacao: null },
-  { nome: "Yasmin", github: "ailoiol", linkedin: null, foto: "/equipe/ailoiol.png", apresentacao: null },
+  { nome: "Yasmin", github: "ailoiol", linkedin: "https://www.linkedin.com/in/yasminloiola/", foto: "/equipe/ailoiol.png", apresentacao: null },
   { nome: "Vinicius", github: "ViniGvdo", linkedin: null, foto: "/equipe/ViniGvdo.png", apresentacao: null },
   { nome: "Gabriel", github: "gabrielrdaraujo", linkedin: "https://www.linkedin.com/in/gabriel-araujo-918910236/", foto: "/equipe/gabrielrdaraujo.png", apresentacao: null },
   { nome: "Tiago", github: "TiagoVieira-596", linkedin: null, foto: "/equipe/TiagoVieira-596.png", apresentacao: null },

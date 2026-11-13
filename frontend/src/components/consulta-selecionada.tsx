@@ -11,13 +11,19 @@ import SecaoComentarios from "./secao-comentarios";
 import Icone from "./icone";
 
 export default function ConsultaSelecionada({ avaliacao: a, contexto }: { avaliacao: AvaliacaoAgregada; contexto: ContextoBusca | null }) {
-  const [comentarios, setComentarios] = useState<ComentarioPublico[] | null>(null);
-  const [erro, setErro] = useState(false);
+  const chave = `${a.professorId}:${a.disciplinaId}`;
+  // O resultado guarda a chave a que pertence: ao trocar de professor, o anterior deixa de valer.
+  const [resultado, setResultado] = useState<{ chave: string; comentarios: ComentarioPublico[] | null }>({ chave: "", comentarios: null });
   useEffect(() => {
     const controller = new AbortController();
-    void listarComentariosPublicados(a.professorId, a.disciplinaId, controller.signal).then(v => { if (!controller.signal.aborted) setComentarios(v); }).catch(() => { if (!controller.signal.aborted) setErro(true); });
+    void listarComentariosPublicados(a.professorId, a.disciplinaId, controller.signal)
+      .then(v => { if (!controller.signal.aborted) setResultado({ chave, comentarios: v }); })
+      .catch(() => { if (!controller.signal.aborted) setResultado({ chave, comentarios: null }); });
     return () => controller.abort();
-  }, [a.professorId, a.disciplinaId]);
+  }, [a.professorId, a.disciplinaId, chave]);
+  const atual = resultado.chave === chave;
+  const comentarios = atual ? resultado.comentarios : null;
+  const erro = atual && resultado.comentarios === null;
   const rotulos = { FACIL: "Fácil", MEDIO: "Médio", DIFICIL: "Difícil", RUIM: "Ruim", BOM: "Bom" };
   return <section id="consulta-selecionada" aria-labelledby="consulta-nome" className="mt-8 flex scroll-mt-48 flex-col gap-6">
     <div className="flex flex-wrap items-end justify-between gap-4"><div><span className="kicker">Professor nesta disciplina</span><h3 id="consulta-nome" className="section-title mt-2">{a.professor.nome}</h3><p className="lead mt-2">{a.totalAvaliacoes} avaliações. Dificuldade e chamada são informações neutras.</p></div><div className="flex flex-wrap gap-3"><Link className="button primary" href={comContextoBusca(`/professores/${a.professorId}/disciplinas/${a.disciplinaId}/avaliar`, contexto)}>Avaliar este professor <Icone nome="arrow-right" pequeno /></Link><Link className="button border-accent/50! text-accent!" href={comContextoBusca(`/professores/${a.professorId}`, contexto)}><Icone nome="user" pequeno />Ver perfil completo</Link></div></div>

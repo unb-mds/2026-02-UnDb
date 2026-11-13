@@ -65,3 +65,12 @@ class DecisaoIdentidade(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
+
+class IdentidadeLocal(Base):
+    """Fallback por nome completo + unidade; nunca equivale a SIAPE confirmado."""
+
+    __tablename__ = "identidades_locais"
+    nome_normalizado: Mapped[str] = mapped_column(String(150), primary_key=True)
+    unidade: Mapped[str] = mapped_column(String(100), primary_key=True)
+    professor_id: Mapped[UUID] = mapped_column(ForeignKey("professores.id"), nullable=False)

@@ -14,6 +14,7 @@ from app.models.denuncia import Denuncia, Agradecimento
 
 __all__ = [
     "IdentidadeDocente",
+    "IdentidadeLocal",
     "PendenciaIdentidade",
     "DecisaoIdentidade",
     "Avaliacao",
@@ -33,3 +34,4 @@ __all__ = [
 ]
 
 from app.models.identidade_docente import IdentidadeDocente, PendenciaIdentidade, DecisaoIdentidade
+from app.models.identidade_docente import IdentidadeLocal

@@ -258,6 +258,23 @@ class ConsultaDocentes:
     def __init__(self):
         self.cache = {}
 
+    def registrar_perfil(self, nome, identificador):
+        """Perfil indicado explicitamente; verifica nome e histórico antes de usar."""
+        if not identificador.isdigit():
+            raise ValueError("Identificador de perfil deve conter somente dígitos.")
+        perfil = coletar_perfil(
+            {
+                "nome": nome,
+                "identificador_url": identificador,
+                "perfil_url": BASE + "/sigaa/public/docente/portal.jsf?siape=" + identificador,
+            }
+        )
+        chave = normalizar(nome)
+        atuais = self.cache.get(chave) or []
+        self.cache[chave] = [p for p in atuais if p["identificador_url"] != identificador] + [
+            perfil
+        ]
+
     def consultar(self, nome, oferta):
         chave = normalizar(nome)
         if chave not in self.cache:

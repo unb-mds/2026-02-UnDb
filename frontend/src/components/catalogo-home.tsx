@@ -4,10 +4,11 @@ import Link from "next/link";
 import { nomesDasUnidades, unidadesDoCatalogo, urlUnidade } from "@/lib/catalogo";
 import { ordenarResultados } from "@/lib/contexto-busca";
 import { useCatalogo } from "@/lib/hooks/useCatalogo";
-import DisciplinaCatalogo from "./disciplina-catalogo";
+import CartoesPilha from "./cartoes-pilha";
+import { nomeUnidade } from "@/lib/unidade";
 import EstadoCatalogo from "./estado-catalogo";
 
-export default function CatalogoHome() {
+export default function CatalogoHome({ apenasUnidades = false }: { apenasUnidades?: boolean }) {
   const { consulta, tentarNovamente } = useCatalogo();
   if (!consulta) return <EstadoCatalogo estado="carregando" tentarNovamente={tentarNovamente} />;
   if (consulta.estado === "erro") return <EstadoCatalogo estado="erro" tentarNovamente={tentarNovamente} />;
@@ -17,16 +18,14 @@ export default function CatalogoHome() {
   const nomes = nomesDasUnidades(consulta.disciplinas);
   return (
     <>
-      <section aria-labelledby="catalogo-disciplinas" className="flex flex-col gap-5">
+      {!apenasUnidades && <section aria-labelledby="catalogo-disciplinas" className="flex flex-col gap-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div><span className="kicker">Catálogo institucional</span><h2 id="catalogo-disciplinas" className="section-title mt-2">Explore as disciplinas</h2></div>
           <Link href="/disciplinas" className="link text-sm">Buscar disciplina →</Link>
         </div>
         <p className="lead -mt-2">Uma seleção em ordem alfabética do catálogo institucional.</p>
-        <ul aria-label="Disciplinas do catálogo" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {disciplinas.map((disciplina) => <DisciplinaCatalogo key={disciplina.id} disciplina={disciplina} titulo="h3" />)}
-        </ul>
-      </section>
+        <CartoesPilha rotulo="Disciplinas do catálogo" itens={disciplinas.map((d) => ({ id: d.id, href: `/disciplinas/${d.id}`, codigo: d.codigo, titulo: d.nome, tags: [{ texto: nomeUnidade(d), rotulo: "Unidade acadêmica: " }], acao: "Comparar professores desta disciplina" }))} />
+      </section>}
       <section aria-labelledby="catalogo-unidades" className="flex flex-col gap-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div><span className="kicker">Unidades</span><h2 id="catalogo-unidades" className="section-title mt-2">Explore qualquer unidade acadêmica</h2></div>

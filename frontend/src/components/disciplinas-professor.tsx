@@ -3,10 +3,11 @@ import Link from "next/link";
 import type { DisciplinaDetalhe } from "@/lib/types/institucional";
 import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
 
-export default function DisciplinasProfessor({ professorId, disciplinas, contexto = null }: {
+export default function DisciplinasProfessor({ professorId, disciplinas, contexto = null, compacta = false }: {
   professorId: string;
   disciplinas: DisciplinaDetalhe[];
   contexto?: ContextoBusca | null;
+  compacta?: boolean;
 }) {
   if (disciplinas.length === 0) {
     return (
@@ -19,7 +20,7 @@ export default function DisciplinasProfessor({ professorId, disciplinas, context
   return (
     <ul className="mt-4 flex min-w-0 flex-col gap-3">
       {disciplinas.map((disciplina) => (
-        <li key={disciplina.id} className="flex min-w-0 flex-col justify-between gap-4 rounded-xl border border-(--border) bg-(--raised)/80 p-4 break-words lg:flex-row lg:items-center">
+        <li key={disciplina.id} className={`flex min-w-0 flex-col justify-between gap-4 rounded-xl border border-(--border) bg-(--raised)/80 p-4 break-words ${compacta ? "" : "lg:flex-row lg:items-center"}`}>
           <div className="min-w-0">
             <Link href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}`, contexto)} className="block hover:text-accent">
               <span className="block text-base font-semibold">{disciplina.nome}</span>
@@ -29,7 +30,7 @@ export default function DisciplinasProfessor({ professorId, disciplinas, context
               <span className="mt-1 block text-sm text-(--muted)">Unidade acadêmica: {nomeUnidade(disciplina)}</span>
             </Link>
           </div>
-          <div className="flex shrink-0 flex-wrap gap-3 text-sm lg:max-w-64">
+          <div className={`flex shrink-0 flex-wrap gap-3 text-sm ${compacta ? "" : "lg:max-w-64"}`}>
             <Link href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}`, contexto)} className="button">Consultar</Link>
             <Link
               href={comContextoBusca(`/professores/${professorId}/disciplinas/${disciplina.id}/avaliar`, contexto)}

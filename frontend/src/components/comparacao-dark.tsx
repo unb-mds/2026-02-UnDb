@@ -5,11 +5,11 @@ import ConsultaSelecionada from "./consulta-selecionada";
 import { useEffect, useRef, useState } from "react";
 import { iniciaisProfessor } from "@/lib/iniciais";
 import { nomeUnidade } from "@/lib/unidade";
-import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
+import type { ContextoBusca } from "@/lib/contexto-busca";
 import type { AvaliacaoAgregada } from "@/lib/types/avaliacao";
 import type { TurmaInstitucional } from "@/lib/types/institucional";
-import EstrelasDidatica, { formatarDidatica } from "./estrelas-didatica";
 import Icone from "./icone";
+import EstrelasDidatica, { formatarDidatica } from "./estrelas-didatica";
 
 const labels = {
   FACIL: "Fácil",
@@ -100,7 +100,9 @@ export default function ComparacaoDark({
             com oferta registrada para esta matéria. Cada cartão mostra sua própria base de respostas.
           </p>
         </div>
-        {selecionado && <div className="flex flex-col items-start gap-2"><Link href={comContextoBusca(`/professores/${selecionado.professorId}/disciplinas/${disciplinaId}/avaliar`, contexto)} className="button primary">Avaliar este professor <Icone nome="arrow-right" pequeno /></Link><p className="text-xs text-(--muted)">{selecionado.professor.nome}</p></div>}
+      </div>
+
+      <div className="mt-6 flex justify-end">
         {professores.some((p) => p.dadosSuficientes) && (
           <button
             type="button"
@@ -122,7 +124,7 @@ export default function ComparacaoDark({
           <ul
             ref={trilho}
             id="comparacao-cartoes"
-            className="carousel mt-8"
+            className="carousel mt-4"
             aria-label="Comparação de professores por recomendação; dados insuficientes ficam ao final"
             tabIndex={0}
           >

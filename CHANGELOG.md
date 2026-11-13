@@ -3,6 +3,16 @@
 O histórico abaixo resume versões do código. Notas detalhadas distinguem publicação,
 preparação e verificações operacionais. As datas de disponibilização são as do GitHub Releases.
 
+## 1.5.0 — candidata
+
+- Identidade híbrida: perfil institucional prioritário e fallback por nome completo + unidade.
+- Promoção posterior para perfil e reavaliação seletiva sem perder avaliações.
+- Consolidação com menos consultas, progresso salvo por grupo e retomada.
+- Ajustes visuais de cartões, busca, navegação e transições da PR #233.
+- Nova migration e permissões; consolidação de dados continua sendo etapa administrativa.
+
+[Notas e implantação](docs/releases/1.5.0.md).
+
 ## 1.4.0
 
 - Nova direção visual azul e verde, home e layouts amplos e responsivos.

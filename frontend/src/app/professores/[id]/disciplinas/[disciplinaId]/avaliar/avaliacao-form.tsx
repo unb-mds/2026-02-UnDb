@@ -150,7 +150,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
           <p className="flex gap-3 text-sm leading-relaxed"><Icone nome="shield" />Você pode entrar antes de preencher. Para enviar, é necessário ter uma sessão ativa e confirmar seu e-mail institucional.</p>
           <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="button shrink-0">Entrar ou criar conta antes de avaliar</Link>
         </div>
-        <CriteriosAvaliacao rotulosExplicitos destacarDidatica disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
+        <CriteriosAvaliacao rotulosExplicitos disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
         <label className="glass flex min-w-0 flex-col gap-3 rounded-2xl! p-3 sm:p-6">
           <span className="flex items-start gap-3"><span className="form-step" aria-hidden="true">03</span><span className="text-xl font-medium sm:text-2xl">Novo comentário ou substituto (opcional)</span></span>
           <textarea name="comentario" value={texto} disabled={enviando} rows={5} aria-describedby="orientacao-comentario" onChange={(e) => { setTexto(e.target.value); setSucesso(false); setAvisoComentario(null); }} className="field" />
