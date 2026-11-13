@@ -463,6 +463,27 @@ institucional com o risco residual debatido e aceito na conversa; não é união
 por nome nem uma prova direta de identidade por turma. Documentação operacional:
 [identidades docentes](identidades-docentes.md).
 
+### Evolução híbrida do ADR 07 — autorizada em 13/11/2026
+
+O PO aprovou o modelo híbrido e aceitou o risco residual de homônimos sem perfil
+encontrado na mesma unidade. A associação institucional tem precedência. Busca
+completa sem candidato permite chave provisória `(nome_normalizado, unidade)` em
+`identidades_locais`, separada do identificador de perfil e da chave de ocorrência.
+Não generalizar indisponibilidade, múltiplos perfis ou histórico incompatível como
+perfil ausente. Decisões humanas de separação e conflitos conhecidos prevalecem.
+
+A chave local reaproveita UUID entre turmas e semestres da mesma unidade. Quando
+surge perfil verificável, o mesmo UUID pode ser promovido; se já existe outro
+UUID institucional, agendar manutenção. Ao reunir um destino que já possui aliases,
+redirecionar seus aliases ao destino final na mesma transação, sem criar cadeias.
+
+A rotina administrativa valida identidades e colisões em conjuntos, move vínculos
+em lote e confirma cada grupo separadamente, sob os locks existentes. Isso permite
+progresso durável e retomada após interrupção. Um grupo bloqueado não descarta dados;
+falha inesperada desfaz apenas o grupo atual. Backup validado, janela sem escritores
+e verificações posteriores continuam exigidos. Não há alteração de stack ou nova
+dependência. Documentação operacional: [identidades docentes](identidades-docentes.md).
+
 ### ADR 08 — Execução e containerização do frontend
 
 **Estado.** Aprovado pelo responsável em 19/09/2026, após revisão do resumo da
