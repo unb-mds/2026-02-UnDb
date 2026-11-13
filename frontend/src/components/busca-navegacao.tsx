@@ -1,3 +1,4 @@
+import BotaoBuscar from "./botao-buscar";
 import Form from "next/form";
 import type { OrdemBusca, TipoBusca } from "@/lib/contexto-busca";
 import Icone from "./icone";
@@ -37,6 +38,6 @@ export default function BuscaNavegacao({ id, tipo = "disciplinas", termo = "", o
         placeholder={compacta ? "Professor, disciplina ou código" : "Ex.: Cálculo 1, MAT0025 ou nome do professor"} />
     </div>
     <input type="hidden" name="ordem" value={ordem} />
-    <button type="submit" className="button primary">Buscar{!compacta && <Icone nome="arrow-right" pequeno />}</button>
+    <BotaoBuscar compacto={compacta} />
   </Form>;
 }

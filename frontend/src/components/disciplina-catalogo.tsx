@@ -4,18 +4,24 @@ import Icone from "./icone";
 import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
 import type { DisciplinaDetalhe } from "@/lib/types/institucional";
 
+/** Mesmo cartão das "Disciplinas mais avaliadas" da home: bloco superior só com o código e a unidade acadêmica como tag. */
+
 export default function DisciplinaCatalogo({ disciplina, contexto = null, titulo: Titulo = "h2" }: {
   disciplina: DisciplinaDetalhe;
   contexto?: ContextoBusca | null;
   titulo?: "h2" | "h3";
 }) {
   return (
-    <li className="min-w-0">
-      <Link href={comContextoBusca(`/disciplinas/${disciplina.id}`, contexto)} className="tile flex h-full flex-col items-start gap-3 p-5 break-words">
-        <span className="code-chip"><span className="sr-only">Código da disciplina: </span>{disciplina.codigo}</span>
-        <Titulo className="text-lg leading-snug font-semibold">{disciplina.nome}</Titulo>
-        <p className="text-sm text-(--ink-soft)">Unidade acadêmica: {nomeUnidade(disciplina)}</p>
-        <span className="mt-auto inline-flex items-center gap-2 pt-2 text-sm font-medium text-accent">Comparar professores <Icone nome="arrow-right" pequeno /></span>
+    <li className="flex min-w-0">
+      <Link href={comContextoBusca(`/disciplinas/${disciplina.id}`, contexto)} className="destaque w-full break-words">
+        <div className="destaque-visual">
+          <span className="destaque-pill"><span className="sr-only">Código da disciplina: </span>{disciplina.codigo}</span>
+          <span className="destaque-notch" aria-hidden="true"><span className="destaque-arrow"><span className="inline-flex -rotate-45"><Icone nome="arrow-right" /></span></span></span>
+        </div>
+        <div className="flex flex-1 flex-col gap-3 px-3">
+          <Titulo className="text-xl leading-tight font-semibold tracking-tight">{disciplina.nome}</Titulo>
+          <div className="destaque-tags mt-auto"><span className="destaque-tag destaque-tag-unidade"><span className="sr-only">Unidade acadêmica: </span>{nomeUnidade(disciplina)}</span><span className="destaque-tag">Comparar professores</span></div>
+        </div>
       </Link>
     </li>
   );

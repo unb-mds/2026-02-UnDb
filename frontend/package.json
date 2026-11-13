@@ -10,14 +10,15 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node tests/run-tests.mjs",
     "test:coverage": "node tests/run-tests.mjs --coverage",
-    "test:browser": "node tests/avaliacao-browser.mjs && node tests/moderacao-browser.mjs && node tests/denuncia-browser.mjs && node tests/comentarios-browser.mjs && node tests/cabecalho-browser.mjs && node tests/identidades-browser.mjs",
+    "test:browser": "node tests/avaliacao-browser.mjs && node tests/moderacao-browser.mjs && node tests/denuncia-browser.mjs && node tests/comentarios-browser.mjs && node tests/cabecalho-browser.mjs && node tests/identidades-browser.mjs && node tests/transicao-browser.mjs",
     "test:cabecalho": "node tests/cabecalho-browser.mjs",
     "test:identidades": "node tests/identidades-browser.mjs",
     "test:moderacao": "node tests/moderacao-browser.mjs",
     "test:denuncia": "node tests/denuncia-browser.mjs",
     "test:comentarios": "node tests/comentarios-browser.mjs",
     "test:perfil": "node tests/perfil-browser.mjs",
-    "test:fluxo-moderacao": "node tests/fluxo-moderacao-browser.mjs"
+    "test:fluxo-moderacao": "node tests/fluxo-moderacao-browser.mjs",
+    "test:transicoes": "node tests/transicao-browser.mjs"
   },
   "dependencies": {
     "next": "16.3.5",

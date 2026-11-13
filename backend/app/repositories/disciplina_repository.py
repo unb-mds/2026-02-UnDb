@@ -1,7 +1,8 @@
-from sqlalchemy import and_, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.domain.texto import normalizar_busca
+from app.models.avaliacao import Avaliacao
 from app.models.disciplina import Disciplina
 from app.models.turma import Turma
 
@@ -53,10 +54,7 @@ def listar_turmas(db: Session, disciplina_id) -> list[Turma]:
     return list(db.scalars(consulta).unique().all())
 
 
-def listar_mais_avaliadas(db: Session, limite: int = 6):
-    from sqlalchemy import func
-    from app.models.avaliacao import Avaliacao
-
+def listar_mais_avaliadas(db: Session, limite: int = 6) -> list[tuple[Disciplina, int]]:
     contagens = (
         select(Avaliacao.disciplina_id, func.count(Avaliacao.id).label("total"))
         .group_by(Avaliacao.disciplina_id)
@@ -68,4 +66,4 @@ def listar_mais_avaliadas(db: Session, limite: int = 6):
         .order_by(contagens.c.total.desc(), Disciplina.nome, Disciplina.id)
         .limit(limite)
     )
-    return list(db.execute(consulta).all())
+    return [(disciplina, total) for disciplina, total in db.execute(consulta).all()]
