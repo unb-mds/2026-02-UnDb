@@ -1,4 +1,3 @@
-from collections import defaultdict
 from sqlalchemy.exc import OperationalError
 from app.models.identidade_docente import PendenciaIdentidade, DecisaoIdentidade
 from app.repositories import identidade_docente_repository as repo, professor_repository
@@ -19,7 +18,11 @@ def autorizar(usuario):
 def resolver(db, nome, departamento, chave, oferta, consulta):
     repo.bloquear(db)
     anterior = repo.obter(db, chave)
-    if anterior and anterior.estado in ("APLICADA", "SEPARADA", "CONFIRMADA"):
+    if (
+        anterior
+        and anterior.estado in ("APLICADA", "SEPARADA", "CONFIRMADA")
+        and anterior.motivo != "ASSOCIACAO_LOCAL"
+    ):
         origem = repo.professor(db, anterior.professor_id)
         if anterior.estado == "CONFIRMADA":
             institucional = repo.identidade(db, anterior.identificador_destino)
@@ -38,10 +41,28 @@ def resolver(db, nome, departamento, chave, oferta, consulta):
                     anterior.motivo = "APLICACAO_BLOQUEADA"
         return origem
     # Correspondências explícitas da #223 têm precedência sobre inferências novas.
-    origem = professor_repository.get_by_identidade_origem(db, chave)
-    if origem and reconciliacao.resolver_id(db, origem.id) != origem.id:
+    origem = (
+        repo.professor(db, anterior.professor_id)
+        if anterior
+        else professor_repository.get_by_identidade_origem(db, chave)
+    )
+    if (
+        origem
+        and reconciliacao.resolver_id(db, origem.id) != origem.id
+        and not (anterior and anterior.motivo == "ASSOCIACAO_LOCAL")
+    ):
         return repo.professor(db, origem.id)
     motivo, candidatos = consulta.consultar(nome, oferta)
+    from app.scrapers.docentes import ConsultaDocentes
+
+    if motivo == "PERFIL_AUSENTE" and isinstance(consulta, ConsultaDocentes):
+        conhecido = repo.perfil_conhecido(db, nome, departamento)
+        if conhecido:
+            try:
+                consulta.registrar_perfil(nome, conhecido)
+                motivo, candidatos = consulta.consultar(nome, oferta)
+            except Exception:
+                motivo, candidatos = "CONSULTA_INCONCLUSIVA", []
     destino = None
     identificador = None
     if motivo == "COMPATIVEL" and len(candidatos) == 1:
@@ -49,6 +70,21 @@ def resolver(db, nome, departamento, chave, oferta, consulta):
         institucional = repo.identidade(db, identificador)
         if institucional:
             destino = repo.professor(db, institucional.professor_id)
+    # Um cadastro local pode receber perfil posteriormente sem trocar seu UUID.
+    associacao_local = repo.local(db, nome, departamento)
+    if origem is None and associacao_local and motivo == "COMPATIVEL":
+        origem = repo.professor(db, associacao_local.professor_id)
+    if motivo == "PERFIL_AUSENTE" and len(repo.perfis_conhecidos(db, nome, departamento)) > 1:
+        motivo = "CONFLITO_INSTITUCIONAL"
+    if motivo == "PERFIL_AUSENTE" and not repo.separacao_humana(db, nome, departamento):
+        if associacao_local:
+            destino = repo.professor(db, associacao_local.professor_id)
+        else:
+            origem = origem or professor_repository.get_or_create_provisorio(
+                db, nome, departamento, chave
+            )
+            destino = repo.vincular_local(db, nome, departamento, origem)
+        motivo = "ASSOCIACAO_LOCAL"
     if origem is None:
         origem = destino or professor_repository.get_or_create_provisorio(
             db, nome, departamento, chave
@@ -60,6 +96,10 @@ def resolver(db, nome, departamento, chave, oferta, consulta):
             motivo = "CONFLITO_INSTITUCIONAL"
             identificador = None
             destino = None
+    # UUIDs antigos distintos exigem manutenção; nunca agendar perfil NULL como SIAPE.
+    if motivo == "ASSOCIACAO_LOCAL" and destino and destino.id != origem.id:
+        motivo = "PERFIL_AUSENTE"
+        destino = None
     estado = (
         "APLICADA"
         if destino and destino.id == origem.id
@@ -135,29 +175,30 @@ def decidir(db, usuario, id, dados):
         raise
 
 
-def aplicar_confirmadas(db):
-    """Somente comando administrativo em janela sem escritores, como na #223."""
-    repo.bloquear(db)
-    grupos = defaultdict(list)
-    for item in repo.confirmadas(db):
-        grupos[item.identificador_destino].append(item)
+def aplicar_confirmadas(db, progresso=None):
+    """Commit por grupo: progresso durável e retomada sem repetir grupos concluídos."""
+    grupos = repo.grupos_confirmados(db)
+    db.commit()
     resultados = []
-    for identificador, itens in grupos.items():
+    for numero, (identificador, ids) in enumerate(grupos.items(), 1):
+        itens = []
         try:
+            repo.bloquear(db)
+            reconciliacao._bloquear_escritas(db)
+            itens = [
+                i
+                for i in repo.itens_por_ids(db, ids)
+                if i.estado == "CONFIRMADA" and i.identificador_destino == identificador
+            ]
+            if not itens:
+                db.rollback()
+                continue
             with db.begin_nested():
-                # A validação e o lock de todas as tabelas precedem qualquer mudança.
-                reconciliacao._bloquear_escritas(db)
-                origem = repo.professor(db, itens[0].professor_id)
-                destino = repo.vincular(db, identificador, origem)
-                # A identidade pode ter mudado desde a confirmação. Conferir cada
-                # origem antes de mover qualquer turma ou avaliação do grupo.
-                for item in itens:
-                    repo.vincular(db, identificador, repo.professor(db, item.professor_id))
-                origens = sorted(
-                    {repo.professor(db, i.professor_id).id for i in itens} - {destino.id}, key=str
+                destino, origens = repo.vincular_grupo(
+                    db, identificador, [i.professor_id for i in itens]
                 )
                 if origens:
-                    reconciliacao.aplicar_grupo(
+                    reconciliacao.aplicar_grupo_em_lote(
                         db,
                         origens,
                         destino.id,
@@ -168,16 +209,23 @@ def aplicar_confirmadas(db):
                     item.professor_id = destino.id
                     item.versao += 1
                 db.flush()
-            resultados.append(
-                {"identificador": identificador, "estado": "APLICADA", "ocorrencias": len(itens)}
-            )
-        except ValueError:
-            # Não sobrescrever a decisão ou descartar avaliações em caso de colisão.
+            resultado = {
+                "identificador": identificador,
+                "estado": "APLICADA",
+                "ocorrencias": len(itens),
+            }
+        except ValueError as erro:
             for item in itens:
                 item.motivo = "APLICACAO_BLOQUEADA"
                 item.versao += 1
-            resultados.append({"identificador": identificador, "estado": "BLOQUEADA"})
-    db.commit()
+            resultado = {"identificador": identificador, "estado": "BLOQUEADA", "erro": str(erro)}
+        except BaseException:
+            db.rollback()
+            raise
+        db.commit()
+        resultados.append(resultado)
+        if progresso:
+            progresso(numero, len(grupos), resultado)
     return resultados
 
 
@@ -205,3 +253,68 @@ def previa(db, item, identificador):
         "turmas": plano["turmas"],
         "avaliacoes": plano["avaliacoes"],
     }
+
+
+def consolidar_locais(db, aplicar=False, progresso=None):
+    """Prévia por padrão; aplicar somente na janela administrativa de manutenção."""
+    grupos = repo.grupos_locais(db)
+    db.commit()
+    resultados = []
+    for numero, ((nome, unidade), ids) in enumerate(grupos.items(), 1):
+        itens = []
+        try:
+            if aplicar:
+                repo.bloquear(db)
+                reconciliacao._bloquear_escritas(db)
+            itens = [
+                i
+                for i in repo.itens_por_ids(db, ids)
+                if i.estado == "PENDENTE" and i.motivo == "PERFIL_AUSENTE" and not i.humana
+            ]
+            if not itens:
+                db.rollback()
+                continue
+            destino, origens = repo.destino_local_grupo(
+                db, itens[0].nome, unidade, [i.professor_id for i in itens]
+            )
+            resultado = {
+                "nome": nome,
+                "unidade": unidade,
+                "ocorrencias": len(itens),
+                "registros_a_unir": len(origens),
+                "estado": "APLICADA" if aplicar else "PREVIA",
+            }
+            if origens and not aplicar:
+                reconciliacao.validar_grupo_em_lote(
+                    db, origens, destino.id, "Prévia do fallback nome + unidade #207."
+                )
+            if aplicar:
+                with db.begin_nested():
+                    if origens:
+                        reconciliacao.aplicar_grupo_em_lote(
+                            db,
+                            origens,
+                            destino.id,
+                            "Fallback nome completo + unidade #207; risco residual aceito pelo PO.",
+                        )
+                    repo.vincular_local(db, itens[0].nome, unidade, destino)
+                    for item in itens:
+                        item.professor_id = destino.id
+                        item.estado = "APLICADA"
+                        item.motivo = "ASSOCIACAO_LOCAL"
+                        item.identificador_destino = None
+                        item.versao += 1
+                    db.flush()
+        except ValueError as erro:
+            resultado = {"nome": nome, "unidade": unidade, "estado": "BLOQUEADA", "erro": str(erro)}
+        except BaseException:
+            db.rollback()
+            raise
+        if aplicar:
+            db.commit()
+        else:
+            db.rollback()
+        resultados.append(resultado)
+        if progresso:
+            progresso(numero, len(grupos), resultado)
+    return resultados

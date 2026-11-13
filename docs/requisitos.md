@@ -695,3 +695,30 @@ as decisões de separação; negar acesso sem papel específico; rejeitar decis�
 uma versão obsoleta; apresentar prévia e histórico; bloquear colisões sem alterações
 parciais; distinguir fonte indisponível de ausência de perfil. A implantação e o
 lote real de reconciliação continuam sujeitos ao procedimento operacional da #207.
+
+### Evolução de RF23 autorizada em 13/11/2026 — modelo híbrido
+
+Fonte: Nicolas aprovou explicitamente usar o perfil institucional quando disponível,
+aceitou o risco residual de homônimos sem perfil encontrado na mesma unidade e
+solicitou implementar o híbrido, otimizar a consolidação e informar seu progresso.
+Essa decisão substitui a proibição geral anterior somente no fallback abaixo.
+
+- Priorizar associação institucional verificável. Quando a busca completa não
+  encontra perfil, reutilizar o cadastro por nome completo normalizado e unidade
+  da oferta entre disciplinas, turmas e semestres. A associação deve permanecer
+  identificável como provisória, sem afirmar confirmação institucional.
+- Uma falha de consulta, múltiplos perfis encontrados, identidades institucionais
+  conflitantes ou histórico incompatível não autorizam esse fallback.
+- Descobrir um perfil posteriormente deve permitir promover o cadastro preservando
+  UUID e avaliações. União entre UUIDs distintos mantém a janela administrativa,
+  prévia e proteção contra colisões de RF03. Manter os links antigos utilizáveis.
+- Decisões humanas de manter separados não podem ser contornadas pelo fallback
+  em outra turma/semestre do mesmo nome e unidade. O fallback não une unidades.
+- Consolidar registros antigos deve apresentar progresso salvo por grupo e permitir
+  retomar os restantes após interrupção; uma falha não pode deixar um grupo parcial.
+
+Critérios complementares: repetir a importação sem novo cadastro na mesma chave
+local; preservar o UUID ao promover para perfil; distinguir associação provisória
+na fila; manter casos ambíguos na moderação; preservar avaliações e seus históricos;
+retomar consolidação sem reaplicar grupos concluídos. Não foi aprovada uma meta de
+segundos para produção: medições locais não são compromisso de duração remota.
