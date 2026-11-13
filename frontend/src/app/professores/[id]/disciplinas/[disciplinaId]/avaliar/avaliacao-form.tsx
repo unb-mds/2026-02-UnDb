@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import CriteriosAvaliacao from "@/components/criterios-avaliacao";
+import Icone from "@/components/icone";
 import MeusComentarios from "@/components/meus-comentarios";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { criarEntradaAvaliacao, mensagemErroAvaliacao } from "@/lib/avaliacao-formulario";
@@ -144,31 +145,34 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
-      <form onSubmit={enviar} className="panel flex min-w-0 flex-col gap-6 p-3 sm:p-6" aria-busy={enviando}>
-        <div className="flex min-w-0 flex-col items-start gap-3 rounded-xl border border-(--border) bg-(--raised) p-4">
-          <p className="text-sm leading-relaxed text-(--muted)">Você pode entrar antes de preencher. Para enviar, é necessário ter uma sessão ativa e confirmar seu e-mail institucional.</p>
-          <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="button">Entrar ou criar conta antes de avaliar</Link>
+      <form onSubmit={enviar} className="flex min-w-0 flex-col gap-5" aria-busy={enviando}>
+        <div className="note flex-col items-start sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex gap-3 text-sm leading-relaxed"><Icone nome="shield" />Você pode entrar antes de preencher. Para enviar, é necessário ter uma sessão ativa e confirmar seu e-mail institucional.</p>
+          <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="button shrink-0">Entrar ou criar conta antes de avaliar</Link>
         </div>
         <CriteriosAvaliacao rotulosExplicitos destacarDidatica disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
-        <label className="flex min-w-0 flex-col gap-2">
-          <span className="font-semibold">Novo comentário ou substituto (opcional)</span>
-          <textarea name="comentario" value={texto} disabled={enviando} rows={5} aria-describedby="orientacao-comentario" onChange={(e) => { setTexto(e.target.value); setSucesso(false); setAvisoComentario(null); }} className="w-full min-w-0 rounded-lg border border-(--control-border) bg-(--raised) px-4 py-3 text-base text-foreground focus:border-accent disabled:bg-(--disabled-surface) disabled:text-(--on-disabled)" />
+        <label className="glass flex min-w-0 flex-col gap-3 rounded-2xl! p-3 sm:p-6">
+          <span className="flex items-start gap-3"><span className="form-step" aria-hidden="true">03</span><span className="text-xl font-medium sm:text-2xl">Novo comentário ou substituto (opcional)</span></span>
+          <textarea name="comentario" value={texto} disabled={enviando} rows={5} aria-describedby="orientacao-comentario" onChange={(e) => { setTexto(e.target.value); setSucesso(false); setAvisoComentario(null); }} className="field" />
           <span id="orientacao-comentario" className="text-sm leading-relaxed text-(--muted)">De 1 a 500 caracteres após remover espaços nas extremidades. Críticas acadêmicas são permitidas; não publique ofensas, ameaças, discriminação, dados pessoais ou spam. Todo texto novo depende de aprovação humana. Deixe vazio para manter o comentário existente. Para retirar, use a ação explícita abaixo.</span>
         </label>
-        <button type="submit" disabled={enviando} className="button primary">{enviando ? "Enviando…" : "Enviar avaliação"}</button>
+        <div className="flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
+          <p className="flex gap-2 text-sm text-(--muted)"><Icone nome="shield" pequeno />Suas respostas aparecem apenas de forma agregada.</p>
+          <button type="submit" disabled={enviando} className="button primary">{enviando ? "Enviando…" : "Enviar avaliação"}{!enviando && <Icone nome="arrow-right" pequeno />}</button>
+        </div>
         <div aria-live="polite" aria-atomic="true">
-          {sucesso && <p role="status" className="rounded-lg border border-green-600/30 p-4 text-sm">Avaliação registrada com sucesso. Se você já tinha uma avaliação para este professor nesta disciplina, ela foi substituída por este envio.</p>}
+          {sucesso && <p role="status" className="status-box success">Avaliação registrada com sucesso. Se você já tinha uma avaliação para este professor nesta disciplina, ela foi substituída por este envio.</p>}
           {avisoComentario && <p role="status" className="mt-2 text-sm">{avisoComentario}</p>}
-          {erro && <div role="alert" className="rounded-lg border border-red-600/30 p-4 text-sm"><p>{erro}</p>{precisaEntrar && <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-accent underline">Entrar na conta (nova aba)</Link>}</div>}
+          {erro && <div role="alert" className="status-box error"><p>{erro}</p>{precisaEntrar && <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} target="_blank" rel="noopener noreferrer" className="link mt-2 inline-block">Entrar na conta (nova aba)</Link>}</div>}
         </div>
       </form>
       {consulta.estado === "carregando" && <p role="status">Carregando seus comentários…</p>}
       {consulta.estado === "pronto" && <MeusComentarios comentarios={consulta.itens} aoRetirar={setConfirmarRetirada} disabled={enviando} />}
-      {consulta.estado === "erro" && <p role="alert">Não foi possível carregar seus comentários agora. <button type="button" onClick={() => void carregar()} className="text-accent underline">Tentar novamente</button></p>}
-      {confirmarRetirada && consulta.estado === "pronto" && <div role="group" aria-label="Confirmar retirada" className="rounded-lg border border-foreground/20 p-4 text-sm">
+      {consulta.estado === "erro" && <p role="alert">Não foi possível carregar seus comentários agora. <button type="button" onClick={() => void carregar()} className="link">Tentar novamente</button></p>}
+      {confirmarRetirada && consulta.estado === "pronto" && <div role="group" aria-label="Confirmar retirada" className="note block! text-sm">
         <p>A retirada remove o texto público e cancela eventual substituto pendente, preservando os critérios. Deseja continuar?</p>
-        <button type="button" disabled={enviando} onClick={() => void retirar(confirmarRetirada)} className="mr-4 mt-3 text-accent underline">Confirmar retirada</button>
-        <button type="button" disabled={enviando} onClick={() => setConfirmarRetirada(null)}>Cancelar retirada</button>
+        <button type="button" disabled={enviando} onClick={() => void retirar(confirmarRetirada)} className="button mr-3 mt-3">Confirmar retirada</button>
+        <button type="button" disabled={enviando} onClick={() => setConfirmarRetirada(null)} className="button ghost mt-3">Cancelar retirada</button>
       </div>}
       {resultadoRetirada && <p role="status">{resultadoRetirada}</p>}
     </div>

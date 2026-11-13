@@ -7,6 +7,7 @@ import { Suspense, useEffect, useState } from "react";
 import { retornoAvaliacaoSeguro } from "@/lib/retorno-avaliacao";
 import { consultarSessao, EVENTO_SESSAO_ALTERADA } from "@/lib/services/auth";
 import BuscaCabecalho from "./busca-cabecalho";
+import Icone from "./icone";
 
 type EstadoSessao = "carregando" | "autenticado" | "visitante" | "erro";
 
@@ -14,9 +15,9 @@ function LinksConta({ retorno, sessao = "carregando" }: { retorno?: string | nul
   const query = retorno ? `?returnTo=${encodeURIComponent(retorno)}` : "";
   return <nav aria-label="Conta" className="header-actions">
     {sessao === "autenticado" ? (
-      <Link href="/login" className="button primary">Minha conta</Link>
+      <Link href="/login" className="button ghost"><Icone nome="user" pequeno />Minha conta</Link>
     ) : <>
-      <Link href={`/login${query}`} className="button">Entrar ou criar conta</Link>
+      <Link href={`/login${query}`} className="button ghost">Entrar ou criar conta</Link>
       {sessao !== "visitante" && <span className="sr-only" role="status">{sessao === "carregando" ? "Verificando sessão…" : "Não foi possível verificar a sessão. Acesse a conta para tentar novamente."}</span>}
     </>}
   </nav>;
@@ -64,6 +65,15 @@ function ContaComRetorno() {
   return <LinksConta retorno={retorno} sessao={sessao} />;
 }
 
+const LINKS = [["/professores", "Professores"], ["/disciplinas", "Disciplinas"], ["/departamentos", "Unidades acadêmicas"], ["/sobre", "Sobre"]] as const;
+
+function NavegacaoPrincipal({ caminho }: { caminho: string }) {
+  return <nav aria-label="Navegação principal" className="main-nav">
+    <Link href={caminho === "/" ? "#busca" : "/#busca"} className="nav-search"><Icone nome="search" pequeno />Buscar</Link>
+    {LINKS.map(([href, nome]) => <Link key={href} href={href} aria-current={caminho === href ? "page" : undefined}>{nome}</Link>)}
+  </nav>;
+}
+
 export default function Cabecalho() {
   const caminho = usePathname();
   if (caminho === "/prototipo" || caminho.startsWith("/prototipo/")) return null;
@@ -71,8 +81,10 @@ export default function Cabecalho() {
   const conta = ["/login", "/cadastro", "/confirmar-email"].includes(caminho);
   return <header className="header"><div className="container header-inner">
     <Link href="/" aria-label="UnDb — início" className="brand"><Image src="/brand/undb-logo.png" alt="" width={600} height={201} className="brand-logo" loading="eager" /></Link>
-    {home ? <nav aria-label="Navegação principal" className="main-nav"><Link href="/professores">Professores</Link><Link href="/disciplinas">Disciplinas</Link><Link href="/departamentos">Unidades acadêmicas</Link><Link href="/disciplinas">Comparar professores</Link></nav>
-      : !conta && <Suspense fallback={<div className="search search-header" role="status">Carregando busca…</div>}><BuscaCabecalho /></Suspense>}
+    <div className="header-center">
+      {home || conta || caminho === "/sobre" ? <NavegacaoPrincipal caminho={caminho} />
+        : <Suspense fallback={<div className="search search-header" role="status">Carregando busca…</div>}><BuscaCabecalho /></Suspense>}
+    </div>
     <Suspense fallback={<LinksConta />}><ContaComRetorno /></Suspense>
   </div></header>;
 }

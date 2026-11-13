@@ -14,12 +14,18 @@ from app.schemas.avaliacao import (
 from app.services import avaliacao_service
 from app.schemas.institucional import (
     DisciplinaDetalheResponse,
+    DisciplinaDestaqueResponse,
     TurmaInstitucionalResponse,
 )
 from app.services import institucional_service
 
 
 router = APIRouter(prefix="/api/disciplinas", tags=["disciplinas"])
+
+
+@router.get("/destaques", response_model=list[DisciplinaDestaqueResponse])
+def listar_destaques(session: Annotated[Session, Depends(get_db)]):
+    return institucional_service.listar_destaques(session)
 
 
 @router.get("/{disciplina_id}/professores", response_model=ComparacaoProfessoresResponse)

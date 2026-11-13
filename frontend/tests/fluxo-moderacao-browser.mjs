@@ -42,7 +42,7 @@ await comNavegador({ executar: async ({ cdp, avaliar, aguardar }) => {
   }
   async function enviar(textoNovo) {
     await navegar(caminho+'/avaliar'); await esperar('Meus comentários');
-    await avaliar(`document.querySelector('input[name="didatica"][value="4"]').click();for(const [nome,valor] of Object.entries({dificuldade:'MEDIO',chamada:'true',material:'BOM',recomenda:'true'})){const select=document.querySelector('select[name="'+nome+'"]');select.value=valor;select.dispatchEvent(new Event('change',{bubbles:true}));}const campo=document.querySelector('textarea[name="comentario"]');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(campo,${JSON.stringify(textoNovo)});campo.dispatchEvent(new Event('input',{bubbles:true}));`);
+    await avaliar(`document.querySelector('input[name="didatica"][value="4"]').click();for(const [nome,valor] of Object.entries({dificuldade:'MEDIO',chamada:'true',material:'BOM',recomenda:'true'})){document.querySelector('input[name="'+nome+'"][value="'+valor+'"]').click();}const campo=document.querySelector('textarea[name="comentario"]');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(campo,${JSON.stringify(textoNovo)});campo.dispatchEvent(new Event('input',{bubbles:true}));`);
     await clicar('Enviar avaliação'); await esperar('Seu novo texto foi enviado para aprovação humana');
     await esperar(textoNovo);
     const pendente=(await meus()).find(v=>v.estado==='PENDENTE');

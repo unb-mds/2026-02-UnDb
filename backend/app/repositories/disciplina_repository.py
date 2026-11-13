@@ -51,3 +51,21 @@ def listar_turmas(db: Session, disciplina_id) -> list[Turma]:
         .order_by(Turma.semestre.desc(), Turma.codigo)
     )
     return list(db.scalars(consulta).unique().all())
+
+
+def listar_mais_avaliadas(db: Session, limite: int = 6):
+    from sqlalchemy import func
+    from app.models.avaliacao import Avaliacao
+
+    contagens = (
+        select(Avaliacao.disciplina_id, func.count(Avaliacao.id).label("total"))
+        .group_by(Avaliacao.disciplina_id)
+        .subquery()
+    )
+    consulta = (
+        select(Disciplina, contagens.c.total)
+        .join(contagens, contagens.c.disciplina_id == Disciplina.id)
+        .order_by(contagens.c.total.desc(), Disciplina.nome, Disciplina.id)
+        .limit(limite)
+    )
+    return list(db.execute(consulta).all())

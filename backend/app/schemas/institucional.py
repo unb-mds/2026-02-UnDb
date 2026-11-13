@@ -41,3 +41,7 @@ class TurmaInstitucionalResponse(BaseModel):
     semestre: str
     ativa: bool
     professores: list[ProfessorDetalheResponse]
+
+
+class DisciplinaDestaqueResponse(DisciplinaDetalheResponse):
+    total_avaliacoes: int

@@ -35,8 +35,12 @@ export async function verificarContaDark({ cdp, avaliar, aguardar }) {
         await cdp('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
         await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
         assert.equal(await avaliar('document.activeElement instanceof HTMLInputElement'), true);
-        assert.equal(await avaliar('getComputedStyle(document.activeElement).outlineStyle'), 'solid');
-        assert.ok(await avaliar('parseFloat(getComputedStyle(document.activeElement).outlineWidth)') >= 2);
+        assert.equal(await avaliar('getComputedStyle(document.activeElement).outlineStyle'), 'none');
+        await aguardar(
+          () => avaliar('getComputedStyle(document.activeElement).backgroundSize === "100% 2px"'),
+          `${rota}: foco sublinhado visível`,
+        );
+        assert.notEqual(await avaliar('getComputedStyle(document.activeElement).backgroundImage'), 'none');
       } else {
         await aguardar(() => avaliar('document.body.innerText.includes("O link de confirmação está incompleto.")'), 'confirmação sem token');
         assert.ok(await contrasteTexto(avaliar, 'main [aria-live]') >= 4.5);

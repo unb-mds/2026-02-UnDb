@@ -45,3 +45,21 @@ def obter_disciplina(db: Session, disciplina_id: UUID) -> Disciplina:
 def listar_turmas_da_disciplina(db: Session, disciplina_id: UUID) -> list[Turma]:
     obter_disciplina(db, disciplina_id)
     return disciplina_repository.listar_turmas(db, disciplina_id)
+
+
+def listar_destaques(db: Session):
+    from app.schemas.institucional import DisciplinaDestaqueResponse
+
+    return [
+        DisciplinaDestaqueResponse(
+            id=d.id,
+            codigo=d.codigo,
+            nome=d.nome,
+            departamento=d.departamento,
+            departamento_nome=d.departamento_nome,
+            identificador_externo=d.identificador_externo,
+            creditos=d.creditos,
+            total_avaliacoes=total,
+        )
+        for d, total in disciplina_repository.listar_mais_avaliadas(db)
+    ]

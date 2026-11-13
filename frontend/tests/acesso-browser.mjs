@@ -140,7 +140,9 @@ async function encerrar(p) {
 }
 async function preencherAvaliacao(tab) {
   assert.equal(await tab.avaliar("document.querySelector('[name=didatica]:checked') === null"), true);
-  await preencher(tab, { dificuldade: "MEDIO", chamada: "false", material: "NAO_DISPONIBILIZA", recomenda: "false" });
+  // Critérios são rádios (#211): marcar a opção, não atribuir value.
+  await aguardar(async () => await tab.avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "formulário hidratado");
+  await tab.avaliar(`Object.entries(${JSON.stringify({ dificuldade: "MEDIO", chamada: "false", material: "NAO_DISPONIBILIZA", recomenda: "false" })}).forEach(([nome, valor]) => document.querySelector('[name="'+nome+'"][value="'+valor+'"]').click())`);
   await tab.avaliar("document.querySelector('[name=didatica][value=\"1\"]').focus()");
   for (const type of ["keyDown", "keyUp"]) await tab.cdp("Input.dispatchKeyEvent", { type, key: "ArrowRight", code: "ArrowRight", windowsVirtualKeyCode: 39 });
   assert.equal(await tab.avaliar("document.querySelector('[name=didatica]:checked').value"), "2");
@@ -170,14 +172,18 @@ try {
     await navegar(tab, "/", "Encontre professores e disciplinas");
     if (i === 0) await matriz(tab, "entrada");
     await aguardar(async () => await tab.avaliar("!!document.querySelector('main form') && Object.keys(document.querySelector('main form')).some(k => k.startsWith('__reactProps'))"), "busca inicial hidratada");
-    await tab.avaliar(`document.querySelector('main select[name=busca]').value="${contexto.busca}"; document.querySelector('[name=q]').value=${JSON.stringify(contexto.q)}`);
+    await tab.avaliar(`document.querySelector('main [name=busca][value=${contexto.busca}]').checked=true; document.querySelector('[name=q]').value=${JSON.stringify(contexto.q)}`);
     assert.equal(await tab.avaliar("new FormData(document.querySelector('main form')).get('busca')"), contexto.busca);
     await tab.avaliar("document.querySelector('main form').requestSubmit()");
     await esperarTexto(tab, "resultado(s)");
     await tab.avaliar(`const s=document.querySelector('main select'); s.value=${JSON.stringify(contexto.ordem)}; s.dispatchEvent(new Event('change',{bubbles:true}))`);
     await aguardar(async () => await tab.avaliar(`location.pathname + location.search === ${JSON.stringify(lista)}`), "lista com contexto da entrada");
     await matriz(tab, `busca-${contexto.busca}`);
-    if (i === 1) await clicar(tab, `main a[href^="/disciplinas/${fixture.disciplinaId}?"]`, "Comparação de professores");
+    if (i === 1) {
+      await clicar(tab, `main a[href^="/disciplinas/${fixture.disciplinaId}?"]`, "Comparação de professores");
+      await clicar(tab, `#comparacao-cartoes li[data-professor-id="${fixture.professores[i]}"] > a`, "Ver perfil completo");
+      await aguardar(() => tab.avaliar(`!!document.querySelector('#consulta-selecionada a[href="${destinos[i]}"]')`), "avaliação acompanha professor selecionado");
+    }
     await clicar(tab, `main a[href="${destinos[i]}"]`, "Avaliar professor na disciplina");
     // O mesmo contexto acompanha o atalho direto da #157 e a entrada de conta.
     await aguardar(() => tab.avaliar("document.querySelector('header nav[aria-label=\"Conta\"] a')?.textContent === 'Entrar ou criar conta' && !document.querySelector('header nav[aria-label=\"Conta\"] [role=status]')"), "conta visitante validada");
