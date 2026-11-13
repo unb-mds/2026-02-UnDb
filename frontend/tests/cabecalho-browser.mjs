@@ -138,6 +138,11 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
     if (autenticacao) await conectado(); else await visitante();
     for (const width of [320, 768, 1280]) {
       await cdp("Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      if (width < 1024) {
+        await avaliar("document.querySelector('header .menu-toggle').click()");
+        await aguardar(() => avaliar("document.querySelector('header .menu-toggle').getAttribute('aria-expanded') === 'true'"), "menu aberto");
+        assert.equal(await avaliar(`document.querySelector('${conta} a').getBoundingClientRect().height >= 44`), true, "conta acessível no menu");
+      }
       for (const tema of ["light", "dark"]) {
         await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
         assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true, `overflow ${width}/${tema}/${autenticacao}`);
@@ -150,6 +155,10 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
           const { data } = await cdp("Page.captureScreenshot", { format: "png" });
           await writeFile(join(process.env.PREVIEW_DIR, `cabecalho-${autenticacao ? "conta" : "visitante"}-${width}-${tema}.png`), Buffer.from(data, "base64"));
         }
+      }
+      if (width < 1024) {
+        await avaliar("document.querySelector('header .menu-toggle').click()");
+        await aguardar(() => avaliar("document.querySelector('header .menu-toggle').getAttribute('aria-expanded') === 'false'"), "menu fechado");
       }
     }
   }

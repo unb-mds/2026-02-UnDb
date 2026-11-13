@@ -5,6 +5,7 @@ import { nomeUnidade } from "@/lib/unidade";
 import Link from "next/link";
 import { iniciaisProfessor } from "@/lib/iniciais";
 import { useEffect, useState } from "react";
+import Icone from "@/components/icone";
 import DisciplinasProfessor from "@/components/disciplinas-professor";
 import { listarDisciplinasDoProfessor } from "@/lib/services/professores";
 import type { DisciplinaDetalhe, ProfessorDetalhe } from "@/lib/types/institucional";
@@ -39,18 +40,17 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
 
 
   return (
-    <li className="tile min-w-0 rounded-2xl! p-5 break-words sm:p-6">
-      <div className="flex items-start gap-4">
-        <span aria-hidden="true" className="avatar-initials rounded-xl!">{iniciaisProfessor(professor.nome)}</span>
-        <div className="min-w-0">
-          <h2 className="text-xl font-semibold">
-            <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="hover:text-accent">
-              {professor.nome}
-            </Link>
-          </h2>
-          <p className="mt-2 text-sm text-(--muted)">Unidade acadêmica: {nomeUnidade(professor)}</p>
-        </div>
-      </div>
+    <li className="destaque h-full min-w-0 break-words">
+      <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="destaque-visual professor-visual" aria-label={`Ver perfil de ${professor.nome}`}>
+        <span className="avatar-initials large rounded-2xl!" aria-hidden="true">{iniciaisProfessor(professor.nome)}</span>
+        <span className="text-xs font-medium tracking-widest text-(--ink-soft) uppercase">Professor</span>
+        <span className="destaque-notch" aria-hidden="true"><span className="destaque-arrow"><span className="inline-flex -rotate-45"><Icone nome="arrow-right" /></span></span></span>
+      </Link>
+      <div className="px-3">
+        <h2 className="text-xl leading-tight font-semibold tracking-tight">
+          <Link href={comContextoBusca(`/professores/${professor.id}`, contexto)} className="hover:text-accent">{professor.nome}</Link>
+        </h2>
+        <p className="mt-3 text-sm text-(--muted)">Unidade acadêmica: {nomeUnidade(professor)}</p>
       <h3 className="label-mono mt-6 normal-case!">Disciplinas lecionadas</h3>
       {consulta.estado === "carregando" && <p role="status" className="mt-2 text-sm text-(--muted)">Carregando disciplinas…</p>}
       {consulta.estado === "erro" && (
@@ -59,7 +59,8 @@ export default function ProfessorResultado({ professor, contexto = null }: { pro
           <button type="button" onClick={tentarNovamente} className="button" aria-label={`Tentar novamente disciplinas de ${professor.nome}`}>Tentar novamente</button>
         </div>
       )}
-      {consulta.estado === "sucesso" && <DisciplinasProfessor professorId={professor.id} disciplinas={consulta.disciplinas} contexto={contexto} />}
+      {consulta.estado === "sucesso" && <DisciplinasProfessor professorId={professor.id} disciplinas={consulta.disciplinas} contexto={contexto} compacta />}
+      </div>
     </li>
   );
 }

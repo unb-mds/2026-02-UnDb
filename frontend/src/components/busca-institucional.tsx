@@ -114,7 +114,7 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
         {buscaValida && atual && !erro && resultados.length > 0 && (
           <>
             <p className="text-sm text-foreground/70">{professor ? "As disciplinas estão agrupadas por professor. Confira a unidade acadêmica antes de escolher." : "Escolha uma disciplina para comparar professores ou chegar à avaliação."}</p>
-            <ul className={`grid gap-4 ${professor ? "" : "sm:grid-cols-2 lg:grid-cols-3"}`} aria-label="Lista de resultados">
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Lista de resultados">
               {resultados.map((resultado) => (
                 "codigo" in resultado ? <DisciplinaCatalogo key={resultado.id} disciplina={resultado} contexto={contexto} />
                   : <ProfessorResultado key={resultado.id} professor={resultado} contexto={contexto} />

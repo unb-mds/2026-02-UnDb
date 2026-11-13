@@ -42,7 +42,12 @@ export function criarCenarioBusca(professor, disciplina) {
     if (!ativo) return false;
     const url = new URL(req.url, "http://localhost");
     const enviar = (dados, status = 200) => res.writeHead(status).end(JSON.stringify(dados));
-    if (url.pathname === "/api/professores" || url.pathname === "/api/disciplinas") {
+    if (url.pathname === "/api/disciplinas/destaques") {
+      if (catalogo === "lento") await new Promise(resolve => setTimeout(resolve, 900));
+      const destaques = [...disciplinas].sort((a,b) => a.nome.localeCompare(b.nome, "pt-BR")).map((d,i) => ({...d,total_avaliacoes:30-i}));
+      enviar(catalogo === "erro" ? [] : catalogo === "vazio" ? [] : destaques);
+    }
+    else if (url.pathname === "/api/professores" || url.pathname === "/api/disciplinas") {
       consultas += 1;
       const termo = url.searchParams.get("nome") ?? url.searchParams.get("codigo");
       if (termo === "lenta") {
@@ -102,7 +107,10 @@ export function criarCenarioBusca(professor, disciplina) {
       const { data } = await cdp("Page.captureScreenshot", { format: "png", captureBeyondViewport: true });
       await writeFile(join(process.env.PREVIEW_DIR, `155-${nome}.png`), Buffer.from(data, "base64"));
     };
-    const semTransbordar = async () => assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true);
+    const semTransbordar = async () => {
+      const layout = await avaliar("({rota:location.pathname,largura:innerWidth,total:document.documentElement.scrollWidth,excedentes:Array.from(document.querySelectorAll('main *, header *')).filter(e=>e.getBoundingClientRect().right>innerWidth+1).slice(0,8).map(e=>({tag:e.tagName,classe:e.className,direita:e.getBoundingClientRect().right}))})");
+      assert.ok(layout.total <= layout.largura, JSON.stringify(layout));
+    };
     try {
       // A escolha nativa precisa encaminhar a busca enquanto os scripts não chegam.
       const termoAntesDaHidratacao = "Teste & CIC";
@@ -134,8 +142,16 @@ export function criarCenarioBusca(professor, disciplina) {
           assert.equal(await avaliar("document.querySelectorAll('main h1').length"), 1);
           assert.equal(await avaliar("document.querySelector('[aria-current=step]') === null"), true);
           assert.equal(await avaliar("document.querySelector('main form').checkValidity()"), false);
+          // A pílula acompanha o rádio nativo sem alterar a consulta ou exigir JS.
+          await avaliar("document.querySelector('.segmented input[value=professores]').click()");
+          await aguardar(() => avaliar("getComputedStyle(document.querySelector('.segmented'), '::before').transform !== 'none'"), "pílula acompanha Professor");
+          assert.equal(await avaliar("new FormData(document.querySelector('main form')).get('busca')"), "professores");
+          await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
+          assert.equal(await avaliar("getComputedStyle(document.querySelector('.segmented'), '::before').transitionDuration"), "0s");
+          await avaliar("document.querySelector('.segmented input[value=disciplinas]').click()");
+          await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
           await aguardarTexto("Explore as disciplinas");
-          assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('[aria-label=\"Disciplinas do catálogo\"] h3')).map(e => e.textContent)"), ["Álgebra Teste", "Biologia Teste", "Zoologia Teste"]);
+          assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('[aria-label=\"Disciplinas mais avaliadas\"] h3')).map(e => e.textContent)"), ["Álgebra Teste", "Biologia Teste", "Zoologia Teste"]);
           await semTransbordar();
           if (width === 320 || width === 1440) await capturar(`203-entrada-${width}-${tema}`);
           await clicar("Ver unidades");
@@ -188,7 +204,7 @@ export function criarCenarioBusca(professor, disciplina) {
             assert.equal(await avaliar("getComputedStyle(document.activeElement).outlineStyle !== 'none'"), true);
             assert.equal(await avaliar("document.querySelector('main select').labels[0].textContent.includes('Ordenar resultados')"), true);
             assert.deepEqual(await itens(), tipo === "professores" ? ["Álvaro Teste", "Ana Teste", "Zélia Teste"] : ["Álgebra Teste", "Biologia Teste", "Zoologia Teste"]);
-            assert.equal(await avaliar("getComputedStyle(document.querySelector('section[aria-label=\"Resultados da busca\"] > ul')).gridTemplateColumns.split(' ').length"), tipo === "professores" || width < 640 ? 1 : width < 1024 ? 2 : 3);
+            assert.equal(await avaliar("getComputedStyle(document.querySelector('section[aria-label=\"Resultados da busca\"] > ul')).gridTemplateColumns.split(' ').length"), width < 640 ? 1 : width < 1024 ? 2 : 3);
             const total = consultas;
             await ordenar("unidade");
             assert.equal(consultas, total, "Trocar ordem não refaz a busca");
@@ -243,13 +259,13 @@ export function criarCenarioBusca(professor, disciplina) {
             const enviosAntes = logins;
             await clicar("Ocultar senha");
             assert.equal(await avaliar("document.querySelector('[name=senha]').type"), "password");
-            assert.equal(await avaliar("document.querySelector('button[aria-controls]').type"), "button");
-            assert.equal(await avaliar("document.querySelector('button[aria-controls]').getAttribute('aria-pressed')"), "false");
+            assert.equal(await avaliar("document.querySelector('main button[aria-controls]').type"), "button");
+            assert.equal(await avaliar("document.querySelector('main button[aria-controls]').getAttribute('aria-pressed')"), "false");
             assert.equal(await avaliar("document.querySelector('[name=senha]').value"), "senha-apenas-teste");
             assert.equal(logins, enviosAntes);
             assert.equal(await avaliar("document.querySelector('[aria-label=\"Etapas da jornada\"], main input[type=search], main select') === null"), true);
-            await avaliar("document.querySelector('button[aria-controls]').focus()");
-            assert.equal(await avaliar("document.activeElement === document.querySelector('button[aria-controls]')"), true);
+            await avaliar("document.querySelector('main button[aria-controls]').focus()");
+            assert.equal(await avaliar("document.activeElement === document.querySelector('main button[aria-controls]')"), true);
             await cdp("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Enter", text: "\r", windowsVirtualKeyCode: 13 });
             await cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
             await aguardar(async () => await avaliar("document.querySelector('[name=senha]').type === 'text'"), "mostrar senha por teclado");
@@ -265,7 +281,7 @@ export function criarCenarioBusca(professor, disciplina) {
       for (const rota of ["/", "/departamentos"]) {
         catalogo = "lento";
         await navegar(rota, "Carregando catálogo");
-        await aguardarTexto("Zoologia Teste");
+        await aguardar(() => avaliar("Array.from(document.querySelectorAll('main h2, main h3')).some(e => e.textContent === 'Zoologia Teste')"), "disciplina do catálogo carregada");
         catalogo = "vazio";
         await cdp("Page.reload");
         await aguardarTexto("Catálogo vazio");
@@ -277,7 +293,8 @@ export function criarCenarioBusca(professor, disciplina) {
         assert.equal(await avaliar("document.body.innerText.includes('Catálogo vazio')"), false);
         catalogo = "sucesso";
         await clicar("Tentar novamente");
-        await aguardarTexto("Zoologia Teste");
+        if (rota === "/") await aguardarTexto("Explore qualquer unidade acadêmica");
+        else await aguardar(() => avaliar("Array.from(document.querySelectorAll('main h2, main h3')).some(e => e.textContent === 'Zoologia Teste')"), "disciplina do catálogo carregada");
       }
       await navegar("/departamentos?unidade=Inexistente", "Nenhuma disciplina encontrada nesta unidade");
       await clicar("Ver todas as unidades");

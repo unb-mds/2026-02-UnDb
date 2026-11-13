@@ -11,7 +11,7 @@ import {
 import { ApiError } from "@/lib/services/http-error";
 import ComparacaoDark from "@/components/comparacao-dark";
 import Caminho from "@/components/caminho";
-import FundoParticulas from "@/components/fundo-particulas";
+import FundoLiquido from "@/components/fundo-liquido";
 import Icone from "@/components/icone";
 
 export default async function DetalheDisciplinaPage({
@@ -38,7 +38,7 @@ export default async function DetalheDisciplinaPage({
 
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
-      <FundoParticulas />
+      <FundoLiquido />
       <div className="container flex flex-col gap-8 py-8 sm:py-12">
         <Caminho
           itens={[

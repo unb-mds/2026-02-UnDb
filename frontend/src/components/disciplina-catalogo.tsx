@@ -5,19 +5,16 @@ import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
 import type { DisciplinaDetalhe } from "@/lib/types/institucional";
 
 /** Mesmo cartão das "Disciplinas mais avaliadas" da home: bloco superior só com o código e a unidade acadêmica como tag. */
-const TONS = ["verde", "azul", "claro", "escuro"] as const;
 
-export default function DisciplinaCatalogo({ disciplina, contexto = null, titulo: Titulo = "h2", indice }: {
+export default function DisciplinaCatalogo({ disciplina, contexto = null, titulo: Titulo = "h2" }: {
   disciplina: DisciplinaDetalhe;
   contexto?: ContextoBusca | null;
   titulo?: "h2" | "h3";
-  /** Posição na lista: quando informada, o bloco de cima ganha uma cor sólida (como nas "mais avaliadas"). */
-  indice?: number;
 }) {
   return (
     <li className="flex min-w-0">
       <Link href={comContextoBusca(`/disciplinas/${disciplina.id}`, contexto)} className="destaque w-full break-words">
-        <div className="destaque-visual" data-tom={indice === undefined ? undefined : TONS[indice % TONS.length]}>
+        <div className="destaque-visual">
           <span className="destaque-pill"><span className="sr-only">Código da disciplina: </span>{disciplina.codigo}</span>
           <span className="destaque-notch" aria-hidden="true"><span className="destaque-arrow"><span className="inline-flex -rotate-45"><Icone nome="arrow-right" /></span></span></span>
         </div>

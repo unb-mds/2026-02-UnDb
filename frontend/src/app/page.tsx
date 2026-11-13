@@ -25,7 +25,15 @@ export default function Home() {
     </section>
     <div className="container flex flex-col gap-10 py-10 sm:py-14">
       <DestaquesHome />
-      <CatalogoHome />
+      <CatalogoHome apenasUnidades />
+      <details className="group border-t border-(--border) pt-5 text-sm">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-medium">Primeira vez por aqui? Veja como funciona.<span aria-hidden="true" className="text-accent group-open:rotate-90"><Icone nome="arrow-right" pequeno /></span></summary>
+        <ol className="mt-4 grid gap-5 pb-4 text-sm text-(--ink-soft) sm:grid-cols-3">
+          <li><strong className="mb-1 block text-foreground">01 · Encontre</strong>Busque pelo nome do professor, da disciplina ou pelo código.</li>
+          <li><strong className="mb-1 block text-foreground">02 · Compare</strong>Leia cada critério e a quantidade de avaliações. Dificuldade e chamada são informações neutras.</li>
+          <li><strong className="mb-1 block text-foreground">03 · Contribua</strong>Avalie com sua conta institucional confirmada. Comentários são opcionais e passam por moderação humana.</li>
+        </ol>
+      </details>
       <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-(--border) bg-background p-6 sm:flex-row sm:items-center sm:p-6">
         <div><h2 className="text-xl font-medium sm:text-2xl">Já cursou? Ajude quem vem depois.</h2><p className="mt-1 text-sm text-(--muted)">Avalie em cinco critérios com sua conta institucional confirmada. Comentários são opcionais e passam por moderação humana.</p></div>
         <Link href="/professores" className="button primary shrink-0">Avaliar um professor <Icone nome="arrow-right" pequeno /></Link>

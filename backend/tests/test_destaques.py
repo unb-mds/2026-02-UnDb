@@ -1,6 +1,8 @@
+import asyncio
 import os
 import unittest
 from uuid import uuid4
+from unittest.mock import patch
 
 os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 os.environ.setdefault("SECRET_KEY", "teste-local")
@@ -68,9 +70,43 @@ class DestaquesTest(unittest.TestCase):
             self.assertEqual(listar_destaques(db), [])
         engine.dispose()
 
-    def test_rota_destaques_vem_antes_da_rota_por_id(self):
-        caminhos = [getattr(rota, "path", "") for rota in app.routes]
-        self.assertLess(
-            caminhos.index("/api/disciplinas/destaques"),
-            caminhos.index("/api/disciplinas/{disciplina_id}"),
-        )
+    def test_rota_destaques_nao_e_capturada_como_id(self):
+        # Verifica o contrato HTTP, sem depender da representação interna dos routers.
+        mensagens = []
+
+        async def solicitar():
+            async def receive():
+                return {"type": "http.request", "body": b"", "more_body": False}
+
+            async def send(mensagem):
+                mensagens.append(mensagem)
+
+            await app(
+                {
+                    "type": "http",
+                    "asgi": {"version": "3.0"},
+                    "http_version": "1.1",
+                    "method": "GET",
+                    "scheme": "http",
+                    "path": "/api/disciplinas/destaques",
+                    "raw_path": b"/api/disciplinas/destaques",
+                    "query_string": b"",
+                    "headers": [],
+                    "client": ("127.0.0.1", 12345),
+                    "server": ("testserver", 80),
+                    "root_path": "",
+                    "state": {},
+                },
+                receive,
+                send,
+            )
+
+        with patch(
+            "app.services.institucional_service.listar_destaques", return_value=[]
+        ) as listar:
+            asyncio.run(solicitar())
+        inicio = next(m for m in mensagens if m["type"] == "http.response.start")
+        corpo = b"".join(m.get("body", b"") for m in mensagens if m["type"] == "http.response.body")
+        self.assertEqual(inicio["status"], 200)
+        self.assertEqual(corpo, b"[]")
+        listar.assert_called_once()

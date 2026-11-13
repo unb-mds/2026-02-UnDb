@@ -5,11 +5,11 @@ import ConsultaSelecionada from "./consulta-selecionada";
 import { useEffect, useRef, useState } from "react";
 import { iniciaisProfessor } from "@/lib/iniciais";
 import { nomeUnidade } from "@/lib/unidade";
-import { comContextoBusca, type ContextoBusca } from "@/lib/contexto-busca";
+import type { ContextoBusca } from "@/lib/contexto-busca";
 import type { AvaliacaoAgregada } from "@/lib/types/avaliacao";
 import type { TurmaInstitucional } from "@/lib/types/institucional";
-import EstrelasDidatica, { formatarDidatica } from "./estrelas-didatica";
 import Icone from "./icone";
+import EstrelasDidatica, { formatarDidatica } from "./estrelas-didatica";
 
 const labels = {
   FACIL: "Fácil",
@@ -18,8 +18,6 @@ const labels = {
   RUIM: "Ruim",
   BOM: "Bom",
 } as const;
-
-const TONS = ["verde", "azul", "claro", "escuro"] as const;
 
 function textoAvaliacoes(total: number) {
   return `${total} ${total === 1 ? "avaliação" : "avaliações"}`;
@@ -87,7 +85,7 @@ export default function ComparacaoDark({
   }
 
   return (
-    <section className="comparison-section relative p-5 sm:p-8" aria-labelledby="comparacao-titulo">
+    <section className="comparison-section glass p-5 sm:p-8" aria-labelledby="comparacao-titulo">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <span className="kicker">Comparação</span>
@@ -102,7 +100,9 @@ export default function ComparacaoDark({
             com oferta registrada para esta matéria. Cada cartão mostra sua própria base de respostas.
           </p>
         </div>
-        {selecionado && <div className="flex flex-col items-start gap-2"><Link href={comContextoBusca(`/professores/${selecionado.professorId}/disciplinas/${disciplinaId}/avaliar`, contexto)} className="button primary">Avaliar este professor <Icone nome="arrow-right" pequeno /></Link><p className="text-xs text-(--muted)">{selecionado.professor.nome}</p></div>}
+      </div>
+
+      <div className="mt-6 flex justify-end">
         {professores.some((p) => p.dadosSuficientes) && (
           <button
             type="button"
@@ -124,13 +124,13 @@ export default function ComparacaoDark({
           <ul
             ref={trilho}
             id="comparacao-cartoes"
-            className="carousel mt-8"
+            className="carousel mt-4"
             aria-label="Comparação de professores por recomendação; dados insuficientes ficam ao final"
             tabIndex={0}
           >
             {ordenados.map((a, i) => (
               <li data-professor-id={a.professorId} key={a.professorId} aria-label={`${i + 1} de ${ordenados.length}: ${a.professor.nome}`}>
-                <Link href="#consulta-selecionada" data-tom={TONS[i % TONS.length]} onClick={() => setSelecionadoId(a.professorId)} aria-current={selecionado?.professorId === a.professorId ? "true" : undefined} className={`pro-card transition-colors hover:border-accent ${selecionado?.professorId === a.professorId ? "border-accent!" : ""}`}>
+                <Link href="#consulta-selecionada" onClick={() => setSelecionadoId(a.professorId)} aria-current={selecionado?.professorId === a.professorId ? "true" : undefined} className={`pro-card transition-colors hover:border-accent ${selecionado?.professorId === a.professorId ? "border-accent!" : ""}`}>
                   <header className="pro-card-head">
                     <span className="avatar-initials" aria-hidden="true">{iniciaisProfessor(a.professor.nome)}</span>
                     <div className="min-w-0">
