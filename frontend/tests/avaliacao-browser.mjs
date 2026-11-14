@@ -75,6 +75,8 @@ const fixture = createServer(async (req, res) => {
     res.end(JSON.stringify({disciplina, professores:[]}));
   } else if (req.url === "/api/auth/sessao") {
     consultasSessao += 1; res.end(JSON.stringify({ autenticado }));
+  } else if (req.url.startsWith("/api/comentarios/meu")) {
+    res.writeHead(autenticado ? 200 : 401).end(JSON.stringify([]));
   } else if (req.method === "POST" && req.url === "/api/auth/login") {
     autenticado = statusLogin === 200;
     if (autenticado) res.setHeader("Set-Cookie", "undb_session=sessao-de-teste; Path=/; HttpOnly; SameSite=Lax");
@@ -203,7 +205,13 @@ try {
   assert.ok((await texto()).includes(`Código da disciplina: ${real?.disciplinaCodigo ?? "CIC0001"}`));
   assert.equal(await avaliar('document.querySelector("[name=didatica]:checked") === null'), true);
   assert.equal(await avaliar('document.querySelector("[name=didatica][type=radio]")?.required'), true);
-  assert.equal(await avaliar(`document.querySelector('a[href^="/login?returnTo="]')?.target`), "");
+  // Sessão conhecida ativa não recebe convite de login; o retorno é verificado como visitante abaixo.
+  await aguardar(async () => await avaliar('!document.querySelector("[data-testid=acesso-avaliacao]")?.textContent.includes("Verificando seu acesso")'), "estado do acesso");
+  if (real) {
+    assert.equal(await avaliar(`document.querySelector('[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]')?.target`), "");
+  } else {
+    assert.equal(await avaliar(`!!document.querySelector('[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]')`), false);
+  }
   // Confirma hidratação antes de testar a validação local.
   await aguardarValidacaoLocal("Selecione uma opção válida para Didática.");
   await enviar();
@@ -270,6 +278,9 @@ try {
     console.log("Integração real: formulário → FastAPI → PostgreSQL; criação, substituição com mesmo ID/linha, sessões ausente/inválida/expirada, e-mail não confirmado, 422 e falha de rede sem perda das respostas.");
   } else {
     autenticado = false;
+    await avaliar("window.dispatchEvent(new Event('focus'))");
+    await aguardar(async () => await avaliar('!!document.querySelector(\'[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]\')'), "convite para visitante");
+    assert.equal(await avaliar(`document.querySelector('[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]')?.target`), "");
     await enviar();
     await aguardarTexto("Entre na sua conta");
     assert.equal(envios.length, 0);

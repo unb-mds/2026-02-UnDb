@@ -61,6 +61,11 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
     assert.doesNotMatch(await texto(), /Entrar|criar conta/i);
     assert.equal(await avaliar(`document.querySelector('${conta} a').getAttribute('href')`), "/login");
   };
+  const neutro = async () => {
+    await esperar("Verificar conta");
+    assert.doesNotMatch(await texto(), /Entrar|Minha conta/);
+    assert.equal(await avaliar(`document.querySelectorAll('${conta} a').length`), 1);
+  };
 
   await navegar("/login");
   await visitante();
@@ -94,7 +99,7 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
   await evento("undb:sessao-alterada");
   await aguardar(async () => !!respostaRetida, "revalidação após logout retida");
   await aguardar(() => avaliar(`document.querySelector('${conta} [role=status]')?.textContent === 'Verificando sessão…'`), "carregamento neutro após perder a sessão");
-  await visitante();
+  await neutro();
   respostaRetida();
   respostaRetida = null;
   await aguardar(() => avaliar(`!document.querySelector('${conta} [role=status]')`), "logout revalidado");
@@ -118,7 +123,7 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
   statusSessao = 503;
   await evento("focus");
   await aguardar(() => avaliar(`document.querySelector('${conta} [role=status]')?.textContent.includes('Não foi possível')`), "erro de sessão sem assumir visitante");
-  await visitante();
+  await neutro();
   statusSessao = 200;
   await evento("focus");
   await conectado();
@@ -127,7 +132,7 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
   segurarProxima = true;
   await navegar("/");
   await aguardar(async () => !!respostaRetida, "sessão inicial retida");
-  await visitante();
+  await neutro();
   respostaRetida();
   respostaRetida = null;
   await conectado();
