@@ -76,7 +76,7 @@ await comNavegador({ fixture:real?null:fixture, executar:async ({cdp,avaliar,agu
   async function login(dados){
     // Conta ativa mostra Minha conta; aguardar o estado verificado antes de trocar a sessão.
     await navegar('/login');
-    await aguardar(async()=>await avaliar(`!!document.querySelector('input[name="email"]') || document.body.innerText.includes('Sua sessão está ativa')`),'sessão de login');
+    await aguardar(async()=>await avaliar(`!!document.querySelector('input[name="email"]') || document.body?.innerText.includes('Sua sessão está ativa')`),'sessão de login');
     if ((await texto()).includes('Sua sessão está ativa')) await clicar('Sair');
     await aguardar(async()=>await avaliar(`!!document.querySelector('input[name="email"]')`),'login pronto');
     await avaliar(`for(const [nome,valor] of Object.entries(${JSON.stringify(dados)})){const i=document.querySelector('input[name="'+nome+'"]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(i,valor);i.dispatchEvent(new Event('input',{bubbles:true}));}`);
