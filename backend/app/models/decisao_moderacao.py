@@ -14,7 +14,7 @@ class DecisaoModeracao(Base):
     comentario_versao_id: Mapped[UUID] = mapped_column(
         ForeignKey("comentario_versoes.id"), nullable=False, index=True
     )
-    moderador_id: Mapped[UUID] = mapped_column(ForeignKey("usuarios.id"), nullable=False)
+    moderador_id: Mapped[UUID | None] = mapped_column(ForeignKey("usuarios.id"), nullable=True)
     acao: Mapped[str] = mapped_column(String(20), nullable=False)
     motivo: Mapped[str] = mapped_column(Text, nullable=False)
     estado_anterior: Mapped[str] = mapped_column(String(20), nullable=False)

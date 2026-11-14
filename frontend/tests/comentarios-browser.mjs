@@ -1,3 +1,4 @@
+let publicacaoAutomatica = false;
 import { lerTextoPagina } from "./browser-navigation.mjs";
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
@@ -53,9 +54,9 @@ const fixture = createServer(async (req,res) => {
     if (dados.comentario !== undefined) {
       const texto = dados.comentario.trim();
       if (!texto || [...texto].length>500) comentario_erro='invalido';
-      else { itens=itens.filter(v=>v.estado!=='PENDENTE'); itens.push({...criar(11,'PENDENTE',texto),substitui_id:versaoId}); }
+      else { itens=itens.filter(v=>v.estado!=='PENDENTE'); itens.push({...criar(11,publicacaoAutomatica?'PUBLICADO':'PENDENTE',texto),substitui_id:versaoId}); }
     }
-    responder(200,{id:avaliacaoId,comentario_erro}); return;
+    responder(200,{id:avaliacaoId,comentario_erro,comentario_estado:dados.comentario&&!comentario_erro?(publicacaoAutomatica?'PUBLICADO':'PENDENTE'):null}); return;
   }
   if (url.pathname.endsWith('/retirar') && req.method==='PATCH') {
     if(statusRetirada!==200){responder(statusRetirada,{});return;}
@@ -141,5 +142,6 @@ await comNavegador({ fixture:real?null:fixture, executar:async ({cdp,avaliar,agu
     await new Promise(r=>setTimeout(r,600)); assert.ok(!(await texto()).includes('Meus comentários'),'resposta antiga não reaparece');
     conta=autor.email; itens=[]; await avaliar(`window.dispatchEvent(new Event('undb:sessao-alterada'))`); await esperar('Você ainda não possui comentários');
   }
+  if(!real){publicacaoAutomatica=true;await preencher('Texto adequado para publicação automática.');await clicar('Enviar avaliação');await esperar('Seu comentário foi publicado após a triagem automática.');}
   console.log(`RF20 aprovado (${real?'API/PostgreSQL reais':'HTTP controlado'}): permissões, estados, texto descartado, envio/substituição/retirada, critérios preservados, erros e oito combinações de tema/largura.`);
 }});
