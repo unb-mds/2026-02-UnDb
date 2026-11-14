@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { contextoEmTransicao } from './browser-navigation.mjs';
 
-export async function comNavegador({ fixture, executar }) {
+export async function comNavegador({ fixture, executar, diretorioFrontend }) {
   const navegador = process.env.BROWSER_PATH ?? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
   assert.ok(existsSync(navegador), 'Informe BROWSER_PATH com Edge/Chromium.');
   for (const porta of fixture ? [8000, 3100, 9228] : [3100, 9228]) {
@@ -49,7 +49,7 @@ export async function comNavegador({ fixture, executar }) {
   try {
     if (fixture) await new Promise(resolve => fixture.listen(8000, resolve));
     next = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '-p', '3100'], {
-      cwd: fileURLToPath(new URL('../', import.meta.url)), stdio: 'inherit', windowsHide: true,
+      cwd: diretorioFrontend ?? fileURLToPath(new URL('../', import.meta.url)), stdio: 'inherit', windowsHide: true,
     });
     await aguardar(() => responder(3100), 'Next.js');
     browser = spawn(navegador, ['--headless=new', '--edge-skip-compat-layer-relaunch', '--disable-gpu', '--no-first-run', '--remote-debugging-port=9228', `--user-data-dir=${perfil}`, 'about:blank'], { stdio: 'ignore', windowsHide: true });

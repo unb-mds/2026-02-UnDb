@@ -10,7 +10,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node tests/run-tests.mjs",
     "test:coverage": "node tests/run-tests.mjs --coverage",
-    "test:browser": "node tests/avaliacao-browser.mjs && node tests/moderacao-browser.mjs && node tests/denuncia-browser.mjs && node tests/comentarios-browser.mjs && node tests/cabecalho-browser.mjs && node tests/identidades-browser.mjs && node tests/transicao-browser.mjs",
+    "test:browser": "node tests/avaliacao-browser.mjs && node tests/moderacao-browser.mjs && node tests/denuncia-browser.mjs && node tests/comentarios-browser.mjs && node tests/cabecalho-browser.mjs && node tests/identidades-browser.mjs && node tests/transicao-browser.mjs && node tests/conta-avaliacao-sessao-browser.mjs",
     "test:cabecalho": "node tests/cabecalho-browser.mjs",
     "test:identidades": "node tests/identidades-browser.mjs",
     "test:moderacao": "node tests/moderacao-browser.mjs",
