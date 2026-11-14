@@ -67,11 +67,101 @@ class HibridoTest(unittest.TestCase):
         self.assertEqual(a.professores[0].id, b.professores[0].id)
 
     def test_falha_ou_ambiguidade_nao_acionam_fallback(self):
-        for i, motivo in enumerate(
-            ["CONSULTA_INCONCLUSIVA", "HOMONIMOS", "DISCIPLINA_NAO_CONFIRMADA"]
-        ):
+        for i, motivo in enumerate(["CONSULTA_INCONCLUSIVA", "HOMONIMOS"]):
             self.oferta_local(str(10 + i), motivo=motivo)
         self.assertEqual(self.db.scalar(select(func.count()).select_from(IdentidadeLocal)), 0)
+
+    def test_historico_incompleto_reutiliza_identidade_no_semestre_seguinte(self):
+        a = self.oferta_local("04", motivo="DISCIPLINA_NAO_CONFIRMADA")
+        b = self.oferta_local("05", "2027.1", motivo="DISCIPLINA_NAO_CONFIRMADA")
+        self.assertEqual(a.professores[0].id, b.professores[0].id)
+        self.assertIsNone(repo.identidade_do_professor(self.db, a.professores[0].id))
+
+    def test_historico_incompleto_reutiliza_canonico_institucional_existente(self):
+        repo.vincular(self.db, "1234", self.destino)
+        a = self.oferta_local("04", motivo="DISCIPLINA_NAO_CONFIRMADA")
+        self.assertEqual(a.professores[0].id, self.destino.id)
+        self.assertEqual(self.item("04").estado, "APLICADA")
+
+    def oferta_multiplos(self, turma, periodo="2026.2", segundo="5678", unidade="673"):
+        candidatos = [fixture.CANDIDATO, dict(fixture.CANDIDATO, identificador=segundo)]
+        return salvar_oferta(
+            self.db,
+            replace(self.oferta, turma_codigo=turma, periodo=periodo, unidade_id=unidade),
+            unidade,
+            consulta_docentes=Mock(consultar=Mock(return_value=("HOMONIMOS", candidatos))),
+        )
+
+    def test_multiplos_revisados_reutilizados_sem_aceitar_perfil_novo(self):
+        a = self.oferta_multiplos("04")
+        b = self.oferta_multiplos("05")
+        avaliacao = self.avaliar(a.professores[0])
+        avaliacao_id = avaliacao.id
+        self.db.commit()
+        self.assertEqual(service.consolidar_locais(self.db), [])
+        previa = service.consolidar_locais(self.db, incluir_revisadas=True)
+        self.assertEqual(previa[0]["registros_a_unir"], 1)
+        self.assertIsNone(repo.local(self.db, "DOCENTE TESTE", "673"))
+        resultado = service.consolidar_locais(self.db, True, incluir_revisadas=True)
+        self.assertEqual(resultado[0]["estado"], "APLICADA")
+        destino = repo.local(self.db, "DOCENTE TESTE", "673").professor_id
+        self.db.expire_all()
+        self.assertEqual(a.professores[0].id, destino)
+        self.assertEqual(b.professores[0].id, destino)
+        self.assertEqual(avaliacao.id, avaliacao_id)
+        self.assertEqual(avaliacao.professor_id, destino)
+        futuro = self.oferta_multiplos("06", "2027.1")
+        self.assertEqual(futuro.professores[0].id, destino)
+        self.assertEqual(self.item("06").estado, "APLICADA")
+        novo = self.oferta_multiplos("07", "2027.1", segundo="9999")
+        self.assertNotEqual(novo.professores[0].id, destino)
+        self.assertEqual(self.item("07").estado, "PENDENTE")
+        outra = self.oferta_multiplos("08", "2027.1", unidade="524")
+        self.assertNotEqual(outra.professores[0].id, destino)
+        self.assertEqual(self.item("08").estado, "PENDENTE")
+        self.oferta_local("04", motivo="CONSULTA_INCONCLUSIVA")
+        self.assertTrue(
+            repo.candidatos_locais_revisados(
+                self.db,
+                "DOCENTE TESTE",
+                "673",
+                [fixture.CANDIDATO, dict(fixture.CANDIDATO, identificador="5678")],
+            )
+        )
+
+    def test_indisponibilidade_reutiliza_local_apos_revisao_explicita(self):
+        self.oferta_local("04", motivo="CONSULTA_INCONCLUSIVA")
+        self.db.commit()
+        self.assertEqual(service.consolidar_locais(self.db), [])
+        self.assertEqual(
+            service.consolidar_locais(self.db, True, incluir_revisadas=True)[0]["estado"],
+            "APLICADA",
+        )
+        destino = repo.local(self.db, "DOCENTE TESTE", "673").professor_id
+        futuro = self.oferta_local("05", "2027.1", motivo="CONSULTA_INCONCLUSIVA")
+        self.assertEqual(futuro.professores[0].id, destino)
+
+    def test_revisao_explicita_nao_descarta_avaliacoes_em_colisao(self):
+        a = self.oferta_multiplos("04")
+        b = self.oferta_multiplos("05")
+        avaliacao = self.avaliar(a.professores[0])
+        self.avaliar(b.professores[0], avaliacao.usuario)
+        self.db.commit()
+        resultado = service.consolidar_locais(self.db, True, incluir_revisadas=True)
+        self.assertEqual(resultado[0]["estado"], "BLOQUEADA")
+        self.assertIn("Colisão", resultado[0]["erro"])
+        self.assertIsNone(repo.local(self.db, "DOCENTE TESTE", "673"))
+        self.assertEqual(self.item("04").estado, "PENDENTE")
+        self.assertEqual(self.item("05").estado, "PENDENTE")
+
+    def test_multiplos_sem_evidencia_valida_bloqueiam_revisao(self):
+        self.salvar("04", motivo="HOMONIMOS")
+        self.db.commit()
+        self.assertEqual(
+            service.consolidar_locais(self.db, True, incluir_revisadas=True)[0]["estado"],
+            "BLOQUEADA",
+        )
+        self.assertIsNone(repo.local(self.db, "DOCENTE TESTE", "673"))
 
     def test_decisao_humana_separada_impede_fallback_em_nova_turma(self):
         self.salvar("04", motivo="HOMONIMOS")

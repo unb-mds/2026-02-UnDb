@@ -704,11 +704,14 @@ solicitou implementar o híbrido, otimizar a consolidação e informar seu progr
 Essa decisão substitui a proibição geral anterior somente no fallback abaixo.
 
 - Priorizar associação institucional verificável. Quando a busca completa não
-  encontra perfil, reutilizar o cadastro por nome completo normalizado e unidade
+  encontra perfil ou o histórico não confirma a disciplina, reutilizar o cadastro por nome completo normalizado e unidade
   da oferta entre disciplinas, turmas e semestres. A associação deve permanecer
   identificável como provisória, sem afirmar confirmação institucional.
-- Uma falha de consulta, múltiplos perfis encontrados, identidades institucionais
-  conflitantes ou histórico incompatível não autorizam esse fallback.
+- Ampliação aprovada pelo PO após investigação das 41 ocorrências: múltiplos perfis
+  e consultas inconclusivas podem receber associação local por revisão explícita.
+  Em novas ocorrências, múltiplos perfis só reutilizam o conjunto exato de candidatos
+  revisado; mudança exige nova revisão. Indisponibilidade reutiliza associação local
+  existente. Identidades institucionais conflitantes continuam bloqueadas.
 - Descobrir um perfil posteriormente deve permitir promover o cadastro preservando
   UUID e avaliações. União entre UUIDs distintos mantém a janela administrativa,
   prévia e proteção contra colisões de RF03. Manter os links antigos utilizáveis.

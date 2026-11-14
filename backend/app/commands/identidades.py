@@ -19,6 +19,11 @@ def main():
     aplicar.add_argument("--confirmo-janela-sem-escritores-e-backup", action="store_true")
     locais = sub.add_parser("locais", help="Prévia do fallback por nome + unidade")
     locais.add_argument("--aplicar", action="store_true")
+    locais.add_argument(
+        "--incluir-revisadas",
+        action="store_true",
+        help="Inclui múltiplos perfis e consultas inconclusivas já conferidos pelo operador.",
+    )
     locais.add_argument("--confirmo-janela-sem-escritores-e-backup", action="store_true")
     args = parser.parse_args()
     inicio = monotonic()
@@ -48,7 +53,7 @@ def main():
             resultados = (
                 aplicar_confirmadas(db, progresso)
                 if args.acao == "aplicar"
-                else consolidar_locais(db, args.aplicar, progresso)
+                else consolidar_locais(db, args.aplicar, progresso, args.incluir_revisadas)
             )
             print(json.dumps(resultados, ensure_ascii=False))
             if any(r["estado"] == "BLOQUEADA" for r in resultados):
