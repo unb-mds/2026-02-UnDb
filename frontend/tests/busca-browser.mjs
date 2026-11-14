@@ -150,7 +150,7 @@ export function criarCenarioBusca(professor, disciplina) {
           assert.equal(await avaliar("getComputedStyle(document.querySelector('.segmented'), '::before').transitionDuration"), "0s");
           await avaliar("document.querySelector('.segmented input[value=disciplinas]').click()");
           await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });
-          await aguardarTexto("Explore as disciplinas");
+          await aguardarTexto("Disciplinas mais avaliadas");
           assert.deepEqual(await avaliar("Array.from(document.querySelectorAll('[aria-label=\"Disciplinas mais avaliadas\"] h3')).map(e => e.textContent)"), ["Álgebra Teste", "Biologia Teste", "Zoologia Teste"]);
           await semTransbordar();
           if (width === 320 || width === 1440) await capturar(`203-entrada-${width}-${tema}`);
