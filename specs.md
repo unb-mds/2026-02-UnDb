@@ -572,8 +572,8 @@ em outros semestres. Casos seguros futuros são rechecados automaticamente.
 ### Evolução híbrida de RF23 — 13/11/2026
 
 Derivado da evolução de RF23 em `docs/requisitos.md`, aprovada pelo PO em 13/11/2026.
-O importador prioriza perfil institucional verificável. Somente busca concluída sem
-perfil encontrado permite fallback por nome completo normalizado + unidade da oferta,
+O importador prioriza perfil institucional verificável. Busca concluída sem
+perfil encontrado ou histórico sem confirmação da disciplina permite fallback por nome completo normalizado + unidade da oferta,
 reutilizado entre turmas e semestres, com risco residual aceito de homônimos sem perfil.
 
 `identidades_locais` tem PK composta `(nome_normalizado, unidade)` e FK `professor_id`.
@@ -582,7 +582,9 @@ marca confirmação institucional. Perfil descoberto depois pode promover o mesm
 uniões entre UUIDs diferentes permanecem administrativas. Perfil manualmente indicado
 é consultado novamente e exige nome e componente/semestre compatíveis.
 
-Falha de consulta, múltiplos perfis, conflito institucional e histórico incompatível
+Múltiplos perfis e falha de consulta exigem revisão inicial explícita para associação
+local. O conjunto de candidatos revisado é preservado; um novo conjunto fica pendente.
+Indisponibilidade pode reutilizar associação local existente. Conflitos institucionais
 permanecem pendentes. Decisão humana de separação bloqueia fallback do mesmo nome/unidade
 em novas turmas/semestres. Unidades diferentes continuam separadas sem evidência adicional.
 A consolidação tem atomicidade e commit por grupo, progresso salvo e retomada dos grupos

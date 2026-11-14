@@ -12,9 +12,9 @@ Associa automaticamente apenas um perfil com nome completo normalizado, discipli
 ID do componente e semestre compatíveis. O identificador do perfil fica separado
 do SIAPE legado; não se inventa SIAPE nem se promove identidade_confirmada.
 Novas turmas/unidades/semestres reutilizam o UUID institucional sem confirmação
-humana repetida. Múltiplos perfis, respostas parciais ou histórico não compatível
-geram pendências. A evolução híbrida autorizada em 13/11/2026 permite fallback
-por nome completo + unidade apenas quando a busca não encontra perfil.
+humana repetida. A evolução híbrida autorizada em 13/11/2026 permite associação
+local por nome completo + unidade quando a busca não encontra perfil ou o
+histórico não confirma a disciplina. Múltiplos perfis exigem revisão inicial.
 Consultas incompletas nunca significam ausência ou unicidade.
 
 A fila `/moderacao/identidades` tem acesso separado dos comentários, filtro por
@@ -154,7 +154,7 @@ para a reavaliação seletiva; evitar executá-la junto de outra importação.
 
 ## Modelo híbrido e consolidação por grupo (#207)
 
-Decisão do PO em 13/11/2026: aceitar o risco residual de homônimos sem perfil encontrado na mesma unidade. O importador consulta primeiro o perfil institucional. Somente `PERFIL_AUSENTE` (busca concluída sem candidato) permite reutilizar `(nome_normalizado, unidade da oferta)`. Erro de rede, múltiplos perfis, disciplina não confirmada e conflito institucional continuam na moderação. A chave local não contém semestre ou turma e não une unidades distintas.
+Decisão do PO em 13/11/2026: aceitar o risco residual de homônimos sem perfil encontrado na mesma unidade. O importador consulta primeiro o perfil institucional. `PERFIL_AUSENTE` e `DISCIPLINA_NAO_CONFIRMADA` permitem reutilizar `(nome_normalizado, unidade da oferta)`, sem declarar confirmação institucional da disciplina. Múltiplos perfis e consultas inconclusivas exigem uma primeira revisão explícita; uma associação local já registrada pode ser reutilizada durante indisponibilidade. Conflitos institucionais continuam bloqueados. A chave local não contém semestre ou turma e não une unidades distintas.
 
 `identidades_locais` registra a chave provisória por nome e unidade, separada de `identidades_docentes`. O registro não recebe SIAPE nem marca de confirmação institucional. Uma associação local aplicada tem motivo `ASSOCIACAO_LOCAL`; ela é reavaliada em importações seguintes e pode ser promovida mantendo o UUID e as avaliações. Se o perfil já pertence a outro UUID, a união permanece administrativa. Quando um destino já consolidado muda, seus aliases são redirecionados diretamente ao destino final, preservando os links antigos sem cadeias.
 
@@ -196,3 +196,36 @@ python -m app.commands.identidades locais --aplicar \
 Cada grupo é atômico e tem seu próprio commit. O progresso `[n/total]` vai para stderr após salvar o resultado; stdout mantém o JSON final. Em caso de interrupção, grupos concluídos permanecem aplicados; executar novamente processa apenas os restantes. Uma falha inesperada desfaz o grupo atual. Grupos bloqueados continuam para revisão, e o CLI retorna código 2. Isso substitui a antiga transação única de todo o lote.
 
 A consolidação otimizada verifica identidades e colisões em conjuntos, move vínculos com `INSERT SELECT` e mantém IDs, datas, comentários e decisões das avaliações. O ganho depende da latência e do tamanho dos grupos; não usar o tempo local como promessa de duração em produção.
+
+
+## Encerramento das pendências investigadas em 13/11/2026
+
+A [investigação das 41 ocorrências](estudos/pendencias-finais-issue-207.md) fundamenta
+a ampliação autorizada pelo PO. Nenhuma tabela ou migração nova é necessária.
+
+`locais --incluir-revisadas` inclui também `HOMONIMOS` e `CONSULTA_INCONCLUSIVA`.
+O operador deve conferir **todos os grupos da prévia** antes de aplicá-la; a opção
+não significa que múltiplos perfis quaisquer representam a mesma pessoa.
+A evidência dos candidatos permanece em `pendencias_identidade`, com motivo
+`ASSOCIACAO_LOCAL_REVISADA`. Em novas ocorrências, o conjunto de identificadores
+precisa ser exatamente o revisado e todos os nomes completos precisam corresponder.
+Um perfil adicional ou diferente gera pendência. Não se escolhe um SIAPE arbitrário.
+
+```bash
+python -m app.commands.identidades locais --incluir-revisadas > previa-revisadas.json
+```
+
+Após conferir a prévia, suspender API e outros escritores e validar um backup
+atualizado com restauração. Usar conexão administrativa somente nesse processo:
+
+```bash
+python -m app.commands.identidades locais --incluir-revisadas --aplicar \
+  --confirmo-janela-sem-escritores-e-backup
+```
+
+O fallback de histórico incompleto passa a valer automaticamente para novos
+semestres. Associações locais persistem no banco, sem depender do cache da coleta.
+Decisões de separação e colisões de avaliações continuam bloqueando a união.
+Uma nova ambiguidade exige revisão; este tratamento não promete eliminar toda
+pendência futura. A opção não apaga nem corrige ofertas históricas ausentes na
+consulta pública atual.

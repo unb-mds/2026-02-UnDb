@@ -49,7 +49,7 @@ def resolver(db, nome, departamento, chave, oferta, consulta):
     if (
         origem
         and reconciliacao.resolver_id(db, origem.id) != origem.id
-        and not (anterior and anterior.motivo == "ASSOCIACAO_LOCAL")
+        and not (anterior and anterior.motivo in repo.MOTIVOS_ASSOCIACAO_LOCAL)
     ):
         return repo.professor(db, origem.id)
     motivo, candidatos = consulta.consultar(nome, oferta)
@@ -74,17 +74,34 @@ def resolver(db, nome, departamento, chave, oferta, consulta):
     associacao_local = repo.local(db, nome, departamento)
     if origem is None and associacao_local and motivo == "COMPATIVEL":
         origem = repo.professor(db, associacao_local.professor_id)
-    if motivo == "PERFIL_AUSENTE" and len(repo.perfis_conhecidos(db, nome, departamento)) > 1:
+    fallback = motivo in repo.MOTIVOS_FALLBACK_LOCAL or (
+        associacao_local
+        and (
+            motivo == "CONSULTA_INCONCLUSIVA"
+            or (
+                motivo == "HOMONIMOS"
+                and repo.candidatos_locais_revisados(db, nome, departamento, candidatos)
+            )
+        )
+    )
+    if fallback and len(repo.perfis_conhecidos(db, nome, departamento)) > 1:
         motivo = "CONFLITO_INSTITUCIONAL"
-    if motivo == "PERFIL_AUSENTE" and not repo.separacao_humana(db, nome, departamento):
+        fallback = False
+    if fallback and not repo.separacao_humana(db, nome, departamento):
         if associacao_local:
             destino = repo.professor(db, associacao_local.professor_id)
         else:
-            origem = origem or professor_repository.get_or_create_provisorio(
+            conhecido = repo.perfil_conhecido(db, nome, departamento)
+            alvo = (
+                repo.professor(db, repo.identidade(db, conhecido).professor_id)
+                if conhecido
+                else origem
+            )
+            alvo = alvo or professor_repository.get_or_create_provisorio(
                 db, nome, departamento, chave
             )
-            destino = repo.vincular_local(db, nome, departamento, origem)
-        motivo = "ASSOCIACAO_LOCAL"
+            destino = repo.vincular_local(db, nome, departamento, alvo)
+        motivo = "ASSOCIACAO_LOCAL_REVISADA" if motivo == "HOMONIMOS" else "ASSOCIACAO_LOCAL"
     if origem is None:
         origem = destino or professor_repository.get_or_create_provisorio(
             db, nome, departamento, chave
@@ -97,8 +114,9 @@ def resolver(db, nome, departamento, chave, oferta, consulta):
             identificador = None
             destino = None
     # UUIDs antigos distintos exigem manutenção; nunca agendar perfil NULL como SIAPE.
-    if motivo == "ASSOCIACAO_LOCAL" and destino and destino.id != origem.id:
-        motivo = "PERFIL_AUSENTE"
+    if motivo in repo.MOTIVOS_ASSOCIACAO_LOCAL and destino and destino.id != origem.id:
+        # Conservar a necessidade de revisão de múltiplos perfis no lote legado.
+        motivo = "HOMONIMOS" if motivo == "ASSOCIACAO_LOCAL_REVISADA" else "PERFIL_AUSENTE"
         destino = None
     estado = (
         "APLICADA"
@@ -255,9 +273,12 @@ def previa(db, item, identificador):
     }
 
 
-def consolidar_locais(db, aplicar=False, progresso=None):
+def consolidar_locais(db, aplicar=False, progresso=None, incluir_revisadas=False):
     """Prévia por padrão; aplicar somente na janela administrativa de manutenção."""
-    grupos = repo.grupos_locais(db)
+    grupos = repo.grupos_locais(db, incluir_revisadas)
+    motivos = repo.MOTIVOS_FALLBACK_LOCAL + (
+        repo.MOTIVOS_REVISAO_LOCAL if incluir_revisadas else ()
+    )
     db.commit()
     resultados = []
     for numero, ((nome, unidade), ids) in enumerate(grupos.items(), 1):
@@ -269,11 +290,23 @@ def consolidar_locais(db, aplicar=False, progresso=None):
             itens = [
                 i
                 for i in repo.itens_por_ids(db, ids)
-                if i.estado == "PENDENTE" and i.motivo == "PERFIL_AUSENTE" and not i.humana
+                if i.estado == "PENDENTE" and i.motivo in motivos and not i.humana
             ]
             if not itens:
                 db.rollback()
                 continue
+            from app.domain.texto import normalizar_busca
+
+            for item in itens:
+                if item.motivo == "HOMONIMOS" and (
+                    len({c.get("identificador") for c in item.candidatos}) < 2
+                    or any(
+                        not str(c.get("identificador", "")).isdigit()
+                        or normalizar_busca(c.get("nome", "")) != normalizar_busca(item.nome)
+                        for c in item.candidatos
+                    )
+                ):
+                    raise ValueError("Múltiplos perfis sem candidatos válidos para revisão.")
             destino, origens = repo.destino_local_grupo(
                 db, itens[0].nome, unidade, [i.professor_id for i in itens]
             )
@@ -283,6 +316,7 @@ def consolidar_locais(db, aplicar=False, progresso=None):
                 "ocorrencias": len(itens),
                 "registros_a_unir": len(origens),
                 "estado": "APLICADA" if aplicar else "PREVIA",
+                "motivos_origem": sorted({i.motivo for i in itens}),
             }
             if origens and not aplicar:
                 reconciliacao.validar_grupo_em_lote(
@@ -295,13 +329,22 @@ def consolidar_locais(db, aplicar=False, progresso=None):
                             db,
                             origens,
                             destino.id,
-                            "Fallback nome completo + unidade #207; risco residual aceito pelo PO.",
+                            "Fallback nome completo + unidade #207; risco residual aceito pelo PO."
+                            + (
+                                " Pendências revisadas explicitamente incluídas."
+                                if incluir_revisadas
+                                else ""
+                            ),
                         )
                     repo.vincular_local(db, itens[0].nome, unidade, destino)
                     for item in itens:
                         item.professor_id = destino.id
                         item.estado = "APLICADA"
-                        item.motivo = "ASSOCIACAO_LOCAL"
+                        item.motivo = (
+                            "ASSOCIACAO_LOCAL_REVISADA"
+                            if item.motivo in repo.MOTIVOS_REVISAO_LOCAL
+                            else "ASSOCIACAO_LOCAL"
+                        )
                         item.identificador_destino = None
                         item.versao += 1
                     db.flush()
