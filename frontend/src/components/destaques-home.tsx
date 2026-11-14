@@ -6,7 +6,6 @@ import { compararProfessoresDaDisciplina } from "@/lib/services/disciplinas";
 import type { AvaliacaoAgregada } from "@/lib/types/avaliacao";
 import { identificadorValido } from "@/lib/identificador";
 import Link from "next/link";
-import Icone from "./icone";
 
 const MAXIMO_DESTAQUES = 6;
 type Destaque = { id: string; codigo: string; nome: string; total_avaliacoes: number; professores?: AvaliacaoAgregada[] };
@@ -28,25 +27,22 @@ export default function DestaquesHome() {
     return () => c.abort();
   }, []);
   if (!dados.length) return null;
-  return <section aria-labelledby="destaques-titulo" className="flex flex-col gap-5">
+  return <section aria-labelledby="destaques-titulo" className="flex min-w-0 flex-col gap-4">
     <div className="flex flex-wrap items-end justify-between gap-3">
-      <div><span className="kicker">Experiências compartilhadas</span><h2 id="destaques-titulo" className="section-title mt-2">Explore as disciplinas</h2></div>
+      <div><span className="kicker">Experiências compartilhadas</span><h2 id="destaques-titulo" className="section-title mt-2">Disciplinas mais avaliadas</h2></div>
       <Link href="/disciplinas" className="link text-sm">Buscar disciplina →</Link>
     </div>
-    <p className="lead">As mais avaliadas do site, pela quantidade de avaliações — sem nota geral.</p>
-    <ul aria-label="Disciplinas mais avaliadas" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <p className="text-sm leading-relaxed text-(--ink-soft)">Por quantidade de avaliações — esse volume não indica qualidade nem uma nota geral da disciplina.</p>
+    <ul aria-label="Disciplinas mais avaliadas" className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
       {dados.map(d => <li key={d.id} className="flex min-w-0">
-        <Link href={`/disciplinas/${d.id}`} className="destaque w-full break-words">
-          <div className="destaque-visual">
-            <span className="destaque-pill">{d.codigo}</span>
-            <span className="mt-auto text-sm text-(--ink-soft)">{d.total_avaliacoes} {d.total_avaliacoes === 1 ? "avaliação" : "avaliações"}</span>
-            <span className="destaque-notch" aria-hidden="true"><span className="destaque-arrow"><span className="inline-flex -rotate-45"><Icone nome="arrow-right" /></span></span></span>
+        <Link href={`/disciplinas/${d.id}`} className="group panel flex w-full min-w-0 flex-col gap-3 p-4 text-foreground sm:p-5">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="code-chip max-w-full [overflow-wrap:anywhere]"><span className="sr-only">Código da disciplina: </span>{d.codigo}</span>
+            <span className="text-sm text-(--ink-soft)">{d.total_avaliacoes} {d.total_avaliacoes === 1 ? "avaliação" : "avaliações"}</span>
           </div>
-          <div className="flex flex-1 flex-col gap-3 px-3">
-            <h3 className="text-xl leading-tight font-semibold tracking-tight">{d.nome}</h3>
-            {d.professores && <div className="grid gap-3 border-t border-(--border) pt-3">{d.professores.slice(0, 2).map(p => <div key={p.professorId} className="text-sm"><p className="text-(--ink-soft)">{p.professor.nome}</p><p className="mt-1 text-xs text-(--muted)">{p.dadosSuficientes ? `${p.didatica.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}/5 didática · ${p.recomenda}% recomendam` : "Dados insuficientes"}</p></div>)}</div>}
-            <span className="mt-auto pt-2 text-sm font-medium text-accent">Comparar professores →</span>
-          </div>
+          <h3 className="text-lg leading-snug font-semibold tracking-tight [overflow-wrap:anywhere]">{d.nome}</h3>
+          {d.professores && <div className="grid gap-3 [overflow-wrap:anywhere] border-t border-(--border) pt-3">{d.professores.slice(0, 2).map(p => <div key={p.professorId} className="text-sm"><p className="text-(--ink-soft)">{p.professor.nome}</p><p className="mt-1 text-xs text-(--muted)">{p.dadosSuficientes ? `${p.didatica.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}/5 didática · ${p.recomenda}% recomendam` : "Dados insuficientes"}</p></div>)}</div>}
+          <span className="mt-auto pt-2 text-sm font-medium text-accent underline-offset-4 group-hover:underline">Comparar professores →</span>
         </Link>
       </li>)}
     </ul>
