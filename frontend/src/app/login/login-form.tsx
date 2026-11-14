@@ -20,7 +20,9 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
 
   const verificarSessao = useCallback(async () => {
     const geracao = ++geracaoVerificacao.current;
-    setSessao("carregando");
+    // Revalidar um visitante já conhecido não desmonta o formulário nem perde o foco.
+    // A primeira consulta e a revalidação de conta ativa continuam neutras até a resposta.
+    setSessao((atual) => atual === "visitante" ? atual : "carregando");
     try {
       const resposta = await consultarSessao();
       if (geracao !== geracaoVerificacao.current) return;
