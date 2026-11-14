@@ -160,6 +160,13 @@ async function removerPerfilTemporario() {
 const texto = () => lerTextoPagina(avaliar);
 const enviar = () => avaliar('document.querySelector("main button[type=submit]").click()');
 const aguardarTexto = (trecho) => aguardar(async () => (await texto()).includes(trecho), trecho);
+// O aviso de acesso também contém textos de erro: aguardar o resultado do envio,
+// não uma mensagem já visível, e só ler FormData depois de reabilitar os campos.
+const aguardarErroEnvio = (trecho) => aguardar(async () => await avaliar(`
+  document.querySelector('main form [role="alert"]')?.textContent.includes(${JSON.stringify(trecho)})
+  && document.querySelector('main form').getAttribute('aria-busy') === 'false'
+  && !document.querySelector('main button[type="submit"]').disabled
+`), `envio concluído: ${trecho}`);
 
 // HTML visível não garante hidratação. Somente usar com dados localmente inválidos:
 // repetir um evento sintético não navega nem envia dados antes de o React estar pronto.
@@ -282,13 +289,13 @@ try {
     await aguardar(async () => await avaliar('!!document.querySelector(\'[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]\')'), "convite para visitante");
     assert.equal(await avaliar(`document.querySelector('[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]')?.target`), "");
     await enviar();
-    await aguardarTexto("Entre na sua conta");
+    await aguardarErroEnvio("Entre na sua conta");
     assert.equal(envios.length, 0);
     autenticado = true;
     for (const [status, mensagem] of [[401,"Entre na sua conta"], [403,"link recebido"], [422,"Revise as opções"], [503,"não conseguiu confirmar"]]) {
       statusEnvio = status;
       await enviar();
-      await aguardarTexto(mensagem);
+      await aguardarErroEnvio(mensagem);
       assert.deepEqual(await respostas(), preenchidas);
       assert.ok(!(await texto()).includes("Avaliação registrada com sucesso"));
     }
