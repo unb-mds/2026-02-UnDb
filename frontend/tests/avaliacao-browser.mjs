@@ -75,6 +75,8 @@ const fixture = createServer(async (req, res) => {
     res.end(JSON.stringify({disciplina, professores:[]}));
   } else if (req.url === "/api/auth/sessao") {
     consultasSessao += 1; res.end(JSON.stringify({ autenticado }));
+  } else if (req.url.startsWith("/api/comentarios/meu")) {
+    res.writeHead(autenticado ? 200 : 401).end(JSON.stringify([]));
   } else if (req.method === "POST" && req.url === "/api/auth/login") {
     autenticado = statusLogin === 200;
     if (autenticado) res.setHeader("Set-Cookie", "undb_session=sessao-de-teste; Path=/; HttpOnly; SameSite=Lax");
@@ -158,6 +160,13 @@ async function removerPerfilTemporario() {
 const texto = () => lerTextoPagina(avaliar);
 const enviar = () => avaliar('document.querySelector("main button[type=submit]").click()');
 const aguardarTexto = (trecho) => aguardar(async () => (await texto()).includes(trecho), trecho);
+// O aviso de acesso também contém textos de erro: aguardar o resultado do envio,
+// não uma mensagem já visível, e só ler FormData depois de reabilitar os campos.
+const aguardarErroEnvio = (trecho) => aguardar(async () => await avaliar(`
+  document.querySelector('main form [role="alert"]')?.textContent.includes(${JSON.stringify(trecho)})
+  && document.querySelector('main form').getAttribute('aria-busy') === 'false'
+  && !document.querySelector('main button[type="submit"]').disabled
+`), `envio concluído: ${trecho}`);
 
 // HTML visível não garante hidratação. Somente usar com dados localmente inválidos:
 // repetir um evento sintético não navega nem envia dados antes de o React estar pronto.
@@ -203,7 +212,13 @@ try {
   assert.ok((await texto()).includes(`Código da disciplina: ${real?.disciplinaCodigo ?? "CIC0001"}`));
   assert.equal(await avaliar('document.querySelector("[name=didatica]:checked") === null'), true);
   assert.equal(await avaliar('document.querySelector("[name=didatica][type=radio]")?.required'), true);
-  assert.equal(await avaliar(`document.querySelector('a[href^="/login?returnTo="]')?.target`), "");
+  // Sessão conhecida ativa não recebe convite de login; o retorno é verificado como visitante abaixo.
+  await aguardar(async () => await avaliar('!document.querySelector("[data-testid=acesso-avaliacao]")?.textContent.includes("Verificando seu acesso")'), "estado do acesso");
+  if (real) {
+    assert.equal(await avaliar(`document.querySelector('[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]')?.target`), "");
+  } else {
+    assert.equal(await avaliar(`!!document.querySelector('[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]')`), false);
+  }
   // Confirma hidratação antes de testar a validação local.
   await aguardarValidacaoLocal("Selecione uma opção válida para Didática.");
   await enviar();
@@ -220,7 +235,7 @@ try {
       await cdp("Network.clearBrowserCookies");
       if (token) await cdp("Network.setCookie", { name:"undb_session", value:token, url:"http://localhost:8000", httpOnly:true, sameSite:"Lax" });
       await enviar();
-      await aguardarTexto("Entre na sua conta");
+      await aguardarErroEnvio("Entre na sua conta");
       assert.deepEqual(await respostas(), preenchidas);
       assert.deepEqual(banco(), []);
     }
@@ -228,7 +243,7 @@ try {
     const login = await avaliar(`fetch("http://localhost:8000/api/auth/login", {method:"POST", credentials:"include", headers:{"Content-Type":"application/json"}, body:JSON.stringify(${JSON.stringify({email:real.email, senha:real.senha})})}).then(r=>r.status)`);
     assert.equal(login, 200);
     await enviar();
-    await aguardarTexto("link recebido");
+    await aguardarErroEnvio("link recebido");
     assert.deepEqual(banco(), []);
     assert.deepEqual(await respostas(), preenchidas);
     const confirmacao = await avaliar(`fetch("http://localhost:8000/api/auth/confirmar", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({token:${JSON.stringify(real.confirmationToken)}})}).then(r=>r.status)`);
@@ -239,7 +254,7 @@ try {
       return window.fetchOriginal(url, init);
     }`);
     await enviar();
-    await aguardarTexto("Revise os campos: Didática");
+    await aguardarErroEnvio("Revise os campos: Didática");
     await avaliar('window.fetch = window.fetchOriginal');
     assert.deepEqual(banco(), []);
     assert.deepEqual(await respostas(), preenchidas);
@@ -263,21 +278,24 @@ try {
     assert.ok(segunda[0].updated_at >= primeira[0].updated_at);
     await cdp("Network.setBlockedURLs", {urls:["*api/avaliacoes*"]});
     await enviar();
-    await aguardarTexto("Verifique sua conexão");
+    await aguardarErroEnvio("Verifique sua conexão");
     assert.equal((await respostas()).material, "BOM");
     assert.deepEqual(banco(), segunda);
     await cdp("Network.setBlockedURLs", {urls:[]});
     console.log("Integração real: formulário → FastAPI → PostgreSQL; criação, substituição com mesmo ID/linha, sessões ausente/inválida/expirada, e-mail não confirmado, 422 e falha de rede sem perda das respostas.");
   } else {
     autenticado = false;
+    await avaliar("window.dispatchEvent(new Event('focus'))");
+    await aguardar(async () => await avaliar('!!document.querySelector(\'[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]\')'), "convite para visitante");
+    assert.equal(await avaliar(`document.querySelector('[data-testid=acesso-avaliacao] a[href^="/login?returnTo="]')?.target`), "");
     await enviar();
-    await aguardarTexto("Entre na sua conta");
+    await aguardarErroEnvio("Entre na sua conta");
     assert.equal(envios.length, 0);
     autenticado = true;
     for (const [status, mensagem] of [[401,"Entre na sua conta"], [403,"link recebido"], [422,"Revise as opções"], [503,"não conseguiu confirmar"]]) {
       statusEnvio = status;
       await enviar();
-      await aguardarTexto(mensagem);
+      await aguardarErroEnvio(mensagem);
       assert.deepEqual(await respostas(), preenchidas);
       assert.ok(!(await texto()).includes("Avaliação registrada com sucesso"));
     }

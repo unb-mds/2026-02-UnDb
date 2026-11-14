@@ -11,7 +11,7 @@ from pydantic import (
     model_validator,
 )
 
-from app.models.enums import Dificuldade, QualidadeMaterial
+from app.models.enums import Dificuldade, QualidadeMaterial, EstadoComentario
 from app.schemas.institucional import (
     DisciplinaInstitucionalResponse,
     ProfessorInstitucionalResponse,
@@ -82,6 +82,7 @@ class AvaliacaoResponse(AvaliacaoBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+    comentario_estado: EstadoComentario | None = None
     comentario_erro: str | None = Field(
         default=None,
         description="Motivo do descarte de um comentario invalido; os criterios foram salvos",

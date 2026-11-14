@@ -40,7 +40,7 @@ class DecisaoResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
     comentario_versao_id: UUID
-    moderador_id: UUID
+    moderador_id: UUID | None
     acao: AcaoModeracao
     motivo: str
     estado_anterior: EstadoComentario

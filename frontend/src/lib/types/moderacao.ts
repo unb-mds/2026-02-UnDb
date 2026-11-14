@@ -33,7 +33,7 @@ export type DenunciasDaVersao = {
 export type DecisaoModeracao = {
   id: string;
   comentario_versao_id: string;
-  moderador_id: string;
+  moderador_id: string | null;
   acao: AcaoModeracao;
   motivo: string;
   estado_anterior: EstadoComentario;
@@ -41,3 +41,27 @@ export type DecisaoModeracao = {
   created_at: string;
 };
 export type AcaoModeracaoInput = { acao: AcaoModeracao; motivo: string };
+
+export const statusTriagem = ["CONCLUIDA", "DESATIVADA", "DADOS_SENSIVEIS", "LIMITE", "INDISPONIVEL"] as const;
+export type TriagemComentario = {
+  comentario_versao_id: string;
+  status: (typeof statusTriagem)[number];
+  filtro_ativo: boolean;
+  versao_lista: string;
+  categorias_locais: MotivoDenuncia[];
+  categorias_ia: CategoriaOpenAI[];
+  sinalizado: boolean | null;
+  modelo: string | null;
+  versao_integracao: string;
+};
+
+export const categoriasOpenAI = ["harassment", "harassment/threatening", "hate", "hate/threatening", "illicit", "illicit/violent", "self-harm", "self-harm/intent", "self-harm/instructions", "sexual", "sexual/minors", "violence", "violence/graphic"] as const;
+export type CategoriaOpenAI = (typeof categoriasOpenAI)[number];
+export const rotulosOpenAI: Record<CategoriaOpenAI, string> = {
+  harassment: "Assédio ou linguagem hostil", "harassment/threatening": "Assédio com ameaça",
+  hate: "Ódio ou discriminação", "hate/threatening": "Ódio com ameaça",
+  illicit: "Instruções de atividade ilícita", "illicit/violent": "Instruções de atividade ilícita violenta",
+  "self-harm": "Conteúdo de autolesão", "self-harm/intent": "Intenção de autolesão",
+  "self-harm/instructions": "Instruções de autolesão", sexual: "Conteúdo sexual",
+  "sexual/minors": "Conteúdo sexual envolvendo menores", violence: "Violência", "violence/graphic": "Violência gráfica",
+};

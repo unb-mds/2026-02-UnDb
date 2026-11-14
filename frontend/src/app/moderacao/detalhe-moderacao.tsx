@@ -5,6 +5,8 @@ import { acoesParaEstado, rotulosAcao, rotulosEstado, rotulosMotivo, statusModer
 import { consultarComentario, consultarDecisoes, consultarDenuncias } from "@/lib/services/moderacao";
 import type { AcaoModeracao, AcaoModeracaoInput, ComentarioModeracao, DecisaoModeracao, DenunciasDaVersao } from "@/lib/types/moderacao";
 
+import ApoioModeracao from "./apoio-moderacao";
+
 type Consulta<T> = { tipo: "carregando" } | { tipo: "pronta"; dados: T } | { tipo: "erro" };
 type Props = {
   comentario: ComentarioModeracao;
@@ -62,6 +64,7 @@ export default function DetalheModeracao({ comentario, executando, impedido, aoD
         <p className="text-xs text-foreground/70">Enviado em {formatarData(comentario.created_at)}</p>
       </div>
       <p className="whitespace-pre-wrap rounded-lg bg-foreground/[0.03] p-4">{comentario.texto ?? "O texto desta versão já foi descartado."}</p>
+      {comentario.texto && ["PENDENTE", "PUBLICADO", "SUSPENSO"].includes(comentario.estado) && <ApoioModeracao key={`${comentario.id}-${comentario.estado}`} versaoId={comentario.id} desabilitado={executando || impedido} />}
       <div className="text-sm"><h3 className="font-medium">Autor — informação interna</h3><p>{comentario.autor.nome}</p><p>{comentario.autor.email}</p></div>
       {comentario.substitui_id && <details className="rounded-lg border border-foreground/10 p-3">
         <summary className="cursor-pointer text-sm font-medium text-accent">Versão anterior</summary>
@@ -95,7 +98,7 @@ export default function DetalheModeracao({ comentario, executando, impedido, aoD
         {decisoes.tipo === "carregando" && <p role="status" className="mt-2 text-sm">Carregando decisões…</p>}
         {decisoes.tipo === "erro" && <p role="alert" className="mt-2 text-sm">Não foi possível consultar as decisões.</p>}
         {decisoes.tipo === "pronta" && (decisoes.dados.length === 0 ? <p className="mt-2 text-sm text-foreground/70">Nenhuma decisão disponível para esta versão.</p> :
-          <ul className="mt-2 space-y-3 text-sm">{decisoes.dados.map((item) => <li key={item.id}><p className="font-medium">{rotulosAcao[item.acao]} · {rotulosEstado[item.estado_posterior]}</p><p className="whitespace-pre-wrap">{item.motivo}</p><p className="text-xs text-foreground/70">{formatarData(item.created_at)}</p></li>)}</ul>)}
+          <ul className="mt-2 space-y-3 text-sm">{decisoes.dados.map((item) => <li key={item.id}><p className="font-medium">{item.moderador_id === null ? "Sistema — publicação automática" : rotulosAcao[item.acao]} · {rotulosEstado[item.estado_posterior]}</p><p className="whitespace-pre-wrap">{item.motivo}</p><p className="text-xs text-foreground/70">{formatarData(item.created_at)}</p></li>)}</ul>)}
       </section>
       {(denuncias.tipo === "erro" || decisoes.tipo === "erro" || (comentario.substitui_id && anterior.tipo === "erro")) && <button type="button" disabled={executando} onClick={() => setRecarga((valor) => valor + 1)} className="text-sm text-accent underline underline-offset-4">Tentar carregar informações novamente</button>}
       {impedido ? <p role="alert" className="text-sm">Este caso requer outro moderador. Nenhuma nova ação está disponível nesta análise.</p> : acoes.length > 0 ?

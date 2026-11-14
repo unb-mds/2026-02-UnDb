@@ -42,6 +42,7 @@ nav:
       - Visão: visao.md
       - Requisitos: requisitos.md
       - Board no Figma: figma.md
+      - Apoio à moderação com IA: moderacao-ia.md
   - Arquitetura:
       - Visão e decisões: arquitetura.md
       - ADRs — catálogo e manutenção: adrs/index.md
