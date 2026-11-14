@@ -6,6 +6,10 @@ from app.models.professor import Professor
 from app.models.usuario import Usuario
 from app.repositories.reconciliacao_professor_repository import resolver_id
 
+MOTIVOS_FALLBACK_LOCAL = ("PERFIL_AUSENTE", "DISCIPLINA_NAO_CONFIRMADA")
+MOTIVOS_REVISAO_LOCAL = ("HOMONIMOS", "CONSULTA_INCONCLUSIVA")
+MOTIVOS_ASSOCIACAO_LOCAL = ("ASSOCIACAO_LOCAL", "ASSOCIACAO_LOCAL_REVISADA")
+
 
 def bloquear(db):
     if db.bind.dialect.name == "postgresql":
@@ -129,7 +133,7 @@ def separacao_humana(db, nome, unidade):
     )
 
 
-def grupos_locais(db):
+def grupos_locais(db, incluir_revisadas=False):
     """Snapshot escalar; não manter milhares de ORM expirados entre commits."""
     from collections import defaultdict
     from app.domain.texto import normalizar_busca
@@ -140,7 +144,9 @@ def grupos_locais(db):
         .where(
             PendenciaIdentidade.humana.is_(False),
             PendenciaIdentidade.estado == "PENDENTE",
-            PendenciaIdentidade.motivo == "PERFIL_AUSENTE",
+            PendenciaIdentidade.motivo.in_(
+                MOTIVOS_FALLBACK_LOCAL + (MOTIVOS_REVISAO_LOCAL if incluir_revisadas else ())
+            ),
         )
         .order_by(PendenciaIdentidade.chave)
     ):
@@ -205,12 +211,18 @@ def vincular_grupo(db, identificador, ids):
 
 
 def destino_local_grupo(db, nome, unidade, ids):
-    if len(perfis_conhecidos(db, nome, unidade)) > 1:
+    conhecidos = perfis_conhecidos(db, nome, unidade)
+    if len(conhecidos) > 1:
         raise ValueError("Mais de uma identidade institucional conhecida nesta unidade.")
     if separacao_humana(db, nome, unidade):
         raise ValueError("Há decisão humana de manter separados nesta unidade.")
     associacao = local(db, nome, unidade)
-    docentes = professores_canonicos(db, ids + ([associacao.professor_id] if associacao else []))
+    # A identidade institucional já conhecida deve ser o destino, inclusive
+    # quando não aparece entre as ocorrências provisórias deste lote.
+    extras = [associacao.professor_id] if associacao else []
+    if conhecidos:
+        extras.append(identidade(db, conhecidos[0]).professor_id)
+    docentes = professores_canonicos(db, ids + extras)
     institucionais = list(
         db.scalars(
             select(IdentidadeDocente).where(
@@ -250,6 +262,31 @@ def perfis_conhecidos(db, nome, unidade):
 def perfil_conhecido(db, nome, unidade):
     ids = perfis_conhecidos(db, nome, unidade)
     return ids[0] if len(ids) == 1 else None
+
+
+def candidatos_locais_revisados(db, nome, unidade, candidatos):
+    """Reutiliza o conjunto explicitamente revisado; perfil novo exige nova análise."""
+    from app.domain.texto import normalizar_busca
+
+    ids = {c.get("identificador") for c in candidatos}
+    if len(ids) < 2 or any(
+        not str(c.get("identificador", "")).isdigit()
+        or normalizar_busca(c.get("nome", "")) != normalizar_busca(nome)
+        for c in candidatos
+    ):
+        return False
+    for item in db.scalars(
+        select(PendenciaIdentidade).where(
+            PendenciaIdentidade.unidade == unidade,
+            PendenciaIdentidade.estado == "APLICADA",
+            PendenciaIdentidade.motivo == "ASSOCIACAO_LOCAL_REVISADA",
+        )
+    ):
+        if normalizar_busca(item.nome) == normalizar_busca(nome) and ids == {
+            c.get("identificador") for c in item.candidatos
+        }:
+            return True
+    return False
 
 
 def pendencias_reavaliaveis(db, motivos, incluir_locais=False):

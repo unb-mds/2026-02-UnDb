@@ -467,10 +467,13 @@ por nome nem uma prova direta de identidade por turma. Documentação operaciona
 
 O PO aprovou o modelo híbrido e aceitou o risco residual de homônimos sem perfil
 encontrado na mesma unidade. A associação institucional tem precedência. Busca
-completa sem candidato permite chave provisória `(nome_normalizado, unidade)` em
-`identidades_locais`, separada do identificador de perfil e da chave de ocorrência.
-Não generalizar indisponibilidade, múltiplos perfis ou histórico incompatível como
-perfil ausente. Decisões humanas de separação e conflitos conhecidos prevalecem.
+completa sem candidato ou histórico sem confirmação da disciplina permite chave
+provisória `(nome_normalizado, unidade)` em `identidades_locais`, separada do
+identificador de perfil e da chave de ocorrência. A ampliação aprovada após a
+investigação das 41 pendências permite revisão explícita de múltiplos perfis e
+consultas inconclusivas. Os candidatos ficam preservados na ocorrência aplicada;
+novas ocorrências só reutilizam o conjunto exato revisado. Indisponibilidade pode
+reutilizar uma associação local existente, sem declarar perfil ausente. Decisões humanas de separação e conflitos conhecidos prevalecem.
 
 A chave local reaproveita UUID entre turmas e semestres da mesma unidade. Quando
 surge perfil verificável, o mesmo UUID pode ser promovido; se já existe outro
