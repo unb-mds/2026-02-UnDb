@@ -77,3 +77,7 @@ Nenhuma vulnerabilidade explorável foi confirmada por esta inspeção limitada.
 - [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html): menor privilégio e verificação de permissões por requisição.
 - [OWASP LLM Prompt Injection Prevention](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html): separação de instruções/dados e validação de saída.
 - [NIST SP 800-61 Rev. 3, abril de 2025](https://csrc.nist.gov/pubs/sp/800/61/r3/final): resposta integrada à gestão de riscos, detecção, resposta e recuperação. Não define responsáveis, ferramentas ou SLA do UnDb.
+
+## Validação da entrega
+
+[Checklist, comandos observados e limites](validation.md).
