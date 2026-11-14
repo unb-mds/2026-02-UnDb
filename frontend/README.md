@@ -353,3 +353,7 @@ específica `reconciliador`, independente do papel de comentários. Exibe a fila
 candidatos institucionais, prévia, decisões com justificativa e estados de aplicação.
 Confirmar não executa união de avaliações no navegador. Fluxo e implantação em
 [identidades docentes](../docs/identidades-docentes.md).
+
+## Continuidade visual — Issue #247
+
+[Guia das seis telas de conta, confirmação, sucesso, 404 e moderação](../docs/referencias/telas-jornada-247/README.md), com capturas e critérios para implementação. O commit inicial documenta o trabalho pendente; não entrega essas telas.
