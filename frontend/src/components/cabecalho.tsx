@@ -16,7 +16,7 @@ function LinksConta({ retorno, sessao = "carregando" }: { retorno?: string | nul
     {sessao === "autenticado" ? (
       <Link href="/login" className="button ghost"><Icone nome="user" pequeno />Minha conta</Link>
     ) : <>
-      <Link href={`/login${query}`} className="button ghost">Entrar</Link>
+      <Link href={`/login${query}`} className="button ghost">{sessao === "visitante" ? "Entrar" : "Verificar conta"}</Link>
       {sessao !== "visitante" && <span className="sr-only" role="status">{sessao === "carregando" ? "Verificando sessão…" : "Não foi possível verificar a sessão. Acesse a conta para tentar novamente."}</span>}
     </>}
   </nav>;
