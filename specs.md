@@ -377,7 +377,7 @@ Não implementar nem inventar valor para os itens abaixo.
 | Item | Situação |
 |---|---|
 | Lista de termos do filtro de comentários | Solicitante definirá depois; moderação humana até então |
-| IA sem aprovação humana prévia | Objetivo futuro condicionado, sem mecanismo/provedor aprovado; não substituir moderação humana nesta etapa |
+| IA sem aprovação humana prévia | Autorizada pelo PO em 14/11/2026 na #239; triagem habilitada publica sem sinais e mantém demais casos pendentes |
 
 **Itens já resolvidos — fontes:** a seção 11 de `docs/requisitos.md` aprova a
 importação inicial manual na R1; sua operação/cobertura na R2 é verificada na
@@ -423,9 +423,10 @@ Consulte [evidências e limites por release](docs/releases/2.0.0-reconciliacao.m
 - Leitura pública do texto publicado, sem nome/e-mail/identificador do autor ou vínculo
   público com a conta. A consulta não expõe os cinco critérios individuais; RNF02 continua
   protegendo os critérios agregados abaixo de três avaliações.
-- Novos textos e substitutos exigem moderação vigente. Nesta etapa, aprovação humana
-  antes de publicar; não ativar filtro enquanto a lista não estiver definida. IA é evolução
-  condicionada, não mecanismo atual. Crítica acadêmica negativa não é motivo de rejeição.
+- Novos textos e substitutos passam pela triagem #239 quando habilitada: publicação
+  sem sinais locais/IA e pendência humana nos demais casos. Sem habilitação, aprovação
+  humana prévia. Revisar a lista antes de ativar o filtro. Crítica acadêmica negativa
+  não é motivo de rejeição.
 - Critérios válidos são registrados normalmente; moderação do texto não os modifica.
   Versão anterior aprovada permanece enquanto o substituto é analisado, se não suspensa
   ou removida. Rejeitar o substituto mantém o estado anterior e descarta o texto rejeitado.
@@ -589,3 +590,21 @@ permanecem pendentes. Decisão humana de separação bloqueia fallback do mesmo 
 em novas turmas/semestres. Unidades diferentes continuam separadas sem evidência adicional.
 A consolidação tem atomicidade e commit por grupo, progresso salvo e retomada dos grupos
 restantes; RF03, RNF02 e a janela sem escritores continuam obrigatórios.
+
+
+## Apoio assistivo à moderação — #239
+
+Implementação autorizada pelo PO em 14/11/2026 com OpenAI, desativada por padrão.
+O endpoint privado `POST /api/moderacao/comentarios/{versao_id}/triagem` recebe
+apenas a versão e retorna categorias e sinalização; não decide nem altera avaliações.
+Contrato, flags, limites, privacidade e validação em [docs/moderacao-ia.md](docs/moderacao-ia.md).
+
+
+### Evolução autorizada — triagem automática #239 (14/11/2026)
+
+Fonte: docs/requisitos.md, RF20 e seção “Evolução da moderação”. O envio confirma
+critérios/texto pendente antes da consulta externa. Sem sinais locais/IA, publicar e
+auditar como sistema; demais casos ficam pendentes. Resposta de avaliação acrescenta
+comentario_estado: PUBLICADO/PENDENTE/null. DecisaoResponse.moderador_id é nulo
+somente para decisão do sistema. Nenhuma restauração ou rejeição automática.
+A flag MODERACAO_AUTOMATICA_ATIVA é False por padrão. Guia: docs/moderacao-ia.md.

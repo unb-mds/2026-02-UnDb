@@ -1,6 +1,6 @@
 import { identificadorValido } from "../identificador";
-import { acoesModeracao, estadosComentario, motivosDenuncia } from "../types/moderacao";
-import type { AcaoModeracaoInput, ComentarioModeracao, DecisaoModeracao, DenunciaInterna, DenunciasDaVersao, EstadoFila, IdentidadeInterna } from "../types/moderacao";
+import { acoesModeracao, estadosComentario, motivosDenuncia, statusTriagem, categoriasOpenAI } from "../types/moderacao";
+import type { AcaoModeracaoInput, ComentarioModeracao, DecisaoModeracao, DenunciaInterna, DenunciasDaVersao, EstadoFila, IdentidadeInterna, TriagemComentario } from "../types/moderacao";
 import { apiClient } from "./api-client";
 
 const base = "/api/moderacao/comentarios";
@@ -16,7 +16,7 @@ function comentario(valor: unknown): valor is ComentarioModeracao {
     && estado(valor.estado) && identidade(valor.autor) && (valor.substitui_id === null || id(valor.substitui_id)) && data(valor.created_at);
 }
 function decisao(valor: unknown): valor is DecisaoModeracao {
-  return registro(valor) && id(valor.id) && id(valor.comentario_versao_id) && id(valor.moderador_id)
+  return registro(valor) && id(valor.id) && id(valor.comentario_versao_id) && (valor.moderador_id === null || id(valor.moderador_id))
     && acao(valor.acao) && typeof valor.motivo === "string" && estado(valor.estado_anterior) && estado(valor.estado_posterior) && data(valor.created_at);
 }
 function denuncia(valor: unknown): valor is DenunciaInterna {
@@ -66,5 +66,24 @@ export async function executarAcao(versaoId: string, dados: AcaoModeracaoInput):
   const resposta = validar(await apiClient.post<unknown, AcaoModeracaoInput>(`${caminho(versaoId)}/acoes`,
     { acao: dados.acao, motivo: dados.motivo.trim() }, opcoes()), decisao);
   if (resposta.comentario_versao_id !== versaoId || resposta.acao !== dados.acao) throw new Error("Decisão de outra versão ou ação.");
+  return resposta;
+}
+
+function triagem(valor: unknown): valor is TriagemComentario {
+  const categorias = (itens: unknown) => Array.isArray(itens) && itens.length <= 7
+    && itens.every((item) => motivosDenuncia.some((motivo) => motivo === item));
+  return registro(valor) && id(valor.comentario_versao_id)
+    && statusTriagem.some((item) => item === valor.status)
+    && typeof valor.filtro_ativo === "boolean" && (valor.sinalizado === null || typeof valor.sinalizado === "boolean")
+    && typeof valor.versao_lista === "string" && typeof valor.versao_integracao === "string"
+    && (valor.modelo === null || typeof valor.modelo === "string")
+    && categorias(valor.categorias_locais) && Array.isArray(valor.categorias_ia)
+    && valor.categorias_ia.length <= 13 && valor.categorias_ia.every((c) => categoriasOpenAI.some((item) => item === c));
+}
+
+export async function analisarComentario(versaoId: string, signal?: AbortSignal): Promise<TriagemComentario> {
+  const resposta = validar(await apiClient.post<unknown, Record<string, never>>(
+    `${caminho(versaoId)}/triagem`, {}, opcoes(signal)), triagem);
+  if (resposta.comentario_versao_id !== versaoId) throw new Error("Triagem de outra versão.");
   return resposta;
 }

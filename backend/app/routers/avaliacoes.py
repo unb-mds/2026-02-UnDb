@@ -27,4 +27,5 @@ def registrar_avaliacao(
         ) from erro
     resposta = AvaliacaoResponse.model_validate(avaliacao)
     resposta.comentario_erro = dados.comentario_erro
+    resposta.comentario_estado = getattr(avaliacao, "_comentario_estado", None)
     return resposta
