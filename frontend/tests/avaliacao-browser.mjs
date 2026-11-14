@@ -235,7 +235,7 @@ try {
       await cdp("Network.clearBrowserCookies");
       if (token) await cdp("Network.setCookie", { name:"undb_session", value:token, url:"http://localhost:8000", httpOnly:true, sameSite:"Lax" });
       await enviar();
-      await aguardarTexto("Entre na sua conta");
+      await aguardarErroEnvio("Entre na sua conta");
       assert.deepEqual(await respostas(), preenchidas);
       assert.deepEqual(banco(), []);
     }
@@ -243,7 +243,7 @@ try {
     const login = await avaliar(`fetch("http://localhost:8000/api/auth/login", {method:"POST", credentials:"include", headers:{"Content-Type":"application/json"}, body:JSON.stringify(${JSON.stringify({email:real.email, senha:real.senha})})}).then(r=>r.status)`);
     assert.equal(login, 200);
     await enviar();
-    await aguardarTexto("link recebido");
+    await aguardarErroEnvio("link recebido");
     assert.deepEqual(banco(), []);
     assert.deepEqual(await respostas(), preenchidas);
     const confirmacao = await avaliar(`fetch("http://localhost:8000/api/auth/confirmar", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({token:${JSON.stringify(real.confirmationToken)}})}).then(r=>r.status)`);
@@ -254,7 +254,7 @@ try {
       return window.fetchOriginal(url, init);
     }`);
     await enviar();
-    await aguardarTexto("Revise os campos: Didática");
+    await aguardarErroEnvio("Revise os campos: Didática");
     await avaliar('window.fetch = window.fetchOriginal');
     assert.deepEqual(banco(), []);
     assert.deepEqual(await respostas(), preenchidas);
@@ -278,7 +278,7 @@ try {
     assert.ok(segunda[0].updated_at >= primeira[0].updated_at);
     await cdp("Network.setBlockedURLs", {urls:["*api/avaliacoes*"]});
     await enviar();
-    await aguardarTexto("Verifique sua conexão");
+    await aguardarErroEnvio("Verifique sua conexão");
     assert.equal((await respostas()).material, "BOM");
     assert.deepEqual(banco(), segunda);
     await cdp("Network.setBlockedURLs", {urls:[]});
