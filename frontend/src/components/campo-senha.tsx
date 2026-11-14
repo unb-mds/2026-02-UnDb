@@ -22,7 +22,7 @@ export default function CampoSenha({ cadastro = false }: { cadastro?: boolean })
       <button type="button" aria-controls={id} aria-pressed={visivel} onClick={() => setVisivel((valor) => !valor)} className="link mt-1 inline-flex min-h-11 items-center self-end text-sm">
         {visivel ? "Ocultar senha" : "Mostrar senha"}
       </button>
-      {cadastro && <span id={ajudaId} className="text-xs text-(--muted)">Use entre 8 e 128 caracteres.</span>}
+      {cadastro && <span id={ajudaId} className="text-xs text-(--muted)">Use entre 8 e 128 caracteres.<span className="mt-2 block leading-relaxed">Crie uma senha exclusiva para o UnDb, diferente da usada na UnB/SIGAA e em outros serviços. Evite informações relacionadas à UnB na sua senha.</span></span>}
     </div>
   );
 }
