@@ -13,6 +13,14 @@ import { ApiError } from "@/lib/services/http-error";
 import type { ComentarioDoAutor } from "@/lib/types/comentario";
 
 type Consulta = { estado: "carregando" | "negado" | "erro" | "pronto"; itens: ComentarioDoAutor[] };
+type Acesso = "carregando" | "erro" | "visitante" | "pendente" | "confirmado";
+const ORIENTACAO_ACESSO: Record<Acesso, string> = {
+  carregando: "Verificando seu acesso à avaliação…",
+  erro: "Não foi possível verificar seu acesso agora. Isso não significa que você saiu da conta. Tente verificar novamente.",
+  visitante: "Entre na sua conta para enviar a avaliação. É necessário confirmar seu e-mail institucional.",
+  pendente: "Você está conectado, mas precisa confirmar seu e-mail institucional pelo link enviado no cadastro antes de avaliar.",
+  confirmado: "Você está conectado e seu e-mail está confirmado. Já pode enviar sua avaliação.",
+};
 
 export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }: {
   professorId: string; disciplinaId: string; retornoHref: string;
@@ -28,6 +36,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
   const [avisoComentario, setAvisoComentario] = useState<string | null>(null);
   const [texto, setTexto] = useState("");
   const [consulta, setConsulta] = useState<Consulta>({ estado: "carregando", itens: [] });
+  const [acesso, setAcesso] = useState<Acesso>("carregando");
   const [confirmarRetirada, setConfirmarRetirada] = useState<string | null>(null);
   const [resultadoRetirada, setResultadoRetirada] = useState<string | null>(null);
 
@@ -35,12 +44,28 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
     consultaRef.current?.abort();
     const controlador = new AbortController();
     consultaRef.current = controlador;
+    setAcesso("carregando");
+    let sessaoAutenticada = false;
     try {
+      const sessao = await consultarSessao();
+      if (controlador.signal.aborted) return;
+      if (!sessao.autenticado) {
+        setAcesso("visitante");
+        setConsulta({ estado: "negado", itens: [] });
+        return;
+      }
+      sessaoAutenticada = true;
+      // O contrato existente de /comentarios/meu exige e-mail confirmado;
+      // apenas seu 403, após sessão válida, indica confirmação pendente.
       const itens = await consultarMeusComentarios(controlador.signal, { professorId, disciplinaId });
-      if (!controlador.signal.aborted) setConsulta({ estado: "pronto", itens });
+      if (!controlador.signal.aborted) {
+        setAcesso("confirmado");
+        setConsulta({ estado: "pronto", itens });
+      }
     } catch (falha) {
       if (controlador.signal.aborted) return;
-      const negado = falha instanceof ApiError && [401, 403].includes(falha.status);
+      const negado = sessaoAutenticada && falha instanceof ApiError && [401, 403].includes(falha.status);
+      setAcesso(negado ? (falha.status === 403 ? "pendente" : "visitante") : "erro");
       setConsulta({ estado: negado ? "negado" : "erro", itens: [] });
     }
   }, [professorId, disciplinaId]);
@@ -53,6 +78,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
       enviandoRef.current = false;
       setEnviando(false);
       setConsulta({ estado: "carregando", itens: [] });
+      setAcesso("carregando");
       setConfirmarRetirada(null);
       setResultadoRetirada(null);
       setSucesso(false);
@@ -119,6 +145,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
       setErro(mensagemErroAvaliacao(falha));
       if (falha instanceof ApiError && [401, 403].includes(falha.status)) {
         consultaRef.current?.abort(); setConsulta({ estado: "negado", itens: [] });
+        setAcesso(falha.status === 403 ? "pendente" : "visitante");
       }
     } finally {
       if (geracao === geracaoSessao.current) { enviandoRef.current = false; setEnviando(false); }
@@ -148,9 +175,10 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
   return (
     <div className="flex min-w-0 flex-col gap-6">
       <form onSubmit={enviar} className="flex min-w-0 flex-col gap-5" aria-busy={enviando}>
-        <div className="note flex-col items-start sm:flex-row sm:items-center sm:justify-between">
-          <p className="flex gap-3 text-sm leading-relaxed"><Icone nome="shield" />Você pode entrar antes de preencher. Para enviar, é necessário ter uma sessão ativa e confirmar seu e-mail institucional.</p>
-          <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="button shrink-0">Entrar ou criar conta antes de avaliar</Link>
+        <div className="note flex-col items-start sm:flex-row sm:items-center sm:justify-between" aria-live="polite" data-testid="acesso-avaliacao">
+          <p className="flex gap-3 text-sm leading-relaxed" role="status"><Icone nome="shield" />{ORIENTACAO_ACESSO[acesso]}</p>
+          {acesso === "visitante" && <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="button shrink-0">Entrar para avaliar</Link>}
+          {(acesso === "pendente" || acesso === "erro") && <button type="button" className="button shrink-0" onClick={() => void carregar()}>{acesso === "pendente" ? "Já confirmei, verificar novamente" : "Verificar acesso novamente"}</button>}
         </div>
         <CriteriosAvaliacao rotulosExplicitos disabled={enviando} onChange={() => { setSucesso(false); setErro(null); }} />
         <label className="glass flex min-w-0 flex-col gap-3 rounded-2xl! p-3 sm:p-6">

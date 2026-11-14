@@ -75,7 +75,8 @@ await comNavegador({ fixture:real?null:fixture, executar:async ({cdp,avaliar,agu
   const caminho=`/professores/${professorId}/disciplinas/${disciplinaId}`;
   const getComentarios=()=>avaliar(`fetch('http://localhost:8000/api/comentarios/meu?professor_id=${professorId}&disciplina_id=${disciplinaId}',{credentials:'include',cache:'no-store'}).then(r=>r.json())`);
   async function login(dados){
-    await navegar('/login'); await esperar('Entrar');
+    // Conta ativa mostra Minha conta; aguardar o estado verificado antes de trocar a sessão.
+    await navegar('/login');
     await aguardar(async()=>await avaliar(`!!document.querySelector('input[name="email"]') || document.body.innerText.includes('Sua sessão está ativa')`),'sessão de login');
     if ((await texto()).includes('Sua sessão está ativa')) await clicar('Sair');
     await aguardar(async()=>await avaliar(`!!document.querySelector('input[name="email"]')`),'login pronto');

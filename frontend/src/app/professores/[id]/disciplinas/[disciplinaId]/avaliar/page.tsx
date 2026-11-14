@@ -8,7 +8,6 @@ import { ApiError } from "@/lib/services/http-error";
 import { caminhoAvaliacao } from "@/lib/retorno-avaliacao";
 import AvaliacaoForm from "./avaliacao-form";
 import Caminho from "@/components/caminho";
-import FundoParticulas from "@/components/fundo-particulas";
 import Icone from "@/components/icone";
 
 export default async function AvaliarPage({ params, searchParams }: {
@@ -26,8 +25,7 @@ export default async function AvaliarPage({ params, searchParams }: {
   });
 
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
-      <FundoParticulas />
+    <main className="relative isolate flex flex-1 flex-col overflow-hidden bg-background">
       <div className="container flex min-w-0 flex-col gap-6 py-8 sm:py-12">
         <Caminho itens={[{ nome: "Início", href: "/" }, ...(contexto ? [{ nome: "Resultados", href: urlBusca(contexto), retornoBusca: true }] : []), { nome: "Consulta", href: consultaHref }, { nome: "Avaliar" }]} />
         <div className="-mt-2 flex flex-wrap gap-x-6">
