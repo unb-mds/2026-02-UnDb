@@ -174,7 +174,7 @@ denúncias autenticadas/anônimas, restringir ações a moderadores designados e
 os cinco critérios. Também deve cumprir a retenção/descarte definidos pela fonte,
 sem transformar registros privados em arquivo permanente de texto ou denúncias encerradas.
 
-Nesta etapa a aprovação de textos novos e substitutos é humana. A lista do filtro é
+A evolução #239 autoriza triagem automática de textos novos/substitutos quando habilitada; casos sinalizados ou indisponíveis continuam humanos. A lista do filtro é
 pendente e a IA é objetivo futuro condicionado, sem aprovação de tecnologia/provedor.
 **Estado integrado — fontes:** a [PR #191](https://github.com/unb-mds/2026-02-UnDb/pull/191)
 entregou a base RF20 (`4126897`); a
@@ -576,3 +576,15 @@ operação independente do servidor HTTP e de suas suspensões por inatividade.
 | Identificação indireta do avaliador em disciplinas com poucas avaliações | Risco de retaliação | RNF02 aprovado: mínimo de 3 avaliações para exibir critérios; abaixo disso, apenas contagem e dados insuficientes. O limiar reduz exposição, mas não garante anonimato |
 | Estrutura do SIGAA muda sem aviso | Importação para de funcionar silenciosamente | RF19 (log de execução) e RNF07 (falha isolada) |
 | Runtime Node no container do frontend | Ambiente mais pesado que hospedagem estática | Build standalone em múltiplas etapas; exportação estática exigiria reavaliar as rotas atuais (ADR 08) |
+
+
+### Evolução #239 — publicação automática (14/11/2026)
+
+Implementação da nova direção explicitamente autorizada pelo PO (RF20 atualizado).
+Primeira transação confirma critérios e versão pendente. Sem manter locks no acesso
+externo, filtro/API analisam; segunda transação bloqueia avaliação/versão e confere
+estado e conteúdo antes de publicar. Um envio posterior ou retirada pode invalidar
+a análise antiga. Falha da segunda etapa não desfaz os critérios já confirmados.
+Decisões automáticas usam moderador_id nulo como ator sistema, mantendo retenção
+vigente; não existe conta fictícia de moderador. Migração 20261114_01 permite essa
+nulabilidade. Downgrade recusa-se a apagar auditoria automática ainda existente.

@@ -21,6 +21,7 @@ from app.repositories import (
     turma_repository,
 )
 from app.schemas.avaliacao import AvaliacaoCreate
+from app.services import moderacao_automatica_service
 
 
 MIN_AVALIACOES_EXIBICAO = 3
@@ -54,7 +55,9 @@ def _persistir_avaliacao(
     )
 
 
-def _criar_ou_substituir_comentario(db: Session, avaliacao_id: UUID, texto: str | None) -> None:
+def _criar_ou_substituir_comentario(
+    db: Session, avaliacao_id: UUID, texto: str | None
+) -> UUID | None:
     """Cria uma nova versao PENDENTE do comentario, se texto for valido.
 
     - texto None: mantem comentario existente (re-envio de criterios).
@@ -72,9 +75,10 @@ def _criar_ou_substituir_comentario(db: Session, avaliacao_id: UUID, texto: str 
     publicado = comentario_repository.obter_atual_por_avaliacao(db, avaliacao_id)
     substitui_id = publicado.id if publicado is not None else None
 
-    comentario_repository.criar(
+    versao = comentario_repository.criar(
         db, avaliacao_id=avaliacao_id, texto=texto, substitui_id=substitui_id
     )
+    return versao.id
 
 
 def registrar_avaliacao(
@@ -96,13 +100,15 @@ def registrar_avaliacao(
 
     try:
         avaliacao = _persistir_avaliacao(db, usuario, dados)
-        _criar_ou_substituir_comentario(db, avaliacao.id, dados.comentario)
+        versao_id = _criar_ou_substituir_comentario(db, avaliacao.id, dados.comentario)
         db.commit()
     except Exception:
         db.rollback()
         raise
 
+    estado = moderacao_automatica_service.processar(db, versao_id) if versao_id else None
     db.refresh(avaliacao)
+    avaliacao._comentario_estado = estado
     return avaliacao
 
 

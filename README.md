@@ -86,3 +86,11 @@ Conheça nossos perfis e redes na [página Sobre](https://undb.app.br/sobre).
 Usamos Gitflow: `develop` integra o trabalho e `main` registra releases. Alterações entram por PR, com checks e revisão humana, conforme o [guia de contribuição](CONTRIBUTING.md).
 
 A licença do projeto ainda está em definição; este repositório não declara uma licença de uso.
+
+
+### Apoio opcional à moderação
+
+A #239 prepara análise assistiva com a Moderation API gratuita da OpenAI e filtro de termos, desativados por
+padrão. A evolução autorizada permite publicar automaticamente sem sinais e encaminha
+os demais textos à revisão humana. Consulte [configuração, limites e
+validação](docs/moderacao-ia.md) antes de habilitar.

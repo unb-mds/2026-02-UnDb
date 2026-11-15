@@ -164,11 +164,13 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
    identificador de conta ou vínculo que identifique o autor. Comentários publicados podem
    ser lidos sem cadastro. Isso não autoriza exibir avaliações individuais nem critérios
    agregados abaixo do mínimo de RNF02; aprovação de texto não altera esse requisito.
-4. **Nesta etapa, a moderação é humana antes de publicar qualquer novo texto.** O filtro
-   de termos aguarda a lista que será definida pelo solicitante. A IA não substitui a
-   aprovação humana nesta entrega documental; sua adoção futura depende da evolução
-   registrada na seção 11. Toda substituição de texto passa novamente pela moderação
-   vigente no momento; um texto anteriormente aprovado não dispensa a revisão do substituto.
+4. **Triagem automática com revisão humana por exceção (#239, autorização do PO em 14/11/2026).**
+   Com o fluxo habilitado, todo texto novo ou substituto passa pelo filtro local e pela
+   API de moderação. Publicar automaticamente somente sem sinais em ambos. Sinais,
+   possível exposição de dados, falhas, limite ou configuração incompleta mantêm o
+   texto pendente; não há rejeição automática. A ausência de sinais não garante
+   adequação. Sem habilitação, permanece a aprovação humana prévia. Edição não
+   contorna suspensão, remoção ou denúncias abertas da versão anterior.
 5. O moderador deve rejeitar ofensas pessoais, xingamentos, palavrões, ameaças,
    discriminação, exposição de dados pessoais de estudantes/terceiros e spam. Críticas
    acadêmicas negativas são permitidas; discordância do moderador não justifica rejeição.
@@ -240,8 +242,7 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
    Usuário comum, visitante ou conta sem a permissão não pode moderar.
 2. A fila inclui textos novos/substitutos pendentes de aprovação e versões denunciadas ou
    suspensas. O moderador pode aprovar/rejeitar pendentes, manter/remover da exibição pública
-   textos denunciados e restaurar/remover da exibição pública textos suspensos. A aprovação
-   prévia humana não se limita a conteúdo denunciado.
+   textos denunciados e restaurar/remover da exibição pública textos suspensos. A revisão humana inclui textos pendentes pela triagem, não apenas conteúdo denunciado.
 3. O moderador não pode julgar seu próprio comentário nem um caso com denúncia sua. Outro
    moderador deve decidir; sem outro disponível, o caso permanece pendente e uma suspensão
    existente é preservada. A permissão de curadoria não elimina esse impedimento.
@@ -268,6 +269,7 @@ atribuídos a cada versão, não compartilhados automaticamente entre versões.
 | Origem | Evento/ator autorizado | Resultado e efeito |
 |---|---|---|
 | Sem texto / nova versão | Autor envia texto válido | `pendente`; sem publicação do novo texto |
+| `pendente` | Triagem habilitada, sem sinais, versão ainda atual | `publicado`; ator sistema auditado; substitui versão anterior elegível |
 | `pendente` | Moderador aprova | `publicado`; se substituto, encerra denúncias anteriores e descarta texto substituído |
 | `pendente` | Moderador rejeita | `rejeitado`; texto rejeitado não é conservado; versão anterior mantém seu estado |
 | `publicado` | Denúncia abaixo do limiar | Mantém estado; entra na fila com denúncias separadas por origem |
@@ -320,7 +322,7 @@ serão definidos nas issues de implementação, não por este detalhamento docum
 
 | ID | Cenário verificável | Origem |
 |---|---|---|
-| AC20-01 | Conta confirmada envia avaliação com texto de 1/500 caracteres; texto aguarda aprovação e os cinco critérios válidos são registrados | R2-DEC-01/02/04 |
+| AC20-01 | Conta confirmada envia avaliação com texto de 1/500 caracteres; critérios são registrados e texto passa pela triagem vigente (publicado sem sinais ou pendente) | R2-DEC-01/02/04 |
 | AC20-02 | Texto com 0/501 caracteres após desconsiderar espaços não é publicado; omitir comentário não impede avaliação válida | R2-DEC-01/02 |
 | AC20-03 | Visitante lê somente texto publicado, sem nome/e-mail/identificador do autor ou valores individuais dos cinco critérios | R2-DEC-01/03; RF08/RNF02 |
 | AC20-04 | Substituto aguarda nova revisão; anterior continua público se não suspenso/removido; rejeição não altera seu estado e descarta o substituto rejeitado | R2-DEC-04/05 |
@@ -519,7 +521,7 @@ definida. A resposta 26 esclarece a retenção do agradecimento inicialmente ind
 | R2-DEC-01 | Aprovada | Comentário opcional da avaliação única estudante/professor/disciplina; vínculo interno e autoria pública anônima (respostas 1–3) |
 | R2-DEC-02 | Aprovada | 1–500 caracteres quando preenchido, desconsiderando espaços nas extremidades; critérios válidos independem do texto (8/11) |
 | R2-DEC-03 | Aprovada | Leitura pública; política de conteúdo inclui ofensas, xingamentos, palavrões, ameaças, discriminação, dados pessoais e spam; crítica acadêmica negativa permitida (3/12) |
-| R2-DEC-04 | Aprovada | Aprovação humana prévia nesta etapa; toda substituição passa pela moderação vigente; filtro aguarda lista e IA é objetivo futuro condicionado (4/7/18 e esclarecimento final após 25) |
+| R2-DEC-04 | Atualizada pelo PO em 14/11/2026 (#239) | Triagem automática quando habilitada; publicar somente sem sinais locais/IA. Sinais, falhas ou impedimentos seguem para revisão humana. Toda substituição passa pela triagem vigente. A regra exclusivamente humana anterior fica como histórico. |
 | R2-DEC-05 | Aprovada | Anterior aprovado permanece durante revisão do substituto; rejeição não o substitui; autor pode retirar apenas texto (9/10) |
 | R2-DEC-06 | Aprovada | Apenas texto é denunciável; conta autenticada confirmada ou não e visitante sem login podem denunciar (2/5/6) |
 | R2-DEC-07 | Aprovada | Motivo fechado obrigatório sem justificativa livre; uma denúncia aberta por conta/versão; visitantes podem repetir, com separação de origens na fila (13/14) |
@@ -538,7 +540,7 @@ definida. A resposta 26 esclarece a retenção do agradecimento inicialmente ind
 |---|---|---|
 | Lista de termos proibidos do filtro | Decisão pendente | Solicitante definirá depois; bloqueia ativação do filtro, não a moderação humana |
 | Correspondência do filtro futuro | Aprovada, não ativada | Palavras/expressões completas, ignorando maiúsculas e acentos (resposta 7); sem promessa de detectar toda forma de disfarce |
-| IA sem aprovação humana prévia | Objetivo futuro condicionado; não aprovado como fluxo atual | Viabilidade e validação posterior antes de substituir humanos; toda edição continua sujeita ao mecanismo vigente |
+| IA sem aprovação humana prévia | Autorizada pelo PO em 14/11/2026 na #239 | Publicação somente sem sinais do filtro e da API; demais casos pendentes; habilitação controlada e sem rejeição automática |
 | Modelo de dados, rotas, códigos HTTP, concessão operacional do papel e descarte programado | Detalhamento técnico pendente | #156/#160/#161, conforme requisitos e governança; esta issue não aprova schema, biblioteca ou provedor |
 | Reconhecimento de autoria de denúncia sem autenticação | Limitação do fluxo aprovado | Não há identidade de conta para visitantes; não prometer detecção automática de todo impedimento pessoal nem introduzir coleta de identidade por suposição. A proibição de julgar caso próprio permanece |
 | Sugestão antiga de ocultação após 5 denúncias | Sugestão não adotada | Limiar aprovado é 50 contas autenticadas distintas; não aplicar o exemplo da #149 |
@@ -725,3 +727,21 @@ local; preservar o UUID ao promover para perfil; distinguir associação provis�
 na fila; manter casos ambíguos na moderação; preservar avaliações e seus históricos;
 retomar consolidação sem reaplicar grupos concluídos. Não foi aprovada uma meta de
 segundos para produção: medições locais não são compromisso de duração remota.
+
+
+## Evolução da moderação — Issue #239
+
+Fonte: autorização explícita do PO em 14/11/2026: “é uma nova direção, pode implementar”.
+Substitui a proposta anterior de IA apenas sob demanda. Todo comentário novo/editado
+passa pela triagem quando habilitada, com publicação sem sinais e revisão humana
+nos demais casos. Não rejeitar automaticamente; não alterar notas. Filtro, IA e
+fluxo automático têm habilitação própria. A lista proposta continua revisável.
+Decisões automáticas identificam o ator como sistema (sem atribuição a pessoa),
+com versão, data, transição e identificação da integração/lista/modelo, sem copiar
+texto. Mesma retenção de sete dias das decisões humanas. APIs devem informar ao
+autor se o texto está publicado ou pendente; denúncia e retirada continuam disponíveis.
+
+Critérios adicionais de aceite: publicação limpa inicial/editada; preservação de
+versão anterior durante pendência; falha/limite sem perda dos critérios; bloqueio
+local de dados; retirada concorrente sem republicação; não contornar casos
+suspensos/denunciados; auditoria com ator sistema. [Guia](moderacao-ia.md).

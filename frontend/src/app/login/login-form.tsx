@@ -15,6 +15,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
   const [carregando, setCarregando] = useState(false);
   const [sessao, setSessao] = useState<"carregando" | "erro" | "visitante" | "autenticado">("carregando");
   const geracaoVerificacao = useRef(0);
+  const enviandoRef = useRef(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -56,6 +57,8 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
+    if (enviandoRef.current) return;
+    enviandoRef.current = true;
     setCarregando(true);
     setMensagem(null);
     setErro(null);
@@ -81,6 +84,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
           : "Não foi possível entrar agora. Tente novamente em instantes.",
       );
     } finally {
+      enviandoRef.current = false;
       setCarregando(false);
     }
   }
@@ -103,8 +107,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
   }
 
   return (
-    <MolduraConta titulo={sessao === "visitante" ? "Entrar" : "Minha conta"} descricao={sessao === "autenticado" ? "Você já está conectado ao UnDb." : sessao === "visitante" ? "Use sua conta institucional para registrar avaliações. As consultas continuam públicas." : "Aguarde a verificação da sessão antes de continuar."} retorno={retorno} contexto={contexto} rotulo="Acesso à conta">
-        {sessao === "visitante" && <OpcoesAcesso atual="login" retorno={retorno} />}
+    <MolduraConta titulo={sessao === "visitante" ? "Entrar" : "Minha conta"} descricao={sessao === "autenticado" ? "Você já está conectado ao UnDb." : sessao === "visitante" ? "Use sua conta institucional para registrar avaliações. As consultas continuam públicas." : "Aguarde a verificação da sessão antes de continuar."} retorno={retorno} contexto={contexto} opcoes={sessao === "visitante" && <OpcoesAcesso atual="login" retorno={retorno} />} rotulo="Acesso à conta">
         {sessao === "carregando" ? (
           <p className="text-sm text-(--muted)" role="status">Verificando sessão…</p>
         ) : sessao === "erro" ? (
@@ -113,9 +116,9 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
             <button type="button" className="button" onClick={() => void verificarSessao()}>Verificar sessão novamente</button>
           </div>
         ) : sessao === "visitante" ? (
-          <form onSubmit={enviar} className="flex min-w-0 flex-col gap-5">
+          <form onSubmit={enviar} aria-busy={carregando} className="flex min-w-0 flex-col gap-5">
             <label className="underline-field">
-              <span className="label-mono">E-mail institucional</span>
+              <span className="text-sm font-medium text-(--ink-soft)">E-mail institucional</span>
               <input
                 name="email"
                 type="email"
@@ -134,7 +137,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
               disabled={carregando}
               className="button primary mt-2"
             >
-              {carregando ? "Entrando…" : "Entrar"}
+              {carregando ? "Entrando…" : retorno ? "Entrar e continuar" : "Entrar"}
             </button>
           </form>
         ) : (

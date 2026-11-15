@@ -91,3 +91,28 @@ test("403 e 409 preservam status e não revelam mensagens internas", async (t) =
   assert.match(mensagemModeracao(new ApiError("interno", 409), "acao"), /estado.*mudou/);
   assert.match(mensagemModeracao(new TypeError("offline"), "consulta"), /conexão/);
 });
+
+test("triagem é explícita, usa apenas versão e valida categorias e vínculo", async (t) => {
+  const corpo = { comentario_versao_id: id, status: "CONCLUIDA", filtro_ativo: false,
+    versao_lista: "teste", versao_integracao: "teste", categorias_locais: [], categorias_ia: [], sinalizado: false, modelo: "teste" };
+  t.mock.method(globalThis, "fetch", async (url, init) => {
+    assert.equal(new URL(url).pathname, `/api/moderacao/comentarios/${id}/triagem`);
+    assert.equal(init.method, "POST");
+    assert.equal(init.credentials, "include");
+    assert.equal(init.cache, "no-store");
+    assert.deepEqual(JSON.parse(init.body), {});
+    return Response.json(corpo);
+  });
+  assert.deepEqual(await servico.analisarComentario(id), corpo);
+  corpo.categorias_ia = ["DESCONHECIDA"];
+  await assert.rejects(servico.analisarComentario(id), /incompatível/);
+  corpo.categorias_ia = [];
+  corpo.comentario_versao_id = outro;
+  await assert.rejects(servico.analisarComentario(id), /outra versão/);
+});
+
+
+test("histórico distingue ator sistema de moderador humano", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => Response.json([{ ...decisao, moderador_id: null }]));
+  assert.equal((await servico.consultarDecisoes(id))[0].moderador_id, null);
+});

@@ -25,6 +25,7 @@ const data = "2026-11-01T12:00:00Z";
 const criar = (i, estado) => ({ id: uuid(i), estado, texto: `${i}: Texto acadêmico de teste. ${"Texto longo ".repeat(40)}<script>window.injecao=true</script>`, autor, created_at: data, substitui_id: i === 1 ? uuid(4) : null });
 let itens, acesso, statusAcao, atrasoFila, atrasos, falhaDenuncias, falhaDecisoes, mudarNoConflito, falharAtualizacao;
 const envios = [];
+let statusTriagem = "CONCLUIDA";
 function reiniciar() {
   itens = [criar(1, "PENDENTE"), criar(2, "PUBLICADO"), criar(3, "SUSPENSO")];
   acesso = 200; statusAcao = 200; atrasoFila = 0; atrasos = {}; falhaDenuncias = false; falhaDecisoes = false; mudarNoConflito = false; falharAtualizacao = false;
@@ -47,7 +48,7 @@ const fixture = createServer(async (req, res) => {
     const resposta = structuredClone(itens.filter((item) => !url.searchParams.has("estado") || item.estado === url.searchParams.get("estado")));
     setTimeout(() => responder(200, resposta), atrasoFila); return;
   }
-  const match = url.pathname.match(/^\/api\/moderacao\/comentarios\/([^/]+)(?:\/(denuncias|decisoes|acoes))?$/);
+  const match = url.pathname.match(/^\/api\/moderacao\/comentarios\/([^/]+)(?:\/(denuncias|decisoes|acoes|triagem))?$/);
   if (!match) { responder(404, {}); return; }
   const [, id, recurso] = match;
   const item = itens.find((valor) => valor.id === id) ?? (id === uuid(4) ? criar(4, "SUSPENSO") : null);
@@ -57,6 +58,12 @@ const fixture = createServer(async (req, res) => {
     if (falhaDenuncias) { responder(503, {}); return; }
     const relato = { id: uuid(50), comentario_versao_id: id, estado: "EM_ABERTO", motivo: "SPAM", created_at: data, denunciante: autor };
     responder(200, { autenticadas: [relato], visitantes: [{ ...relato, id: uuid(51), denunciante: null }], contas_distintas: 1, total_visitantes: 1 }); return;
+  }
+  if (recurso === "triagem") {
+    responder(200, { comentario_versao_id: id, status: statusTriagem, filtro_ativo: true,
+      versao_lista: "teste", versao_integracao: "teste", categorias_locais: ["PALAVRAO"],
+      categorias_ia: statusTriagem === "CONCLUIDA" ? ["harassment"] : [], sinalizado: true,
+      modelo: statusTriagem === "CONCLUIDA" ? "modelo-teste" : null }); return;
   }
   if (recurso === "decisoes") { responder(falhaDecisoes ? 503 : 200, falhaDecisoes ? {} : []); return; }
   let corpo = "";
@@ -157,6 +164,17 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 700));
     assert.ok((await avaliar("document.querySelector('[aria-label=\"Análise do comentário\"]').innerText")).includes(uuid(2)), "resposta antiga não substitui seleção");
     atrasos = {};
+    await selecionar(uuid(1));
+    assert.ok(!consultas.some(({ url }) => url.includes("/triagem")), "não chama IA ao abrir detalhes");
+    for (const [status, mensagem] of [["CONCLUIDA", "Análise assistiva concluída"],
+      ["DESATIVADA", "está desativado"], ["DADOS_SENSIVEIS", "não foi enviado"],
+      ["LIMITE", "Limite de análises"], ["INDISPONIVEL", "está indisponível"]]) {
+      statusTriagem = status;
+      await clicar("Consultar apoio à revisão");
+      await esperarTexto(mensagem);
+      assert.equal(await avaliar("document.querySelector('#acao-moderacao').value"), "", "IA não escolhe ação");
+      assert.equal(await avaliar("document.querySelector('#motivo-moderacao').value"), "", "IA não preenche motivo");
+    }
     for (const tema of ["light", "dark"]) for (const largura of [320, 390, 768, 1440]) {
       await cdp("Emulation.setDeviceMetricsOverride", { width: largura, height: 900, deviceScaleFactor: 1, mobile: largura === 320 });
       await cdp("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: tema }] });

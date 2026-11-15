@@ -1,0 +1,201 @@
+{
+  "versao": "239-proposta-2",
+  "estado": "proposed",
+  "termos": [
+    {
+      "termo": "idiota",
+      "categoria": "OFENSA_PESSOAL",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "imbecil",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "babaca",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "otário",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "trouxa",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "escroto",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "arrombado",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "canalha",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "filho da puta",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "filha da puta",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "desgraçado",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "desgraçada",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "pessoa de merda",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "lixo humano",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vai se foder",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vai tomar no cu",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "tomar no cu",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vai à merda",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vai pra merda",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "fdp",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vsf",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vtnc",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "tnc",
+      "categoria": "XINGAMENTO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "porra",
+      "categoria": "PALAVRAO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "caralho",
+      "categoria": "PALAVRAO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "puta que pariu",
+      "categoria": "PALAVRAO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "cacete",
+      "categoria": "PALAVRAO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "merda",
+      "categoria": "PALAVRAO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "foda-se",
+      "categoria": "PALAVRAO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "pqp",
+      "categoria": "PALAVRAO",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vou te matar",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vou te bater",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vou te pegar",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "você vai apanhar",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "merece morrer",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "tinha que morrer",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "se mata",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "se mate",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    },
+    {
+      "termo": "vai se matar",
+      "categoria": "AMEACA",
+      "justificativa": "Sinal para revisão contextual, inclusive citações e negações; não rejeitar automaticamente."
+    }
+  ]
+}
