@@ -356,4 +356,9 @@ Confirmar não executa união de avaliações no navegador. Fluxo e implantaçã
 
 ## Continuidade visual — Issue #247
 
-[Guia das seis telas de conta, confirmação, sucesso, 404 e moderação](../docs/referencias/telas-jornada-247/README.md), com capturas e critérios para implementação. O commit inicial documenta o trabalho pendente; não entrega essas telas.
+[Guia das seis telas de conta, confirmação, sucesso, 404 e moderação](../docs/referencias/telas-jornada-247/README.md).
+As telas foram implementadas preservando os serviços e permissões existentes, junto
+do LinkedIn solicitado na aba Sobre. O [relatório da continuidade](docs/jornada-247.md)
+registra verificações, limites e 36 capturas em 320/768/1280 px. O runner
+`tests/jornada-247-browser.mjs` integra `npm run test:browser`; a integração real e o
+aceite humano permanecem pendentes antes de concluir a PR #248 em rascunho.

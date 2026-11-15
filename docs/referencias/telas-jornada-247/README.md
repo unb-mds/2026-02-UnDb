@@ -6,9 +6,11 @@
 @nicolaszanin06 e @ViniGvdo. Fonte: pedido e seis capturas fornecidas pelo PO em
 14/11/2026. Vinícius continuará a implementação nesta mesma branch e PR.
 
-**Este primeiro commit contém apenas documentação e referências visuais.** A PR é de
-implementação, permanece em rascunho e não deve ser integrada apenas pelo guia.
-A issue só estará concluída após implementar, verificar e obter aceite das telas.
+O primeiro commit `0ff2591` contém apenas documentação e referências visuais.
+A continuidade implementa as seis telas e o LinkedIn de Vinicius na mesma branch.
+Consulte o [relatório da implementação e 36 capturas antes/depois](../../../frontend/docs/jornada-247.md)
+para arquivos, comportamentos, verificações e limitações reais. A PR permanece em
+rascunho: integração real, revisão técnica humana e aceite visual ainda são necessários.
 
 Base inspecionada: `develop` em `18c04c445bed813948a6ed64f0fbcdc8a33c4bb7`.
 Antes de continuar, atualizar com a `develop` vigente e reavaliar os arquivos abaixo.
@@ -36,6 +38,13 @@ logo oficial do repositório, não a marca simplificada do protótipo. Não tran
 nomes, códigos, comentários, horários ou avaliações ilustrativos para produção.
 
 ## Arquivos e sequência sugerida
+
+Sequência original preservada abaixo para rastreabilidade. A implementação acrescentou
+`frontend/src/components/icone-resultado.tsx` e, junto ao formulário de avaliação,
+`resultado-avaliacao.tsx`. O contexto público já consultado é passado pela página ao
+cartão de conclusão; não foi criada uma rota/API de sucesso. O LinkedIn reutiliza
+`frontend/src/app/sobre/equipe.ts`. O runner `frontend/tests/jornada-247-browser.mjs`
+foi incorporado ao script `test:browser`, sem novas dependências nem alteração no lockfile.
 
 Todos os caminhos abaixo são relativos à raiz do repositório.
 
@@ -171,14 +180,16 @@ Revisar principalmente `tests/conta-avaliacao-sessao-browser.mjs`,
 Manter a sincronização por resultado do envio introduzida nas correções da #243;
 não voltar a aguardar textos genéricos que também existem no aviso de acesso.
 
-- [ ] Capturas antes/depois das seis telas em 320, 768 e 1280 px, aguardando fontes/imagens.
-- [ ] Sem overflow/corte; rótulos e textos longos legíveis; teclado, foco e contraste.
-- [ ] Conta: visitante/ativa/pendente/confirmada, logout/expiração, loading/erro/recuperação.
-- [ ] Cadastro/retorno/confirmar: sucesso, erros de validação, token ausente/inválido e rede.
-- [ ] Avaliação: sucesso, rejeições 401/403/422, rede, substituição, comentário e falha parcial.
-- [ ] 404 real distinto de erro temporário, com ambos os destinos funcionando.
-- [ ] Moderação: permissão, filas vazias/erro, seleção, filtros, decisões e impedimentos.
-- [ ] Sem dados fictícios no produto; sem regressão na home, animações ou telas da #237.
+- [x] Capturas antes/depois das seis telas em 320, 768 e 1280 px, aguardando fontes/imagens.
+- [x] Sem overflow/corte nas inspeções; rótulos, teclado, foco e contraste nos runners documentados.
+- [x] Conta: visitante/ativa/pendente/confirmada, logout/expiração, loading/erro/recuperação (HTTP controlado).
+- [x] Cadastro/retorno/confirmar: sucesso, erros de validação, token ausente/inválido e falha recuperável (HTTP controlado).
+- [x] Avaliação: sucesso, rejeições 401/403/422, rede, substituição, comentário e falha parcial (HTTP controlado).
+- [x] 404 HTTP direto, distinto de erro temporário; destinos preservados.
+- [x] Moderação: permissão, filas vazias/erro, seleção, filtros, decisões e impedimentos (HTTP controlado).
+- [x] Sem dados fictícios no produto; regressões da home, animações e #237 passaram nos runners.
+- [x] LinkedIn solicitado incluído no padrão existente da aba Sobre.
+- [ ] Reexecutar integração com FastAPI/PostgreSQL e confirmação institucional em ambiente de testes.
 - [ ] Checks remotos aprovados e evidências identificando versão/limites de cada teste.
 - [ ] Aceite visual do PO e revisão técnica; tirar de rascunho somente com implementação pronta.
 
