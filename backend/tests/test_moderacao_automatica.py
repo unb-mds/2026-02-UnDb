@@ -4,6 +4,7 @@ from unittest.mock import patch
 from sqlalchemy import select, func
 from tests import test_triagem as triagem
 from app.core import config
+from app.domain import filtro_moderacao
 from app.models.comentario_versao import ComentarioVersao
 from app.models.decisao_moderacao import DecisaoModeracao
 from app.models.enums import EstadoComentario as Estado
@@ -107,6 +108,24 @@ class AutomaticaTest(unittest.TestCase):
                 self.assertEqual(self.enviar()[1]["comentario_estado"], "PENDENTE")
                 chamada.assert_not_called()
 
+    def test_marcas_mn_classe_zero_preservam_texto_e_revisao_humana(self):
+        self.ativar()
+        for texto in ("me\ufe0frda", "me\u034frda"):
+            with (
+                self.subTest(texto=ascii(texto)),
+                patch.object(openai_triagem, "classificar") as chamada,
+            ):
+                code, resposta = self.enviar(texto)
+                self.assertEqual(code, 200, resposta)
+                self.assertEqual(resposta["comentario_estado"], "PENDENTE")
+                chamada.assert_not_called()
+                self.db.expire_all()
+                versao = self.db.scalar(select(ComentarioVersao))
+                self.assertEqual(versao.texto, texto)
+                self.assertEqual(versao.estado, Estado.PENDENTE)
+                self.assertEqual(versao.avaliacao.didatica, 4)
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(DecisaoModeracao)), 0)
+
     def test_limite(self):
         self.ativar()
         with (
@@ -191,3 +210,96 @@ class AutomaticaTest(unittest.TestCase):
         versao = self.db.scalar(select(ComentarioVersao))
         self.assertEqual(versao.estado, Estado.PENDENTE)
         self.assertEqual(versao.avaliacao.didatica, 4)
+
+    def test_disfarces_sinalizados_nao_chamam_ia_nem_alteram_original(self):
+        self.ativar()
+        for texto in ("m.e.r.d.a", "i d i o t a", "ｍｅｒｄａ", "bаbаcа", "meeerda"):
+            with (
+                self.subTest(texto=texto),
+                patch.object(config, "MODERACAO_DISFARCES_ATIVO", True),
+                patch.object(openai_triagem, "classificar") as chamada,
+            ):
+                code, resposta = self.enviar(texto)
+                self.assertEqual(code, 200, resposta)
+                self.assertEqual(resposta["comentario_estado"], "PENDENTE")
+                chamada.assert_not_called()
+                self.db.expire_all()
+                versao = self.db.scalar(select(ComentarioVersao))
+                self.assertEqual(versao.texto, texto)
+                self.assertEqual(versao.avaliacao.didatica, 4)
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(DecisaoModeracao)), 0)
+
+    def test_complemento_reversivel_e_substituto_preserva_anterior(self):
+        self.ativar()
+        texto = "m.e.r.d.a"
+        with patch.object(openai_triagem, "classificar", return_value=self.limpo()):
+            self.assertEqual(self.enviar(texto)[1]["comentario_estado"], "PUBLICADO")
+            anterior = self.db.scalar(select(ComentarioVersao))
+            with patch.object(config, "MODERACAO_DISFARCES_ATIVO", True):
+                self.assertEqual(self.enviar(texto)[1]["comentario_estado"], "PENDENTE")
+            self.db.expire_all()
+            self.assertEqual(anterior.estado, Estado.PUBLICADO)
+            self.assertEqual(anterior.texto, texto)
+            # Desligar somente o complemento restaura o comportamento anterior.
+            self.assertEqual(self.enviar(texto)[1]["comentario_estado"], "PUBLICADO")
+        self.db.expire_all()
+        self.assertEqual(anterior.estado, Estado.SUBSTITUIDO)
+
+    def test_critica_sem_sinais_preserva_payload_e_audita_versao(self):
+        self.ativar()
+        texto = "A didá\u200btica é ruim; tirei 4 na P1 e 3 na P2."
+        with (
+            patch.object(config, "MODERACAO_DISFARCES_ATIVO", True),
+            patch.object(openai_triagem, "classificar", return_value=self.limpo()) as chamada,
+        ):
+            code, resposta = self.enviar(texto)
+        self.assertEqual(code, 200, resposta)
+        self.assertEqual(resposta["comentario_estado"], "PUBLICADO")
+        self.assertEqual(chamada.call_args.args, (texto,))
+        self.assertEqual(self.db.scalar(select(ComentarioVersao)).texto, texto)
+        self.assertIn("filtro 252-disfarces-v1", self.db.scalar(select(DecisaoModeracao)).motivo)
+
+    def test_falha_da_normalizacao_nao_publica_nem_perde_criterios(self):
+        self.ativar()
+        with (
+            patch.object(config, "MODERACAO_DISFARCES_ATIVO", True),
+            patch.object(
+                filtro_moderacao, "normalizar_disfarces", side_effect=ValueError("fixture")
+            ),
+            patch.object(openai_triagem, "classificar") as chamada,
+        ):
+            code, resposta = self.enviar("Crítica acadêmica legítima.")
+        self.assertEqual(code, 200, resposta)
+        self.assertEqual(resposta["comentario_estado"], "PENDENTE")
+        chamada.assert_not_called()
+        self.db.expire_all()
+        versao = self.db.scalar(select(ComentarioVersao))
+        self.assertEqual(versao.estado, Estado.PENDENTE)
+        self.assertEqual(versao.avaliacao.didatica, 4)
+
+    def test_sinais_falhas_da_ia_e_filtro_desligado_com_complemento_ativo(self):
+        self.ativar()
+        for resultado in (
+            ClassificacaoIA(
+                categorias=["harassment"], sinalizado=True, modelo="omni-moderation-latest"
+            ),
+            openai_triagem.TriagemIndisponivel(),
+        ):
+            opcoes = (
+                {"side_effect": resultado}
+                if isinstance(resultado, Exception)
+                else {"return_value": resultado}
+            )
+            with (
+                self.subTest(resultado=type(resultado).__name__),
+                patch.object(config, "MODERACAO_DISFARCES_ATIVO", True),
+                patch.object(openai_triagem, "classificar", **opcoes),
+            ):
+                self.assertEqual(self.enviar()[1]["comentario_estado"], "PENDENTE")
+        with (
+            patch.object(config, "MODERACAO_DISFARCES_ATIVO", True),
+            patch.object(config, "MODERACAO_FILTRO_ATIVO", False),
+            patch.object(openai_triagem, "classificar") as chamada,
+        ):
+            self.assertEqual(self.enviar()[1]["comentario_estado"], "PENDENTE")
+            chamada.assert_not_called()

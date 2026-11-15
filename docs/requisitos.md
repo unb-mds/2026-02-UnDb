@@ -746,6 +746,33 @@ versão anterior durante pendência; falha/limite sem perda dos critérios; bloq
 local de dados; retirada concorrente sem republicação; não contornar casos
 suspensos/denunciados; auditoria com ator sistema. [Guia](moderacao-ia.md).
 
+### Evolução de RF20 — etapa inicial da #252, autorizada em 15/11/2026
+
+Fonte: após consultar a [PR #258](https://github.com/unb-mds/2026-02-UnDb/pull/258) e o
+[parecer de Gabriel](https://github.com/unb-mds/2026-02-UnDb/pull/258#pullrequestreview-5912949613),
+o solicitante esclareceu nesta sessão que Gabriel tem a mesma autoridade de decisão de
+Nicolas e lhe delegou os pontos sem decisão explícita. Em resposta às perguntas de escopo,
+aprovou explicitamente a primeira etapa e seus critérios e autorizou implementar/validar
+localmente com rótulos exploratórios, mantendo homologação e ativação pendentes.
+A aprovação da PR anterior era exclusivamente documental; não é a fonte desta autorização funcional.
+
+- Complementar a identificação de possíveis ofensas disfarçadas sem perder nenhum sinal
+  ou categoria do filtro vigente. A detecção adicional é opcional e desativada por padrão;
+  desativá-la deve restaurar o comportamento lexical anterior sem desligar filtro, IA ou triagem.
+- Escopo aprovado: representações Unicode de compatibilidade, conjunto limitado de
+  invisíveis/homoglifos da proposta e separadores/repetições dentro de termos conhecidos,
+  com fronteiras de palavras, até três separadores e quatro repetições por posição.
+- Substituições de letras por números, incluindo `m3rda`/`m4rda`, não pertencem a esta etapa.
+  Não mudar lista, provedor/modelo nem enviar texto normalizado no payload externo.
+- Trabalhar em cópia derivada para análise; preservar texto original, privacidade, permissões,
+  retenção, substituições e critérios estruturados. Sinais/falhas mantêm revisão humana, sem
+  rejeição automática; publicação sem sinais continua conforme a #239.
+- Aceite local: preservar as detecções e categorias anteriores, incluindo U+FE0F/U+034F;
+  detectar os casos das técnicas delimitadas e não acrescentar sinais nos controles negativos
+  atuais. A meta de 90% do estudo não foi adotada como critério desta etapa incremental.
+- Homologação humana dos rótulos, avaliação adicional e ativação em produção continuam pendentes.
+  Esta autorização não permite habilitar a melhoria em produção ou usar comentários reais nos ensaios.
+
 ### RF24 — Recuperação de senha
 
 **Estado:** validado pelo solicitante nesta conversa em 15/11/2026, ao aprovar

@@ -619,6 +619,31 @@ comentario_estado: PUBLICADO/PENDENTE/null. DecisaoResponse.moderador_id é nulo
 somente para decisão do sistema. Nenhuma restauração ou rejeição automática.
 A flag MODERACAO_AUTOMATICA_ATIVA é False por padrão. Guia: docs/moderacao-ia.md.
 
+### Detecção complementar de disfarces — etapa inicial #252 (15/11/2026)
+
+Fonte: docs/requisitos.md, “Evolução de RF20 — etapa inicial da #252”. Escopo e critérios
+aprovados pelo solicitante após a delegação de decisão esclarecida nesta sessão.
+
+`MODERACAO_DISFARCES_ATIVO=False` controla somente o complemento. O filtro vigente
+continua independente e seus sinais/categorias são unidos aos novos. U+FE0F e U+034F
+devem continuar detectados. Em `filtro_moderacao.py`, NFKD/casefold/remoção de marcas
+com classe combinante não zero são aplicados a uma cópia, sem compactar espaços.
+Remover explicitamente U+200B/U+200C/U+200D/U+FEFF/U+2060 e mapear somente
+`а→a`, `е→e`, `о→o`, `і→i`, `с→c` (caracteres de origem cirílicos).
+
+Padrões são pré-compilados da lista existente, com fronteiras Unicode de palavra;
+até três espaços/pontos/hífens/sublinhados/asteriscos entre letras e até quatro
+repetições contíguas por posição. Entre palavras da expressão, exigir um a três
+separadores. Limites novos não retiram detecções já cobertas pelo filtro anterior.
+Não substituir números. Não mudar o texto armazenado ou o texto enviado à IA.
+
+O fluxo automático e o apoio privado usam a união; falhas mantêm revisão e no apoio
+retornam `INDISPONIVEL`, sem expor o erro bruto. Publicação automática registra a versão
+`252-disfarces-v1` (ou `239-lexical-v1` com complemento desligado) no motivo privado
+da auditoria existente. Não há alteração de schema/contrato ou retenção.
+Desligar somente a flag nova restaura o filtro anterior. Homologação dos rótulos e
+ativação em produção permanecem pendentes; não há autorização de deploy/ativação.
+
 ### Persistência da recuperação de senha — RF24
 
 `password_reset_tokens`: `id` UUID PK, `usuario_id` UUID FK obrigatória para

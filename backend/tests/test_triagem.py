@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 from tests import test_moderacao as moderacao
 from app.domain.triagem_comentario import categorias_lexicais, contem_dados_sensiveis
+from app.domain import filtro_moderacao
 from app.models.enums import EstadoComentario
 from app.schemas.triagem import CategoriaOpenAI, ClassificacaoIA
 from app.services import openai_triagem, triagem_service
@@ -32,6 +33,19 @@ class LocalTest(unittest.TestCase):
             self.assertTrue(contem_dados_sensiveis(texto), texto)
         self.assertTrue(contem_dados_sensiveis("Sou MáRia", ("Maria Silva",)))
         self.assertFalse(contem_dados_sensiveis("A didática não me ajudou"))
+
+    def test_preserva_sinais_com_marcas_mn_de_classe_zero(self):
+        # Regressão obrigatória da revisão da PR #258: ambos são Mn,
+        # embora unicodedata.combining retorne zero para esses caracteres.
+        for marca in ("\ufe0f", "\u034f"):
+            for texto, esperado in (
+                (f"me{marca}rda", ["PALAVRAO"]),
+                (f"idi{marca}ota", ["OFENSA_PESSOAL"]),
+                (f"vou te ma{marca}tar", ["AMEACA"]),
+                (f"me{marca}rda e idi{marca}ota", ["OFENSA_PESSOAL", "PALAVRAO"]),
+            ):
+                with self.subTest(marca=ascii(marca), texto=ascii(texto)):
+                    self.assertEqual(categorias_lexicais(texto), esperado)
 
     def test_limites(self):
         limite = triagem_service.LimiteChamadas()
@@ -107,6 +121,7 @@ class HttpTest(unittest.TestCase):
         for nome, valor in {
             "MODERACAO_AUTOMATICA_ATIVA": False,
             "MODERACAO_FILTRO_ATIVO": False,
+            "MODERACAO_DISFARCES_ATIVO": False,
             "MODERACAO_IA_ATIVA": False,
             "MODERACAO_IA_DADOS_APROVADOS": False,
             "OPENAI_API_KEY": "",
@@ -224,3 +239,46 @@ class HttpTest(unittest.TestCase):
 
         with patch.object(openai_triagem, "classificar", side_effect=mudou):
             self.assertEqual(self.triagem(versao)[0], 409)
+
+    def test_apoio_disfarces_preserva_payload_original(self):
+        self.ativar()
+        self.moderador()
+        versao = self.versao()
+        versao.texto = "Que m.e.r.d.a!"
+        self.db.commit()
+        with (
+            patch.object(triagem_service.config, "MODERACAO_DISFARCES_ATIVO", True),
+            patch.object(
+                openai_triagem,
+                "classificar",
+                return_value=ClassificacaoIA(
+                    categorias=[], sinalizado=False, modelo="omni-moderation-latest"
+                ),
+            ) as chamada,
+        ):
+            code, resposta = self.triagem(versao)
+        self.assertEqual(code, 200, resposta)
+        self.assertEqual(resposta["categorias_locais"], ["PALAVRAO"])
+        self.assertEqual(chamada.call_args.args, ("Que m.e.r.d.a!",))
+        self.db.expire_all()
+        self.assertEqual(versao.estado, EstadoComentario.PENDENTE)
+        self.assertEqual(versao.texto, "Que m.e.r.d.a!")
+
+    def test_falha_do_complemento_mantem_revisao_sem_chamar_ia(self):
+        self.ativar()
+        self.moderador()
+        versao = self.versao()
+        with (
+            patch.object(triagem_service.config, "MODERACAO_DISFARCES_ATIVO", True),
+            patch.object(
+                filtro_moderacao, "normalizar_disfarces", side_effect=ValueError("privado")
+            ),
+            patch.object(openai_triagem, "classificar") as chamada,
+        ):
+            code, resposta = self.triagem(versao)
+        self.assertEqual(code, 200, resposta)
+        self.assertEqual(resposta["status"], "INDISPONIVEL")
+        self.assertNotIn("privado", json.dumps(resposta))
+        chamada.assert_not_called()
+        self.db.expire_all()
+        self.assertEqual(versao.estado, EstadoComentario.PENDENTE)
