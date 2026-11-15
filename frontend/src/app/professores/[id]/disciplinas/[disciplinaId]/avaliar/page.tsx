@@ -58,7 +58,7 @@ export default async function AvaliarPage({ params, searchParams }: {
                 <dd className="mt-1 font-medium">{nomeUnidade(avaliacao.disciplina)}</dd>
               </div>
             </dl>
-            <AvaliacaoForm professorId={avaliacao.professorId} disciplinaId={avaliacao.disciplinaId} retornoHref={retornoHref} />
+            <AvaliacaoForm professorId={avaliacao.professorId} disciplinaId={avaliacao.disciplinaId} retornoHref={retornoHref} contextoResultado={{ professor: avaliacao.professor.nome, disciplina: avaliacao.disciplina.nome, codigo: avaliacao.disciplina.codigo, resultadosHref: contexto ? urlBusca(contexto) : consultaHref }} />
           </>
         ) : (
           <p role="alert" className="status-box error">

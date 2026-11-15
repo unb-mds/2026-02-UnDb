@@ -4,8 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import Icone from "@/components/icone";
 import { equipe } from "./equipe";
+import { metadadosCompartilhamento } from "@/lib/metadados-compartilhamento";
 
-export const metadata: Metadata = { title: "Sobre o UnDb", description: "Conheça a proposta do UnDb e a equipe que constrói a plataforma." };
+const titulo = "Sobre o UnDb";
+const descricao = "Conheça a proposta do UnDb e a equipe que constrói a plataforma.";
+export const metadata: Metadata = {
+  title: titulo,
+  description: descricao,
+  openGraph: { ...metadadosCompartilhamento.openGraph, title: titulo, description: descricao, url: "https://undb.app.br/sobre" },
+  twitter: { ...metadadosCompartilhamento.twitter, title: titulo, description: descricao },
+};
 
 export default function Sobre() {
   return <main className="flex flex-1 flex-col">

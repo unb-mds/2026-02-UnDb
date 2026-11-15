@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { metadadosCompartilhamento } from "@/lib/metadados-compartilhamento";
 import TransicaoPagina from "@/components/transicao-pagina";
 import Rodape from "@/components/rodape";
 import Cabecalho from "@/components/cabecalho";
@@ -16,10 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "UnDb — Avaliação de Professores UnB",
-  description: "Consulta pública de avaliações estruturadas de professores e disciplinas da UnB.",
-};
+export const metadata: Metadata = metadadosCompartilhamento;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

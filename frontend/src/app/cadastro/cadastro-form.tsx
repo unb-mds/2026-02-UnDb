@@ -5,7 +5,7 @@ import MolduraConta from "@/components/moldura-conta";
 import OpcoesAcesso from "@/components/opcoes-acesso";
 
 import Link from "next/link";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import { cadastrarUsuario } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
 
@@ -14,9 +14,11 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
   const [mensagem, setMensagem] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [erroNome, setErroNome] = useState(false);
+  const enviandoRef = useRef(false);
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
+    if (enviandoRef.current) return;
     setCarregando(true);
     setMensagem(null);
     setErro(null);
@@ -30,6 +32,7 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
       return;
     }
 
+    enviandoRef.current = true;
     try {
       const resposta = await cadastrarUsuario({
         nome,
@@ -44,21 +47,22 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
         ? `Revise os dados do cadastro. ${falha.message}`
         : "Não foi possível realizar o cadastro agora. Tente novamente em instantes.");
     } finally {
+      enviandoRef.current = false;
       setCarregando(false);
     }
   }
 
   return (
-    <MolduraConta titulo="Criar conta" descricao="Use seu e-mail institucional de estudante. Você precisará confirmá-lo antes de registrar avaliações." retorno={retorno} contexto={contexto} rotulo="Cadastro de conta">
-        <OpcoesAcesso atual="cadastro" retorno={retorno} />
-        <form onSubmit={enviar} className="flex min-w-0 flex-col gap-5">
+    <MolduraConta titulo="Criar conta" descricao="Use seu e-mail institucional da UnB. Você receberá um link para confirmar o endereço antes de avaliar." retorno={retorno} contexto={contexto} opcoes={<OpcoesAcesso atual="cadastro" retorno={retorno} />} rotulo="Cadastro de conta">
+        <form onSubmit={enviar} aria-busy={carregando} className="flex min-w-0 flex-col gap-5">
           <label className="underline-field">
-            <span className="label-mono">Nome</span>
+            <span className="text-sm font-medium text-(--ink-soft)">Nome</span>
             <input
               name="nome"
               type="text"
               autoComplete="name"
               required
+              placeholder="Como você quer ser identificado"
               maxLength={100}
               aria-invalid={erroNome}
               aria-describedby={erroNome ? "nome-erro" : undefined}
@@ -69,7 +73,7 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
           </label>
 
           <label className="underline-field">
-            <span className="label-mono">E-mail institucional</span>
+            <span className="text-sm font-medium text-(--ink-soft)">E-mail institucional</span>
             <input
               name="email"
               type="email"
@@ -78,6 +82,7 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
               required
               maxLength={150}
               pattern="[^@]+@[aA][lL][uU][nN][oO][.][uU][nN][bB][.][bB][rR]"
+              title="Use seu e-mail institucional com domínio @aluno.unb.br."
               placeholder="seu-email@aluno.unb.br"
             />
           </label>
