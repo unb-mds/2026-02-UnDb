@@ -31,6 +31,7 @@ os.environ.update(
     MODERACAO_AUTOMATICA_ATIVA="False",
     MODERACAO_FILTRO_ATIVO="False",
     MODERACAO_DISFARCES_ATIVO="False",
+    MODERACAO_SUBSTITUICOES_ATIVAS="False",
     MODERACAO_IA_ATIVA="False",
     MODERACAO_IA_DADOS_APROVADOS="False",
 )
@@ -112,7 +113,7 @@ def erro_binario(caso, sinal):
     return "TP" if sinal else "TN"
 
 
-def simular_fluxo(texto, cenario, *, disfarces_ativos=False):
+def simular_fluxo(texto, cenario, *, disfarces_ativos=False, substituicoes_ativas=False):
     """Executa processar real com repositórios/IA substituídos, sem banco/HTTP.
 
     PUBLICADO significa somente estado de um objeto em memória, não publicação.
@@ -140,6 +141,9 @@ def simular_fluxo(texto, cenario, *, disfarces_ativos=False):
         ):
             stack.enter_context(patch.object(auto.config, flag, True))
         stack.enter_context(patch.object(auto.config, "OPENAI_API_KEY", "fixture-offline"))
+        stack.enter_context(
+            patch.object(auto.config, "MODERACAO_SUBSTITUICOES_ATIVAS", substituicoes_ativas)
+        )
         stack.enter_context(
             patch.object(auto.config, "MODERACAO_DISFARCES_ATIVO", disfarces_ativos)
         )

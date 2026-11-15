@@ -1,5 +1,10 @@
 # Detecção complementar de ofensas — primeira etapa da #252
 
+Registro da primeira etapa, preservado no commit `b383ea8`. A
+[ampliação numérica posterior](implementacao-substituicoes-issue-252.md) foi solicitada
+explicitamente nesta sessão e tem configuração, versão e resultados próprios.
+As exclusões numéricas e hashes abaixo descrevem a primeira etapa.
+
 **Data:** 15/11/2026. **Estado:** implementação local autorizada e executada;
 homologação humana, avaliação adicional e ativação em produção pendentes.
 Branch: `feature/252-deteccao-ofensas`, base remota atualizada

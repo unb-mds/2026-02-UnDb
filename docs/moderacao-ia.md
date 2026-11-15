@@ -65,7 +65,8 @@ cinco invisíveis explícitos, mapa cirílico limitado e separadores/repetiçõe
 O filtro atual sempre participa: casos com U+FE0F/U+034F e suas categorias não podem se perder.
 São até três separadores entre posições e quatro repetições contíguas por posição;
 espaços não são compactados antes do teste. Não transforma números em letras: `m3rda`
-e `m4rda` permanecem fora desta etapa. Ver [implementação e resultados](estudos/implementacao-ofensas-disfarcadas-issue-252.md).
+e `m4rda` ficam fora da primeira etapa; a ampliação numérica abaixo acrescenta `m3rda`.
+Ver [implementação e resultados](estudos/implementacao-ofensas-disfarcadas-issue-252.md).
 
 O texto original segue para armazenamento e eventual chamada à IA. Falha local não produz
 resultado limpo: no automático mantém pendência; no apoio retorna `INDISPONIVEL`.
@@ -80,12 +81,25 @@ O exemplo/Compose mantêm a melhoria desligada; esta entrega não autoriza ativa
 
 ## Configuração e ativação
 
+Ampliação numérica da #252: `MODERACAO_SUBSTITUICOES_ATIVAS=False` é independente e
+também exige `MODERACAO_DISFARCES_ATIVO=True`. Quando autorizada e ligada em teste,
+reconhece `m3rda`, `p0rra`, `b4b4c4`, `1d10t4` e outras grafias pelas classes por posição
+`a4/e3/i1/o0/s5/t7`. Não reescreve números do comentário ou o payload da IA.
+Sua versão na auditoria é `252-disfarces-leet-v2`; desligar só essa flag restaura a
+primeira etapa. Não inclui a exceção `4→e` para `m4rda`.
+
+O ensaio ampliado encontrou sinais em três controles de identificadores técnicos isolados.
+Não são rejeições automáticas: devem passar por revisão humana. A homologação de rótulos
+e limites de FP e a autorização de ativação continuam pendentes. Ver
+[resultados e operação da ampliação](estudos/implementacao-substituicoes-issue-252.md).
+
 Variáveis somente no backend, nunca em `NEXT_PUBLIC_*`, código ou chat:
 
 ```dotenv
 MODERACAO_AUTOMATICA_ATIVA=False
 MODERACAO_FILTRO_ATIVO=False
 MODERACAO_DISFARCES_ATIVO=False
+MODERACAO_SUBSTITUICOES_ATIVAS=False
 MODERACAO_IA_ATIVA=False
 MODERACAO_IA_DADOS_APROVADOS=False
 OPENAI_API_KEY=

@@ -1,0 +1,5547 @@
+{
+  "data_utc": "2026-11-15T22:23:46.755383+00:00",
+  "codigo_head": "910bdf6b0d5fa369a7819e50a72aa0e583307ad8",
+  "sha256_fontes_utf8_lf": {
+    "backend/app/domain/filtro_moderacao.py": "f5fe117238b93181276ab0289830b24ba0ec053be3a955417fbb21ce0af9cc31",
+    "backend/app/domain/triagem_comentario.py": "7f1f4f8a8e4b10035ac30bbb2bb8ac95b5832dd59062567cee71d2ffab8a37fd",
+    "backend/app/services/moderacao_automatica_service.py": "f31b9593810630910045286e0645acf4831ccaa2e2bfbb560f3450a1f7b16004",
+    "backend/app/services/triagem_service.py": "2aeefcac36b7f9f74800c826d01a87b85194394104d04518930d22e63776f054",
+    "backend/app/core/config.py": "03bee99d548020a2a53100b4e6a5b96e7bcdb553a7a12087928140c83391bce1",
+    "docs/estudos/evidencias/issue-252/casos.json": "4a66be1fd34648351e0714e06744dd283aa0bb6413697eda1dce8682c7e69ee4",
+    "docs/estudos/evidencias/issue-252/casos-leet.json": "150b159e6f2b4b933347c0e16a5efc75d2147a12dd5648d487b1b3876586aaf3",
+    "docs/estudos/evidencias/issue-252/avaliar.py": "715becc332b9ded19a89ed4845f022e4edad6f053c66775d0c63bfe0799e168e",
+    "docs/estudos/evidencias/issue-252/avaliar_leet.py": "c286d6e84867997756a3b7ffdf4e024eca952a2543c4938f1d16b5ec33b6f269"
+  },
+  "python": "3.14.7",
+  "versao": "252-disfarces-leet-v2",
+  "api_real_chamadas": 0,
+  "homologacao_humana": "PENDENTE",
+  "modelo_configurado": "omni-moderation-latest",
+  "composicao": {
+    "positivo": 46,
+    "negativo": 36,
+    "contextual": 6
+  },
+  "resumo_local": {
+    "anterior_239": {
+      "TP": 10,
+      "FN": 36,
+      "FP": 0,
+      "TN": 36
+    },
+    "etapa1": {
+      "TP": 24,
+      "FN": 22,
+      "FP": 0,
+      "TN": 36
+    },
+    "leet": {
+      "TP": 42,
+      "FN": 4,
+      "FP": 3,
+      "TN": 33
+    }
+  },
+  "casos": [
+    {
+      "id": "P01",
+      "grupo": "positivo",
+      "tecnica": "explicito",
+      "texto": "Que merda de aula.",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que merda de aula.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P02",
+      "grupo": "positivo",
+      "tecnica": "explicito",
+      "texto": "Você é um idiota.",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Voc\\xea \\xe9 um idiota.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P03",
+      "grupo": "positivo",
+      "tecnica": "explicito",
+      "texto": "Que porra!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que porra!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P04",
+      "grupo": "positivo",
+      "tecnica": "expressao",
+      "texto": "Vai   se foder!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Vai   se foder!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P05",
+      "grupo": "positivo",
+      "tecnica": "caixa_acento",
+      "texto": "Seu OTÁRIO!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu OT\\xc1RIO!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P06",
+      "grupo": "positivo",
+      "tecnica": "caixa_acento",
+      "texto": "IDÍOTA!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "ID\\xcdOTA!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P07",
+      "grupo": "positivo",
+      "tecnica": "leet_4_ambiguo",
+      "texto": "Que m4rda de aula.",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m4rda de aula.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P08",
+      "grupo": "positivo",
+      "tecnica": "leet",
+      "texto": "Que m3rda de aula.",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m3rda de aula.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P09",
+      "grupo": "positivo",
+      "tecnica": "leet",
+      "texto": "Você é um b4b4c4.",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Voc\\xea \\xe9 um b4b4c4.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P10",
+      "grupo": "positivo",
+      "tecnica": "leet",
+      "texto": "Seu 1d10ta!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Seu 1d10ta!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P11",
+      "grupo": "positivo",
+      "tecnica": "pontuacao",
+      "texto": "Que m.e.r.d.a!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m.e.r.d.a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P12",
+      "grupo": "positivo",
+      "tecnica": "pontuacao",
+      "texto": "Seu b-a-b-a-c-a!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu b-a-b-a-c-a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P13",
+      "grupo": "positivo",
+      "tecnica": "espacos",
+      "texto": "Você é i d i o t a!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Voc\\xea \\xe9 i d i o t a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P14",
+      "grupo": "positivo",
+      "tecnica": "espacos",
+      "texto": "Que m er da!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m er da!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P15",
+      "grupo": "positivo",
+      "tecnica": "repeticao",
+      "texto": "Que meeerda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que meeerda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P16",
+      "grupo": "positivo",
+      "tecnica": "repeticao",
+      "texto": "Seu babacaaaa!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu babacaaaa!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P17",
+      "grupo": "positivo",
+      "tecnica": "invisivel",
+      "texto": "Que me​rda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que me\\u200brda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P18",
+      "grupo": "positivo",
+      "tecnica": "invisivel",
+      "texto": "Seu idi‍ota!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Seu idi\\u200dota!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P19",
+      "grupo": "positivo",
+      "tecnica": "invisivel",
+      "texto": "Que por﻿ra!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que por\\ufeffra!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P20",
+      "grupo": "positivo",
+      "tecnica": "unicode_compativel",
+      "texto": "Que ｍｅｒｄａ!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que \\uff4d\\uff45\\uff52\\uff44\\uff41!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P21",
+      "grupo": "positivo",
+      "tecnica": "unicode_compativel",
+      "texto": "Seu 𝐛𝐚𝐛𝐚𝐜𝐚!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu \\U0001d41b\\U0001d41a\\U0001d41b\\U0001d41a\\U0001d41c\\U0001d41a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P22",
+      "grupo": "positivo",
+      "tecnica": "homoglifo",
+      "texto": "Que mеrda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m\\u0435rda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P23",
+      "grupo": "positivo",
+      "tecnica": "homoglifo",
+      "texto": "Seu bаbаcа!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu b\\u0430b\\u0430c\\u0430!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P24",
+      "grupo": "positivo",
+      "tecnica": "combinado",
+      "texto": "Seu B.4.B.4.C.4!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu B.4.B.4.C.4!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P25",
+      "grupo": "positivo",
+      "tecnica": "combinado",
+      "texto": "Que M​3 R D A!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que M\\u200b3 R D A!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P26",
+      "grupo": "positivo",
+      "tecnica": "expressao_pontuacao",
+      "texto": "Vai.se.foder!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Vai.se.foder!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P27",
+      "grupo": "positivo",
+      "tecnica": "ameaca",
+      "texto": "Vou te matar.",
+      "categoria_esperada": "AMEACA",
+      "texto_escapado": "Vou te matar.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P28",
+      "grupo": "positivo",
+      "tecnica": "ameaca_disfarcada",
+      "texto": "V0u te m4t4r.",
+      "categoria_esperada": "AMEACA",
+      "texto_escapado": "V0u te m4t4r.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P29",
+      "grupo": "positivo",
+      "tecnica": "repeticao_longa",
+      "texto": "Que meeeeeeeerda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que meeeeeeeerda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P30",
+      "grupo": "positivo",
+      "tecnica": "homoglifo_fora_mapa",
+      "texto": "Que ᴍerda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que \\u1d0derda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P31",
+      "grupo": "positivo",
+      "tecnica": "explicito",
+      "texto": "Seu imbecil!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu imbecil!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P32",
+      "grupo": "positivo",
+      "tecnica": "pontuacao_fora_limite",
+      "texto": "Que m....e....r....d....a!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m....e....r....d....a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P33",
+      "grupo": "positivo",
+      "tecnica": "marca_mn_classe_zero",
+      "texto": "me️rda",
+      "categoria_esperada": "PALAVRAO",
+      "origem_revisao": "https://github.com/unb-mds/2026-02-UnDb/pull/258#discussion_r4580253635",
+      "texto_escapado": "me\\ufe0frda",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "P34",
+      "grupo": "positivo",
+      "tecnica": "marca_mn_classe_zero",
+      "texto": "me͏rda",
+      "categoria_esperada": "PALAVRAO",
+      "origem_revisao": "https://github.com/unb-mds/2026-02-UnDb/pull/258#discussion_r4580253635",
+      "texto_escapado": "me\\u034frda",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N01",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "A didática foi ruim; não recomendo.",
+      "categoria_esperada": null,
+      "texto_escapado": "A did\\xe1tica foi ruim; n\\xe3o recomendo.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N02",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "As provas cobraram assuntos ausentes das aulas.",
+      "categoria_esperada": null,
+      "texto_escapado": "As provas cobraram assuntos ausentes das aulas.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N03",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "A organização da disciplina foi péssima.",
+      "categoria_esperada": null,
+      "texto_escapado": "A organiza\\xe7\\xe3o da disciplina foi p\\xe9ssima.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N04",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "Reprovei e discordo dos critérios de correção.",
+      "categoria_esperada": null,
+      "texto_escapado": "Reprovei e discordo dos crit\\xe9rios de corre\\xe7\\xe3o.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N05",
+      "grupo": "negativo",
+      "tecnica": "substring",
+      "texto": "A análise discute a imbecilidade do argumento.",
+      "categoria_esperada": null,
+      "texto_escapado": "A an\\xe1lise discute a imbecilidade do argumento.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N06",
+      "grupo": "negativo",
+      "tecnica": "substring",
+      "texto": "O capítulo descreve a anatomia escrotal.",
+      "categoria_esperada": null,
+      "texto_escapado": "O cap\\xedtulo descreve a anatomia escrotal.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N07",
+      "grupo": "negativo",
+      "tecnica": "substring",
+      "texto": "O texto aborda a canalhice como conceito literário.",
+      "categoria_esperada": null,
+      "texto_escapado": "O texto aborda a canalhice como conceito liter\\xe1rio.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N08",
+      "grupo": "negativo",
+      "tecnica": "substring",
+      "texto": "Estudamos a família Otariidae.",
+      "categoria_esperada": null,
+      "texto_escapado": "Estudamos a fam\\xedlia Otariidae.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N09",
+      "grupo": "negativo",
+      "tecnica": "numeros",
+      "texto": "Tirei 4 na P1 e 3 na P2, com média 3,5.",
+      "categoria_esperada": null,
+      "texto_escapado": "Tirei 4 na P1 e 3 na P2, com m\\xe9dia 3,5.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N10",
+      "grupo": "negativo",
+      "tecnica": "numeros",
+      "texto": "A matriz 4 por 3 tem 12 entradas.",
+      "categoria_esperada": null,
+      "texto_escapado": "A matriz 4 por 3 tem 12 entradas.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N11",
+      "grupo": "negativo",
+      "tecnica": "numeros",
+      "texto": "Em 2026.2 cursei CIC0004 e MAT0031.",
+      "categoria_esperada": null,
+      "texto_escapado": "Em 2026.2 cursei CIC0004 e MAT0031.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N12",
+      "grupo": "negativo",
+      "tecnica": "tecnico",
+      "texto": "Usamos C++, C# e Python 3.12 no laboratório.",
+      "categoria_esperada": null,
+      "texto_escapado": "Usamos C++, C# e Python 3.12 no laborat\\xf3rio.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N13",
+      "grupo": "negativo",
+      "tecnica": "separadores",
+      "texto": "A prova separa os itens a, b, c e d.",
+      "categoria_esperada": null,
+      "texto_escapado": "A prova separa os itens a, b, c e d.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N14",
+      "grupo": "negativo",
+      "tecnica": "repeticao",
+      "texto": "O algoritmo processa uma fila e uma pilha.",
+      "categoria_esperada": null,
+      "texto_escapado": "O algoritmo processa uma fila e uma pilha.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N15",
+      "grupo": "negativo",
+      "tecnica": "referencia",
+      "texto": "Conforme o capítulo 3, seção 4, a hipótese foi refutada.",
+      "categoria_esperada": null,
+      "texto_escapado": "Conforme o cap\\xedtulo 3, se\\xe7\\xe3o 4, a hip\\xf3tese foi refutada.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N16",
+      "grupo": "negativo",
+      "tecnica": "unicode_legitimo",
+      "texto": "A função f(x)=αx+β representa o modelo.",
+      "categoria_esperada": null,
+      "texto_escapado": "A fun\\xe7\\xe3o f(x)=\\u03b1x+\\u03b2 representa o modelo.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N17",
+      "grupo": "negativo",
+      "tecnica": "unicode_legitimo",
+      "texto": "A discussão cita ação, órgão e frequência.",
+      "categoria_esperada": null,
+      "texto_escapado": "A discuss\\xe3o cita a\\xe7\\xe3o, \\xf3rg\\xe3o e frequ\\xeancia.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N18",
+      "grupo": "negativo",
+      "tecnica": "invisivel_legitimo",
+      "texto": "A didá​tica precisa melhorar.",
+      "categoria_esperada": null,
+      "texto_escapado": "A did\\xe1\\u200btica precisa melhorar.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N19",
+      "grupo": "negativo",
+      "tecnica": "limite_palavra",
+      "texto": "Usamos a variável prefixo_merda_sufixo no exercício de strings.",
+      "categoria_esperada": null,
+      "texto_escapado": "Usamos a vari\\xe1vel prefixo_merda_sufixo no exerc\\xedcio de strings.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N20",
+      "grupo": "negativo",
+      "tecnica": "identificador_leet",
+      "texto": "A variável m3rda armazena o resultado da matriz no exemplo.",
+      "categoria_esperada": null,
+      "texto_escapado": "A vari\\xe1vel m3rda armazena o resultado da matriz no exemplo.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "FP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N21",
+      "grupo": "negativo",
+      "tecnica": "identificador_4",
+      "texto": "No exercício, m4rda é o código de uma célula.",
+      "categoria_esperada": null,
+      "texto_escapado": "No exerc\\xedcio, m4rda \\xe9 o c\\xf3digo de uma c\\xe9lula.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N22",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "O material é insuficiente e as aulas são confusas.",
+      "categoria_esperada": null,
+      "texto_escapado": "O material \\xe9 insuficiente e as aulas s\\xe3o confusas.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N23",
+      "grupo": "negativo",
+      "tecnica": "referencia",
+      "texto": "A bibliografia inclui o artigo intitulado Crítica da razão pura.",
+      "categoria_esperada": null,
+      "texto_escapado": "A bibliografia inclui o artigo intitulado Cr\\xedtica da raz\\xe3o pura.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "N24",
+      "grupo": "negativo",
+      "tecnica": "numeros",
+      "texto": "A conversão hexadecimal usa 0x4A e 0x3E.",
+      "categoria_esperada": null,
+      "texto_escapado": "A convers\\xe3o hexadecimal usa 0x4A e 0x3E.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "C01",
+      "grupo": "contextual",
+      "tecnica": "citacao",
+      "texto": "O texto cita a palavra merda para analisar linguagem.",
+      "categoria_esperada": "PALAVRAO",
+      "decisao_esperada": "PENDENTE",
+      "texto_escapado": "O texto cita a palavra merda para analisar linguagem.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "etapa1": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "C02",
+      "grupo": "contextual",
+      "tecnica": "negacao",
+      "texto": "Não chame ninguém de idiota.",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "decisao_esperada": "PENDENTE",
+      "texto_escapado": "N\\xe3o chame ningu\\xe9m de idiota.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "etapa1": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "C03",
+      "grupo": "contextual",
+      "tecnica": "tecnico",
+      "texto": "O escroto foi descrito no material de anatomia.",
+      "categoria_esperada": "XINGAMENTO",
+      "decisao_esperada": "PENDENTE",
+      "texto_escapado": "O escroto foi descrito no material de anatomia.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "etapa1": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "C04",
+      "grupo": "contextual",
+      "tecnica": "ambiguidade",
+      "texto": "Essa prova foi de matar.",
+      "categoria_esperada": null,
+      "decisao_esperada": null,
+      "texto_escapado": "Essa prova foi de matar.",
+      "decisao_esperada_proposta": null,
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": null
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": null
+        },
+        "leet": {
+          "categorias": [],
+          "erro": null
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "C05",
+      "grupo": "contextual",
+      "tecnica": "ambiguidade",
+      "texto": "O argumento foi idiota ou apenas equivocado?",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "decisao_esperada": "PENDENTE",
+      "texto_escapado": "O argumento foi idiota ou apenas equivocado?",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "etapa1": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "C06",
+      "grupo": "contextual",
+      "tecnica": "ambiguidade",
+      "texto": "A aula foi um lixo.",
+      "categoria_esperada": null,
+      "decisao_esperada": null,
+      "texto_escapado": "A aula foi um lixo.",
+      "decisao_esperada_proposta": null,
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": null
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": null
+        },
+        "leet": {
+          "categorias": [],
+          "erro": null
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L01",
+      "grupo": "positivo",
+      "texto": "Que p0rra de aula!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que p0rra de aula!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L02",
+      "grupo": "positivo",
+      "texto": "P0RR4!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "P0RR4!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L03",
+      "grupo": "positivo",
+      "texto": "Que m3rd4!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m3rd4!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L04",
+      "grupo": "positivo",
+      "texto": "Seu b4b4c4!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu b4b4c4!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L05",
+      "grupo": "positivo",
+      "texto": "Seu 1d10t4!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Seu 1d10t4!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L06",
+      "grupo": "positivo",
+      "texto": "Seu 0t4r10!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu 0t4r10!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L07",
+      "grupo": "positivo",
+      "texto": "V41 s3 f0d3r!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "V41 s3 f0d3r!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L08",
+      "grupo": "positivo",
+      "texto": "V0u t3 m4t4r!",
+      "categoria_esperada": "AMEACA",
+      "texto_escapado": "V0u t3 m4t4r!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L09",
+      "grupo": "positivo",
+      "texto": "Que c4r4lh0!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que c4r4lh0!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L10",
+      "grupo": "positivo",
+      "texto": "Que c4c3t3!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que c4c3t3!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L11",
+      "grupo": "positivo",
+      "texto": "P.0.R.R.4!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "P.0.R.R.4!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "L12",
+      "grupo": "positivo",
+      "texto": "M​3 R D 4!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "M\\u200b3 R D 4!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN01",
+      "grupo": "negativo",
+      "texto": "A variável p0rra armazena o resultado da matriz.",
+      "categoria_esperada": null,
+      "texto_escapado": "A vari\\xe1vel p0rra armazena o resultado da matriz.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "FP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN02",
+      "grupo": "negativo",
+      "texto": "O identificador 1d10ta pertence ao exemplo de programação.",
+      "categoria_esperada": null,
+      "texto_escapado": "O identificador 1d10ta pertence ao exemplo de programa\\xe7\\xe3o.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "FP"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": false
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN03",
+      "grupo": "negativo",
+      "texto": "A variável p0rra_total contém a soma.",
+      "categoria_esperada": null,
+      "texto_escapado": "A vari\\xe1vel p0rra_total cont\\xe9m a soma.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN04",
+      "grupo": "negativo",
+      "texto": "O identificador prefixo_m3rda_sufixo está no exemplo.",
+      "categoria_esperada": null,
+      "texto_escapado": "O identificador prefixo_m3rda_sufixo est\\xe1 no exemplo.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN05",
+      "grupo": "negativo",
+      "texto": "A matriz 4 por 3 tem 12 entradas.",
+      "categoria_esperada": null,
+      "texto_escapado": "A matriz 4 por 3 tem 12 entradas.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN06",
+      "grupo": "negativo",
+      "texto": "Tirei 3,0 na P1 e 4,0 na P2.",
+      "categoria_esperada": null,
+      "texto_escapado": "Tirei 3,0 na P1 e 4,0 na P2.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN07",
+      "grupo": "negativo",
+      "texto": "Usamos 0, 1, 3, 4, 5 e 7 no exercício.",
+      "categoria_esperada": null,
+      "texto_escapado": "Usamos 0, 1, 3, 4, 5 e 7 no exerc\\xedcio.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN08",
+      "grupo": "negativo",
+      "texto": "Cursei CIC0004 e MAT0031 em 2026.2.",
+      "categoria_esperada": null,
+      "texto_escapado": "Cursei CIC0004 e MAT0031 em 2026.2.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN09",
+      "grupo": "negativo",
+      "texto": "O código m3rdas identifica a coluna da tabela.",
+      "categoria_esperada": null,
+      "texto_escapado": "O c\\xf3digo m3rdas identifica a coluna da tabela.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN10",
+      "grupo": "negativo",
+      "texto": "O identificador c4r4lhometro aparece no exercício de strings.",
+      "categoria_esperada": null,
+      "texto_escapado": "O identificador c4r4lhometro aparece no exerc\\xedcio de strings.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN11",
+      "grupo": "negativo",
+      "texto": "A didática foi ruim e faltou organização nas avaliações.",
+      "categoria_esperada": null,
+      "texto_escapado": "A did\\xe1tica foi ruim e faltou organiza\\xe7\\xe3o nas avalia\\xe7\\xf5es.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    },
+    {
+      "id": "LN12",
+      "grupo": "negativo",
+      "texto": "No relatório, m4rda identifica a célula da matriz.",
+      "categoria_esperada": null,
+      "texto_escapado": "No relat\\xf3rio, m4rda identifica a c\\xe9lula da matriz.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "anterior_239": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "etapa1": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "fluxos_controlados": {
+        "etapa1": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        },
+        "leet": {
+          "sem_sinal": {
+            "estado_simulado": "PUBLICADO",
+            "ia_mock_chamada": true
+          },
+          "sinal": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          },
+          "falha": {
+            "estado_simulado": "PENDENTE",
+            "ia_mock_chamada": true
+          }
+        }
+      },
+      "decisao_obtida_real": null,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "modelo_retornado": null
+      }
+    }
+  ],
+  "desempenho": {
+    "caracteres": 500,
+    "aquecimento": 3,
+    "amostras": 31,
+    "ordem": "sequencial por entrada, etapa1 depois leet; sem HTTP/banco",
+    "resultados": {
+      "numeros": {
+        "etapa1": {
+          "tempos_ms": [
+            0.9224,
+            0.9865,
+            1.0934,
+            1.1636,
+            1.2696,
+            1.4376,
+            1.4557,
+            1.3192,
+            1.4456,
+            1.2777,
+            1.0876,
+            1.1034,
+            1.1489,
+            1.31,
+            1.3043,
+            1.2208,
+            1.1482,
+            1.0441,
+            1.0173,
+            0.9299,
+            0.9203,
+            0.8595,
+            0.8094,
+            0.7826,
+            0.7993,
+            0.7651,
+            0.7769,
+            0.7657,
+            0.743,
+            0.7828,
+            0.7649
+          ],
+          "p95_ms": 1.4456
+        },
+        "leet": {
+          "tempos_ms": [
+            1.0583,
+            1.1121,
+            1.0508,
+            1.182,
+            1.0798,
+            1.0591,
+            1.0822,
+            1.0481,
+            1.0746,
+            1.0592,
+            1.0756,
+            1.0466,
+            1.0479,
+            1.113,
+            1.1669,
+            1.3266,
+            1.0568,
+            1.0583,
+            1.0678,
+            1.0804,
+            1.1409,
+            1.1078,
+            1.1332,
+            1.0821,
+            1.0755,
+            1.2867,
+            1.0874,
+            1.0431,
+            1.053,
+            1.0454,
+            1.0662
+          ],
+          "p95_ms": 1.2867
+        }
+      },
+      "quase_termo": {
+        "etapa1": {
+          "tempos_ms": [
+            0.7095,
+            0.7035,
+            0.6868,
+            0.7365,
+            0.6853,
+            0.6791,
+            0.8003,
+            0.6925,
+            0.6924,
+            0.6745,
+            0.6861,
+            0.7123,
+            0.6832,
+            0.683,
+            0.6995,
+            0.7003,
+            0.6922,
+            0.6849,
+            0.678,
+            0.6983,
+            0.6736,
+            0.6837,
+            0.6956,
+            0.6767,
+            0.6901,
+            0.7204,
+            0.7237,
+            0.6901,
+            0.7107,
+            0.712,
+            0.7053
+          ],
+          "p95_ms": 0.7365
+        },
+        "leet": {
+          "tempos_ms": [
+            0.9418,
+            0.9665,
+            0.9369,
+            0.9604,
+            0.951,
+            0.9831,
+            1.0679,
+            1.1674,
+            1.2465,
+            1.2339,
+            1.0919,
+            1.009,
+            0.989,
+            0.9595,
+            0.9524,
+            0.9491,
+            0.9656,
+            0.9399,
+            0.9789,
+            0.9453,
+            0.9552,
+            0.9465,
+            0.9612,
+            0.9429,
+            0.9483,
+            1.0218,
+            0.9711,
+            0.9897,
+            0.9591,
+            0.9496,
+            0.9536
+          ],
+          "p95_ms": 1.2339
+        }
+      },
+      "expansao_nfkd": {
+        "etapa1": {
+          "tempos_ms": [
+            6.9112,
+            6.8278,
+            6.7937,
+            6.8378,
+            6.8335,
+            6.8827,
+            6.9015,
+            6.9132,
+            6.8245,
+            7.0551,
+            6.999,
+            6.8619,
+            6.9237,
+            6.8082,
+            6.8863,
+            6.7898,
+            6.9005,
+            6.7482,
+            6.8035,
+            6.9921,
+            6.8326,
+            8.8219,
+            7.7638,
+            6.94,
+            6.8336,
+            6.9523,
+            7.0157,
+            7.138,
+            6.9617,
+            7.3099,
+            7.0226
+          ],
+          "p95_ms": 7.7638
+        },
+        "leet": {
+          "tempos_ms": [
+            13.1191,
+            12.2559,
+            17.3,
+            22.1116,
+            17.9748,
+            12.3456,
+            12.5597,
+            14.225,
+            12.4108,
+            12.3675,
+            12.3311,
+            12.2192,
+            12.909,
+            12.842,
+            13.0565,
+            12.786,
+            12.7515,
+            12.8374,
+            12.8281,
+            12.5942,
+            12.4415,
+            13.0128,
+            12.6001,
+            12.8721,
+            13.0575,
+            13.6404,
+            12.304,
+            12.4991,
+            12.762,
+            12.7089,
+            13.4783
+          ],
+          "p95_ms": 17.9748
+        }
+      }
+    }
+  }
+}
