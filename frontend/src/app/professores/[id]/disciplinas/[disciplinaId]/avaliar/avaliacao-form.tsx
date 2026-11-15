@@ -11,6 +11,7 @@ import { enviarAvaliacaoComComentario } from "@/lib/services/avaliacoes";
 import { consultarMeusComentarios, retirarComentario } from "@/lib/services/comentarios";
 import { ApiError } from "@/lib/services/http-error";
 import type { ComentarioDoAutor } from "@/lib/types/comentario";
+import ResultadoAvaliacao, { type ContextoResultado } from "./resultado-avaliacao";
 
 type Consulta = { estado: "carregando" | "negado" | "erro" | "pronto"; itens: ComentarioDoAutor[] };
 type Acesso = "carregando" | "erro" | "visitante" | "pendente" | "confirmado";
@@ -22,8 +23,8 @@ const ORIENTACAO_ACESSO: Record<Acesso, string> = {
   confirmado: "Você está conectado e seu e-mail está confirmado. Já pode enviar sua avaliação.",
 };
 
-export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }: {
-  professorId: string; disciplinaId: string; retornoHref: string;
+export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref, contextoResultado }: {
+  professorId: string; disciplinaId: string; retornoHref: string; contextoResultado: ContextoResultado;
 }) {
   const enviandoRef = useRef(false);
   const geracaoSessao = useRef(0);
@@ -39,6 +40,15 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
   const [acesso, setAcesso] = useState<Acesso>("carregando");
   const [confirmarRetirada, setConfirmarRetirada] = useState<string | null>(null);
   const [resultadoRetirada, setResultadoRetirada] = useState<string | null>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (sucesso) {
+      const resultado = resultadoRef.current?.querySelector<HTMLElement>("section");
+      resultado?.focus({ preventScroll: true });
+      resultado?.scrollIntoView({ block: "nearest", behavior: "instant" });
+    }
+  }, [sucesso]);
 
   const carregar = useCallback(async () => {
     consultaRef.current?.abort();
@@ -174,7 +184,11 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
-      <form onSubmit={enviar} className="flex min-w-0 flex-col gap-5" aria-busy={enviando}>
+      {sucesso && <div ref={resultadoRef}><ResultadoAvaliacao contexto={contextoResultado} avisoComentario={avisoComentario} aoRevisar={() => {
+        setSucesso(false);
+        window.requestAnimationFrame(() => document.querySelector<HTMLInputElement>("main [name=didatica]:checked")?.focus());
+      }} /></div>}
+      <form onSubmit={enviar} hidden={sucesso} className={sucesso ? "hidden" : "flex min-w-0 flex-col gap-5"} aria-busy={enviando}>
         <div className="note flex-col items-start sm:flex-row sm:items-center sm:justify-between" aria-live="polite" data-testid="acesso-avaliacao">
           <p className="flex gap-3 text-sm leading-relaxed" role="status"><Icone nome="shield" />{ORIENTACAO_ACESSO[acesso]}</p>
           {acesso === "visitante" && <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} className="button shrink-0">Entrar para avaliar</Link>}
@@ -191,8 +205,7 @@ export default function AvaliacaoForm({ professorId, disciplinaId, retornoHref }
           <button type="submit" disabled={enviando} className="button primary">{enviando ? "Enviando…" : "Enviar avaliação"}{!enviando && <Icone nome="arrow-right" pequeno />}</button>
         </div>
         <div aria-live="polite" aria-atomic="true">
-          {sucesso && <p role="status" className="status-box success">Avaliação registrada com sucesso. Se você já tinha uma avaliação para este professor nesta disciplina, ela foi substituída por este envio.</p>}
-          {avisoComentario && <p role="status" className="mt-2 text-sm">{avisoComentario}</p>}
+          {avisoComentario && !sucesso && <p role="status" className="mt-2 text-sm">{avisoComentario}</p>}
           {erro && <div role="alert" className="status-box error"><p>{erro}</p>{precisaEntrar && <Link href={`/login?returnTo=${encodeURIComponent(retornoHref)}`} target="_blank" rel="noopener noreferrer" className="link mt-2 inline-block">Entrar na conta (nova aba)</Link>}</div>}
         </div>
       </form>
