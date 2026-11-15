@@ -181,7 +181,7 @@ await comNavegador({ fixture, diretorioFrontend: process.env.UI247_FRONTEND, exe
   }
   await navegar('/sobre'); await esperar('Pessoas que constroem');
   const linkedin = 'https://www.linkedin.com/in/vinicius-gavald%C3%A3o-franco-74950a44b/';
-  assert.deepEqual(await avaliar(`const a = document.querySelector('a[href="${linkedin}"]'); [a?.target, a?.rel, a?.getAttribute('aria-label')]`), ['_blank', 'noopener noreferrer', 'LinkedIn de Vinicius, abre em outra aba']);
+  assert.deepEqual(await avaliar(`const a = document.querySelector('a[href="${linkedin}"]'); [a?.target, a?.rel, a?.getAttribute('aria-label')]`), ['_blank', 'noopener noreferrer', 'LinkedIn de Vinicius Gavaldao, abre em outra aba']);
   assert.equal((await fetch('http://localhost:3100/rota-inexistente-247')).status, 404);
   console.log('#247: seis telas em 320/768/1280 px; retorno, login, cadastro, confirmação sem sessão, sucesso contextual, reenvio, falha parcial, 404, autorização e LinkedIn aprovados (HTTP controlado).');
 } });
