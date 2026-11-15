@@ -16,6 +16,8 @@ class EmailDeliveryError(Exception):
 class EmailSender(Protocol):
     def enviar_confirmacao(self, destinatario: str, link: str) -> None: ...
 
+    def enviar_recuperacao_senha(self, destinatario: str, link: str) -> None: ...
+
 
 class ConsoleEmailSender:
     def enviar_confirmacao(self, destinatario: str, link: str) -> None:
@@ -23,6 +25,11 @@ class ConsoleEmailSender:
             "EMAIL_BACKEND=console: confirmacao para %s: %s",
             destinatario,
             link,
+        )
+
+    def enviar_recuperacao_senha(self, destinatario: str, link: str) -> None:
+        logger.warning(
+            "EMAIL_BACKEND=console: recuperacao de senha para %s: %s", destinatario, link
         )
 
 
@@ -51,6 +58,25 @@ class ResendEmailSender:
             )
         except Exception as erro:
             raise EmailDeliveryError("falha ao enviar e-mail de confirmação") from erro
+
+    def enviar_recuperacao_senha(self, destinatario: str, link: str) -> None:
+        try:
+            resend.api_key = self.api_key
+            resend.Emails.send(
+                {
+                    "from": self.remetente,
+                    "to": [destinatario],
+                    "subject": "Redefina sua senha no UnDb",
+                    "html": (
+                        "<p>Recebemos uma solicitação para redefinir sua senha no UnDb.</p>"
+                        f'<p><a href="{link}">Redefinir senha</a></p>'
+                        "<p>Este link expira em uma hora e só pode ser usado uma vez.</p>"
+                        "<p>Se você não fez esta solicitação, ignore este e-mail.</p>"
+                    ),
+                }
+            )
+        except Exception as erro:
+            raise EmailDeliveryError("falha ao enviar recuperação de senha") from erro
 
 
 def get_email_sender() -> EmailSender:

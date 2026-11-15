@@ -8,6 +8,7 @@ from app.models.sessao_usuario import SessaoUsuario
 from app.models.turma import Turma
 from app.models.token_confirmacao_email import TokenConfirmacaoEmail
 from app.models.unidade import Unidade
+from app.models.token_recuperacao_senha import TokenRecuperacaoSenha
 from app.models.usuario import Usuario
 from app.models.decisao_moderacao import DecisaoModeracao
 from app.models.denuncia import Denuncia, Agradecimento
@@ -27,6 +28,7 @@ __all__ = [
     "Turma",
     "TokenConfirmacaoEmail",
     "Unidade",
+    "TokenRecuperacaoSenha",
     "Usuario",
     "DecisaoModeracao",
     "Denuncia",

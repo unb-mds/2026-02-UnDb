@@ -745,3 +745,21 @@ Critérios adicionais de aceite: publicação limpa inicial/editada; preservaç�
 versão anterior durante pendência; falha/limite sem perda dos critérios; bloqueio
 local de dados; retirada concorrente sem republicação; não contornar casos
 suspensos/denunciados; auditoria com ator sistema. [Guia](moderacao-ia.md).
+
+### RF24 — Recuperação de senha
+
+**Estado:** validado pelo solicitante nesta conversa em 15/11/2026, ao aprovar
+explicitamente o fluxo completo proposto de “Esqueci minha senha”.
+
+- **[RF24] Recuperação de senha:** disponibilizar no acesso a solicitação de um link
+  temporário no e-mail cadastrado e permitir definir uma nova senha por esse link.
+- A resposta à solicitação não revela se o endereço tem conta.
+- A recuperação mantém os limites de senha e a exigência de confirmação de e-mail
+  vigentes; não cria conta nem confirma o e-mail automaticamente.
+
+Detalhes de implementação para este fluxo: token aleatório separado da confirmação,
+com apenas seu hash persistido, validade de uma hora e uso único. A troca é atômica,
+invalida os demais links de recuperação e encerra as sessões anteriores. Uma falha
+no envio não altera a senha nem invalida os links anteriores. Não há login automático.
+O adaptador local continua mostrando o link nos logs; envio externo segue a configuração
+operacional já existente, sem ativação de provedor nesta mudança.
