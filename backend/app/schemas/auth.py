@@ -89,3 +89,18 @@ class SessaoResponse(BaseModel):
 
 class MensagemResponse(BaseModel):
     message: str
+
+
+class RecuperarSenhaRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    email: str = Field(min_length=1, max_length=150)
+
+    @field_validator("email")
+    @classmethod
+    def validar_email(cls, email: str) -> str:
+        return CadastroRequest.validar_email(email)
+
+
+class RedefinirSenhaRequest(ConfirmacaoEmailRequest):
+    senha: str = Field(min_length=8, max_length=128)

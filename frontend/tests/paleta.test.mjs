@@ -47,3 +47,18 @@ test('foco e limites dos controles atingem 3:1 nas superfícies adjacentes', t =
     }
   }
 });
+
+test('destaques #242 preservam contraste do texto, código e foco nas superfícies usadas', t => {
+  for (const [texto, fundo] of [
+    ['foreground', 'panel'], ['ink-soft', 'panel'], ['muted', 'panel'],
+    ['accent', 'panel'], ['accent', 'accent-soft'],
+    ['ink-soft', 'background'],
+  ]) {
+    const valor = contraste(texto, fundo);
+    assert.ok(valor >= 4.5, `${texto} / ${fundo}: ${valor}`);
+    t.diagnostic(`${texto} / ${fundo}: ${valor.toFixed(2)}:1`);
+  }
+  const foco = contraste('focus', 'background');
+  assert.ok(foco >= 3);
+  t.diagnostic(`focus / background (offset do cartão): ${foco.toFixed(2)}:1`);
+});

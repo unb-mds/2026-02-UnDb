@@ -8,13 +8,14 @@ export default function CampoSenha({ cadastro = false }: { cadastro?: boolean })
   const ajudaId = `${id}-ajuda`;
   return (
     <div className="underline-field">
-      <label htmlFor={id} className="label-mono">Senha</label>
+      <label htmlFor={id} className="text-sm font-medium text-(--ink-soft)">Senha</label>
       <input
         id={id}
         name="senha"
         type={visivel ? "text" : "password"}
         autoComplete={cadastro ? "new-password" : "current-password"}
         required
+        placeholder={cadastro ? "Crie uma senha" : "Digite sua senha"}
         minLength={cadastro ? 8 : undefined}
         maxLength={128}
         aria-describedby={cadastro ? ajudaId : undefined}

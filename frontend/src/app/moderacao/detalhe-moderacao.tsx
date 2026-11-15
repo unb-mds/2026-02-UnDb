@@ -58,12 +58,13 @@ export default function DetalheModeracao({ comentario, executando, impedido, aoD
 
   return (
     <div className="space-y-5 [overflow-wrap:anywhere]">
-      <div><h2 className="text-lg font-semibold">Analisar comentário</h2>
-        <p className="mt-1 text-sm text-accent">{rotulosEstado[comentario.estado]}</p>
+      <div><p className="kicker">{comentario.estado === "PENDENTE" && comentario.substitui_id ? "Substituto em análise" : rotulosEstado[comentario.estado]}</p>
+        <h2 className="mt-3 text-xl font-semibold">Analisar comentário</h2>
         <p className="mt-2 text-xs text-foreground/70">Versão <span className="font-mono">{comentario.id}</span></p>
         <p className="text-xs text-foreground/70">Enviado em {formatarData(comentario.created_at)}</p>
       </div>
-      <p className="whitespace-pre-wrap rounded-lg bg-foreground/[0.03] p-4">{comentario.texto ?? "O texto desta versão já foi descartado."}</p>
+      <p className="whitespace-pre-wrap text-lg leading-relaxed font-medium">{comentario.texto ?? "O texto desta versão já foi descartado."}</p>
+      <p className="text-sm leading-relaxed text-(--muted)">Os critérios da avaliação são preservados qualquer que seja a decisão sobre o texto.</p>
       {comentario.texto && ["PENDENTE", "PUBLICADO", "SUSPENSO"].includes(comentario.estado) && <ApoioModeracao key={`${comentario.id}-${comentario.estado}`} versaoId={comentario.id} desabilitado={executando || impedido} />}
       <div className="text-sm"><h3 className="font-medium">Autor — informação interna</h3><p>{comentario.autor.nome}</p><p>{comentario.autor.email}</p></div>
       {comentario.substitui_id && <details className="rounded-lg border border-foreground/10 p-3">

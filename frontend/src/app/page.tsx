@@ -1,9 +1,17 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+import { metadadosCompartilhamento } from "@/lib/metadados-compartilhamento";
 import BuscaEntrada from "@/components/busca-entrada";
 import MapaVento from "@/components/mapa-vento";
 import Icone from "@/components/icone";
 import DestaquesHome from "@/components/destaques-home";
 import CatalogoHome from "@/components/catalogo-home";
+
+export const metadata: Metadata = {
+  ...metadadosCompartilhamento,
+  alternates: { canonical: "https://undb.app.br/" },
+  openGraph: { ...metadadosCompartilhamento.openGraph, url: "https://undb.app.br/" },
+};
 
 export default function Home() {
   return <main className="relative isolate flex flex-1 flex-col overflow-x-clip">

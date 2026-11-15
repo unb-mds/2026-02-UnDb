@@ -23,3 +23,14 @@ def adicionar_usuario(db: Session, usuario: Usuario) -> None:
 
 def adicionar_token(db: Session, token: TokenConfirmacaoEmail) -> None:
     db.add(token)
+
+
+def obter_para_login(db: Session, email: str) -> Usuario | None:
+    # Usa o mesmo bloqueio da redefinição: uma senha antiga não pode criar
+    # sessão depois de a troca já ter invalidado as sessões da conta.
+    return db.scalar(
+        select(Usuario)
+        .where(Usuario.email == email)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )

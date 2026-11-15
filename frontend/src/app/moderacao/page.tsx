@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 
 export default function ModeracaoPage() {
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
+    <main className="container flex flex-1 flex-col gap-7 py-10 sm:py-14">
       <div>
-        <h1 className="text-2xl font-semibold">Fila de moderação</h1>
-        <p className="mt-2 text-sm text-foreground/70">Analise comentários pendentes, denunciados e suspensos. As decisões sobre o texto preservam os critérios da avaliação.</p>
+        <h1 className="page-title">Fila de moderação</h1>
+        <p className="lead mt-3 max-w-4xl">Analise comentários pendentes, denunciados e suspensos. As decisões sobre o texto preservam os critérios da avaliação.</p>
       </div>
-      <nav aria-label="Filas de moderação" className="flex flex-wrap gap-4"><span aria-current="page">Comentários</span><Link href="/moderacao/identidades">Identidades de professores</Link></nav>
+      <nav aria-label="Filas de moderação" className="flex flex-wrap items-center gap-2 text-sm font-medium"><span aria-current="page" className="inline-flex min-h-11 items-center rounded-full bg-foreground px-4 text-background">Comentários</span><Link href="/moderacao/identidades" className="button pill">Identidades de professores</Link></nav>
       <FilaModeracao />
     </main>
   );

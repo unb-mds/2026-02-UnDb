@@ -287,6 +287,14 @@ dados suficientes. Não atribuir percentual artificial aos resultados insuficien
     pela dependência de autenticação. Rotas públicas não renovam sessão.
 13. Login não exige e-mail já confirmado; a dependência de escrita de avaliação exige
     autenticação e `email_confirmado = true`.
+14. Recuperação de senha (RF24, aprovada em 15/11/2026): solicitar link pelo e-mail
+    cadastrado com resposta genérica `202`. Token separado da confirmação, aleatório,
+    com hash SHA-256 persistido, uso único e validade de uma hora. A troca mantém a
+    confirmação de e-mail, usa Argon2id e senha de 8–128 caracteres, invalida todos os
+    links de recuperação e sessões da conta e não autentica automaticamente.
+    Falha de envio não altera senha nem invalida links anteriores.
+
+
 
 ---
 
@@ -299,6 +307,8 @@ modelo SQLAlchemy diretamente.
 |---|---|---|---|
 | `POST` | `/auth/cadastro` | não | Cria usuário, dispara e-mail de confirmação |
 | `POST` | `/auth/confirmar` | não | Confirma e-mail a partir do token no corpo |
+| `POST` | `/auth/recuperar-senha` | não | Solicita link temporário; corpo `email`, resposta genérica `202` |
+| `POST` | `/auth/redefinir-senha` | não | Recebe `token` e `senha`; troca senha e invalida sessões; token inválido/expirado retorna `400` |
 | `POST` | `/auth/login` | não | Autentica |
 | `GET` | `/auth/sessao` | opcional | Informa se o navegador possui sessão válida e renova sua validade |
 | `POST` | `/auth/logout` | sim | Invalida a sessão atual e remove seu cookie |
@@ -608,3 +618,12 @@ auditar como sistema; demais casos ficam pendentes. Resposta de avaliação acre
 comentario_estado: PUBLICADO/PENDENTE/null. DecisaoResponse.moderador_id é nulo
 somente para decisão do sistema. Nenhuma restauração ou rejeição automática.
 A flag MODERACAO_AUTOMATICA_ATIVA é False por padrão. Guia: docs/moderacao-ia.md.
+
+### Persistência da recuperação de senha — RF24
+
+`password_reset_tokens`: `id` UUID PK, `usuario_id` UUID FK obrigatória para
+`usuarios.id`, `token_hash` VARCHAR(64) obrigatório e único, `expires_at` TIMESTAMPTZ
+obrigatório, `used_at` TIMESTAMPTZ opcional e `created_at` TIMESTAMPTZ obrigatório.
+Índice em `usuario_id` para invalidar os links da conta. Não armazena token aberto,
+senha ou cópia do e-mail; mantém o padrão de tokens de confirmação sem permitir
+uso cruzado entre as duas finalidades.

@@ -51,3 +51,14 @@ export async function sair(): Promise<MensagemResponse> {
   notificarSessao();
   return resposta;
 }
+
+
+export async function recuperarSenha(email: string): Promise<MensagemResponse> {
+  return apiClient.post<MensagemResponse, { email: string }>("/api/auth/recuperar-senha", { email });
+}
+
+export async function redefinirSenha(token: string, senha: string): Promise<MensagemResponse> {
+  const resposta = await apiClient.post<MensagemResponse, { token: string; senha: string }>("/api/auth/redefinir-senha", { token, senha });
+  notificarSessao();
+  return resposta;
+}

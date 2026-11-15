@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { confirmarEmail } from "@/lib/services/auth";
 import { ApiError } from "@/lib/services/http-error";
+import Icone from "@/components/icone";
+import IconeResultado from "@/components/icone-resultado";
 
 export function ConfirmationClient({ token, retorno }: { token?: string; retorno: string | null }) {
   const [tentativa, setTentativa] = useState(0);
@@ -19,7 +21,8 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
     if (!token) return;
     let cancelado = false;
 
-    confirmarEmail(token)
+    // Cancela a montagem descartada pelo StrictMode antes de consumir um token de uso único.
+    const inicio = window.setTimeout(() => void confirmarEmail(token)
       .then((resposta) => {
         if (!cancelado) {
           setEstado("sucesso");
@@ -35,23 +38,28 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
             ? "Este link é inválido ou expirou."
             : "Não foi possível confirmar seu e-mail agora. Verifique sua conexão e tente novamente.");
         }
-      });
+      }), 0);
 
     return () => {
       cancelado = true;
+      window.clearTimeout(inicio);
     };
   }, [token, tentativa]);
 
   return (
-    <main className="container flex max-w-xl min-w-0 flex-1 flex-col gap-6 py-10 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">Confirmação de e-mail</h1>
-      <section className="panel flex min-w-0 flex-col gap-5 p-4 break-words sm:p-6" aria-label="Resultado da confirmação" aria-busy={estado === "carregando"}>
+    <main className="flex flex-1 items-center justify-center px-4 py-12 sm:py-20">
+      <section className="flex w-full max-w-lg min-w-0 flex-col gap-5 rounded-3xl border border-(--border) bg-(--panel) p-5 text-center break-words sm:p-10" aria-label="Resultado da confirmação" aria-busy={estado === "carregando"}>
+      <IconeResultado estado={estado} />
+      <h1 className="kicker">Confirmação de e-mail</h1>
+      <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{estado === "sucesso" ? "E-mail confirmado." : estado === "carregando" ? "Confirmando seu e-mail…" : "Não foi possível confirmar."}</h2>
       <p
         aria-live="polite"
-        className={estado === "erro" ? "text-red-600 dark:text-red-400" : "text-sm leading-relaxed text-(--muted)"}
+        role={estado === "erro" ? "alert" : "status"}
+        className={estado === "sucesso" ? "sr-only" : "text-sm leading-relaxed text-(--ink-soft)"}
       >
         {mensagem}
       </p>
+      {estado === "sucesso" && <p className="text-sm leading-relaxed text-(--ink-soft)">Seu endereço institucional foi confirmado. Entre na sua conta para registrar avaliações.</p>}
       {estado === "erro" && podeTentar && (
         <button className="button primary" onClick={() => {
           setEstado("carregando");
@@ -61,16 +69,16 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
         }}>Tentar novamente</button>
       )}
       {estado !== "carregando" && (
-        <div className="flex flex-col items-start gap-4">
-          {estado === "sucesso" && retorno && (
+        <div className="flex flex-col gap-3">
+          {estado === "sucesso" && (
             <Link
-              href={`/login?returnTo=${encodeURIComponent(retorno)}`}
+              href={retorno ? `/login?returnTo=${encodeURIComponent(retorno)}` : "/login"}
               className="button primary"
             >
-              Continuar para a avaliação
+              {retorno ? "Continuar para a avaliação" : "Entrar na conta"}<Icone nome="arrow-right" pequeno />
             </Link>
           )}
-          <Link href="/" className="font-medium text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+          <Link href="/" className="link inline-flex min-h-11 items-center justify-center text-sm font-medium">
             Voltar ao início
           </Link>
         </div>

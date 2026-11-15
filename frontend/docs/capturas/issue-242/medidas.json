@@ -1,0 +1,136 @@
+{
+  "antes": {
+    "resultados": [
+      {
+        "width": 320,
+        "tema": "light",
+        "pagina": 320,
+        "viewport": 320,
+        "colunas": 1,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 2302
+      },
+      {
+        "width": 320,
+        "tema": "dark",
+        "pagina": 320,
+        "viewport": 320,
+        "colunas": 1,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 2302
+      },
+      {
+        "width": 768,
+        "tema": "light",
+        "pagina": 753,
+        "viewport": 768,
+        "colunas": 2,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 1194
+      },
+      {
+        "width": 768,
+        "tema": "dark",
+        "pagina": 753,
+        "viewport": 768,
+        "colunas": 2,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 1194
+      },
+      {
+        "width": 1280,
+        "tema": "light",
+        "pagina": 1265,
+        "viewport": 1280,
+        "colunas": 3,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 799
+      },
+      {
+        "width": 1280,
+        "tema": "dark",
+        "pagina": 1265,
+        "viewport": 1280,
+        "colunas": 3,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 799
+      }
+    ],
+    "dados": "HTTP controlado, sintético, exclusivo do teste",
+    "teclado": "Tab, foco e Enter",
+    "estados": "sucesso, vazio, erro"
+  },
+  "depois": {
+    "resultados": [
+      {
+        "width": 320,
+        "tema": "light",
+        "pagina": 320,
+        "viewport": 320,
+        "colunas": 1,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 1657.8125
+      },
+      {
+        "width": 320,
+        "tema": "dark",
+        "pagina": 320,
+        "viewport": 320,
+        "colunas": 1,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 1657.8125
+      },
+      {
+        "width": 768,
+        "tema": "light",
+        "pagina": 753,
+        "viewport": 768,
+        "colunas": 2,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 918.03125
+      },
+      {
+        "width": 768,
+        "tema": "dark",
+        "pagina": 753,
+        "viewport": 768,
+        "colunas": 2,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 918.03125
+      },
+      {
+        "width": 1280,
+        "tema": "light",
+        "pagina": 1265,
+        "viewport": 1280,
+        "colunas": 3,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 590.1875
+      },
+      {
+        "width": 1280,
+        "tema": "dark",
+        "pagina": 1265,
+        "viewport": 1280,
+        "colunas": 3,
+        "titulos": true,
+        "cartoes": true,
+        "altura": 590.1875
+      }
+    ],
+    "dados": "HTTP controlado, sintético, exclusivo do teste",
+    "teclado": "Tab, foco e Enter",
+    "estados": "sucesso, vazio, erro"
+  }
+}

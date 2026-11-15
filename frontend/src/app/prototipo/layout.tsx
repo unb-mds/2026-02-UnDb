@@ -1,3 +1,4 @@
+export const metadata = { robots: { index: false, follow: false } };
 import { Suspense, type ReactNode } from "react";
 import { CabecalhoPrototipo, ContaDemoProvider } from "./conta-demo";
 

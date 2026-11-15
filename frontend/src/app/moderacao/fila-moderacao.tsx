@@ -15,6 +15,7 @@ const filtros: { valor: EstadoFila | ""; rotulo: string }[] = [
   { valor: "", rotulo: "Todos os estados" }, { valor: "PENDENTE", rotulo: "Pendentes de aprovação" },
   { valor: "PUBLICADO", rotulo: "Publicados com denúncias" }, { valor: "SUSPENSO", rotulo: "Suspensos" },
 ];
+const rotulosFiltro = { "": "Todos", PENDENTE: "Pendentes", PUBLICADO: "Denunciados", SUSPENSO: "Suspensos" };
 const botao = "button min-h-11 disabled:opacity-50";
 
 export default function FilaModeracao() {
@@ -31,7 +32,10 @@ export default function FilaModeracao() {
   const painelAnalise = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (detalhe?.tipo === "pronto") painelAnalise.current?.focus();
+    if (detalhe?.tipo === "pronto") {
+      painelAnalise.current?.focus({ preventScroll: true });
+      painelAnalise.current?.scrollIntoView({ block: "nearest", behavior: "instant" });
+    }
   }, [detalhe]);
 
   const negarAcesso = useCallback((erro: unknown) => {
@@ -75,6 +79,11 @@ export default function FilaModeracao() {
     setRecarga((valor) => valor + 1);
   }
 
+  function filtrar(valor: EstadoFila | "") {
+    setFiltro(valor);
+    atualizar();
+  }
+
   async function selecionar(id: string) {
     consultaDetalhe.current?.abort();
     const controlador = new AbortController();
@@ -114,11 +123,15 @@ export default function FilaModeracao() {
 
   return (
     <>
-      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-end">
-        <label className="flex w-full min-w-0 flex-col gap-1 text-sm font-medium sm:flex-1" htmlFor="estado-fila">Estado dos comentários
+      <div className="flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
+        <div role="group" aria-label="Filtrar comentários por estado" className="hidden flex-wrap gap-2 sm:flex">
+          {filtros.map((item) => <button key={item.valor} type="button" disabled={executando} aria-pressed={filtro === item.valor} onClick={() => filtrar(item.valor)}
+            className="min-h-11 rounded-full border border-(--border) bg-(--panel) px-4 py-2 text-sm font-medium text-(--ink-soft) transition-colors hover:border-accent aria-pressed:border-foreground aria-pressed:bg-foreground aria-pressed:text-background disabled:opacity-50">{rotulosFiltro[item.valor]}</button>)}
+        </div>
+        <label className="flex w-full min-w-0 flex-col gap-1 text-sm font-medium sm:hidden" htmlFor="estado-fila">Estado dos comentários
           <select id="estado-fila" value={filtro} disabled={executando} onChange={(evento) => {
             const valor = filtros.find((item) => item.valor === evento.target.value)?.valor;
-            if (valor !== undefined) { setFiltro(valor); atualizar(); }
+            if (valor !== undefined) filtrar(valor);
           }} className="min-h-11 rounded-lg border border-foreground/20 bg-background px-4 py-2.5 text-base">
             {filtros.map((item) => <option key={item.valor} value={item.valor}>{item.rotulo}</option>)}
           </select>
@@ -134,20 +147,21 @@ export default function FilaModeracao() {
         <p className="mt-2 text-sm text-foreground/70">Depois de entrar, volte à Moderação pelo menu.</p>
       </div>}
       {fila.tipo === "pronta" && (fila.itens.length === 0 ? <p role="status" className="rounded-xl border border-foreground/10 p-5">Nenhum comentário aguardando moderação neste filtro.</p> :
-        <div className="grid min-w-0 items-start gap-6 lg:grid-cols-2">
+        <div className="grid min-w-0 items-start gap-6 lg:grid-cols-[minmax(0,0.36fr)_minmax(0,0.64fr)]">
           <section aria-label="Comentários na fila" className="min-w-0">
             <p className="mb-3 text-sm text-foreground/70">Selecione um comentário para analisar.</p>
             <ul className="space-y-3">{fila.itens.map((item) => <li key={item.id}>
               <button type="button" disabled={executando} aria-pressed={detalhe?.tipo === "pronto" && detalhe.comentario.id === item.id} onClick={() => void selecionar(item.id)}
-                className="min-h-24 w-full min-w-0 rounded-xl border border-foreground/20 bg-background p-4 text-left transition-colors hover:border-accent aria-pressed:border-accent aria-pressed:bg-accent/5 disabled:opacity-50">
-                <span className="text-sm font-semibold text-accent">{item.estado === "PUBLICADO" ? "Publicado com denúncias" : rotulosEstado[item.estado]}</span>
+                className="min-h-24 w-full min-w-0 rounded-2xl border border-(--border) bg-(--panel) p-4 text-left transition-colors hover:border-accent aria-pressed:border-accent aria-pressed:bg-(--surface-accent) disabled:opacity-50">
+                <span className="inline-flex rounded-full border border-(--border-strong) bg-background px-3 py-1 text-xs font-medium text-(--ink-soft)">{item.estado === "PUBLICADO" ? "Publicado com denúncias" : rotulosEstado[item.estado]}</span>
                 {item.estado === "PENDENTE" && item.substitui_id && <span className="mt-1 block text-sm text-foreground/70">Substituto em análise</span>}
-                <span className="mt-2 line-clamp-3 whitespace-pre-wrap [overflow-wrap:anywhere]">{item.texto ?? "Texto descartado"}</span>
-                <span className="mt-3 block text-xs text-foreground/70 [overflow-wrap:anywhere]">Versão {item.id}</span>
+                <span className="mt-3 line-clamp-3 whitespace-pre-wrap text-sm leading-relaxed text-(--ink-soft) [overflow-wrap:anywhere]">{item.texto ?? "Texto descartado"}</span>
+                <time dateTime={item.created_at} className="mt-3 block text-xs text-(--muted)">Enviado em {new Date(item.created_at).toLocaleString("pt-BR")}</time>
+                <span className="mt-2 block text-xs text-(--muted) [overflow-wrap:anywhere]">Versão {item.id}</span>
               </button>
             </li>)}</ul>
           </section>
-          <section ref={painelAnalise} tabIndex={-1} aria-label="Análise do comentário" aria-busy={detalhe?.tipo === "carregando"} className="min-w-0 rounded-xl border border-foreground/20 p-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+          <section ref={painelAnalise} tabIndex={-1} aria-label="Análise do comentário" aria-busy={detalhe?.tipo === "carregando"} className="min-w-0 scroll-mt-28 rounded-3xl border border-(--border) bg-(--panel) p-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--focus) sm:p-7">
             {!detalhe && <p className="text-sm text-foreground/70">O conteúdo selecionado e suas ações aparecerão aqui.</p>}
             {detalhe?.tipo === "carregando" && <p role="status">Carregando comentário…</p>}
             {detalhe?.tipo === "erro" && <div role="alert"><p>{detalhe.mensagem}</p><button type="button" className={`${botao} mt-3`} onClick={() => void selecionar(detalhe.id)}>Tentar carregar comentário</button></div>}
