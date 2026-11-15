@@ -3,7 +3,25 @@
 O histórico abaixo resume versões do código. Notas detalhadas distinguem publicação,
 preparação e verificações operacionais. As datas de disponibilização são as do GitHub Releases.
 
-## 1.5.0 — candidata
+## 1.7.0 — candidata
+
+- Recuperação de senha por link temporário, uso único e invalidação de sessões.
+- Metadados específicos, canonical, Open Graph/Twitter, robots e sitemap dividido.
+- Descoberta do catálogo por links HTML e paginação, preservando filtros da busca.
+- Telas atuais de conta, confirmação, sucesso, 404 e moderação; destaques mais discretos.
+- Nomes completos da equipe, foto e LinkedIn atualizados de Tiago.
+- Avaliação documental de autocompletar/tolerância a erros, sem ativar a proposta.
+
+[Notas, verificações e implantação](docs/releases/1.7.0.md).
+
+## 1.6.0
+
+- Moderação assistida por IA e ajustes de identidades e conta.
+- Versão publicada no GitHub; a candidata 1.7.0 parte desse histórico de main.
+
+[Release publicada](https://github.com/unb-mds/2026-02-UnDb/releases/tag/v1.6.0).
+
+## 1.5.0
 
 - Identidade híbrida: perfil institucional prioritário e fallback por nome completo + unidade.
 - Promoção posterior para perfil e reavaliação seletiva sem perder avaliações.
