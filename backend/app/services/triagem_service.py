@@ -82,7 +82,9 @@ def analisar(db: Session, usuario: Usuario, versao_id: UUID) -> TriagemResponse:
             resposta.categorias_locais = [
                 MotivoDenuncia(categoria)
                 for categoria in categorias_para_triagem(
-                    texto, disfarces_ativos=config.MODERACAO_DISFARCES_ATIVO
+                    texto,
+                    disfarces_ativos=config.MODERACAO_DISFARCES_ATIVO,
+                    substituicoes_ativas=config.MODERACAO_SUBSTITUICOES_ATIVAS,
                 )
             ]
         except FiltroIndisponivel:

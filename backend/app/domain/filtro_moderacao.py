@@ -8,6 +8,9 @@ from app.domain.triagem_comentario import LISTA, categorias_lexicais
 
 VERSAO_FILTRO_ATUAL = "239-lexical-v1"
 VERSAO_DISFARCES = "252-disfarces-v1"
+VERSAO_SUBSTITUICOES = "252-disfarces-leet-v2"
+# Alternativas somente nas posições do termo conhecido; nenhum replace global.
+SUBSTITUICOES = {"a": "a4", "e": "e3", "i": "i1", "o": "o0", "s": "s5", "t": "t7"}
 INVISIVEIS = str.maketrans("", "", "\u200b\u200c\u200d\ufeff\u2060")
 # Mapa explícito e limitado. Não é uma implementação geral de UTS #39.
 HOMOGLIFOS = str.maketrans({"а": "a", "е": "e", "о": "o", "і": "i", "с": "c"})
@@ -26,7 +29,7 @@ def normalizar_disfarces(texto: str) -> str:
     return sem_acentos.casefold().translate(INVISIVEIS).translate(HOMOGLIFOS)
 
 
-def _padrao(termo: str) -> re.Pattern:
+def _padrao(termo: str, *, substituicoes: bool = False) -> re.Pattern:
     partes = []
     for parte in re.split(r"(\s+|-)", normalizar_busca(termo)):
         if not parte:
@@ -38,7 +41,12 @@ def _padrao(termo: str) -> re.Pattern:
             # dos dois lados (o que permitiria ultrapassar o limite de três).
             partes.append(r"\-{1,3}")
         else:
-            letras = [re.escape(c) + "{1,4}" for c in parte]
+            letras = [
+                "[" + re.escape(SUBSTITUICOES.get(c, c)) + "]{1,4}"
+                if substituicoes
+                else re.escape(c) + "{1,4}"
+                for c in parte
+            ]
             partes.append((SEPARADORES + "{0,3}").join(letras))
     corpo = "".join(partes)
     return re.compile(r"(?<!\w)" + corpo + r"(?!\w)")
@@ -46,9 +54,14 @@ def _padrao(termo: str) -> re.Pattern:
 
 # Compilação única da lista versionada, sem cache de comentários/autores.
 PADROES = tuple((_padrao(item["termo"]), item["categoria"]) for item in LISTA["termos"])
+PADROES_LEET = tuple(
+    (_padrao(item["termo"], substituicoes=True), item["categoria"]) for item in LISTA["termos"]
+)
 
 
-def categorias_para_triagem(texto: str, *, disfarces_ativos: bool = False) -> list[str]:
+def categorias_para_triagem(
+    texto: str, *, disfarces_ativos: bool = False, substituicoes_ativas: bool = False
+) -> list[str]:
     try:
         # A união é obrigatória: normalizar_busca preserva Mn de classe zero,
         # como U+FE0F/U+034F, que o filtro vigente já remove e detecta.
@@ -56,11 +69,17 @@ def categorias_para_triagem(texto: str, *, disfarces_ativos: bool = False) -> li
         if disfarces_ativos:
             derivado = normalizar_disfarces(texto)
             categorias.update(categoria for padrao, categoria in PADROES if padrao.search(derivado))
+            if substituicoes_ativas:
+                categorias.update(
+                    categoria for padrao, categoria in PADROES_LEET if padrao.search(derivado)
+                )
         return sorted(categorias)
     except Exception:
         # Falha não pode virar ausência de sinal nem expor o texto em erro/log.
         raise FiltroIndisponivel("filtro indisponivel; manter revisao humana") from None
 
 
-def versao_filtro(disfarces_ativos: bool) -> str:
+def versao_filtro(disfarces_ativos: bool, substituicoes_ativas: bool = False) -> str:
+    if disfarces_ativos and substituicoes_ativas:
+        return VERSAO_SUBSTITUICOES
     return VERSAO_DISFARCES if disfarces_ativos else VERSAO_FILTRO_ATUAL

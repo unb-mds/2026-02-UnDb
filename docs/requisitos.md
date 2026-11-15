@@ -773,6 +773,25 @@ A aprovação da PR anterior era exclusivamente documental; não é a fonte dest
 - Homologação humana dos rótulos, avaliação adicional e ativação em produção continuam pendentes.
   Esta autorização não permite habilitar a melhoria em produção ou usar comentários reais nos ensaios.
 
+### Ampliação de RF20 — substituições numéricas da #252 (15/11/2026)
+
+Fonte: solicitação explícita posterior do mesmo solicitante nesta sessão:
+“inclua o tratamento para m3rda, p0rra e entre outros”. Essa autorização amplia a
+primeira etapa; a exclusão de números acima descreve o escopo anterior.
+
+- Detectar substituições numéricas por posição de termos conhecidos, incluindo `m3rda`
+  e `p0rra`, sem transformar globalmente os números do comentário nem ampliar a lista.
+- Usar correspondência delimitada por palavras/expressões, somando aos sinais já existentes.
+  Resultado aproximado é sinal para revisão humana; não rejeitar automaticamente.
+- A ampliação numérica tem habilitação própria, desligada por padrão e dependente do
+  complemento já existente. Desligá-la restaura a primeira etapa sem desligar o filtro anterior.
+- Números acadêmicos e identificadores maiores devem manter suas fronteiras. Limitação técnica
+  a medir: um identificador isolado igual à grafia disfarçada pode ser sinalizado. Registrar os
+  falsos positivos exploratórios, sem criar exceções semânticas ou declarar adequação definitiva.
+  Isso não estabelece tolerância de falsos positivos homologada.
+- Permanecem pendentes homologação dos rótulos e autorização de ativação em produção.
+  Não foi autorizada a exceção `4→e` para `m4rda`, nem novo modelo/provedor ou envio de dados reais.
+
 ### RF24 — Recuperação de senha
 
 **Estado:** validado pelo solicitante nesta conversa em 15/11/2026, ao aprovar

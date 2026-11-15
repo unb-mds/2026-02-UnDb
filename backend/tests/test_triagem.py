@@ -122,6 +122,7 @@ class HttpTest(unittest.TestCase):
             "MODERACAO_AUTOMATICA_ATIVA": False,
             "MODERACAO_FILTRO_ATIVO": False,
             "MODERACAO_DISFARCES_ATIVO": False,
+            "MODERACAO_SUBSTITUICOES_ATIVAS": False,
             "MODERACAO_IA_ATIVA": False,
             "MODERACAO_IA_DADOS_APROVADOS": False,
             "OPENAI_API_KEY": "",
@@ -280,5 +281,29 @@ class HttpTest(unittest.TestCase):
         self.assertEqual(resposta["status"], "INDISPONIVEL")
         self.assertNotIn("privado", json.dumps(resposta))
         chamada.assert_not_called()
+        self.db.expire_all()
+        self.assertEqual(versao.estado, EstadoComentario.PENDENTE)
+
+    def test_apoio_numerico_preserva_texto_enviado_e_estado(self):
+        self.ativar()
+        self.moderador()
+        versao = self.versao()
+        versao.texto = "Que p0rra!"
+        self.db.commit()
+        with (
+            patch.object(triagem_service.config, "MODERACAO_DISFARCES_ATIVO", True),
+            patch.object(triagem_service.config, "MODERACAO_SUBSTITUICOES_ATIVAS", True),
+            patch.object(
+                openai_triagem,
+                "classificar",
+                return_value=ClassificacaoIA(
+                    categorias=[], sinalizado=False, modelo="omni-moderation-latest"
+                ),
+            ) as chamada,
+        ):
+            code, resposta = self.triagem(versao)
+        self.assertEqual(code, 200, resposta)
+        self.assertEqual(resposta["categorias_locais"], ["PALAVRAO"])
+        self.assertEqual(chamada.call_args.args, ("Que p0rra!",))
         self.db.expire_all()
         self.assertEqual(versao.estado, EstadoComentario.PENDENTE)

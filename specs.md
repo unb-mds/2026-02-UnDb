@@ -644,6 +644,19 @@ da auditoria existente. Não há alteração de schema/contrato ou retenção.
 Desligar somente a flag nova restaura o filtro anterior. Homologação dos rótulos e
 ativação em produção permanecem pendentes; não há autorização de deploy/ativação.
 
+### Ampliação numérica da #252
+
+Fonte: docs/requisitos.md, “Ampliação de RF20 — substituições numéricas da #252”.
+`MODERACAO_SUBSTITUICOES_ATIVAS=False`, dependente de `MODERACAO_DISFARCES_ATIVO`,
+adiciona padrões pré-compilados por posição: `a4`, `e3`, `i1`, `o0`, `s5`, `t7`.
+Não aplica substituições globais, substring ou similaridade. Mantém fronteiras e limites
+da primeira etapa e soma todas as categorias anteriores. Versão efetiva, com ambas as flags:
+`252-disfarces-leet-v2`; desligar só números retorna a `252-disfarces-v1`.
+Texto original e payload externo são preservados. `m4rda` não recebe exceção `4→e`.
+Identificadores isolados iguais a um termo disfarçado também podem gerar sinal; não criar
+exceção automática por contexto técnico, nem tratar sinal como decisão de rejeição.
+Homologação/ativação em produção permanecem pendentes.
+
 ### Persistência da recuperação de senha — RF24
 
 `password_reset_tokens`: `id` UUID PK, `usuario_id` UUID FK obrigatória para

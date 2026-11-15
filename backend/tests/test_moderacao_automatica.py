@@ -303,3 +303,48 @@ class AutomaticaTest(unittest.TestCase):
         ):
             self.assertEqual(self.enviar()[1]["comentario_estado"], "PENDENTE")
             chamada.assert_not_called()
+
+    def test_substituicoes_sinalizam_para_humano_sem_enviar_ia(self):
+        self.ativar()
+        for texto in ("m3rda", "p0rra", "b4b4c4", "1d10t4", "P.0.R.R.4"):
+            with (
+                self.subTest(texto=texto),
+                patch.object(config, "MODERACAO_DISFARCES_ATIVO", True),
+                patch.object(config, "MODERACAO_SUBSTITUICOES_ATIVAS", True),
+                patch.object(openai_triagem, "classificar") as chamada,
+            ):
+                code, resposta = self.enviar(texto)
+                self.assertEqual(code, 200, resposta)
+                self.assertEqual(resposta["comentario_estado"], "PENDENTE")
+                chamada.assert_not_called()
+                self.db.expire_all()
+                versao = self.db.scalar(select(ComentarioVersao))
+                self.assertEqual(versao.texto, texto)
+                self.assertEqual(versao.avaliacao.didatica, 4)
+
+    def test_desligar_substituicoes_restaura_etapa1_e_preserva_substituido(self):
+        self.ativar()
+        with (
+            patch.object(config, "MODERACAO_DISFARCES_ATIVO", True),
+            patch.object(openai_triagem, "classificar", return_value=self.limpo()),
+        ):
+            self.assertEqual(self.enviar("p0rra")[1]["comentario_estado"], "PUBLICADO")
+            anterior = self.db.scalar(select(ComentarioVersao))
+            with patch.object(config, "MODERACAO_SUBSTITUICOES_ATIVAS", True):
+                self.assertEqual(self.enviar("p0rra")[1]["comentario_estado"], "PENDENTE")
+            self.db.expire_all()
+            self.assertEqual(anterior.estado, Estado.PUBLICADO)
+            self.assertEqual(anterior.texto, "p0rra")
+            self.assertEqual(self.enviar("p0rra")[1]["comentario_estado"], "PUBLICADO")
+
+    def test_critica_com_numeros_preserva_payload_e_audita_versao_leet(self):
+        self.ativar()
+        texto = "Tirei 3,0 na P1 e 4,0 na P2; a didática foi ruim."
+        with (
+            patch.object(config, "MODERACAO_DISFARCES_ATIVO", True),
+            patch.object(config, "MODERACAO_SUBSTITUICOES_ATIVAS", True),
+            patch.object(openai_triagem, "classificar", return_value=self.limpo()) as chamada,
+        ):
+            self.assertEqual(self.enviar(texto)[1]["comentario_estado"], "PUBLICADO")
+        self.assertEqual(chamada.call_args.args, (texto,))
+        self.assertIn("252-disfarces-leet-v2", self.db.scalar(select(DecisaoModeracao)).motivo)

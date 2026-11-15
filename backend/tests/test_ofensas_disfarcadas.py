@@ -3,7 +3,7 @@
 import json
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from app.domain import filtro_moderacao as filtro
 from app.domain.triagem_comentario import LISTA, categorias_lexicais
@@ -117,6 +117,79 @@ class DisfarcesTest(unittest.TestCase):
                 totais["atual"] += bool(atual)
                 totais["complementar"] += bool(complementar)
         self.assertEqual(totais, {"atual": 10, "complementar": 24})
+
+
+class SubstituicoesTest(unittest.TestCase):
+    def analisar(self, texto):
+        return filtro.categorias_para_triagem(
+            texto, disfarces_ativos=True, substituicoes_ativas=True
+        )
+
+    def test_detecta_substituicoes_por_posicao_e_combinacoes(self):
+        for texto, categoria in (
+            ("m3rda", "PALAVRAO"),
+            ("p0rra", "PALAVRAO"),
+            ("P0RR4", "PALAVRAO"),
+            ("b4b4c4", "XINGAMENTO"),
+            ("1d10t4", "OFENSA_PESSOAL"),
+            ("0t4r10", "XINGAMENTO"),
+            ("v41 s3 f0d3r", "XINGAMENTO"),
+            ("s3 m4t4", "AMEACA"),
+            ("c4c373", "PALAVRAO"),
+            ("p.0.r.r.4", "PALAVRAO"),
+            ("m\u200b3 r d 4", "PALAVRAO"),
+            ("p００rr4", "PALAVRAO"),
+        ):
+            with self.subTest(texto=texto):
+                self.assertIn(categoria, self.analisar(texto))
+
+    def test_flags_reversao_e_versao(self):
+        self.assertEqual(filtro.categorias_para_triagem("m3rda", disfarces_ativos=True), [])
+        self.assertEqual(filtro.categorias_para_triagem("p0rra", substituicoes_ativas=True), [])
+        self.assertEqual(filtro.versao_filtro(False, True), "239-lexical-v1")
+        self.assertEqual(filtro.versao_filtro(True), "252-disfarces-v1")
+        self.assertEqual(filtro.versao_filtro(True, True), "252-disfarces-leet-v2")
+
+    def test_preserva_numeros_e_fronteiras_sem_excecao_4_para_e(self):
+        for texto in (
+            "Tirei 3 na P1 e 4 na P2",
+            "Matriz 4 por 3",
+            "CIC0004 MAT0031",
+            "prefixo_m3rda_sufixo",
+            "p0rra_total",
+            "p0rra9",
+            "4m3rda",
+            "m3rdas",
+            "m4rda",
+            "p....0....r....r....a",
+            "m33333333rda",
+            "007",
+        ):
+            with self.subTest(texto=texto):
+                self.assertEqual(self.analisar(texto), [])
+
+    def test_nao_esconde_sinais_tecnicos_ambiguos(self):
+        # Não inventar exceção pela palavra "variável": sinal exige revisão humana.
+        self.assertEqual(self.analisar("A variável p0rra contém a soma."), ["PALAVRAO"])
+        self.assertEqual(self.analisar("A variável m3rda contém a soma."), ["PALAVRAO"])
+
+    def test_uniao_preserva_todas_as_categorias_da_etapa_anterior(self):
+        for item in LISTA["termos"]:
+            for marca in ("", "\ufe0f", "\u034f"):
+                texto = marca.join(item["termo"])
+                with self.subTest(termo=item["termo"], marca=ascii(marca)):
+                    anterior = filtro.categorias_para_triagem(texto, disfarces_ativos=True)
+                    self.assertTrue(set(anterior).issubset(self.analisar(texto)))
+        for texto in ("1" * 500, "0" * 500):
+            self.assertEqual(self.analisar(texto), [])
+
+    def test_falha_da_regra_numerica_nao_vira_resultado_limpo(self):
+        padrao = MagicMock()
+        padrao.search.side_effect = ValueError("conteúdo privado")
+        with patch.object(filtro, "PADROES_LEET", ((padrao, "PALAVRAO"),)):
+            with self.assertRaises(filtro.FiltroIndisponivel) as erro:
+                self.analisar("m3rda")
+        self.assertNotIn("privado", str(erro.exception))
 
 
 if __name__ == "__main__":
