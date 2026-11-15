@@ -1,0 +1,953 @@
+{
+  "origem": "dados integralmente sintéticos",
+  "commit": "cd7a27c9b7835d1d42967bdc6d51e9596b8a952f",
+  "python": "3.14.7",
+  "sqlalchemy": "2.1.8",
+  "ddl": [
+    "\nCREATE TABLE unidades (\n\tid UUID NOT NULL, \n\tfonte VARCHAR(30) NOT NULL, \n\tcodigo VARCHAR(30) NOT NULL, \n\tidentificador_externo VARCHAR(50), \n\tnome VARCHAR(200) NOT NULL, \n\tPRIMARY KEY (id), \n\tCONSTRAINT uq_unidade_fonte_codigo UNIQUE (fonte, codigo), \n\tCONSTRAINT uq_unidade_fonte_identificador_externo UNIQUE (fonte, identificador_externo)\n)\n\n",
+    "\nCREATE TABLE professores (\n\tid UUID NOT NULL, \n\tnome VARCHAR(150) NOT NULL, \n\tnome_normalizado VARCHAR(150) NOT NULL, \n\tdepartamento VARCHAR(100) NOT NULL, \n\tsiape VARCHAR(30), \n\tidentidade_origem VARCHAR(255), \n\tidentidade_confirmada BOOLEAN NOT NULL, \n\tPRIMARY KEY (id), \n\tUNIQUE (siape), \n\tUNIQUE (identidade_origem)\n)\n\n",
+    "\nCREATE TABLE disciplinas (\n\tid UUID NOT NULL, \n\tcodigo VARCHAR(20) NOT NULL, \n\tidentificador_externo VARCHAR(50), \n\tnome VARCHAR(150) NOT NULL, \n\tnome_normalizado VARCHAR(150) NOT NULL, \n\tdepartamento VARCHAR(100) NOT NULL, \n\tcreditos SMALLINT, \n\tPRIMARY KEY (id), \n\tUNIQUE (codigo)\n)\n\n",
+    "\nCREATE TABLE professor_correspondencias (\n\torigem_id UUID NOT NULL, \n\tdestino_id UUID NOT NULL, \n\tevidencia VARCHAR(500) NOT NULL, \n\tcreated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL, \n\tPRIMARY KEY (origem_id), \n\tCONSTRAINT ck_correspondencia_distinta CHECK (origem_id <> destino_id), \n\tCONSTRAINT ck_correspondencia_evidencia CHECK (length(trim(evidencia)) > 0), \n\tFOREIGN KEY(origem_id) REFERENCES professores (id), \n\tFOREIGN KEY(destino_id) REFERENCES professores (id)\n)\n\n"
+  ],
+  "unidades": [
+    {
+      "id": "0428bcc0-9241-5428-baf1-463de4840829",
+      "codigo": "CIC",
+      "nome": "Departamento de Ciência da Computação"
+    },
+    {
+      "id": "ed9d20c0-cdc2-5b6e-b470-918be918ea0c",
+      "codigo": "MAT",
+      "nome": "Departamento de Matemática"
+    },
+    {
+      "id": "976798d4-b4e9-51bb-b212-f7b3b26761fa",
+      "codigo": "ENM",
+      "nome": "Departamento de Engenharia Mecânica"
+    },
+    {
+      "id": "39b039d9-017a-5a05-b14a-4e96c41f50a7",
+      "codigo": "EST",
+      "nome": "Departamento de Estatística"
+    },
+    {
+      "id": "68dd1714-53f0-5824-b974-78c50661b9ef",
+      "codigo": "FGA",
+      "nome": "Faculdade do Gama"
+    }
+  ],
+  "registros": [
+    {
+      "label": "P1",
+      "id": "4fa127ef-50a6-5b7a-9c46-caa373080563",
+      "tipo": "professores",
+      "nome": "Maria Emília dos Santos",
+      "nome_normalizado": "maria emilia dos santos",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "P2",
+      "id": "bcb7b4ba-748c-5046-8ff1-7d0847fc2da9",
+      "tipo": "professores",
+      "nome": "Maria Emília dos Santos",
+      "nome_normalizado": "maria emilia dos santos",
+      "departamento": "MAT",
+      "departamento_nome": "Departamento de Matemática",
+      "alias": false
+    },
+    {
+      "label": "P3",
+      "id": "622c89e4-c9a1-5bf6-9653-796ecc9c9aa5",
+      "tipo": "professores",
+      "nome": "Maria Elisa de Sousa",
+      "nome_normalizado": "maria elisa de sousa",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "P4",
+      "id": "e6a50866-0a5e-5024-b9c7-ea505d9f3c86",
+      "tipo": "professores",
+      "nome": "João-Pedro D'Ávila",
+      "nome_normalizado": "joao-pedro d'avila",
+      "departamento": "ENM",
+      "departamento_nome": "Departamento de Engenharia Mecânica",
+      "alias": false
+    },
+    {
+      "label": "P5",
+      "id": "fa352a18-e996-5323-9154-c594c90b9431",
+      "tipo": "professores",
+      "nome": "José Álvaro Lima",
+      "nome_normalizado": "jose alvaro lima",
+      "departamento": "MAT",
+      "departamento_nome": "Departamento de Matemática",
+      "alias": false
+    },
+    {
+      "label": "P6",
+      "id": "826db174-c9e9-5fbe-8517-530f0d40c5d5",
+      "tipo": "professores",
+      "nome": "Ana Clara Costa",
+      "nome_normalizado": "ana clara costa",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "P7",
+      "id": "2ab25e82-7f05-5917-84b2-79fa7dca22bd",
+      "tipo": "professores",
+      "nome": "Ana Carolina Costa",
+      "nome_normalizado": "ana carolina costa",
+      "departamento": "MAT",
+      "departamento_nome": "Departamento de Matemática",
+      "alias": false
+    },
+    {
+      "label": "P8",
+      "id": "81c24669-9c14-5deb-bfe2-b1bd2107e4c5",
+      "tipo": "professores",
+      "nome": "Bruno Nascimento",
+      "nome_normalizado": "bruno nascimento",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "P9",
+      "id": "acded89b-0d6c-5a10-a27e-5b38fa902dfe",
+      "tipo": "professores",
+      "nome": "José Lima",
+      "nome_normalizado": "jose lima",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "P10",
+      "id": "9b4935cf-4cc5-5165-b153-8ae7f4977ffc",
+      "tipo": "professores",
+      "nome": "Mario Santos",
+      "nome_normalizado": "mario santos",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "P11",
+      "id": "7a18cb3a-bd63-568f-a22f-536ce1aa72d0",
+      "tipo": "professores",
+      "nome": "Santos",
+      "nome_normalizado": "santos",
+      "departamento": "ENM",
+      "departamento_nome": "Departamento de Engenharia Mecânica",
+      "alias": false
+    },
+    {
+      "label": "P12",
+      "id": "5492e70b-50a4-5d82-89cf-c16ad9a07965",
+      "tipo": "professores",
+      "nome": "Maria Emília dos Santos",
+      "nome_normalizado": "maria emilia dos santos",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": true
+    },
+    {
+      "label": "D1",
+      "id": "dbb854dd-18b6-5c85-aee4-76ccab640671",
+      "tipo": "disciplinas",
+      "codigo": "CIC0004",
+      "nome": "Algoritmos e Programação de Computadores",
+      "nome_normalizado": "algoritmos e programacao de computadores",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "D2",
+      "id": "7f8ae223-5f97-5ee4-8ea1-387ee240f914",
+      "tipo": "disciplinas",
+      "codigo": "CIC0005",
+      "nome": "Programação Orientada a Objetos",
+      "nome_normalizado": "programacao orientada a objetos",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "D3",
+      "id": "7a03d920-8823-5580-8ccc-a858d50a003a",
+      "tipo": "disciplinas",
+      "codigo": "MAT0025",
+      "nome": "Cálculo 1",
+      "nome_normalizado": "calculo 1",
+      "departamento": "MAT",
+      "departamento_nome": "Departamento de Matemática",
+      "alias": false
+    },
+    {
+      "label": "D4",
+      "id": "8d4392d5-59e2-5af0-bcf9-b76618357b5c",
+      "tipo": "disciplinas",
+      "codigo": "MAT0026",
+      "nome": "Cálculo 2",
+      "nome_normalizado": "calculo 2",
+      "departamento": "MAT",
+      "departamento_nome": "Departamento de Matemática",
+      "alias": false
+    },
+    {
+      "label": "D5",
+      "id": "db3ca9da-6c75-5216-be8f-20c7478b2612",
+      "tipo": "disciplinas",
+      "codigo": "CIC0099",
+      "nome": "Banco de Dados",
+      "nome_normalizado": "banco de dados",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "D6",
+      "id": "4249ec22-0f5e-5cae-ba7f-5a317e80a947",
+      "tipo": "disciplinas",
+      "codigo": "EST0101",
+      "nome": "Estatística Aplicada",
+      "nome_normalizado": "estatistica aplicada",
+      "departamento": "EST",
+      "departamento_nome": "Departamento de Estatística",
+      "alias": false
+    },
+    {
+      "label": "D7",
+      "id": "8a20ec7f-8569-5975-942f-f85a783f2992",
+      "tipo": "disciplinas",
+      "codigo": "ENM0001",
+      "nome": "Métodos Numéricos",
+      "nome_normalizado": "metodos numericos",
+      "departamento": "ENM",
+      "departamento_nome": "Departamento de Engenharia Mecânica",
+      "alias": false
+    },
+    {
+      "label": "D8",
+      "id": "86a4bbb3-9d55-57e6-9fc2-b340b8d5fb21",
+      "tipo": "disciplinas",
+      "codigo": "CIC0002",
+      "nome": "Fundamentos Teóricos da Computação",
+      "nome_normalizado": "fundamentos teoricos da computacao",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    },
+    {
+      "label": "D9",
+      "id": "cbcc0679-2555-5a68-9b04-84dd06253abf",
+      "tipo": "disciplinas",
+      "codigo": "FGA0004",
+      "nome": "Algoritmos",
+      "nome_normalizado": "algoritmos",
+      "departamento": "FGA",
+      "departamento_nome": "Faculdade do Gama",
+      "alias": false
+    },
+    {
+      "label": "D10",
+      "id": "912036ef-7811-505b-b25f-7d466ff10327",
+      "tipo": "disciplinas",
+      "codigo": "CIC0014",
+      "nome": "Algoritmos e Estruturas de Dados",
+      "nome_normalizado": "algoritmos e estruturas de dados",
+      "departamento": "CIC",
+      "departamento_nome": "Departamento de Ciência da Computação",
+      "alias": false
+    }
+  ],
+  "casos": [
+    {
+      "id": "01",
+      "tipo": "professores",
+      "termo": "Maria Emília dos Santos",
+      "normalizado": "maria emilia dos santos",
+      "relevantes": [
+        "P1",
+        "P2"
+      ],
+      "cenario": "nome exato",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $4::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $5::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "maria",
+            "emilia",
+            "dos",
+            "santos"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "02",
+      "tipo": "professores",
+      "termo": "emilia",
+      "normalizado": "emilia",
+      "relevantes": [
+        "P1",
+        "P2"
+      ],
+      "cenario": "nome parcial",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "emilia"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "03",
+      "tipo": "professores",
+      "termo": "santos",
+      "normalizado": "santos",
+      "relevantes": [
+        "P1",
+        "P2",
+        "P10",
+        "P11"
+      ],
+      "cenario": "sobrenome",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "santos"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P1",
+        "P2",
+        "P10",
+        "P11"
+      ]
+    },
+    {
+      "id": "04",
+      "tipo": "professores",
+      "termo": "emliia",
+      "normalizado": "emliia",
+      "relevantes": [
+        "P1",
+        "P2"
+      ],
+      "cenario": "transposição",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "emliia"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "05",
+      "tipo": "professores",
+      "termo": "MARIA EMILIA DOS SANTOS",
+      "normalizado": "maria emilia dos santos",
+      "relevantes": [
+        "P1",
+        "P2"
+      ],
+      "cenario": "caixa/acentos",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $4::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $5::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "maria",
+            "emilia",
+            "dos",
+            "santos"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "06",
+      "tipo": "professores",
+      "termo": "maria emlia santos",
+      "normalizado": "maria emlia santos",
+      "relevantes": [
+        "P1",
+        "P2"
+      ],
+      "cenario": "composto/omissão",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $4::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "maria",
+            "emlia",
+            "santos"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "07",
+      "tipo": "professores",
+      "termo": "maria emília",
+      "normalizado": "maria emilia",
+      "relevantes": [
+        "P1",
+        "P2"
+      ],
+      "cenario": "homônimos",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "maria",
+            "emilia"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "08",
+      "tipo": "disciplinas",
+      "termo": "Algoritmos e Programação de Computadores",
+      "normalizado": "algoritmos e programacao de computadores",
+      "relevantes": [
+        "D1"
+      ],
+      "cenario": "nome exato",
+      "queries_atual": [
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE disciplinas.codigo ILIKE $2::VARCHAR ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "%Algoritmos e Programação de Computadores%"
+          ]
+        },
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (disciplinas.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (disciplinas.nome_normalizado LIKE '%' || $3::VARCHAR || '%') AND (disciplinas.nome_normalizado LIKE '%' || $4::VARCHAR || '%') AND (disciplinas.nome_normalizado LIKE '%' || $5::VARCHAR || '%') AND (disciplinas.nome_normalizado LIKE '%' || $6::VARCHAR || '%') ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "algoritmos",
+            "e",
+            "programacao",
+            "de",
+            "computadores"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "D1"
+      ]
+    },
+    {
+      "id": "09",
+      "tipo": "disciplinas",
+      "termo": "programacao",
+      "normalizado": "programacao",
+      "relevantes": [
+        "D1",
+        "D2"
+      ],
+      "cenario": "nome parcial",
+      "queries_atual": [
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE disciplinas.codigo ILIKE $2::VARCHAR ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "%programacao%"
+          ]
+        },
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (disciplinas.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "programacao"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "D1",
+        "D2"
+      ]
+    },
+    {
+      "id": "10",
+      "tipo": "disciplinas",
+      "termo": "CIC0004",
+      "normalizado": "cic0004",
+      "relevantes": [
+        "D1"
+      ],
+      "cenario": "código exato",
+      "queries_atual": [
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE disciplinas.codigo ILIKE $2::VARCHAR ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "%CIC0004%"
+          ]
+        },
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (disciplinas.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "cic0004"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "D1"
+      ]
+    },
+    {
+      "id": "11",
+      "tipo": "disciplinas",
+      "termo": "CIC004",
+      "normalizado": "cic004",
+      "relevantes": [
+        "D1"
+      ],
+      "cenario": "código/omissão",
+      "queries_atual": [
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE disciplinas.codigo ILIKE $2::VARCHAR ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "%CIC004%"
+          ]
+        },
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (disciplinas.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "cic004"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "12",
+      "tipo": "professores",
+      "termo": "a",
+      "normalizado": "a",
+      "relevantes": [],
+      "cenario": "curto; UI não consulta",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "a"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P7",
+        "P6",
+        "P8",
+        "P9",
+        "P5",
+        "P4",
+        "P3",
+        "P1",
+        "P2",
+        "P10",
+        "P11"
+      ]
+    },
+    {
+      "id": "13",
+      "tipo": "professores",
+      "termo": "zzqxv",
+      "normalizado": "zzqxv",
+      "relevantes": [],
+      "cenario": "sem correspondência",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "zzqxv"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "14",
+      "tipo": "professores",
+      "termo": "ana costa",
+      "normalizado": "ana costa",
+      "relevantes": [
+        "P6",
+        "P7"
+      ],
+      "cenario": "múltiplos candidatos",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "ana",
+            "costa"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P7",
+        "P6"
+      ]
+    },
+    {
+      "id": "15",
+      "tipo": "professores",
+      "termo": "emiilia",
+      "normalizado": "emiilia",
+      "relevantes": [
+        "P1",
+        "P2"
+      ],
+      "cenario": "duplicação",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "emiilia"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "16",
+      "tipo": "professores",
+      "termo": "  santos   maria  ",
+      "normalizado": "santos maria",
+      "relevantes": [
+        "P1",
+        "P2"
+      ],
+      "cenario": "espaços/ordem",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "santos",
+            "maria"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "17",
+      "tipo": "professores",
+      "termo": "joao pedro davila",
+      "normalizado": "joao pedro davila",
+      "relevantes": [
+        "P4"
+      ],
+      "cenario": "pontuação omitida",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $4::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "joao",
+            "pedro",
+            "davila"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "18",
+      "tipo": "professores",
+      "termo": "joao-pedro d'avila",
+      "normalizado": "joao-pedro d'avila",
+      "relevantes": [
+        "P4"
+      ],
+      "cenario": "pontuação preservada",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "joao-pedro",
+            "d'avila"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P4"
+      ]
+    },
+    {
+      "id": "19",
+      "tipo": "disciplinas",
+      "termo": "CIC000",
+      "normalizado": "cic000",
+      "relevantes": [
+        "D1",
+        "D2",
+        "D8"
+      ],
+      "cenario": "prefixo de código",
+      "queries_atual": [
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE disciplinas.codigo ILIKE $2::VARCHAR ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "%CIC000%"
+          ]
+        },
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (disciplinas.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "cic000"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "D8",
+        "D1",
+        "D2"
+      ]
+    },
+    {
+      "id": "20",
+      "tipo": "disciplinas",
+      "termo": "calculo",
+      "normalizado": "calculo",
+      "relevantes": [
+        "D3",
+        "D4"
+      ],
+      "cenario": "acentos/ambiguidade",
+      "queries_atual": [
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE disciplinas.codigo ILIKE $2::VARCHAR ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "%calculo%"
+          ]
+        },
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (disciplinas.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "calculo"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "D3",
+        "D4"
+      ]
+    },
+    {
+      "id": "21",
+      "tipo": "professores",
+      "termo": "ma",
+      "normalizado": "ma",
+      "relevantes": [
+        "P1",
+        "P2",
+        "P3",
+        "P5",
+        "P9",
+        "P10"
+      ],
+      "cenario": "duas letras; substring",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "ma"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P9",
+        "P5",
+        "P3",
+        "P1",
+        "P2",
+        "P10"
+      ]
+    },
+    {
+      "id": "22",
+      "tipo": "professores",
+      "termo": "%%",
+      "normalizado": "%%",
+      "relevantes": [],
+      "cenario": "curingas LIKE; nenhuma intenção nominal",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "%%"
+          ]
+        }
+      ],
+      "sqlite_ids": [
+        "P7",
+        "P6",
+        "P8",
+        "P9",
+        "P5",
+        "P4",
+        "P3",
+        "P1",
+        "P2",
+        "P10",
+        "P11"
+      ]
+    },
+    {
+      "id": "23",
+      "tipo": "professores",
+      "termo": "maria alvaro",
+      "normalizado": "maria alvaro",
+      "relevantes": [],
+      "cenario": "nomes incompatíveis",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') AND (professores.nome_normalizado LIKE '%' || $3::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "maria",
+            "alvaro"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "24",
+      "tipo": "disciplinas",
+      "termo": "CIC0400",
+      "normalizado": "cic0400",
+      "relevantes": [
+        "D1"
+      ],
+      "cenario": "código/transposição; intenção não inferível",
+      "queries_atual": [
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE disciplinas.codigo ILIKE $2::VARCHAR ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "%CIC0400%"
+          ]
+        },
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (disciplinas.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "cic0400"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "25",
+      "tipo": "disciplinas",
+      "termo": "algortimos",
+      "normalizado": "algortimos",
+      "relevantes": [
+        "D1",
+        "D9",
+        "D10"
+      ],
+      "cenario": "nome/transposição",
+      "queries_atual": [
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE disciplinas.codigo ILIKE $2::VARCHAR ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "%algortimos%"
+          ]
+        },
+        {
+          "sql": "SELECT disciplinas.id, disciplinas.codigo, disciplinas.identificador_externo, disciplinas.nome, disciplinas.nome_normalizado, disciplinas.departamento, disciplinas.creditos, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo AS codigo_1, unidades_1.identificador_externo AS identificador_externo_1, unidades_1.nome AS nome_1 \nFROM disciplinas LEFT OUTER JOIN unidades AS unidades_1 ON disciplinas.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (disciplinas.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY disciplinas.codigo",
+          "params": [
+            "SIGAA",
+            "algortimos"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    },
+    {
+      "id": "26",
+      "tipo": "professores",
+      "termo": "nascimnto",
+      "normalizado": "nascimnto",
+      "relevantes": [
+        "P8"
+      ],
+      "cenario": "sobrenome/omissão",
+      "queries_atual": [
+        {
+          "sql": "SELECT professores.id, professores.nome, professores.nome_normalizado, professores.departamento, professores.siape, professores.identidade_origem, professores.identidade_confirmada, unidades_1.id AS id_1, unidades_1.fonte, unidades_1.codigo, unidades_1.identificador_externo, unidades_1.nome AS nome_1 \nFROM professores LEFT OUTER JOIN unidades AS unidades_1 ON professores.departamento = unidades_1.codigo AND unidades_1.fonte = $1::VARCHAR \nWHERE (professores.id NOT IN (SELECT professor_correspondencias.origem_id \nFROM professor_correspondencias)) AND (professores.nome_normalizado LIKE '%' || $2::VARCHAR || '%') ORDER BY professores.nome, professores.id",
+          "params": [
+            "SIGAA",
+            "nascimnto"
+          ]
+        }
+      ],
+      "sqlite_ids": []
+    }
+  ]
+}
