@@ -17,7 +17,7 @@ await comNavegador({ executar: async ({ avaliar }) => {
   for (const [rota, titulo, descricao, url] of [
     ['/', tituloHome, descricaoHome, 'https://undb.app.br/'],
     ['/sobre', 'Sobre o UnDb', 'Conheça a proposta do UnDb e a equipe que constrói a plataforma.', 'https://undb.app.br/sobre'],
-    ['/professores', tituloHome, descricaoHome, null],
+    ['/professores', 'Buscar professores da UnB | UnDb', 'Encontre professores da UnB e consulte avaliações por professor e disciplina.', 'https://undb.app.br/professores'],
   ]) {
     const response = await fetch(`http://localhost:3100${rota}`, { headers: { 'User-Agent': 'WhatsApp/2.24' } });
     assert.equal(response.status, 200);

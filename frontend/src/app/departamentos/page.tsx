@@ -1,3 +1,5 @@
+import { metadadosPagina } from "@/lib/seo";
+export const metadata = metadadosPagina("Unidades acadêmicas da UnB | UnDb", "Explore professores e disciplinas por unidade acadêmica da UnB.", "/departamentos", false);
 import { Suspense } from "react";
 import CatalogoUnidades from "@/components/catalogo-unidades";
 

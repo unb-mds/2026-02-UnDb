@@ -131,6 +131,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
             </label>
 
             <CampoSenha />
+            <Link href="/esqueci-senha" className="link self-end text-sm">Esqueci minha senha</Link>
 
             <button
               type="submit"

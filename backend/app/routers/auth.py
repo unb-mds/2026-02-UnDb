@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -12,6 +13,8 @@ from app.core.auth import (
 from app.core.database import get_db
 from app.models.sessao_usuario import SessaoUsuario
 from app.schemas.auth import (
+    RecuperarSenhaRequest,
+    RedefinirSenhaRequest,
     CadastroRequest,
     ConfirmacaoEmailRequest,
     LoginRequest,
@@ -92,5 +95,35 @@ def logout(
     session: Annotated[Session, Depends(get_db)],
 ) -> MensagemResponse:
     message = auth_service.encerrar_sessao(session, sessao)
+    remover_cookie_sessao(response)
+    return MensagemResponse(message=message)
+
+
+@router.post(
+    "/recuperar-senha", response_model=MensagemResponse, status_code=status.HTTP_202_ACCEPTED
+)
+def recuperar_senha(
+    dados: RecuperarSenhaRequest,
+    session: Annotated[Session, Depends(get_db)],
+    email_sender: Annotated[EmailSender, Depends(get_email_sender)],
+) -> MensagemResponse:
+    try:
+        auth_service.solicitar_recuperacao_senha(session, dados.email, email_sender)
+    except EmailDeliveryError:
+        # Não diferenciar conta existente nem expor detalhes do provedor.
+        logging.getLogger(__name__).error("Falha no envio de recuperação de senha.")
+    return MensagemResponse(message=auth_service.RECUPERACAO_MESSAGE)
+
+
+@router.post("/redefinir-senha", response_model=MensagemResponse)
+def redefinir_senha(
+    dados: RedefinirSenhaRequest,
+    response: Response,
+    session: Annotated[Session, Depends(get_db)],
+) -> MensagemResponse:
+    try:
+        message = auth_service.redefinir_senha(session, dados.token, dados.senha)
+    except auth_service.TokenRecuperacaoInvalidoError as erro:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(erro)) from erro
     remover_cookie_sessao(response)
     return MensagemResponse(message=message)

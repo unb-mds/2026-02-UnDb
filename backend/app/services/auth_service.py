@@ -15,6 +15,8 @@ from app.core.security import (
 from app.models.sessao_usuario import SessaoUsuario
 from app.models.token_confirmacao_email import TokenConfirmacaoEmail
 from app.models.usuario import Usuario
+from app.models.token_recuperacao_senha import TokenRecuperacaoSenha
+from app.repositories import recuperacao_senha_repository
 from app.repositories import sessao_repository, usuario_repository
 from app.schemas.auth import CadastroRequest, LoginRequest
 from app.services.email_service import EmailDeliveryError, EmailSender
@@ -40,6 +42,20 @@ class CredenciaisInvalidasError(Exception):
 
 
 class SessaoInvalidaError(Exception):
+    pass
+
+
+RECUPERACAO_MESSAGE = (
+    "Se o endereço informado possuir uma conta, enviaremos um link para redefinir a senha."
+)
+REDEFINICAO_MESSAGE = "Senha redefinida. Entre novamente com sua nova senha."
+RECUPERACAO_TOKEN_INVALIDO_MESSAGE = (
+    "Link de recuperação inválido ou expirado. Solicite um novo link."
+)
+RECUPERACAO_TTL = timedelta(hours=1)
+
+
+class TokenRecuperacaoInvalidoError(Exception):
     pass
 
 
@@ -121,7 +137,7 @@ def confirmar_email(db: Session, token_aberto: str) -> str:
 
 
 def autenticar(db: Session, dados: LoginRequest) -> Autenticacao:
-    usuario = usuario_repository.obter_por_email(db, dados.email)
+    usuario = usuario_repository.obter_para_login(db, dados.email)
     if usuario is None or not verificar_senha(dados.senha, usuario.password_hash):
         raise CredenciaisInvalidasError("E-mail ou senha inválidos.")
 
@@ -159,3 +175,48 @@ def encerrar_sessao(db: Session, sessao: SessaoUsuario) -> str:
     sessao_repository.remover(db, sessao)
     db.commit()
     return LOGOUT_MESSAGE
+
+
+def solicitar_recuperacao_senha(db: Session, email: str, email_sender: EmailSender) -> str:
+    usuario = usuario_repository.obter_por_email(db, email)
+    if usuario is None:
+        return RECUPERACAO_MESSAGE
+
+    token_aberto = gerar_token_confirmacao()
+    token = TokenRecuperacaoSenha(
+        usuario_id=usuario.id,
+        token_hash=gerar_hash_token(token_aberto),
+        expires_at=_agora_utc() + RECUPERACAO_TTL,
+    )
+    recuperacao_senha_repository.adicionar(db, token)
+    link = f"{FRONTEND_URL.rstrip('/')}/redefinir-senha?{urlencode({'token': token_aberto})}"
+    try:
+        db.flush()
+        email_sender.enviar_recuperacao_senha(email, link)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    return RECUPERACAO_MESSAGE
+
+
+def redefinir_senha(db: Session, token_aberto: str, senha: str) -> str:
+    token_hash = gerar_hash_token(token_aberto)
+    try:
+        usuario = recuperacao_senha_repository.obter_usuario_por_token(db, token_hash)
+        token = recuperacao_senha_repository.obter_token(db, token_hash)
+        agora = _agora_utc()
+        if (
+            usuario is None
+            or token is None
+            or token.used_at is not None
+            or _como_utc(token.expires_at) <= agora
+        ):
+            raise TokenRecuperacaoInvalidoError(RECUPERACAO_TOKEN_INVALIDO_MESSAGE)
+        usuario.password_hash = gerar_hash_senha(senha)
+        recuperacao_senha_repository.invalidar_links_e_sessoes(db, usuario, agora)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    return REDEFINICAO_MESSAGE
