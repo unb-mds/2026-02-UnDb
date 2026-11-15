@@ -2,6 +2,13 @@
 
 [Relatório](../../avaliacao-ofensas-disfarcadas-issue-252.md) · [Resultados](resultados.md)
 
+Este roteiro registra a execução histórica da PR #258 (62 casos). Após a autorização da
+primeira etapa, o corpus recebeu P33/P34, e `avaliar.py` passou a gravar
+`resultados-etapa1.json`/`resultados-etapa1.md`, sem sobrescrever aqueles resultados.
+Para comandos e validação atuais, consultar a
+[implementação](../../implementacao-ofensas-disfarcadas-issue-252.md).
+Para reprodução exata do estudo histórico, usar o commit `a6f6b9e` em worktree própria.
+
 ## Ambiente e limites
 
 Base `4d5dabf5343e324c369cf70316e778eb50801a6e`, Windows, Python 3.14.7,

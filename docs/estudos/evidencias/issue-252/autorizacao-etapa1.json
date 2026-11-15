@@ -1,0 +1,46 @@
+{
+  "data": "2026-11-15",
+  "fontes": {
+    "pr": "https://github.com/unb-mds/2026-02-UnDb/pull/258",
+    "parecer": "https://github.com/unb-mds/2026-02-UnDb/pull/258#pullrequestreview-5912949613",
+    "ajuste": "https://github.com/unb-mds/2026-02-UnDb/pull/258#discussion_r4580253635"
+  },
+  "revisoes_consultadas": [
+    {
+      "author": "gabrielrdaraujo",
+      "state": "COMMENTED",
+      "submitted_at": "2026-11-15T21:10:32Z",
+      "body": "Parecer técnico sobre o rascunho — commit `a6f6b9ee17486b20f1a00a86c88010e2831a9d0f`\n\nA proposta é tecnicamente viável. Recomendo implementação por etapas, com o ajuste obrigatório abaixo e escopo inicial limitado. Este parecer registra uma recomendação técnica; a decisão explícita do PO sobre escopo e critérios prevista na #252 permanece necessária. Manter a PR em rascunho, sem merge ou ativação em produção nesta etapa.\n\n### Ajuste obrigatório: preservar as detecções do filtro atual\n\nReproduzi dois casos ausentes do corpus: `me\\uFE0Frda` (U+FE0F) e `me\\u034Frda` (U+034F), com os caracteres Unicode efetivos entre “me” e “rda”. O filtro vigente retorna `PALAVRAO` nos dois casos, enquanto todas as seis variantes experimentais retornam lista vazia.\n\nA normalização vigente remove caracteres da categoria Unicode `Mn`; `normalizar_busca`, reutilizada pelos candidatos, remove caracteres com classe de combinação diferente de zero. Esses dois caracteres são `Mn`, mas têm classe de combinação zero, e permanecem nos candidatos.\n\nIsso é uma lacuna da bancada e um risco de regressão se os candidatos substituírem o filtro atual; não é regressão já introduzida na aplicação, pois o runtime não foi alterado.\n\nCondição para resolver: acrescentar esses casos ao corpus e às regressões e garantir que a implementação combine as detecções existentes com os novos sinais, preservando as categorias do filtro atual. Não substituir diretamente o filtro vigente pelos candidatos da bancada.\n\n### Escopo recomendado para implementação\n\n1. Implementar uma camada complementar com normalização Unicode de compatibilidade, tratamento explícito e limitado de invisíveis/homoglifos e correspondência de separadores/repetições dentro de termos conhecidos, preservando fronteiras de palavras e limites documentados.\n2. Trabalhar sobre cópia derivada para análise, preservando o texto original e o payload externo vigente. Manter OpenAI Moderation API, privacidade, permissões, retenção, regras de substituição e revisão humana da #239. Sinais ou falhas mantêm pendência; sem rejeição automática.\n3. Deixar substituições numéricas e a exceção específica para `m4rda` para decisão e validação separadas. A própria amostra já revela falsos positivos em identificadores técnicos.\n4. Homologar os rótulos com humanos, definir critérios coerentes com o escopo autorizado e validar o resultado em conjunto independente. Antes da ativação, verificar regressões dos fluxos existentes, integração das novas regras e desempenho com entradas no limite de tamanho, além do mecanismo de reversão.\n\n### Evidências e limites\n\nReproduzi as contagens lexicais das sete variantes nos 62 casos, executando isoladamente as funções relevantes em Python 3.14.6:\n\n| Variante | Positivos identificados / 32 | Negativos sinalizados / 24 |\n|---|---:|---:|\n| Atual | 8 | 0 |\n| Até separadores/repetições | 22 | 0 |\n| Com substituições numéricas | 28 | 1 |\n| Com exceção para `m4rda` | 29 | 2 |\n\nOs seis contextuais ficam fora desses denominadores. Zero falsos positivos em 24 negativos não demonstra taxa populacional zero. A etapa recomendada alcança 68,8% dos positivos desta amostra, abaixo da meta de 90% apenas proposta no relatório; o aceite precisa refletir a melhoria incremental autorizada.\n\nConferi os dez arquivos alterados, o contexto do filtro/fluxo automático e as decisões da #239/#252. Os checks remotos do head revisado passaram, incluindo Backend, Frontend, Gitflow, Docker Compose, jornadas de avaliação/moderação com PostgreSQL e documentação. Esses checks validam o estado atual; não comprovam a integração futura dos candidatos, que ainda estão fora do runtime. A eficácia da API real e da triagem combinada nos 62 casos continua não medida.\n\nConclusão: parecer favorável à direção proposta, condicionado à preservação obrigatória das detecções existentes e à definição do escopo/aceite pelo PO. A variante ampla não está pronta para ativação como está."
+    },
+    {
+      "author": "gabrielrdaraujo",
+      "state": "COMMENTED",
+      "submitted_at": "2026-11-15T21:12:00Z",
+      "body": ""
+    },
+    {
+      "author": "gabrielrdaraujo",
+      "state": "APPROVED",
+      "submitted_at": "2026-11-15T21:12:28Z",
+      "body": "Aprovação para integrar exclusivamente o estudo, documentação e bancada experimental offline em develop, conforme autorização humana explícita recebida após o parecer técnico. A implementação funcional será realizada em outra PR. O ajuste obrigatório relativo a U+FE0F/U+034F e à preservação das detecções atuais continua registrado no parecer e deve ser tratado na futura implementação acompanhada pela #252. A conversa foi resolvida por encaminhamento, sem declarar correção entregue. Checks do head a6f6b9e aprovados. Este aceite documental não homologa o corpus, não aprova automaticamente as técnicas/metas propostas, não ativa regras de produção e não encerra a #252."
+    }
+  ],
+  "decisao_funcional": {
+    "origem": "Respostas explícitas do solicitante nesta sessão, posteriores à consulta da PR e distintas do aceite documental.",
+    "delegacao_informada": "Gabriel tem o mesmo poder de decisão que Nicolas; os pontos sem decisão explícita foram confiados ao solicitante.",
+    "escopo": "Unicode de compatibilidade, invisíveis/homoglifos limitados, separadores de até 3 e repetições de até 4 por posição, somados ao filtro vigente; sem substituições numéricas.",
+    "criterios": "Preservar detecções/categorias anteriores, detectar os casos das técnicas delimitadas e não acrescentar sinais nos controles negativos atuais; sem adotar meta de 90%.",
+    "configuracao": "Flag própria desativada por padrão; IA e regras atuais de publicação preservadas.",
+    "resposta_escopo": "Aprovo essa primeira etapa e os critérios descritos",
+    "pergunta_rotulos": "Podemos implementar e validar localmente com esses rótulos exploratórios, mantendo a homologação humana e a avaliação adicional como condições antes de qualquer ativação em produção?",
+    "resposta_rotulos": "Sim; implementar agora e manter homologação/ativação pendentes"
+  },
+  "nao_autorizado": [
+    "Ativação ou alteração de configuração em produção",
+    "Substituições numéricas, inclusive m3rda/m4rda",
+    "Nova API/modelo/provedor",
+    "Uso de comentários reais em ensaios",
+    "Homologação automática dos rótulos",
+    "Merge ou encerramento da issue"
+  ]
+}

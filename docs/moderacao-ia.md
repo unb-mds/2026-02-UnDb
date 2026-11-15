@@ -1,8 +1,9 @@
 # Apoio à revisão de comentários — Issue #239
 
 Avaliação complementar da #252: [detecção de ofensas disfarçadas](estudos/avaliacao-ofensas-disfarcadas-issue-252.md).
-O estudo é exploratório, sem alteração funcional; homologação humana dos casos e aprovação
-de novas regras pelo PO permanecem pendentes. As variantes não são usadas pela aplicação.
+O estudo inicial é histórico. A [primeira etapa implementada](estudos/implementacao-ofensas-disfarcadas-issue-252.md)
+foi autorizada nesta sessão, após a revisão da PR #258. O complemento é opcional e desligado
+por padrão; homologação humana e ativação em produção permanecem pendentes.
 
 O apoio usa a **Moderation API gratuita da OpenAI**, com `omni-moderation-latest`,
 conforme escolha do PO em 14/11/2026. É preciso configurar uma chave de API no
@@ -56,6 +57,27 @@ Não inclui palavras como "ruim", "difícil" ou "reprovei". Não detecta todo di
 nem toda discriminação e pode sinalizar citações/negações legítimas. Incrementar
 versão e reavaliar casos ao alterar o conteúdo. É sinalização para revisão, não veto.
 
+### Complemento opcional — etapa inicial da #252
+
+`MODERACAO_DISFARCES_ATIVO=False` mantém a correspondência anterior. Quando autorizado
+e habilitado junto de `MODERACAO_FILTRO_ATIVO`, soma detecções de compatibilidade Unicode,
+cinco invisíveis explícitos, mapa cirílico limitado e separadores/repetições delimitados.
+O filtro atual sempre participa: casos com U+FE0F/U+034F e suas categorias não podem se perder.
+São até três separadores entre posições e quatro repetições contíguas por posição;
+espaços não são compactados antes do teste. Não transforma números em letras: `m3rda`
+e `m4rda` permanecem fora desta etapa. Ver [implementação e resultados](estudos/implementacao-ofensas-disfarcadas-issue-252.md).
+
+O texto original segue para armazenamento e eventual chamada à IA. Falha local não produz
+resultado limpo: no automático mantém pendência; no apoio retorna `INDISPONIVEL`.
+Não há nova rejeição, publicação, exposição de categorias públicas ou endpoint.
+A auditoria privada de publicação registra a versão do filtro, sem copiar texto e com
+a retenção existente. Rótulos sintéticos ainda não homologados não validam produção.
+
+Reverter somente esta melhoria: `MODERACAO_DISFARCES_ATIVO=False` e reiniciar o backend,
+preservando as demais flags de moderação. Volta ao filtro anterior e não reprocessa pendências.
+Não desligar `MODERACAO_FILTRO_ATIVO` para esse fim: isso interromperia a publicação automática.
+O exemplo/Compose mantêm a melhoria desligada; esta entrega não autoriza ativação em produção.
+
 ## Configuração e ativação
 
 Variáveis somente no backend, nunca em `NEXT_PUBLIC_*`, código ou chat:
@@ -63,6 +85,7 @@ Variáveis somente no backend, nunca em `NEXT_PUBLIC_*`, código ou chat:
 ```dotenv
 MODERACAO_AUTOMATICA_ATIVA=False
 MODERACAO_FILTRO_ATIVO=False
+MODERACAO_DISFARCES_ATIVO=False
 MODERACAO_IA_ATIVA=False
 MODERACAO_IA_DADOS_APROVADOS=False
 OPENAI_API_KEY=
