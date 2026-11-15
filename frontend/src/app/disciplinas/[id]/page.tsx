@@ -1,3 +1,5 @@
+import { metadadosPagina } from "@/lib/seo";
+import { disciplinaPublica } from "@/lib/consultas-publicas";
 import { nomeUnidade } from "@/lib/unidade";
 import { lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
@@ -6,13 +8,17 @@ import { identificadorValido } from "@/lib/identificador";
 import {
   compararProfessoresDaDisciplina,
   listarTurmasDaDisciplina,
-  obterDisciplina,
 } from "@/lib/services/disciplinas";
-import { ApiError } from "@/lib/services/http-error";
 import ComparacaoDark from "@/components/comparacao-dark";
 import Caminho from "@/components/caminho";
 import FundoLiquido from "@/components/fundo-liquido";
 import Icone from "@/components/icone";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const item = await disciplinaPublica(id);
+  return metadadosPagina(`${item.nome} (${item.codigo}) — UnB | UnDb`, `Compare professores de ${item.nome} (${item.codigo}) na UnB. Consulte os cinco critérios e a quantidade de avaliações de cada professor.`, `/disciplinas/${item.id}`);
+}
 
 export default async function DetalheDisciplinaPage({
   params,
@@ -27,10 +33,7 @@ export default async function DetalheDisciplinaPage({
 
   // Consultar primeiro a disciplina faz com que um ID inexistente vire 404
   // antes das consultas dependentes de turmas e agregados.
-  const disciplina = await obterDisciplina(id).catch((erro) => {
-    if (erro instanceof ApiError && erro.naoEncontrado) notFound();
-    throw erro;
-  });
+  const disciplina = await disciplinaPublica(id);
   const [turmas, comparacao] = await Promise.all([
     listarTurmasDaDisciplina(id),
     compararProfessoresDaDisciplina(id),

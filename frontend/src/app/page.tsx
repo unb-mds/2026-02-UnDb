@@ -8,6 +8,8 @@ import DestaquesHome from "@/components/destaques-home";
 import CatalogoHome from "@/components/catalogo-home";
 
 export const metadata: Metadata = {
+  ...metadadosCompartilhamento,
+  alternates: { canonical: "https://undb.app.br/" },
   openGraph: { ...metadadosCompartilhamento.openGraph, url: "https://undb.app.br/" },
 };
 

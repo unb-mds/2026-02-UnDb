@@ -1,12 +1,12 @@
+import { metadadosPagina } from "@/lib/seo";
+import { avaliacaoPublica } from "@/lib/consultas-publicas";
 import { nomeUnidade } from "@/lib/unidade";
 import { comContextoBusca, lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { identificadorValido } from "@/lib/identificador";
-import { consultarAvaliacaoAgregada } from "@/lib/services/avaliacoes";
 import { listarComentariosPublicados } from "@/lib/services/comentarios";
 import { compararProfessoresDaDisciplina } from "@/lib/services/disciplinas";
-import { ApiError } from "@/lib/services/http-error";
 import { iniciaisProfessor } from "@/lib/iniciais";
 import FundoLiquido from "@/components/fundo-liquido";
 import Icone from "@/components/icone";
@@ -15,6 +15,12 @@ import Caminho from "@/components/caminho";
 import SecaoComentarios from "@/components/secao-comentarios";
 
 const MIN_AVALIACOES_EXIBICAO = 3;
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string; disciplinaId: string }> }) {
+  const { id, disciplinaId } = await params;
+  const item = await avaliacaoPublica(id, disciplinaId);
+  return metadadosPagina(`${item.professor.nome} em ${item.disciplina.nome} — UnDb`, `Consulte avaliações de ${item.professor.nome} em ${item.disciplina.nome} (${item.disciplina.codigo}) na UnB. Critérios exibidos somente com dados suficientes.`, `/professores/${item.professorId}/disciplinas/${item.disciplinaId}`);
+}
 
 export default async function AvaliacaoAgregadaPage({
   params,
@@ -27,10 +33,7 @@ export default async function AvaliacaoAgregadaPage({
   const contexto = lerContextoBusca(await searchParams);
   if (!identificadorValido(id) || !identificadorValido(disciplinaId)) notFound();
 
-  const avaliacao = await consultarAvaliacaoAgregada(id, disciplinaId).catch((erro) => {
-    if (erro instanceof ApiError && erro.naoEncontrado) notFound();
-    throw erro;
-  });
+  const avaliacao = await avaliacaoPublica(id, disciplinaId);
 
   const [comentarios, comparacao] = await Promise.all([
     listarComentariosPublicados(id, disciplinaId).catch(() => null),

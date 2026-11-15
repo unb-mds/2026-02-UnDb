@@ -9,6 +9,7 @@ import { metadadosCompartilhamento } from "@/lib/metadados-compartilhamento";
 const titulo = "Sobre o UnDb";
 const descricao = "Conheça a proposta do UnDb e a equipe que constrói a plataforma.";
 export const metadata: Metadata = {
+  alternates: { canonical: "https://undb.app.br/sobre" },
   title: titulo,
   description: descricao,
   openGraph: { ...metadadosCompartilhamento.openGraph, title: titulo, description: descricao, url: "https://undb.app.br/sobre" },

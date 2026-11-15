@@ -1,3 +1,5 @@
+import { metadadosPagina } from "@/lib/seo";
+import { professorPublico } from "@/lib/consultas-publicas";
 import { nomeUnidade } from "@/lib/unidade";
 import { lerContextoBusca, urlBusca, type ParametrosBusca } from "@/lib/contexto-busca";
 import Link from "next/link";
@@ -5,9 +7,14 @@ import { iniciaisProfessor } from "@/lib/iniciais";
 import DisciplinasProfessor from "@/components/disciplinas-professor";
 import { notFound } from "next/navigation";
 import { identificadorValido } from "@/lib/identificador";
-import { listarDisciplinasDoProfessor, obterProfessor } from "@/lib/services/professores";
-import { ApiError } from "@/lib/services/http-error";
+import { listarDisciplinasDoProfessor } from "@/lib/services/professores";
 import Caminho from "@/components/caminho";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const item = await professorPublico(id);
+  return metadadosPagina(`${item.nome} — Professor da UnB | UnDb`, `Consulte as disciplinas lecionadas por ${item.nome} na UnB e acesse avaliações por disciplina, sem cadastro.`, `/professores/${item.id}`);
+}
 
 export default async function DetalheProfessorPage({
   params,
@@ -22,10 +29,7 @@ export default async function DetalheProfessorPage({
 
   // Consultar primeiro o professor mantém o 404 institucional antes das
   // consultas de disciplinas vinculadas.
-  const professor = await obterProfessor(id).catch((erro) => {
-    if (erro instanceof ApiError && erro.naoEncontrado) notFound();
-    throw erro;
-  });
+  const professor = await professorPublico(id);
   const disciplinas = await listarDisciplinasDoProfessor(id);
 
   return (
