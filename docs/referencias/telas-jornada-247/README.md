@@ -12,6 +12,10 @@ Consulte o [relatório da implementação e 36 capturas antes/depois](https://gi
 para arquivos, comportamentos, verificações e limitações reais. A PR permanece em
 rascunho: integração real, revisão técnica humana e aceite visual ainda são necessários.
 
+A [auditoria de commits e pendências da PR #248](../../estudos/auditoria-pr248.md)
+registra a preservação do trabalho paralelo de Nicolas/Vinicius, a correção dos links
+do MkDocs e a implementação local do complemento de preview, com limites de validação.
+
 Base inspecionada: `develop` em `18c04c445bed813948a6ed64f0fbcdc8a33c4bb7`.
 Antes de continuar, atualizar com a `develop` vigente e reavaliar os arquivos abaixo.
 A #237 / PR #243 já corrigiu os estados de sessão e o aviso de senha; preservar.

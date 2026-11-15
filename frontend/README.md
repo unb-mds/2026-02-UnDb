@@ -362,3 +362,9 @@ do LinkedIn solicitado na aba Sobre. O [relatório da continuidade](docs/jornada
 registra verificações, limites e 36 capturas em 320/768/1280 px. O runner
 `tests/jornada-247-browser.mjs` integra `npm run test:browser`; a integração real e o
 aceite humano permanecem pendentes antes de concluir a PR #248 em rascunho.
+
+O [complemento do preview de compartilhamento](../docs/referencias/preview-compartilhamento/README.md)
+usa a arte aprovada em `public/undb-preview.png`, com Open Graph e Twitter Card.
+`node tests/preview-compartilhamento-browser.mjs` verifica o PNG e o HTML inicial de
+produção local e integra `test:browser`. Publicação HTTPS e teste real no WhatsApp
+continuam pendentes; veja a [auditoria da PR](../docs/estudos/auditoria-pr248.md).
