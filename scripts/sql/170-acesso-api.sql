@@ -1,5 +1,5 @@
 -- Executar como administrador no banco neondb da API, após criar undb_api.
--- Base: 15 tabelas informadas pelo operador e repositories de develop.
+-- Base: repositories de develop; inclui tokens de recuperação da release 1.7.0.
 -- Não define senha, não altera ownership e não troca a conexão do Render.
 BEGIN;
 
@@ -14,7 +14,7 @@ TO undb_api;
 
 -- Cadastro, confirmação, upsert de avaliações e renovação de sessão.
 GRANT SELECT, INSERT, UPDATE ON TABLE
-    public.usuarios, public.email_confirmation_tokens,
+    public.usuarios, public.email_confirmation_tokens, public.password_reset_tokens,
     public.avaliacoes, public.sessoes_usuario
 TO undb_api;
 GRANT DELETE ON TABLE public.sessoes_usuario TO undb_api;
