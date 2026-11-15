@@ -8,7 +8,7 @@
 
 O primeiro commit `0ff2591` contém apenas documentação e referências visuais.
 A continuidade implementa as seis telas e o LinkedIn de Vinicius na mesma branch.
-Consulte o [relatório da implementação e 36 capturas antes/depois](../../../frontend/docs/jornada-247.md)
+Consulte o [relatório da implementação e 36 capturas antes/depois](https://github.com/unb-mds/2026-02-UnDb/blob/f0c8f1c804b002390cf13864a2842fd7acf6d930/frontend/docs/jornada-247.md)
 para arquivos, comportamentos, verificações e limitações reais. A PR permanece em
 rascunho: integração real, revisão técnica humana e aceite visual ainda são necessários.
 
@@ -59,7 +59,7 @@ Todos os caminhos abaixo são relativos à raiz do repositório.
 | Moderação | `frontend/src/app/moderacao/page.tsx`, `fila-moderacao.tsx`, `detalhe-moderacao.tsx` |
 | Contratos e retorno seguro | `frontend/src/lib/services/auth.ts`, `avaliacoes.ts`, `moderacao.ts`; `frontend/src/lib/retorno-avaliacao.ts`, `contexto-busca.ts` |
 
-Ler `AGENTS.md`, as skills aplicáveis e os contratos em [specs.md](../../../specs.md)
+Ler `AGENTS.md`, as skills aplicáveis e os contratos em [specs.md](https://github.com/unb-mds/2026-02-UnDb/blob/develop/specs.md)
 e [requisitos](../../requisitos.md). Reutilizar componentes, ícones e tokens atuais;
 não substituir o frontend nem copiar uma segunda folha global de estilos.
 
@@ -150,15 +150,15 @@ não substituir o frontend nem copiar uma segunda folha global de estilos.
 
 Na base inspecionada, as duas propostas da #240 / PR #244 permanecem `proposed`:
 
-- [Security Review](../../../skills/engineering/security-review/SKILL.md), seção 10:
+- [Security Review](https://github.com/unb-mds/2026-02-UnDb/blob/develop/skills/engineering/security-review/SKILL.md), seção 10:
   “adoção da skill e alterações derivadas dependem de aprovação pertinente. Não promover a defined.”
-- [Incident Response](../../../skills/process/incident-response/SKILL.md), seção 10:
+- [Incident Response](https://github.com/unb-mds/2026-02-UnDb/blob/develop/skills/process/incident-response/SKILL.md), seção 10:
   “Promoção a defined exige aprovação humana explícita.”
 
 **Encaminhamento:** registrar na #240 a revisão/aprovação humana explícita para adotar
 cada skill antes de tratá-la como regra oficial. A promoção em si segue
-[skill-authoring](../../../skills/governance/skill-authoring/SKILL.md) e
-[project-governance](../../../skills/governance/project-governance/SKILL.md).
+[skill-authoring](https://github.com/unb-mds/2026-02-UnDb/blob/develop/skills/governance/skill-authoring/SKILL.md) e
+[project-governance](https://github.com/unb-mds/2026-02-UnDb/blob/develop/skills/governance/project-governance/SKILL.md).
 Este guia não altera metadados, aprova skills nem concede acesso operacional.
 A pendência não bloqueia esta documentação ou trabalho independente autorizado.
 Se uma etapa depender de autoridade ainda não definida, interromper apenas essa etapa.
