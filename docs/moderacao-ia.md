@@ -1,5 +1,9 @@
 # Apoio à revisão de comentários — Issue #239
 
+Avaliação complementar da #252: [detecção de ofensas disfarçadas](estudos/avaliacao-ofensas-disfarcadas-issue-252.md).
+O estudo é exploratório, sem alteração funcional; homologação humana dos casos e aprovação
+de novas regras pelo PO permanecem pendentes. As variantes não são usadas pela aplicação.
+
 O apoio usa a **Moderation API gratuita da OpenAI**, com `omni-moderation-latest`,
 conforme escolha do PO em 14/11/2026. É preciso configurar uma chave de API no
 backend; não há chamada à Responses API ou a modelo de geração pago, nem fallback

@@ -67,6 +67,10 @@ nav:
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:
+      - Moderação — avaliação da Issue 252:
+          - Avaliação técnica: estudos/avaliacao-ofensas-disfarcadas-issue-252.md
+          - Casos e resultados: estudos/evidencias/issue-252/resultados.md
+          - Reprodução e validação: estudos/evidencias/issue-252/reproducao.md
       - Busca — avaliação da Issue 251:
           - Avaliação técnica: estudos/avaliacao-busca-autocomplete-issue-251.md
           - Casos e medições: estudos/evidencias/issue-251/resultados.md
