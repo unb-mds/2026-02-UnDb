@@ -1,5 +1,21 @@
 # 🏛️ Arquitetura e Decisões Técnicas — G7
 
+## Canal de solicitações — RF25
+
+Modelo aditivo aprovado por Nicolas em 15/11/2026: solicitações e histórico separados das
+avaliações/moderação. `solicitacoes_titulares` tem UUID aleatório, hash da chave secreta,
+categoria, alvo, descrição, evidência textual e data. Cada solicitação possui N eventos em
+`eventos_solicitacoes`: UUID, FK de solicitação, tipo, texto, data e FK opcional do atendente
+em `usuarios`. Complementos públicos não vinculam conta estudantil. Nenhum cadastro,
+avaliação ou privilégio de moderação é alterado pelo canal.
+
+A FK de solicitação tem índice para leitura do histórico; PKs sustentam consulta direta.
+Fatos permanecem em sua entidade (sem copiar nome/e-mail de atendentes). Exclusão é
+restrita pelas FKs; política de descarte e coordenação com backups dependem da #262.
+API segue router/service/repository já existentes, com schemas públicos e internos
+distintos. Configuração de UUIDs separa leitores de atendentes. Operação detalhada em
+[canal de solicitações](canal-titulares.md).
+
 Sistema de avaliação de professores e disciplinas da UnB.
 Requisitos em [`requisitos.md`](requisitos.md).
 

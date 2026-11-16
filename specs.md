@@ -1,5 +1,19 @@
 # specs.md — Especificação de implementação
 
+## Canal de titulares — RF25
+
+Derivado de `docs/requisitos.md`, RF25 (aprovação de Nicolas em 15/11/2026).
+POST `/api/solicitacoes` recebe categoria, alvo, descrição e evidência textual;
+devolve protocolo UUID aleatório, chave secreta e data. Consultar e complementar usam
+POST com protocolo/chave no corpo, nunca URL. Apenas SHA-256 da chave fica persistido.
+GET `/api/atendimento` e detalhe usam sessão confirmada e UUID em allowlist própria;
+POST de eventos exige allowlist de atendentes. Leitores não podem registrar eventos.
+Campos internos de triagem, providências e identidade do atendente não são retornados ao
+solicitante. Não vincular solicitante a uma avaliação nem copiar dados de avaliadores.
+Schema independente: `solicitacoes_titulares` 1:N `eventos_solicitacoes`; autor interno
+referencia `usuarios`, sem mudar privilégios de moderadores/reconciliadores.
+Recebimento exige flags de ativação/retenção e lista de atendentes configurada.
+
 Documento **derivado**. Fontes de verdade: [`docs/requisitos.md`](docs/requisitos.md) e
 [`docs/arquitetura.md`](docs/arquitetura.md).
 
