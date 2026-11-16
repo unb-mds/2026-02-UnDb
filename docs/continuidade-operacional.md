@@ -202,6 +202,14 @@ contribuição de cenários por Tiago Vieira e GPT; lacunas referenciadas às is
 
 ## 8. Revisão, aceite e pendências
 
+### Integração preparada com #263
+
+Implementação local do canal em `/contato`, com acompanhamento por protocolo/chave e
+atendimento em `/atendimento`. Configuração separa leitura (Nicolas/Tiago) de atendimento
+(Vinicius/Gabriel), usando UUIDs das contas confirmadas. Ainda não foi ativada em produção:
+depende de retenção aprovada na #262, concessão de acessos e validação operacional. A
+pendência do canal desta #260 só fica resolvida depois de conferir a publicação funcional.
+
 ### Rastreabilidade dos critérios da issue #260
 
 | Critério | Evidência neste documento | Estado para aceite |

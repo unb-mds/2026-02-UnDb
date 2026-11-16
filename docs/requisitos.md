@@ -1,5 +1,25 @@
 # 📋 Engenharia de Requisitos — G7
 
+## RF25 — Canal de solicitações de titulares (#263)
+
+Validado por Nicolas nesta conversa em 15/11/2026: disponibilizar formulário sem login
+estudantil para as sete categorias da #263, com referência ao alvo, descrição e evidência
+textual mínima, sem anexos. Gerar protocolo aleatório e chave secreta de acompanhamento,
+guardar somente hash da chave e confirmar recebimento com data na tela. Permitir consulta
+das respostas e envio de complementos/pedido de revisão por quem possuir protocolo/chave.
+Não enviar chave ou dados por e-mail nem exibir registros de outros solicitantes.
+
+Atendimento restrito às contas autorizadas: Vinicius e Gabriel registram triagem,
+providências e respostas; Nicolas e Tiago podem visualizar. Cada registro guarda autor
+e data; triagem/providências são internas e respostas são visíveis ao solicitante.
+Atendimento não altera automaticamente notas, comentários, identidades ou contas.
+Uma ocorrência fundamentada independe de volume; preservar a identidade de avaliadores.
+
+Nicolas aprovou persistência em tabelas próprias. A ativação em produção fica bloqueada
+até aprovação de retenção na #262 e configuração dos responsáveis. Não há prazo/SLA
+aprovado nesta entrega. Inventário/minimização e regras de escalonamento/revisão devem ser
+conciliados com #261, #264 e #267. Release permanece a definir.
+
 Especificação de requisitos do sistema de **Avaliação de Professores e Disciplinas da UnB**,
 desenvolvido para a disciplina de Métodos de Desenvolvimento de Software (MDS) 2026/2.
 

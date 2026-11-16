@@ -1,2 +1,3 @@
 # Ferramentas de desenvolvimento; não instalar na imagem de execução.
 ruff==0.17.3
+httpx==0.28.1
