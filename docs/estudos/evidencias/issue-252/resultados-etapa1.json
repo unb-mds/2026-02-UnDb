@@ -1,0 +1,6030 @@
+{
+  "data_utc": "2026-11-15T22:08:06.889081+00:00",
+  "codigo_head": "5a983c6b6f3b993d4a8b44b8639acd457d9ab705",
+  "python": "3.14.7",
+  "unicode_db": "16.0.0",
+  "sha256_normalizacao": "UTF-8 com finais de linha LF",
+  "sha256_fontes": {
+    "backend/app/domain/triagem_comentario.py": "7f1f4f8a8e4b10035ac30bbb2bb8ac95b5832dd59062567cee71d2ffab8a37fd",
+    "backend/app/domain/texto.py": "4abe8ab92255c892fa996aec5f05e566b8fc582e53495d8d4d8e22c177257290",
+    "backend/app/domain/filtro_moderacao.py": "b6ef9c310b2de09e57e9f4900f0e1ae423470030959f74a78bdd5a5edc1c817d",
+    "backend/app/core/config.py": "503aa95a85d45011f8779fa88e96f5344b941b3dce008d6fb7fba2e485f6b333",
+    "backend/app/data/termos_moderacao.json": "092a232181df6d2da9aa21ba4ba09898133c75ccaf458c5a245e0477fb9a4bde",
+    "backend/app/services/moderacao_automatica_service.py": "1a60d57a65960552adf808d70da8cbaecc1bf4af69fbf63e4340e8324eb7fc87",
+    "backend/app/services/triagem_service.py": "257014a26eda8ad78dbabac6615e591c7daa93380cbab9f6f360b9c1b60663d3",
+    "backend/app/services/openai_triagem.py": "7f7f4529f05f405507bebc604fcab5b7263bd49e42dbdfb88e97e93763cbaccf",
+    "docs/estudos/evidencias/issue-252/casos.json": "4a66be1fd34648351e0714e06744dd283aa0bb6413697eda1dce8682c7e69ee4",
+    "docs/estudos/evidencias/issue-252/avaliar.py": "44954fce205c9ccce43d59fce7b4f0168cff2a37a05d0eefb85ce3b3ab5ed5eb"
+  },
+  "lista": "239-proposta-2",
+  "integracao": "239-moderations-v1",
+  "versao_complemento": "252-disfarces-v1",
+  "modelo_configurado_na_base": "omni-moderation-latest",
+  "api_real_chamadas": 0,
+  "homologacao_humana": "PENDENTE",
+  "composicao": {
+    "positivo": 34,
+    "negativo": 24,
+    "contextual": 6
+  },
+  "resumo_local": {
+    "atual": {
+      "TP": 10,
+      "FN": 24,
+      "FP": 0,
+      "TN": 24
+    },
+    "busca_nfkd": {
+      "TP": 10,
+      "FN": 24,
+      "FP": 0,
+      "TN": 24
+    },
+    "invisiveis": {
+      "TP": 13,
+      "FN": 21,
+      "FP": 0,
+      "TN": 24
+    },
+    "unicode": {
+      "TP": 15,
+      "FN": 19,
+      "FP": 0,
+      "TN": 24
+    },
+    "separadores_repeticoes": {
+      "TP": 22,
+      "FN": 12,
+      "FP": 0,
+      "TN": 24
+    },
+    "leet_contextual": {
+      "TP": 28,
+      "FN": 6,
+      "FP": 1,
+      "TN": 23
+    },
+    "leet_4_como_e": {
+      "TP": 29,
+      "FN": 5,
+      "FP": 2,
+      "TN": 22
+    },
+    "complementar_implementado": {
+      "TP": 24,
+      "FN": 10,
+      "FP": 0,
+      "TN": 24
+    }
+  },
+  "casos": [
+    {
+      "id": "P01",
+      "grupo": "positivo",
+      "tecnica": "explicito",
+      "texto": "Que merda de aula.",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que merda de aula.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P02",
+      "grupo": "positivo",
+      "tecnica": "explicito",
+      "texto": "Você é um idiota.",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Voc\\xea \\xe9 um idiota.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P03",
+      "grupo": "positivo",
+      "tecnica": "explicito",
+      "texto": "Que porra!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que porra!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P04",
+      "grupo": "positivo",
+      "tecnica": "expressao",
+      "texto": "Vai   se foder!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Vai   se foder!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P05",
+      "grupo": "positivo",
+      "tecnica": "caixa_acento",
+      "texto": "Seu OTÁRIO!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu OT\\xc1RIO!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P06",
+      "grupo": "positivo",
+      "tecnica": "caixa_acento",
+      "texto": "IDÍOTA!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "ID\\xcdOTA!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P07",
+      "grupo": "positivo",
+      "tecnica": "leet_4_ambiguo",
+      "texto": "Que m4rda de aula.",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m4rda de aula.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P08",
+      "grupo": "positivo",
+      "tecnica": "leet",
+      "texto": "Que m3rda de aula.",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m3rda de aula.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P09",
+      "grupo": "positivo",
+      "tecnica": "leet",
+      "texto": "Você é um b4b4c4.",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Voc\\xea \\xe9 um b4b4c4.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P10",
+      "grupo": "positivo",
+      "tecnica": "leet",
+      "texto": "Seu 1d10ta!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Seu 1d10ta!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P11",
+      "grupo": "positivo",
+      "tecnica": "pontuacao",
+      "texto": "Que m.e.r.d.a!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m.e.r.d.a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P12",
+      "grupo": "positivo",
+      "tecnica": "pontuacao",
+      "texto": "Seu b-a-b-a-c-a!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu b-a-b-a-c-a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P13",
+      "grupo": "positivo",
+      "tecnica": "espacos",
+      "texto": "Você é i d i o t a!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Voc\\xea \\xe9 i d i o t a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P14",
+      "grupo": "positivo",
+      "tecnica": "espacos",
+      "texto": "Que m er da!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m er da!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P15",
+      "grupo": "positivo",
+      "tecnica": "repeticao",
+      "texto": "Que meeerda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que meeerda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P16",
+      "grupo": "positivo",
+      "tecnica": "repeticao",
+      "texto": "Seu babacaaaa!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu babacaaaa!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P17",
+      "grupo": "positivo",
+      "tecnica": "invisivel",
+      "texto": "Que me​rda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que me\\u200brda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P18",
+      "grupo": "positivo",
+      "tecnica": "invisivel",
+      "texto": "Seu idi‍ota!",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "texto_escapado": "Seu idi\\u200dota!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P19",
+      "grupo": "positivo",
+      "tecnica": "invisivel",
+      "texto": "Que por﻿ra!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que por\\ufeffra!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P20",
+      "grupo": "positivo",
+      "tecnica": "unicode_compativel",
+      "texto": "Que ｍｅｒｄａ!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que \\uff4d\\uff45\\uff52\\uff44\\uff41!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P21",
+      "grupo": "positivo",
+      "tecnica": "unicode_compativel",
+      "texto": "Seu 𝐛𝐚𝐛𝐚𝐜𝐚!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu \\U0001d41b\\U0001d41a\\U0001d41b\\U0001d41a\\U0001d41c\\U0001d41a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P22",
+      "grupo": "positivo",
+      "tecnica": "homoglifo",
+      "texto": "Que mеrda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m\\u0435rda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P23",
+      "grupo": "positivo",
+      "tecnica": "homoglifo",
+      "texto": "Seu bаbаcа!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu b\\u0430b\\u0430c\\u0430!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P24",
+      "grupo": "positivo",
+      "tecnica": "combinado",
+      "texto": "Seu B.4.B.4.C.4!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu B.4.B.4.C.4!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P25",
+      "grupo": "positivo",
+      "tecnica": "combinado",
+      "texto": "Que M​3 R D A!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que M\\u200b3 R D A!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P26",
+      "grupo": "positivo",
+      "tecnica": "expressao_pontuacao",
+      "texto": "Vai.se.foder!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Vai.se.foder!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P27",
+      "grupo": "positivo",
+      "tecnica": "ameaca",
+      "texto": "Vou te matar.",
+      "categoria_esperada": "AMEACA",
+      "texto_escapado": "Vou te matar.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P28",
+      "grupo": "positivo",
+      "tecnica": "ameaca_disfarcada",
+      "texto": "V0u te m4t4r.",
+      "categoria_esperada": "AMEACA",
+      "texto_escapado": "V0u te m4t4r.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "AMEACA"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P29",
+      "grupo": "positivo",
+      "tecnica": "repeticao_longa",
+      "texto": "Que meeeeeeeerda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que meeeeeeeerda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P30",
+      "grupo": "positivo",
+      "tecnica": "homoglifo_fora_mapa",
+      "texto": "Que ᴍerda!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que \\u1d0derda!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P31",
+      "grupo": "positivo",
+      "tecnica": "explicito",
+      "texto": "Seu imbecil!",
+      "categoria_esperada": "XINGAMENTO",
+      "texto_escapado": "Seu imbecil!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "invisiveis": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "unicode": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P32",
+      "grupo": "positivo",
+      "tecnica": "pontuacao_fora_limite",
+      "texto": "Que m....e....r....d....a!",
+      "categoria_esperada": "PALAVRAO",
+      "texto_escapado": "Que m....e....r....d....a!",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "FN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": true,
+          "erro": "FN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "P33",
+      "grupo": "positivo",
+      "tecnica": "marca_mn_classe_zero",
+      "texto": "me️rda",
+      "categoria_esperada": "PALAVRAO",
+      "origem_revisao": "https://github.com/unb-mds/2026-02-UnDb/pull/258#discussion_r4580253635",
+      "texto_escapado": "me\\ufe0frda",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "P34",
+      "grupo": "positivo",
+      "tecnica": "marca_mn_classe_zero",
+      "texto": "me͏rda",
+      "categoria_esperada": "PALAVRAO",
+      "origem_revisao": "https://github.com/unb-mds/2026-02-UnDb/pull/258#discussion_r4580253635",
+      "texto_escapado": "me\\u034frda",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "FN"
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "TP"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": "TP"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "N01",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "A didática foi ruim; não recomendo.",
+      "categoria_esperada": null,
+      "texto_escapado": "A did\\xe1tica foi ruim; n\\xe3o recomendo.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N02",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "As provas cobraram assuntos ausentes das aulas.",
+      "categoria_esperada": null,
+      "texto_escapado": "As provas cobraram assuntos ausentes das aulas.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N03",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "A organização da disciplina foi péssima.",
+      "categoria_esperada": null,
+      "texto_escapado": "A organiza\\xe7\\xe3o da disciplina foi p\\xe9ssima.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N04",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "Reprovei e discordo dos critérios de correção.",
+      "categoria_esperada": null,
+      "texto_escapado": "Reprovei e discordo dos crit\\xe9rios de corre\\xe7\\xe3o.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N05",
+      "grupo": "negativo",
+      "tecnica": "substring",
+      "texto": "A análise discute a imbecilidade do argumento.",
+      "categoria_esperada": null,
+      "texto_escapado": "A an\\xe1lise discute a imbecilidade do argumento.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N06",
+      "grupo": "negativo",
+      "tecnica": "substring",
+      "texto": "O capítulo descreve a anatomia escrotal.",
+      "categoria_esperada": null,
+      "texto_escapado": "O cap\\xedtulo descreve a anatomia escrotal.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N07",
+      "grupo": "negativo",
+      "tecnica": "substring",
+      "texto": "O texto aborda a canalhice como conceito literário.",
+      "categoria_esperada": null,
+      "texto_escapado": "O texto aborda a canalhice como conceito liter\\xe1rio.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N08",
+      "grupo": "negativo",
+      "tecnica": "substring",
+      "texto": "Estudamos a família Otariidae.",
+      "categoria_esperada": null,
+      "texto_escapado": "Estudamos a fam\\xedlia Otariidae.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N09",
+      "grupo": "negativo",
+      "tecnica": "numeros",
+      "texto": "Tirei 4 na P1 e 3 na P2, com média 3,5.",
+      "categoria_esperada": null,
+      "texto_escapado": "Tirei 4 na P1 e 3 na P2, com m\\xe9dia 3,5.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N10",
+      "grupo": "negativo",
+      "tecnica": "numeros",
+      "texto": "A matriz 4 por 3 tem 12 entradas.",
+      "categoria_esperada": null,
+      "texto_escapado": "A matriz 4 por 3 tem 12 entradas.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N11",
+      "grupo": "negativo",
+      "tecnica": "numeros",
+      "texto": "Em 2026.2 cursei CIC0004 e MAT0031.",
+      "categoria_esperada": null,
+      "texto_escapado": "Em 2026.2 cursei CIC0004 e MAT0031.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N12",
+      "grupo": "negativo",
+      "tecnica": "tecnico",
+      "texto": "Usamos C++, C# e Python 3.12 no laboratório.",
+      "categoria_esperada": null,
+      "texto_escapado": "Usamos C++, C# e Python 3.12 no laborat\\xf3rio.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N13",
+      "grupo": "negativo",
+      "tecnica": "separadores",
+      "texto": "A prova separa os itens a, b, c e d.",
+      "categoria_esperada": null,
+      "texto_escapado": "A prova separa os itens a, b, c e d.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N14",
+      "grupo": "negativo",
+      "tecnica": "repeticao",
+      "texto": "O algoritmo processa uma fila e uma pilha.",
+      "categoria_esperada": null,
+      "texto_escapado": "O algoritmo processa uma fila e uma pilha.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N15",
+      "grupo": "negativo",
+      "tecnica": "referencia",
+      "texto": "Conforme o capítulo 3, seção 4, a hipótese foi refutada.",
+      "categoria_esperada": null,
+      "texto_escapado": "Conforme o cap\\xedtulo 3, se\\xe7\\xe3o 4, a hip\\xf3tese foi refutada.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N16",
+      "grupo": "negativo",
+      "tecnica": "unicode_legitimo",
+      "texto": "A função f(x)=αx+β representa o modelo.",
+      "categoria_esperada": null,
+      "texto_escapado": "A fun\\xe7\\xe3o f(x)=\\u03b1x+\\u03b2 representa o modelo.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N17",
+      "grupo": "negativo",
+      "tecnica": "unicode_legitimo",
+      "texto": "A discussão cita ação, órgão e frequência.",
+      "categoria_esperada": null,
+      "texto_escapado": "A discuss\\xe3o cita a\\xe7\\xe3o, \\xf3rg\\xe3o e frequ\\xeancia.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N18",
+      "grupo": "negativo",
+      "tecnica": "invisivel_legitimo",
+      "texto": "A didá​tica precisa melhorar.",
+      "categoria_esperada": null,
+      "texto_escapado": "A did\\xe1\\u200btica precisa melhorar.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N19",
+      "grupo": "negativo",
+      "tecnica": "limite_palavra",
+      "texto": "Usamos a variável prefixo_merda_sufixo no exercício de strings.",
+      "categoria_esperada": null,
+      "texto_escapado": "Usamos a vari\\xe1vel prefixo_merda_sufixo no exerc\\xedcio de strings.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N20",
+      "grupo": "negativo",
+      "tecnica": "identificador_leet",
+      "texto": "A variável m3rda armazena o resultado da matriz no exemplo.",
+      "categoria_esperada": null,
+      "texto_escapado": "A vari\\xe1vel m3rda armazena o resultado da matriz no exemplo.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "FP"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "FP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N21",
+      "grupo": "negativo",
+      "tecnica": "identificador_4",
+      "texto": "No exercício, m4rda é o código de uma célula.",
+      "categoria_esperada": null,
+      "texto_escapado": "No exerc\\xedcio, m4rda \\xe9 o c\\xf3digo de uma c\\xe9lula.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": "FP"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N22",
+      "grupo": "negativo",
+      "tecnica": "critica",
+      "texto": "O material é insuficiente e as aulas são confusas.",
+      "categoria_esperada": null,
+      "texto_escapado": "O material \\xe9 insuficiente e as aulas s\\xe3o confusas.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N23",
+      "grupo": "negativo",
+      "tecnica": "referencia",
+      "texto": "A bibliografia inclui o artigo intitulado Crítica da razão pura.",
+      "categoria_esperada": null,
+      "texto_escapado": "A bibliografia inclui o artigo intitulado Cr\\xedtica da raz\\xe3o pura.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "N24",
+      "grupo": "negativo",
+      "tecnica": "numeros",
+      "texto": "A conversão hexadecimal usa 0x4A e 0x3E.",
+      "categoria_esperada": null,
+      "texto_escapado": "A convers\\xe3o hexadecimal usa 0x4A e 0x3E.",
+      "decisao_esperada_proposta": "PUBLICADO",
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": "TN"
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": "TN"
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": "PUBLICADO",
+          "divergencia": false,
+          "erro": "TN"
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "C01",
+      "grupo": "contextual",
+      "tecnica": "citacao",
+      "texto": "O texto cita a palavra merda para analisar linguagem.",
+      "categoria_esperada": "PALAVRAO",
+      "decisao_esperada": "PENDENTE",
+      "texto_escapado": "O texto cita a palavra merda para analisar linguagem.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "invisiveis": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "unicode": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "leet_contextual": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "PALAVRAO"
+          ],
+          "erro": null
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "C02",
+      "grupo": "contextual",
+      "tecnica": "negacao",
+      "texto": "Não chame ninguém de idiota.",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "decisao_esperada": "PENDENTE",
+      "texto_escapado": "N\\xe3o chame ningu\\xe9m de idiota.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "invisiveis": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "unicode": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "leet_contextual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "C03",
+      "grupo": "contextual",
+      "tecnica": "tecnico",
+      "texto": "O escroto foi descrito no material de anatomia.",
+      "categoria_esperada": "XINGAMENTO",
+      "decisao_esperada": "PENDENTE",
+      "texto_escapado": "O escroto foi descrito no material de anatomia.",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "invisiveis": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "unicode": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "leet_contextual": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "XINGAMENTO"
+          ],
+          "erro": null
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "C04",
+      "grupo": "contextual",
+      "tecnica": "ambiguidade",
+      "texto": "Essa prova foi de matar.",
+      "categoria_esperada": null,
+      "decisao_esperada": null,
+      "texto_escapado": "Essa prova foi de matar.",
+      "decisao_esperada_proposta": null,
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": null
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": null
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": null
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": null
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": null
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": null
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": null
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": null
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": null,
+          "divergencia": null,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": null,
+          "divergencia": null,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    },
+    {
+      "id": "C05",
+      "grupo": "contextual",
+      "tecnica": "ambiguidade",
+      "texto": "O argumento foi idiota ou apenas equivocado?",
+      "categoria_esperada": "OFENSA_PESSOAL",
+      "decisao_esperada": "PENDENTE",
+      "texto_escapado": "O argumento foi idiota ou apenas equivocado?",
+      "decisao_esperada_proposta": "PENDENTE",
+      "local": {
+        "atual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "busca_nfkd": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "invisiveis": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "unicode": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "separadores_repeticoes": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "leet_contextual": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "leet_4_como_e": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        },
+        "complementar_implementado": {
+          "categorias": [
+            "OFENSA_PESSOAL"
+          ],
+          "erro": null
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false,
+          "decisao_esperada_proposta": "PENDENTE",
+          "divergencia": false,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": false
+        }
+      }
+    },
+    {
+      "id": "C06",
+      "grupo": "contextual",
+      "tecnica": "ambiguidade",
+      "texto": "A aula foi um lixo.",
+      "categoria_esperada": null,
+      "decisao_esperada": null,
+      "texto_escapado": "A aula foi um lixo.",
+      "decisao_esperada_proposta": null,
+      "local": {
+        "atual": {
+          "categorias": [],
+          "erro": null
+        },
+        "busca_nfkd": {
+          "categorias": [],
+          "erro": null
+        },
+        "invisiveis": {
+          "categorias": [],
+          "erro": null
+        },
+        "unicode": {
+          "categorias": [],
+          "erro": null
+        },
+        "separadores_repeticoes": {
+          "categorias": [],
+          "erro": null
+        },
+        "leet_contextual": {
+          "categorias": [],
+          "erro": null
+        },
+        "leet_4_como_e": {
+          "categorias": [],
+          "erro": null
+        },
+        "complementar_implementado": {
+          "categorias": [],
+          "erro": null
+        }
+      },
+      "barreira_privacidade": false,
+      "ia_real": {
+        "status": "NAO_EXECUTADA",
+        "sinalizado": null,
+        "modelo_retornado": null
+      },
+      "triagem_combinada_real": {
+        "decisao_obtida": null,
+        "erro": null
+      },
+      "controle_fluxo_atual": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": null,
+          "divergencia": null,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      },
+      "controle_fluxo_complementar": {
+        "sem_sinal": {
+          "estado_simulado": "PUBLICADO",
+          "ia_mock_chamada": true,
+          "decisao_esperada_proposta": null,
+          "divergencia": null,
+          "erro": null
+        },
+        "sinal": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        },
+        "falha": {
+          "estado_simulado": "PENDENTE",
+          "ia_mock_chamada": true
+        }
+      }
+    }
+  ]
+}

@@ -1,5 +1,12 @@
 # Detecção de ofensas disfarçadas — avaliação da Issue #252
 
+**Registro histórico da avaliação integrada pela PR #258.** A autorização funcional posterior,
+o atendimento à revisão e os resultados atuais estão no
+[relatório da primeira etapa](implementacao-ofensas-disfarcadas-issue-252.md).
+Os resultados de 62 casos abaixo foram preservados; o corpus atual tem mais dois casos
+da revisão (64 no total). O [corpus original](https://github.com/unb-mds/2026-02-UnDb/blob/a6f6b9ee17486b20f1a00a86c88010e2831a9d0f/docs/estudos/evidencias/issue-252/casos.json)
+está disponível no commit do estudo. As declarações de pendência deste registro descrevem aquela etapa.
+
 **Data:** 15/11/2026. **Estado:** avaliação exploratória executada; recomendação `Proposed`;
 implementação, critérios e homologação humana `Pending Decision`.
 **Produto:** Nicolas, [@nicolaszanin06](https://github.com/nicolaszanin06).

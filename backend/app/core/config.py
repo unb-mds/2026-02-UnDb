@@ -13,6 +13,9 @@ RESEND_API_KEY = config("RESEND_API_KEY", default="")
 
 # Triagem opcional; publicação automática exige flag própria.
 MODERACAO_FILTRO_ATIVO = config("MODERACAO_FILTRO_ATIVO", default=False, cast=bool)
+# Complemento #252; ativação em produção depende de autorização própria.
+MODERACAO_DISFARCES_ATIVO = config("MODERACAO_DISFARCES_ATIVO", default=False, cast=bool)
+MODERACAO_SUBSTITUICOES_ATIVAS = config("MODERACAO_SUBSTITUICOES_ATIVAS", default=False, cast=bool)
 MODERACAO_IA_ATIVA = config("MODERACAO_IA_ATIVA", default=False, cast=bool)
 MODERACAO_IA_DADOS_APROVADOS = config("MODERACAO_IA_DADOS_APROVADOS", default=False, cast=bool)
 OPENAI_API_KEY = config("OPENAI_API_KEY", default="")

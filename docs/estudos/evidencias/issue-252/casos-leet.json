@@ -1,0 +1,30 @@
+{
+  "estado_rotulos": "propostos; homologacao humana pendente",
+  "origem": "Extensao sintetica autorizada nesta sessao para m3rda, p0rra e substituicoes similares",
+  "casos": [
+    {"id":"L01","grupo":"positivo","texto":"Que p0rra de aula!","categoria_esperada":"PALAVRAO"},
+    {"id":"L02","grupo":"positivo","texto":"P0RR4!","categoria_esperada":"PALAVRAO"},
+    {"id":"L03","grupo":"positivo","texto":"Que m3rd4!","categoria_esperada":"PALAVRAO"},
+    {"id":"L04","grupo":"positivo","texto":"Seu b4b4c4!","categoria_esperada":"XINGAMENTO"},
+    {"id":"L05","grupo":"positivo","texto":"Seu 1d10t4!","categoria_esperada":"OFENSA_PESSOAL"},
+    {"id":"L06","grupo":"positivo","texto":"Seu 0t4r10!","categoria_esperada":"XINGAMENTO"},
+    {"id":"L07","grupo":"positivo","texto":"V41 s3 f0d3r!","categoria_esperada":"XINGAMENTO"},
+    {"id":"L08","grupo":"positivo","texto":"V0u t3 m4t4r!","categoria_esperada":"AMEACA"},
+    {"id":"L09","grupo":"positivo","texto":"Que c4r4lh0!","categoria_esperada":"PALAVRAO"},
+    {"id":"L10","grupo":"positivo","texto":"Que c4c3t3!","categoria_esperada":"PALAVRAO"},
+    {"id":"L11","grupo":"positivo","texto":"P.0.R.R.4!","categoria_esperada":"PALAVRAO"},
+    {"id":"L12","grupo":"positivo","texto":"M\u200b3 R D 4!","categoria_esperada":"PALAVRAO"},
+    {"id":"LN01","grupo":"negativo","texto":"A variável p0rra armazena o resultado da matriz.","categoria_esperada":null},
+    {"id":"LN02","grupo":"negativo","texto":"O identificador 1d10ta pertence ao exemplo de programação.","categoria_esperada":null},
+    {"id":"LN03","grupo":"negativo","texto":"A variável p0rra_total contém a soma.","categoria_esperada":null},
+    {"id":"LN04","grupo":"negativo","texto":"O identificador prefixo_m3rda_sufixo está no exemplo.","categoria_esperada":null},
+    {"id":"LN05","grupo":"negativo","texto":"A matriz 4 por 3 tem 12 entradas.","categoria_esperada":null},
+    {"id":"LN06","grupo":"negativo","texto":"Tirei 3,0 na P1 e 4,0 na P2.","categoria_esperada":null},
+    {"id":"LN07","grupo":"negativo","texto":"Usamos 0, 1, 3, 4, 5 e 7 no exercício.","categoria_esperada":null},
+    {"id":"LN08","grupo":"negativo","texto":"Cursei CIC0004 e MAT0031 em 2026.2.","categoria_esperada":null},
+    {"id":"LN09","grupo":"negativo","texto":"O código m3rdas identifica a coluna da tabela.","categoria_esperada":null},
+    {"id":"LN10","grupo":"negativo","texto":"O identificador c4r4lhometro aparece no exercício de strings.","categoria_esperada":null},
+    {"id":"LN11","grupo":"negativo","texto":"A didática foi ruim e faltou organização nas avaliações.","categoria_esperada":null},
+    {"id":"LN12","grupo":"negativo","texto":"No relatório, m4rda identifica a célula da matriz.","categoria_esperada":null}
+  ]
+}

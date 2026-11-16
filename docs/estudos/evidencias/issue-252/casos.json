@@ -35,6 +35,8 @@
     {"id":"P30","grupo":"positivo","tecnica":"homoglifo_fora_mapa","texto":"Que ᴍerda!","categoria_esperada":"PALAVRAO"},
     {"id":"P31","grupo":"positivo","tecnica":"explicito","texto":"Seu imbecil!","categoria_esperada":"XINGAMENTO"},
     {"id":"P32","grupo":"positivo","tecnica":"pontuacao_fora_limite","texto":"Que m....e....r....d....a!","categoria_esperada":"PALAVRAO"},
+    {"id":"P33","grupo":"positivo","tecnica":"marca_mn_classe_zero","texto":"me\uFE0Frda","categoria_esperada":"PALAVRAO","origem_revisao":"https://github.com/unb-mds/2026-02-UnDb/pull/258#discussion_r4580253635"},
+    {"id":"P34","grupo":"positivo","tecnica":"marca_mn_classe_zero","texto":"me\u034Frda","categoria_esperada":"PALAVRAO","origem_revisao":"https://github.com/unb-mds/2026-02-UnDb/pull/258#discussion_r4580253635"},
     {"id":"N01","grupo":"negativo","tecnica":"critica","texto":"A didática foi ruim; não recomendo.","categoria_esperada":null},
     {"id":"N02","grupo":"negativo","tecnica":"critica","texto":"As provas cobraram assuntos ausentes das aulas.","categoria_esperada":null},
     {"id":"N03","grupo":"negativo","tecnica":"critica","texto":"A organização da disciplina foi péssima.","categoria_esperada":null},

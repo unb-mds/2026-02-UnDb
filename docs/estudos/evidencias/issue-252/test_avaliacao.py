@@ -13,7 +13,9 @@ class BancadaTest(unittest.TestCase):
         self.assertEqual(avaliar.categorias_experimentais("m4rda", "leet_4_como_e"), ["PALAVRAO"])
 
     def test_falha_de_normalizacao_preserva_pendencia(self):
-        with patch.object(avaliar.auto, "categorias_lexicais", side_effect=ValueError("fixture")):
+        with patch.object(
+            avaliar.auto, "categorias_para_triagem", side_effect=ValueError("fixture")
+        ):
             r = avaliar.simular_fluxo("Uma crítica acadêmica.", "sem_sinal")
         self.assertEqual(r, {"estado_simulado": "PENDENTE", "ia_mock_chamada": False})
 

@@ -30,12 +30,15 @@ os.environ.update(
     OPENAI_API_KEY="",
     MODERACAO_AUTOMATICA_ATIVA="False",
     MODERACAO_FILTRO_ATIVO="False",
+    MODERACAO_DISFARCES_ATIVO="False",
+    MODERACAO_SUBSTITUICOES_ATIVAS="False",
     MODERACAO_IA_ATIVA="False",
     MODERACAO_IA_DADOS_APROVADOS="False",
 )
 sys.path.insert(0, str(RAIZ / "backend"))
 
 from app.domain.texto import normalizar_busca  # noqa: E402
+from app.domain.filtro_moderacao import categorias_para_triagem, VERSAO_DISFARCES  # noqa: E402
 from app.domain.triagem_comentario import (  # noqa: E402
     LISTA,
     VERSAO_LISTA,
@@ -110,11 +113,11 @@ def erro_binario(caso, sinal):
     return "TP" if sinal else "TN"
 
 
-def simular_fluxo(texto, cenario):
+def simular_fluxo(texto, cenario, *, disfarces_ativos=False, substituicoes_ativas=False):
     """Executa processar real com repositórios/IA substituídos, sem banco/HTTP.
 
     PUBLICADO significa somente estado de um objeto em memória, não publicação.
-    Nenhum candidato de normalização é injetado no serviço.
+    A flag seleciona o filtro real anterior ou o complemento implementado.
     """
     versao = SimpleNamespace(
         id=uuid4(),
@@ -138,6 +141,12 @@ def simular_fluxo(texto, cenario):
         ):
             stack.enter_context(patch.object(auto.config, flag, True))
         stack.enter_context(patch.object(auto.config, "OPENAI_API_KEY", "fixture-offline"))
+        stack.enter_context(
+            patch.object(auto.config, "MODERACAO_SUBSTITUICOES_ATIVAS", substituicoes_ativas)
+        )
+        stack.enter_context(
+            patch.object(auto.config, "MODERACAO_DISFARCES_ATIVO", disfarces_ativos)
+        )
         stack.enter_context(patch.object(auto.limite, "reservar", return_value=True))
         for nome, retorno in (
             ("obter_por_id", versao),
@@ -183,6 +192,9 @@ def main():
         assert 1 <= len(caso["texto"]) <= 500
         local = {"atual": categorias_lexicais(caso["texto"])}
         local.update({v: categorias_experimentais(caso["texto"], v) for v in VARIANTES})
+        local["complementar_implementado"] = categorias_para_triagem(
+            caso["texto"], disfarces_ativos=True
+        )
         esperado = caso.get(
             "decisao_esperada", "PENDENTE" if caso["grupo"] == "positivo" else "PUBLICADO"
         )
@@ -200,6 +212,10 @@ def main():
             "controle_fluxo_atual": {
                 s: simular_fluxo(caso["texto"], s) for s in ("sem_sinal", "sinal", "falha")
             },
+            "controle_fluxo_complementar": {
+                s: simular_fluxo(caso["texto"], s, disfarces_ativos=True)
+                for s in ("sem_sinal", "sinal", "falha")
+            },
         }
         # Apenas resultado condicional; não mede eficácia da API.
         estado = linha["controle_fluxo_atual"]["sem_sinal"]["estado_simulado"]
@@ -208,12 +224,21 @@ def main():
             divergencia=None if esperado is None else estado != esperado,
             erro=erro_binario(caso, estado == "PENDENTE"),
         )
+        estado_novo = linha["controle_fluxo_complementar"]["sem_sinal"]["estado_simulado"]
+        linha["controle_fluxo_complementar"]["sem_sinal"].update(
+            decisao_esperada_proposta=esperado,
+            divergencia=None if esperado is None else estado_novo != esperado,
+            erro=erro_binario(caso, estado_novo == "PENDENTE"),
+        )
         casos.append(linha)
     fontes = [
         "backend/app/domain/triagem_comentario.py",
         "backend/app/domain/texto.py",
+        "backend/app/domain/filtro_moderacao.py",
+        "backend/app/core/config.py",
         "backend/app/data/termos_moderacao.json",
         "backend/app/services/moderacao_automatica_service.py",
+        "backend/app/services/triagem_service.py",
         "backend/app/services/openai_triagem.py",
         "docs/estudos/evidencias/issue-252/casos.json",
         "docs/estudos/evidencias/issue-252/avaliar.py",
@@ -232,22 +257,26 @@ def main():
         },
         "lista": VERSAO_LISTA,
         "integracao": openai_triagem.VERSAO_INTEGRACAO,
+        "versao_complemento": VERSAO_DISFARCES,
         "modelo_configurado_na_base": "omni-moderation-latest",
         "api_real_chamadas": 0,
         "homologacao_humana": "PENDENTE",
         "composicao": dict(Counter(c["grupo"] for c in casos)),
-        "resumo_local": {v: resumo(casos, v) for v in ("atual", *VARIANTES)},
+        "resumo_local": {
+            v: resumo(casos, v) for v in ("atual", *VARIANTES, "complementar_implementado")
+        },
         "casos": casos,
     }
-    (PASTA / "resultados.json").write_text(
+    (PASTA / "resultados-etapa1.json").write_text(
         json.dumps(dados, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     linhas = [
-        "# Resultados exploratórios — Issue #252\n",
-        "[Relatório técnico](../../avaliacao-ofensas-disfarcadas-issue-252.md) · "
-        "[Dados completos](resultados.json) · [Corpus](casos.json)\n",
+        "# Resultados da etapa inicial — Issue #252\n",
+        "[Relatório da implementação](../../implementacao-ofensas-disfarcadas-issue-252.md) · "
+        "[Dados completos](resultados-etapa1.json) · [Corpus](casos.json)\n",
         "Rótulos propostos; revisão humana pendente. API real e triagem real não executadas. "
-        "Os três controles usam mocks e o serviço atual; não medem qualidade da IA.\n",
+        "Os controles usam mocks e o serviço real com o complemento ligado/desligado; "
+        "não medem qualidade da IA. Os candidatos experimentais permanecem para comparação.\n",
         "| Variante local | TP | FN | FP | TN |",
         "|---|---:|---:|---:|---:|",
     ]
@@ -258,8 +287,9 @@ def main():
         "Códigos dos controles: P = PENDENTE, U = PUBLICADO apenas no objeto em memória. "
         "Sempre sem avaliação persistida ou publicada.\n",
         "| ID | Entrada escapada | Grupo | Local atual | Erro local | Esperada proposta | "
-        "IA real / combinada real | Mock sem sinal / sinal / falha |",
-        "|---|---|---|---|---|---|---|---|",
+        "IA real / combinada real | Mock anterior sem sinal / sinal / falha | "
+        "Complemento local / erro | Mock complemento sem sinal / sinal / falha |",
+        "|---|---|---|---|---|---|---|---|---|---|",
     ]
     for c in casos:
         cats = ", ".join(c["local"]["atual"]["categorias"]) or "∅"
@@ -267,12 +297,19 @@ def main():
             "P" if r["estado_simulado"] == "PENDENTE" else "U"
             for r in c["controle_fluxo_atual"].values()
         )
+        estados_novos = " / ".join(
+            "P" if r["estado_simulado"] == "PENDENTE" else "U"
+            for r in c["controle_fluxo_complementar"].values()
+        )
+        novo = c["local"]["complementar_implementado"]
+        cats_novas = ", ".join(novo["categorias"]) or "∅"
         linhas.append(
             f"| {c['id']} | `{c['texto_escapado']}` | {c['grupo']} | {cats} | "
             f"{c['local']['atual']['erro'] or 'contextual'} | "
-            f"{c['decisao_esperada_proposta'] or 'a julgar'} | não executadas | {estados} |"
+            f"{c['decisao_esperada_proposta'] or 'a julgar'} | não executadas | {estados} | "
+            f"{cats_novas} / {novo['erro'] or 'contextual'} | {estados_novos} |"
         )
-    (PASTA / "resultados.md").write_text("\n".join(linhas) + "\n", encoding="utf-8")
+    (PASTA / "resultados-etapa1.md").write_text("\n".join(linhas) + "\n", encoding="utf-8")
     print(json.dumps({"composicao": dados["composicao"], "resumo_local": dados["resumo_local"]}))
 
 
