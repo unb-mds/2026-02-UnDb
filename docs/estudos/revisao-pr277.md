@@ -42,3 +42,57 @@ universal de dados institucionais.
 A #271 continua aberta e a #277 permanece em rascunho. Revisão humana da comunicação,
 validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
+
+## Confronto técnico e verificações
+
+As fórmulas e desempates de Home/Sobre e derivados foram confrontados com
+`app/domain/avaliacoes.py`; mínimo, contagem e ordenação com
+`app/services/avaliacao_service.py`; publicação condicional e pendência humana com
+`app/services/moderacao_automatica_service.py`, todos no backend da base `d99916e`.
+RF01/RF03/RF14, RNF02 e as decisões de agregação/RF20/#239 sustentam essas explicações.
+Não foi confirmado defeito funcional no diff inspecionado.
+
+Ambiente da revisão: Windows, Python 3.14.6 em `venv/Scripts/python.exe`, Node 24.18.0,
+MkDocs 1.6.1 e Next.js 16.3.5. Estes resultados são da revisão local, separados das
+evidências originais de Python 3.12.16 informadas pelo autor na descrição da PR.
+
+| Diretório | Verificação executada | Resultado |
+|---|---|---|
+| frontend | `npm run lint` | Aprovado |
+| frontend | `npm run typecheck` | Aprovado |
+| frontend | `npm run test:coverage` | 83 aprovados, nenhum pulado; sem meta nova de cobertura |
+| frontend | `npm run build -- --webpack` | Aprovado, incluindo TypeScript e geração das páginas |
+| backend | `../venv/Scripts/python.exe -m unittest tests.test_consulta_agregada tests.test_agregacao_avaliacoes -v` | 15 aprovados, incluindo HTTP 0/1/2/3/4; `DEBUG=False`, `SECRET_KEY=review271-synthetic-only`, `DATABASE_URL=sqlite://` |
+| raiz | `venv/Scripts/python.exe -m ruff check backend/tests/test_consulta_agregada.py` | Aprovado |
+| raiz | `venv/Scripts/python.exe -m ruff format --check backend/tests/test_consulta_agregada.py` | Aprovado |
+| raiz | `venv/Scripts/python.exe -m mkdocs build --strict --site-dir site/review-pr277-docs` | Aprovado |
+| raiz | `git diff --check` | Aprovado |
+
+O teste HTTP inicialmente excedeu 30 segundos sob restrição de sockets. O diagnóstico
+com traceback localizou a espera em `socket.accept`, ao criar o loop asyncio do Windows,
+antes de chamar a aplicação. Com acesso à rede local autorizado, os 15 testes passaram
+em menos de um segundo. Não foi necessário alterar o teste nem a aplicação.
+
+O primeiro build Turbopack falhou ao obter Geist/Geist Mono do Google Fonts; com rede
+liberada, houve erro interno na criação do processo PostCSS do Turbopack. O build
+Webpack acima foi a verificação concluída. Nenhuma dependência ou configuração de build
+foi alterada para contornar essas falhas de ambiente.
+
+### Navegador local
+
+Edge headless com o helper existente `frontend/tests/browser-session.mjs`, build
+Webpack e API HTTP sintética local. Um roteiro temporário da revisão, removido após
+execução, visitou Home/Sobre em 320, 640, 768, 1280 e 1440 px, com preferências clara
+e escura: 20 combinações, todas sem overflow horizontal e com um único `h1`. A seção
+metodológica manteve seus seis itens. O tema efetivo continuou escuro nos dois modos,
+conforme o comportamento existente; não foi criado tema novo.
+
+Foram geradas capturas locais e inspecionadas as de Home em 320 px e metodologia em
+320/1440 px. Enter no link da Home navegou para `/sobre#metodologia`; Tab alcançou o
+próximo link, com contorno de foco visível. Resultados e capturas permanecem em
+`site/review-pr277/`, ignorado pelo Git, sem dados reais.
+
+Limites: não executados nesta revisão banco PostgreSQL/migrations, produção, revisão
+jurídica ou aceite humano da comunicação. O teste HTTP usa repositórios sintéticos;
+o navegador usa dados controlados. Esses resultados não comprovam operação do canal
+de titulares nem resolvem a evidência FGA e os insumos da tabela acima.
