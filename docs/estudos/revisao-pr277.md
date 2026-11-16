@@ -51,6 +51,20 @@ Continuam pendentes o aceite dos demais trechos, a revisão jurídica, a concili
 com #264/#265/#268/#269 e a evidência FGA. Esta aprovação não é parecer jurídico,
 aceite integral da #271, aprovação formal da PR ou autorização de merge/ativação.
 
+### A2 — Autoria pública e vínculo interno: aprovado
+
+Em 16/11/2026 (America/Sao_Paulo), Gabriel aprovou explicitamente nesta conversa
+o seguinte texto do cartão de autoria na página Sobre:
+
+> A consulta pública não mostra a identidade da conta autora. O vínculo com a
+> avaliação é mantido internamente; texto livre pode conter pistas de identificação.
+
+Manifestação do solicitante: “Aprovo essa redação. Pode registrar e vamos para a
+próxima pendência.” O aceite editorial se limita a esse trecho já presente na PR.
+Não aprova promessa de anonimato absoluto, não muda permissões de acesso e não
+encerra a revisão de minimização/privacidade da #265 ou a análise jurídica.
+Os demais trechos e encaminhamentos permanecem pendentes conforme seus registros.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
@@ -59,7 +73,7 @@ localizada evidência verificável de data/contexto/consulta em 2026.2. Obter es
 e decidir eventual publicação específica continua com o PO, sem inferir ausência
 universal de dados institucionais.
 
-A #271 continua aberta e a #277 permanece em rascunho. Com exceção do aceite A1 acima,
+A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1 e A2 acima,
 os demais pontos de revisão humana da comunicação,
 validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
