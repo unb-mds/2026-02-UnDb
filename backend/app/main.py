@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import CORS_ORIGINS
+from app.routers import solicitacoes_titulares
 from app.routers import (
     identidade_docente,
     auth,
@@ -14,6 +15,17 @@ from app.routers import (
 )
 
 app = FastAPI(title="G7 - Avaliação de Disciplinas")
+app.include_router(solicitacoes_titulares.router)
+
+
+@app.middleware("http")
+async def proteger_cache_atendimento(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith(("/api/solicitacoes", "/api/atendimento")):
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Referrer-Policy"] = "no-referrer"
+    return response
+
 
 app.add_middleware(
     CORSMiddleware,
