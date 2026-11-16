@@ -190,6 +190,30 @@ conferir evidência real, aprovar o que exigir decisão e ajustar requisitos ant
 implementar comportamentos novos. FGA segue A7. Não houve mudança no produto,
 ativação de serviço, encerramento de issue, aprovação formal ou merge.
 
+### A10 — Resolução técnica e adiamento dos fatos operacionais
+
+Em 16/11/2026, Gabriel pediu resolver todas as pendências segundo os padrões corretos.
+Ao solicitar fatos que o repositório não comprova, informou: “Quem está responsável
+por tudo isso é o membro Nicolas, deixe pendente.” Pediu marcá-lo na PR para responder
+e autorizou avançar nas partes independentes.
+
+[Perguntas publicadas com menção a Nicolas](https://github.com/unb-mds/2026-02-UnDb/pull/277#issuecomment-6917996624).
+Continuam pendentes responsabilidade jurídica/contato, operação/urgências, contratos,
+regiões e retenções reais, sem atribuir qualificação jurídica por esta indicação.
+
+Na retomada, foram concluídos o [inventário técnico](inventario-tecnico-pr277.md), a
+[matriz de acesso e conferência dos 36 casos](verificacao-pendencias-pr277.md) e a
+correção CACHE-277-01 em `8ca99fb`: impedir cache de respostas privadas, sem mudar
+permissões ou campos. É finding do escopo ampliado, não introduzido pelo diff original.
+Teste de regressão reproduziu ausência de cabeçalhos antes da correção; depois,
+136 testes executados, 135 aprovados e um pulado por exigir PostgreSQL descartável.
+Ruff dos arquivos alterados aprovado. Os resultados não comprovam produção, políticas
+jurídicas completas ou execução integral dos cenários operacionais.
+
+O adiamento autorizado vale para a confirmação dos fatos; não encerra as issues nem
+dispensa validação pertinente. Aprovações editoriais anteriores e encaminhamento FGA
+permanecem; sem ativação, revisão formal da PR ou merge.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela

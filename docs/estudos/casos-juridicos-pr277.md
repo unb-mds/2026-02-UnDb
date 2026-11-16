@@ -4,7 +4,10 @@ Data: 16/11/2026 (America/Sao_Paulo). Base documental: `3708fdc` e
 [análise preliminar](revisao-juridica-preliminar-pr277.md). Os códigos S1–S15 abaixo
 remetem às fontes oficiais e aos limites de consulta desse documento.
 
-**Estado de todos os casos: preparado para validação, não executado.** São cenários
+**Estado inicial: preparado para validação, não executado.** Na retomada de 16/11/2026,
+foi feita [conferência documental individual](verificacao-pendencias-pr277.md), com
+testes sintéticos de componentes relacionados e limites explícitos. Isso não equivale
+a executar/aprovar integralmente os 36 casos jurídicos ou operacionais. São cenários
 fictícios para revisão das políticas, procedimentos e futuros testes autorizados.
 Não são resultados de teste, decisões judiciais ou novas regras de produto aprovadas.
 Não usar pessoas, comentários, documentos ou contas reais. Os encaminhamentos são

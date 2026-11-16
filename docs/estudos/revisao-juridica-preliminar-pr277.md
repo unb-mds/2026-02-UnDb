@@ -22,7 +22,7 @@ certificado. A PR melhora a transparência, mas não entrega sozinha a conformid
 A preparação desta análise fica concluída. Permanecem verificações materiais sobre
 agentes de tratamento, bases legais, operação do canal, retenção, contratos e público
 menor de idade. Esses pontos têm destinos na seção 5. Recomendo não ativar ou anunciar
-de controles ainda não homologados. FGA permanece fora da entrega atual, conforme A7.
+controles ainda não homologados. FGA permanece fora da entrega atual, conforme A7.
 
 ## 2. Fontes e limites de consulta
 
@@ -201,6 +201,17 @@ registrar versão, responsável, fonte, evidência e limitações. Recomendo est
 
 Nenhuma aprovação foi presumida. Até lá, estado correto: análise preliminar preparada,
 textos com aceites editoriais, pendências jurídicas/operacionais identificadas.
+
+### Retomada após solicitação de resolução
+
+Em 16/11/2026, Gabriel pediu resolver as pendências e depois determinou deixar os
+fatos operacionais pendentes com Nicolas, que foi
+[marcado na PR com perguntas concretas](https://github.com/unb-mds/2026-02-UnDb/pull/277#issuecomment-6917996624).
+Foram produzidos o [inventário técnico T01–T18](inventario-tecnico-pr277.md) e a
+[verificação itemizada](verificacao-pendencias-pr277.md), com análise documental
+dos 36 casos, testes sintéticos e correção de cache privado em `8ca99fb`.
+Essas evidências complementam esta versão inicial; não transformam J1–J9 em
+conclusões jurídicas aprovadas ou fatos operacionais confirmados.
 
 ### Verificação documental desta preparação
 
