@@ -2,6 +2,7 @@
 
 import asyncio
 import unittest
+from httpx import ASGITransport, AsyncClient
 from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
@@ -9,6 +10,7 @@ from uuid import uuid4
 from sqlalchemy import select
 
 from tests import test_comentario as comentarios
+from app.main import app
 from app.core.security import gerar_hash_token
 from app.models.decisao_moderacao import DecisaoModeracao
 from app.models.enums import EstadoComentario
@@ -157,6 +159,41 @@ class ModeracaoTest(unittest.TestCase):
             )[1],
             [],
         )
+
+    def test_cache_privado_protege_sucesso_e_erros_sem_alterar_rota_publica(self):
+        self.moderador()
+        versao = self.versao()
+
+        async def verificar():
+            async with AsyncClient(
+                transport=ASGITransport(app=app), base_url="http://test"
+            ) as client:
+                for caminho, token, esperado in (
+                    ("/api/moderacao/comentarios", "mod", 200),
+                    ("/api/moderacao/comentarios", None, 401),
+                    ("/api/moderacao/comentarios", self.token, 403),
+                    (f"/api/moderacao/comentarios/{versao.id}", "mod", 200),
+                    (f"/api/moderacao/comentarios/{versao.id}/decisoes", "mod", 200),
+                    ("/api/moderacao/comentarios/invalido", "mod", 422),
+                    (f"/api/moderacao/comentarios/{uuid4()}", "mod", 404),
+                    ("/api/auth/sessao", self.token, 200),
+                    ("/api/comentarios/meu", self.token, 200),
+                    ("/api/agradecimentos", self.token, 200),
+                    ("/api/moderacao/identidades", "mod", 403),
+                    ("/api/atendimento", self.token, 403),
+                    ("/api/solicitacoes/disponibilidade", None, 200),
+                ):
+                    with self.subTest(caminho=caminho, status=esperado):
+                        headers = {"Cookie": f"undb_session={token}"} if token else {}
+                        resposta = await client.get(caminho, headers=headers)
+                        self.assertEqual(resposta.status_code, esperado)
+                        self.assertEqual(resposta.headers.get("Cache-Control"), "no-store")
+                        self.assertEqual(resposta.headers.get("Referrer-Policy"), "no-referrer")
+                publica = await client.get("/health")
+                self.assertEqual(publica.status_code, 200)
+                self.assertNotIn("Cache-Control", publica.headers)
+
+        asyncio.run(verificar())
 
     def test_ac22_04_detalhe_e_historico_sao_restritos_a_moderadores(self):
         moderador = self.moderador()
