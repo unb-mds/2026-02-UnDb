@@ -27,8 +27,8 @@ relaciona os insumos, impactos, destinos e condições de retomada; os checklist
 | PEND-271-TERMOS | [#269](https://github.com/unb-mds/2026-02-UnDb/issues/269#issuecomment-6915806775) | Reutilizar independência, papel complementar, conta confirmada sem prova de experiência e moderação vigente; conciliar com #264/#268 | Aguardando insumo/revisão |
 
 Cada destino deve retomar a #271 ao fornecer o insumo e registrar ajustes/evidências na
-origem, no destino e no épico. PO valida destinos, responsáveis e decisões; os registros
-não designam pessoas nem resolvem pendências funcionais, jurídicas ou operacionais.
+origem, no destino e no épico. Gabriel confirmou destinos e responsáveis em A8;
+as decisões e a execução permanecem pendentes. Os registros não resolvem essas etapas.
 PEND-263-RET/INV/ESC/OPS/ABUSO continuam com seus estados anteriores.
 
 ## Aceites humanos da comunicação
@@ -150,6 +150,23 @@ jurídica pertinente. Responsável e prazo permanecem a definir.
 
 Registro: [encaminhamento na #271](https://github.com/unb-mds/2026-02-UnDb/issues/271#issuecomment-6917262851).
 
+### A8 — Responsáveis pela retomada: confirmado
+
+Em 16/11/2026 (America/Sao_Paulo), Gabriel confirmou: “Confirmo esses responsáveis.
+Pode registrar e vamos para a próxima pendência.”
+
+| Destino | Responsável | Registro |
+|---|---|---|
+| #264 — Moderação e revisão | Warlley | [Confirmação](https://github.com/unb-mds/2026-02-UnDb/issues/264#issuecomment-6917341999) |
+| #265 — Privacidade e minimização | Yasmin | [Confirmação](https://github.com/unb-mds/2026-02-UnDb/issues/265#issuecomment-6917344977) |
+| #268 — Política de Privacidade | Gabriel | [Confirmação](https://github.com/unb-mds/2026-02-UnDb/issues/268#issuecomment-6917346388) |
+| #269 — Termos de Uso | Gabriel | [Confirmação](https://github.com/unb-mds/2026-02-UnDb/issues/269#issuecomment-6917348158) |
+
+O escopo inclui conferir e ajustar Home/Sobre e documentos derivados quando essas
+entregas trouxerem definições aprovadas, com evidências na origem, destino e épico.
+Isso registra a designação por Gabriel, sem presumir aceite individual dos demais.
+Não há prazo novo; execução, revisão jurídica e aprovação das políticas continuam pendentes.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
@@ -157,7 +174,7 @@ correção. A alegação sobre consulta FGA continua omitida do texto público: 
 localizada evidência verificável de data/contexto/consulta em 2026.2. Conforme A7, sua
 retomada é futura, sem bloquear esta PR e sem inferir ausência universal de dados.
 
-A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A6 e do encaminhamento A7,
+A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A6 e dos encaminhamentos A7–A8,
 os demais pontos de revisão humana da comunicação,
 validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
