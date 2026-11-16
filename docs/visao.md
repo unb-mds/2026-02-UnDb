@@ -29,6 +29,23 @@ avaliações que sustenta cada resultado e integra dados institucionais público
 O objetivo é permitir uma decisão de matrícula mais fundamentada,
 **independentemente de quantas pessoas o estudante conheça no curso**.
 
+### Leitura dos resultados e limites
+
+A motivação acadêmica é ampliar o acesso às experiências sem depender de contatos pessoais
+(requisitos §§1–2). O UnDb é um projeto estudantil independente e complementar aos processos
+oficiais; esta apresentação não afirma autorização ou endosso institucional.
+
+Conforme RF08–RF13, RNF02 e decisões da seção 11 dos requisitos, os indicadores são por
+professor–disciplina, sem nota geral; o mínimo de três protege apenas a exibição dos
+indicadores. Contagem e insuficiência permanecem visíveis abaixo dele. Volume de respostas
+não indica qualidade. A metodologia detalhada está nas seções 4–6 de `specs.md` e em `/sobre`.
+
+Opiniões subjetivas, amostras pequenas e mudanças ao longo do tempo limitam a leitura:
+não há garantia de veracidade ou representatividade. A confirmação do e-mail institucional
+não comprova matrícula nem experiência na disciplina (RF01/RF14 e seção 11). A autoria da
+conta não é divulgada publicamente, mas existe associação interna; texto livre e o mínimo
+de três não garantem anonimato (RF20.3/RNF02).
+
 ## 4. Público e partes interessadas
 
 | Público | Necessidade | Papel no produto |
@@ -72,7 +89,9 @@ O objetivo é permitir uma decisão de matrícula mais fundamentada,
 
 - atualização periódica dos dados importados do SIGAA;
 - comentário opcional da avaliação estudante/professor/disciplina, com leitura pública
-  sem autoria identificável e aprovação humana prévia nesta etapa;
+  sem divulgação pública da identidade da conta autora. Com a triagem #239 habilitada,
+  publicação automática somente sem sinais locais/IA; demais casos aguardam revisão humana.
+  Sem habilitação, aprovação humana prévia;
 - denúncia de comentário por usuários autenticados ou visitantes, com origens separadas
   e suspensão após 50 contas distintas com denúncia aberta da mesma versão;
 - fila para aprovação, denúncias e suspensões, com moderadores designados pelo PO,
@@ -161,9 +180,9 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
 - acompanhar a execução e publicação pública conforme o [registro de hospedagem](hospedagem.md),
   incluindo recuperação, tarefas contínuas e promoção das entregas de `develop`;
 - validar os requisitos não-funcionais ainda propostos, exceto o RNF02 já validado.
-- definir a lista do filtro de termos; enquanto isso, manter aprovação humana prévia;
-- avaliar futuramente a moderação por IA sem aprovação humana prévia, sem considerar
-  essa intenção condicional como substituição já aprovada do fluxo inicial.
+- revisar a lista do filtro e os limites da triagem vigente (#239); sinais, falhas, limites
+  e configuração incompleta preservam pendência humana, sem rejeição automática. A ausência
+  de sinais não garante adequação (RF20.4 e evolução da moderação nos requisitos).
 
 ## 10. Releases
 

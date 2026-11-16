@@ -214,7 +214,11 @@ Saída: objeto agregado. Devem ser testáveis unitariamente.
 As regras de agregação, empate e arredondamento foram aprovadas pelo PO e estão registradas
 na seção 11 dos requisitos, incluindo Material por maioria + moda.
 
-`total_avaliacoes` acompanha sempre o agregado (RF09).
+`total_avaliacoes` acompanha sempre o agregado (RF09). Chamada significa controle de
+presença. Dificuldade e Chamada têm apresentação neutra. O desempate de Dificuldade
+é Difícil > Médio > Fácil; o de qualidade do material é Bom > Médio > Ruim.
+Não há nota geral; destaques por quantidade não representam qualidade (restrições de
+produto e decisões da seção 11 de `docs/requisitos.md`).
 
 Se `disponibiliza_material` agregar para `false` ou `CONFLITANTE`,
 `qualidade_material` retorna `null`.
@@ -239,6 +243,13 @@ avaliações, a exibição pode permitir inferir respostas individuais (RNF02).
 **Sem nenhuma avaliação:** o professor continua aparecendo normalmente na busca e na
 comparação, com `total_avaliacoes: 0`. Ausência de avaliação nunca é apresentada como
 avaliação negativa (RF10).
+
+O mínimo aplica-se somente aos indicadores agregados por professor–disciplina, não
+aos comentários, que seguem RF20. A confirmação do e-mail institucional não comprova
+matrícula ou experiência (RF01/RF14); opiniões subjetivas, amostras pequenas e mudanças
+no tempo limitam a interpretação, sem garantia de veracidade ou representatividade.
+A associação interna da conta permanece; ocultação pública e mínimo de três não
+garantem anonimato (RF20.3/RNF02).
 
 O valor `3` é decisão de produto sem origem empírica e pode ser revisto pelo time.
 Manter como constante configurável, nunca espalhado no código.
