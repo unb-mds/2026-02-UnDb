@@ -254,7 +254,8 @@ try {
       return window.fetchOriginal(url, init);
     }`);
     await enviar();
-    await aguardarErroEnvio("Revise os campos: Didática");
+    // O contrato sanitizado da #266 mantém a mensagem genérica, sem identificar campos.
+    await aguardarErroEnvio("Revise as opções da avaliação. Dados inválidos. Confira os campos informados.");
     await avaliar('window.fetch = window.fetchOriginal');
     assert.deepEqual(banco(), []);
     assert.deepEqual(await respostas(), preenchidas);
