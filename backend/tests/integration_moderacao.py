@@ -101,7 +101,9 @@ def main():
     )
 
     def http(method, path, payload=None, conta=None):
-        headers = {"Content-Type": "application/json"}
+        from app.core.config import CORS_ORIGINS
+
+        headers = {"Content-Type": "application/json", "Origin": CORS_ORIGINS[0]}
         if conta is not None:
             headers["Cookie"] = f"undb_session={contas[conta][1]}"
         request = Request(

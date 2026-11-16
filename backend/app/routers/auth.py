@@ -111,7 +111,7 @@ def recuperar_senha(
         auth_service.solicitar_recuperacao_senha(session, dados.email, email_sender)
     except EmailDeliveryError:
         # Não diferenciar conta existente nem expor detalhes do provedor.
-        logging.getLogger(__name__).error("Falha no envio de recuperação de senha.")
+        logging.getLogger(__name__).error("auth.recuperacao.envio_falhou")
     return MensagemResponse(message=auth_service.RECUPERACAO_MESSAGE)
 
 

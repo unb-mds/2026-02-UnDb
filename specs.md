@@ -1,5 +1,16 @@
 # specs.md — Especificação de implementação
 
+## Proteção de origens — #266
+
+Derivada da restrição transversal aprovada em `docs/requisitos.md` em 16/11/2026.
+Antes dos efeitos de POST/PUT/PATCH/DELETE em `/api`, conferir Origin exato na lista
+`CORS_ORIGINS`. Externo, `null`, inválido ou duplicado retorna 403 genérico. Sem Origin,
+validar origem de Referer se presente; sem ambos, negar login e operações com cookie
+`undb_session`. Outras operações sem cookie seguem seu contrato. Não inferir origem
+de Host ou cabeçalhos encaminhados; preflight e GET mantêm comportamento existente.
+Frontend usa fetch JSON com credenciais. Esse controle não autentica clientes HTTP,
+não define rate limit e não modifica os atributos/prazos da sessão.
+
 ## Canal de titulares — RF25
 
 Derivado de `docs/requisitos.md`, RF25 (aprovação de Nicolas em 15/11/2026).

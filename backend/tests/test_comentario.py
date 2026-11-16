@@ -148,6 +148,7 @@ class ComentarioHttpIntegrationTest(unittest.TestCase):
         path = url.path
         corpo = json.dumps(payload).encode("utf-8") if payload else b""
         headers = [
+            (b"origin", b"http://localhost:3000"),
             (b"content-type", b"application/json"),
             (b"content-length", str(len(corpo)).encode("ascii")),
         ]

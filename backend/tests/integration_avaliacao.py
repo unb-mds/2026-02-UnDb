@@ -57,7 +57,7 @@ def registros(fixture):
 
 
 def requisicao(path, payload=None, cookie=None):
-    headers = {"Content-Type": "application/json"}
+    headers = {"Content-Type": "application/json", "Origin": "http://localhost:3000"}
     if cookie:
         headers["Cookie"] = cookie
     request = Request(

@@ -3,6 +3,7 @@ from typing import Protocol
 
 import resend
 
+from app.core import config
 from app.core.config import EMAIL_BACKEND, EMAIL_FROM, RESEND_API_KEY
 
 
@@ -20,16 +21,26 @@ class EmailSender(Protocol):
 
 
 class ConsoleEmailSender:
+    def _validar_ambiente(self) -> None:
+        if not config.DEBUG:
+            raise EmailDeliveryError("adaptador console disponível apenas em desenvolvimento")
+
     def enviar_confirmacao(self, destinatario: str, link: str) -> None:
+        self._validar_ambiente()
         logger.warning(
             "EMAIL_BACKEND=console: confirmacao para %s: %s",
             destinatario,
             link,
+            extra={"email_console_local": True},
         )
 
     def enviar_recuperacao_senha(self, destinatario: str, link: str) -> None:
+        self._validar_ambiente()
         logger.warning(
-            "EMAIL_BACKEND=console: recuperacao de senha para %s: %s", destinatario, link
+            "EMAIL_BACKEND=console: recuperacao de senha para %s: %s",
+            destinatario,
+            link,
+            extra={"email_console_local": True},
         )
 
 

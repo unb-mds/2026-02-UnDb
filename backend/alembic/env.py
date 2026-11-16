@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import MIGRATION_DATABASE_URL
 from app.core.database import Base
+from app.core.safe_logging import configurar_logs_seguros
 import app.models  # noqa: F401
 
 config = context.config
@@ -12,6 +13,7 @@ config.set_main_option("sqlalchemy.url", MIGRATION_DATABASE_URL.replace("%", "%%
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+configurar_logs_seguros()
 
 target_metadata = Base.metadata
 
@@ -34,6 +36,7 @@ def run_migrations_online() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        hide_parameters=True,
     )
 
     with connectable.connect() as connection:
@@ -43,7 +46,11 @@ def run_migrations_online() -> None:
             context.run_migrations()
 
 
-if context.is_offline_mode():
-    run_migrations_offline()
-else:
-    run_migrations_online()
+try:
+    if context.is_offline_mode():
+        run_migrations_offline()
+    else:
+        run_migrations_online()
+except Exception:
+    # Alembic CLI escreve tracebacks fora de logging; não revelar URI/driver/parâmetros.
+    raise SystemExit("Migração falhou. Conferir configuração e diagnóstico restrito.") from None

@@ -215,8 +215,8 @@ ColetorOfertas = Callable[[str, str, str], tuple[list[Oferta], int | None]]
 
 
 def _mensagem_erro(erro: Exception) -> str:
-    detalhe = str(erro).strip()
-    return f"{type(erro).__name__}: {detalhe}" if detalhe else type(erro).__name__
+    # Esta string é persistida e impressa pelo comando; não copiar erro de driver/HTTP.
+    return f"{type(erro).__name__}: detalhes internos omitidos"
 
 
 def _rollback_seguro(db: Session) -> str | None:
