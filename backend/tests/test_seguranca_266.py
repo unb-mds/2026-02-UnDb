@@ -152,6 +152,23 @@ class FronteiraHttpTest(unittest.TestCase):
         self.assertIn("Max-Age=0", r.headers["set-cookie"])
         self.assertEqual(r.headers["cache-control"], "no-store")
 
+    def test_observabilidade_http_do_canal_nao_inclui_protocolo_corpo_ou_chave(self):
+        protocolo = "00000000-0000-4000-8000-000000000266"
+        segredo = "texto-e-chave-sinteticos-266"
+        with self.assertLogs("app.http", level="INFO") as logs:
+            r = self.client.post(
+                "/api/solicitacoes/consultar",
+                json={"protocolo": protocolo, "chave": segredo},
+            )
+            self.assertEqual(r.status_code, 422)
+            r = self.client.get(f"/api/atendimento/{protocolo}")
+            self.assertEqual(r.status_code, 401)
+        saida = "\n".join(FormatoSeguro().format(record) for record in logs.records)
+        self.assertNotIn(protocolo, saida)
+        self.assertNotIn(segredo, saida)
+        self.assertIn("/api/atendimento/{protocolo}", saida)
+        self.assertIn("status=422", saida)
+
     def test_origem_rejeitada_nao_renova_sessao(self):
         with patch.object(auth_service, "validar_e_renovar_sessao") as validar:
             r = self.client.post(
@@ -161,7 +178,7 @@ class FronteiraHttpTest(unittest.TestCase):
         self.assertEqual(r.status_code, 403)
         validar.assert_not_called()
 
-    def test_cache_privado_em_erros_de_origem_metodo_e_rota(self):
+    def test_cache_privado_em_erros_de_origem_e_rota(self):
         for prefixo in (
             "/api/auth",
             "/api/avaliacoes",
@@ -173,7 +190,7 @@ class FronteiraHttpTest(unittest.TestCase):
             "/api/atendimento",
         ):
             for metodo, sufixo, headers, esperado in (
-                ("GET", "/rota-inexistente", {}, 404),
+                ("GET", "/rota-inexistente", {}, 401 if prefixo == "/api/atendimento" else 404),
                 ("POST", "/rota-inexistente", {"Origin": "null"}, 403),
             ):
                 with self.subTest(prefixo=prefixo, metodo=metodo):
@@ -201,7 +218,7 @@ class FronteiraHttpTest(unittest.TestCase):
             async def proximo(request):
                 return resposta
 
-            request = Request({"type": "http", "path": caminho, "method": "GET"})
+            request = Request({"type": "http", "path": caminho, "method": "GET", "headers": []})
             r = await proteger_cache_privado(request, proximo)
             self.assertIs(r, resposta)
             self.assertIn("sintetico=valor", r.headers["set-cookie"])
@@ -316,6 +333,31 @@ class OrcamentoTest(unittest.IsolatedAsyncioTestCase):
                 limite_atendimento.limitar(self.request())
             limite_atendimento._janelas.clear()
             limite_atendimento.limitar(self.request())
+
+    def test_capacidade_global_nao_impede_cliente_existente_e_expira(self):
+        # Estado sintético direto; não produz tráfego nem define um limite novo.
+        estado = {f"chave-{i}": (100, 1) for i in range(4095)}
+        with (
+            patch.object(limite_atendimento, "_janelas", estado),
+            patch.object(config, "CANAL_TITULARES_LIMITE_MINUTO", 3),
+            patch.object(limite_atendimento, "monotonic", return_value=100) as relogio,
+        ):
+            limite_atendimento.limitar(self.request())
+            limite_atendimento.limitar(self.request())
+            with self.assertRaises(HTTPException) as erro:
+                limite_atendimento.limitar(self.request("192.0.2.2"))
+            self.assertEqual(erro.exception.status_code, 429)
+            self.assertEqual(erro.exception.headers, {"Retry-After": "60"})
+            self.assertNotIn("192.0.2.2", str(erro.exception.detail))
+            relogio.return_value = 160
+            limite_atendimento.limitar(self.request("192.0.2.2"))
+            self.assertEqual(len(estado), 1)
+
+    def test_falha_local_nao_e_convertida_em_orcamento_livre(self):
+        with patch.object(limite_atendimento, "monotonic", side_effect=RuntimeError("sintetico")):
+            with self.assertRaises(RuntimeError):
+                limite_atendimento.limitar(self.request())
+        self.assertEqual(limite_atendimento._janelas, {})
 
     async def test_cabecalhos_so_alteram_cliente_se_peer_e_confiavel_no_servidor(self):
         clientes = []

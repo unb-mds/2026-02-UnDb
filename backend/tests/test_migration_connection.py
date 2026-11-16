@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 
@@ -34,7 +35,7 @@ class MigrationConnectionTest(unittest.TestCase):
 
     def assert_migrated(self, path):
         self.assertTrue(path.exists())
-        with sqlite3.connect(path) as connection:
+        with closing(sqlite3.connect(path)) as connection:
             self.assertEqual(
                 connection.execute("SELECT version_num FROM alembic_version").fetchone(),
                 ("20260911_01",),
