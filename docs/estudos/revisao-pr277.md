@@ -134,15 +134,30 @@ Manifestação: “Aprovo essa explicação. Pode registrar e vamos para a próx
 O aceite é editorial e não modifica fórmulas, escalas ou ordenação. Revisão jurídica
 e demais encaminhamentos continuam pendentes conforme seus registros.
 
+### A7 — Episódio FGA: encaminhado para entrega futura
+
+Em 16/11/2026 (America/Sao_Paulo), Gabriel decidiu: “Concordo, vamos manter o episódio
+FGA fora do texto público e deixar para uma entrega futura. Pode registrar e vamos
+para a próxima pendência.”
+
+A obtenção/validação e eventual publicação da evidência ficam fora do escopo atual
+da PR #277, sem bloqueá-la. A alegação permanece omitida. Não foi obtida evidência
+nem aprovada conclusão factual sobre disponibilidade de dados institucionais.
+
+Na retomada futura: obter registro da consulta em 2026.2 com data, contexto e resultado,
+validá-lo com o PO, preservar dados pessoais e avaliar publicação específica e análise
+jurídica pertinente. Responsável e prazo permanecem a definir.
+
+Registro: [encaminhamento na #271](https://github.com/unb-mds/2026-02-UnDb/issues/271#issuecomment-6917262851).
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
 correção. A alegação sobre consulta FGA continua omitida do texto público: não foi
-localizada evidência verificável de data/contexto/consulta em 2026.2. Obter essa evidência
-e decidir eventual publicação específica continua com o PO, sem inferir ausência
-universal de dados institucionais.
+localizada evidência verificável de data/contexto/consulta em 2026.2. Conforme A7, sua
+retomada é futura, sem bloquear esta PR e sem inferir ausência universal de dados.
 
-A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A6 acima,
+A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A6 e do encaminhamento A7,
 os demais pontos de revisão humana da comunicação,
 validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
