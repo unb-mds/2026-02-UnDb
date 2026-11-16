@@ -69,6 +69,10 @@ nav:
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:
+      - Comunicação e preparação jurídica — PR 277:
+          - Revisão e aceites: estudos/revisao-pr277.md
+          - Análise preliminar: estudos/revisao-juridica-preliminar-pr277.md
+          - Casos para validação: estudos/casos-juridicos-pr277.md
       - Moderação — avaliação da Issue 252:
           - Ampliação com substituições numéricas: estudos/implementacao-substituicoes-issue-252.md
           - Resultados das substituições: estudos/evidencias/issue-252/resultados-leet.md

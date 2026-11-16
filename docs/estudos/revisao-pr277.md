@@ -167,6 +167,29 @@ entregas trouxerem definições aprovadas, com evidências na origem, destino e 
 Isso registra a designação por Gabriel, sem presumir aceite individual dos demais.
 Não há prazo novo; execução, revisão jurídica e aprovação das políticas continuam pendentes.
 
+### A9 — Preparação jurídica: análise e casos preparados
+
+Em 16/11/2026 (America/Sao_Paulo), Gabriel autorizou preparar os pontos pendentes
+conforme o julgamento técnico: “Pode prepara todos de acordo com o que achar melhor
+e adequado para a situação, de forma que nenhum caso seja esquecido e esteja tudo correto.”
+
+Foram preparados:
+
+- [Análise jurídica preliminar](revisao-juridica-preliminar-pr277.md): fontes oficiais,
+  confronto com o código, quatro temas e nove lacunas J1–J9 com destinos.
+- [Matriz de 36 casos de mesa](casos-juridicos-pr277.md): metodologia, identificação,
+  crítica, abuso, urgências, revisão, IA, direitos, retenção, menores e continuidade.
+
+A autorização permite preparar a análise; não é aceite antecipado de suas conclusões,
+parecer profissional, comprovação de operação ou aprovação de novos requisitos.
+Os casos estão preparados, não executados. Limites de consulta e necessidade de
+reconferência das normas/andamentos de 2026 estão indicados na análise.
+
+J1–J9 permanecem propostas ou decisões pendentes nos destinos. A retomada deve
+conferir evidência real, aprovar o que exigir decisão e ajustar requisitos antes de
+implementar comportamentos novos. FGA segue A7. Não houve mudança no produto,
+ativação de serviço, encerramento de issue, aprovação formal ou merge.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
@@ -176,7 +199,8 @@ retomada é futura, sem bloquear esta PR e sem inferir ausência universal de da
 
 A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A6 e dos encaminhamentos A7–A8,
 os demais pontos de revisão humana da comunicação,
-validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
+validação jurídica especializada e conciliação com políticas futuras continuam pendentes.
+A preparação preliminar A9 não encerra essas etapas. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
 
 ## Confronto técnico e verificações
