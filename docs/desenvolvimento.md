@@ -68,6 +68,12 @@ Por padrão, `EMAIL_BACKEND=console`: após um cadastro válido, o link de confi
 nos logs do backend e pode ser aberto no navegador, sem domínio ou serviço externo. Para
 acompanhar o link:
 
+Esse adaptador exige `DEBUG=True` e uso exclusivamente local com dados sintéticos. A
+[revisão #266](seguranca/revisao-sessoes-abuso-logs-issue-266.md) mantém essa exceção local;
+fora de DEBUG o envio console falha sem registrar destinatário ou token. Não exportar
+esses logs para CI, provedores ou evidências compartilhadas. Login e mutações com cookie
+exigem Origin/Referer autorizado por `CORS_ORIGINS`; clientes de teste também devem enviá-lo.
+
 ```bash
 docker compose --env-file backend/.env logs -f backend
 ```
