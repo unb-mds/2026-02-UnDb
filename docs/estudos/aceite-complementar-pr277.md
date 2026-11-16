@@ -1,7 +1,8 @@
 # Aceite editorial complementar — PR #277
 
 Data: 16/11/2026 (America/Sao_Paulo). Textos conferidos em `c69e660`.
-**Estado: preparado para decisão humana; não aprovado.** Origem: solicitação de Gabriel
+**Estado: aprovado editorialmente por Gabriel em 16/11/2026.** O pacote submetido foi
+`772aac7`; manifestação explícita nesta conversa: “Aprovo E1–E6”. Origem: solicitação de Gabriel
 para resolver pendências que não dependam de Nicolas. Não foi encontrado novo defeito
 técnico nesta conferência. Este pacote delimita o aceite editorial que continuava
 descrito genericamente como “demais trechos”.
@@ -82,12 +83,12 @@ Para conferir as alterações exatas em relação à base da PR:
 - [Specs no commit examinado](https://github.com/unb-mds/2026-02-UnDb/blob/c69e660/specs.md).
 - [Registro dos aceites e evidências](revisao-pr277.md).
 
-## 3. Alcance de uma eventual aprovação
+## 3. Alcance da aprovação
 
-Uma aprovação explícita de **E1–E6** encerra somente o aceite editorial complementar
+A aprovação explícita de **E1–E6** encerrou somente o aceite editorial complementar
 desses textos/derivações. Não é aprovação formal no GitHub, parecer jurídico, aceite
 de políticas futuras, escolha de base legal, autorização de ativação, fechamento de
-issue ou merge. A manifestação humana precisa ser registrada com seu alcance real.
+issue ou merge. A manifestação humana está registrada acima com seu alcance real.
 
 A necessidade de aceite vem do critério da [#271](https://github.com/unb-mds/2026-02-UnDb/issues/271):
 “revisão humana confere rastreabilidade e aprova a comunicação”. Preparar o pacote e
@@ -97,7 +98,7 @@ conferir tecnicamente os textos não substitui essa manifestação.
 
 | Ponto | Quem precisa agir | Parte independente disponível | Limite |
 |---|---|---|---|
-| Aceite editorial complementar | Gabriel | E1–E6 acima, prontos para decisão conjunta | Não inferir aceite da ordem para preparar/resolver |
+| Aceite editorial complementar — concluído | Gabriel | E1–E6 aprovados explicitamente em 16/11/2026 | Aceite limitado ao pacote `772aac7`; não é aprovação de políticas ou merge |
 | Política/revisão/escalonamento, #264 | Warlley, com revisão pertinente | Regras vigentes e roteiro já conferidos na [verificação](verificacao-pendencias-pr277.md) | Novas regras e enquadramento jurídico precisam de decisão; operação/urgências dependem também de Nicolas |
 | Necessidade de campos/acesso, #265 | Yasmin, com decisão competente | Matriz de campos/atores, inventário e correção de cache entregues | RF22 aprova nome/e-mail internamente; remover campos ou mudar permissões exige decisão própria |
 | Revisão jurídica | Pessoa habilitada/designada pela equipe | Análise preliminar, fontes/limites, inventário e 36 casos disponíveis | Não há revisor jurídico designado/aceite identificado neste registro; dados operacionais ainda faltam |

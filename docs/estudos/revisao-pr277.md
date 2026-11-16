@@ -227,6 +227,11 @@ continuavam sob a expressão genérica “demais trechos”. Conferência técni
 manifestação humana complementar ainda pendente. Não foi inferida da solicitação de
 resolver pendências, nem se solicitam novamente os aceites A1–A6.
 
+**Atualização após submissão:** Gabriel respondeu explicitamente “Aprovo E1–E6” ao
+pacote `772aac7`, nesta conversa em 16/11/2026. O aceite editorial complementar está
+concluído. A manifestação foi posterior à preparação e não foi presumida da ordem de
+resolver pendências. Não houve alteração dos textos aprovados ao registrar esse aceite.
+
 Revisão jurídica e definições futuras de #264/#265 também não são atribuições exclusivas
 de Nicolas. Os insumos e encaminhamentos já estão preparados; decisões materiais e
 aprovação formal exigem os respectivos responsáveis. Não há novo requisito, mudança
@@ -239,9 +244,9 @@ correção. A alegação sobre consulta FGA continua omitida do texto público: 
 localizada evidência verificável de data/contexto/consulta em 2026.2. Conforme A7, sua
 retomada é futura, sem bloquear esta PR e sem inferir ausência universal de dados.
 
-A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A6 e dos encaminhamentos A7–A8,
-os demais pontos de revisão humana da comunicação,
-validação jurídica especializada e conciliação com políticas futuras continuam pendentes.
+A #271 continua aberta e a #277 permanece em rascunho. Os aceites editoriais A1–A6 e
+E1–E6, além dos encaminhamentos A7–A8, estão registrados. Validação jurídica
+especializada, aprovação formal da PR e conciliação com políticas futuras continuam pendentes.
 A preparação preliminar A9 não encerra essas etapas. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
 

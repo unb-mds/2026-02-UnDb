@@ -187,8 +187,9 @@ integrações PostgreSQL com sucesso; esse resultado não é atribuído ao novo 
 O [pacote E1–E6](aceite-complementar-pr277.md) delimita o aceite editorial complementar
 da Home, do cartão de moderação do Sobre e dos documentos derivados. Não repete os
 aceites A1–A6. A conferência técnica desses textos e da rastreabilidade foi concluída;
-o aceite humano complementar, a revisão jurídica e a aprovação formal continuam
-dependendo das respectivas pessoas, não exclusivamente de Nicolas.
+Gabriel aprovou explicitamente E1–E6 nesta conversa após examinar o pacote `772aac7`.
+O aceite editorial complementar está concluído. A revisão jurídica e a aprovação
+formal continuam dependendo das respectivas pessoas, não exclusivamente de Nicolas.
 
 Não foram encontradas threads de revisão abertas nem revisões submetidas no GitHub.
 CI do head `c69e6603760a1fce447ea9ae402f5aa18bd7ca3b` aprovado nas execuções
