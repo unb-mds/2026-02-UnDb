@@ -53,6 +53,7 @@ nav:
       - Identidades docentes: identidades-docentes.md
       - Operação do SIGAA: operacao-importacao-sigaa.md
       - Hospedagem e operação pública: hospedagem.md
+      - Continuidade operacional: continuidade-operacional.md
       - Acesso PostgreSQL da API: acesso-postgresql-api.md
       - Inicialização no Render: inicializacao-render.md
   - Releases:
