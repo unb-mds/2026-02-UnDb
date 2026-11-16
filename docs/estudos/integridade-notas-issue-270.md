@@ -18,7 +18,7 @@ A fonte de requisitos continua sendo [docs/requisitos.md](../requisitos.md).
 | 1. Documentar controles e limites | IMPLEMENTÁVEL, somente documentação | RF01–RF03/RF14 e seção 11; #50 integrada pelas PRs #122/#126; código conferido na seção 3 | Nenhuma nova regra necessária; preservar upsert e vínculo professor–disciplina |
 | 2. Propor declaração e implementar conforme aprovação | SOMENTE DOCUMENTAÇÃO/PROPOSTA | A issue autoriza propor; não foi localizada aprovação de apresentação/registro de declaração em requisitos na base consultada | Aprova o texto proposto na seção 4? Quando apresentar e o que registrar, inclusive em substituições e contribuições anteriores? |
 | 3. Sinais, dados mínimos, limiares e responsável | SOMENTE DOCUMENTAÇÃO/PROPOSTA | #261 e #264 abertas; definição operacional coletiva de dados em #260 não aprova sinais nem responsáveis pela revisão numérica | Quais dados/fontes estritamente necessários, critérios e responsável serão aprovados, após avaliação de privacidade? |
-| 4. Contestação numérica e revisão fundamentada | BLOQUEADO | #263 aberta, PR #275 em revisão e não integrada; #264 aberta; nenhuma regra numérica aprovada localizada | Qual regra de revisão numérica complementará o contrato da #263, com manutenção da avaliação e comunicação segura? Integrar o contrato antes de implementar |
+| 4. Contestação numérica e revisão fundamentada | BLOQUEADO | #263 aberta, PR #275 integrada em d99916e; RF25 permite receber e encaminhar, sem alterar notas; #264 aberta e sem regra de revisão numérica aprovada | Qual regra de revisão numérica complementará o contrato da #263, com manutenção da avaliação e comunicação segura? Reutilizar RF25; aprovar regras específicas antes de implementar |
 | 5. Invalidação/reversão e registro restrito | BLOQUEADO | RF20–RF22 preservam notas nas ações textuais; #261/#262/#264 abertas; retenção numérica não aprovada | Quem pode invalidar/restaurar, com quais fundamentos, impedimentos, acesso, evento inicial e prazo de descarte? |
 | 6. Recálculo de indicadores, contagens e destaques | BLOQUEADO | RF08/RF09/RF15, RNF02 e fórmulas vigentes autorizam agregação atual; não autorizam excluir/incluir avaliações por revisão | Qual política de elegibilidade resultará da decisão de invalidação/restauração? Preservar fórmulas e mínimo de três |
 | 7. Cenários sintéticos, falsos positivos e contestação | SOMENTE DOCUMENTAÇÃO/PROPOSTA | Há regressões vigentes; oráculos de fraude e invalidação ainda dependem dos critérios 3–6 | Aprovar casos e resultados esperados antes de automatizar novos cenários; plano na seção 5 |
@@ -35,6 +35,12 @@ aceito por `CONTRIBUTING.md`, criada de `origin/develop@0717614820cb14e31bc928ec
 O endereço antigo do remoto (`unb-mds/G7-2026-2`) e o endereço atual da issue retornaram
 o mesmo SHA de develop; não foi necessário alterar o remoto.
 
+Na conferência final, develop avançou novamente para `d99916e93186864c2769ae95ea577bba477b4e17`
+com o merge da #275. RF25 foi conferido como aprovado para recebimento/encaminhamento,
+sem alterar notas e sem autorizar ativação antes de retenção/configuração. O levantamento
+e os testes abaixo permanecem referidos à base inicial `0717614`; não representam
+reteste do código recém-integrado da #263.
+
 Develop avançou desde a auditoria `7b0bd73`: integrou #259 (detecção textual da #252)
 e #274 (continuidade da #260). Main continua em `a3afa44`. Essas entregas não aprovam
 regras de integridade numérica. A governança vigente atribui decisões sobre dados à equipe
@@ -50,7 +56,7 @@ Estados consultados no GitHub (descrição/estado, sem código de dependências)
 | [#160](https://github.com/unb-mds/2026-02-UnDb/issues/160) e [#161](https://github.com/unb-mds/2026-02-UnDb/issues/161) | Fechadas, concluídas | PR [#192](https://github.com/unb-mds/2026-02-UnDb/pull/192) confirmada merged em develop; denúncias/moderação de texto, critérios estruturados preservados |
 | [#261](https://github.com/unb-mds/2026-02-UnDb/issues/261) | Aberta | Inventário, minimização, bases e fornecedores; insumo de integridade ainda não integrado |
 | [#262](https://github.com/unb-mds/2026-02-UnDb/issues/262) | Aberta | Retenção/exclusão e efeito sobre avaliações/agregados ainda pendentes |
-| [#263](https://github.com/unb-mds/2026-02-UnDb/issues/263) | Aberta; entrega em revisão | PR [#275](https://github.com/unb-mds/2026-02-UnDb/pull/275) aberta, `merged=false`, base develop; descrição registra contrato aprovado, recebimento desligado até retenção/configuração/homologação. Contrato não integrado nesta base; não criar paralelo |
+| [#263](https://github.com/unb-mds/2026-02-UnDb/issues/263) | Aberta; PR integrada na conferência final | PR [#275](https://github.com/unb-mds/2026-02-UnDb/pull/275) fechada, `merged=true`, em d99916e; RF25 aprovado em requisitos. Recebimento ainda condicionado a retenção/configuração/homologação; não criar paralelo |
 | [#264](https://github.com/unb-mds/2026-02-UnDb/issues/264) | Aberta | Governança, revisão e comunicação fundamentada propostas; regras numéricas não integradas |
 | [#268](https://github.com/unb-mds/2026-02-UnDb/issues/268) | Aberta | Política precisa descrever apenas tratamentos reais e aprovados |
 | [#269](https://github.com/unb-mds/2026-02-UnDb/issues/269) | Aberta | Termos/ciência não substituem declaração específica ou prova de experiência |
@@ -114,8 +120,10 @@ PO e à equipe aprovar dados, critérios e limiares com revisão jurídica perti
 Não foram escolhidos sinais, identificadores novos ou valores. Definições sensíveis
 futuras precisam de acesso restrito, sem heurísticas de evasão nesta documentação.
 
-**Contestação/revisão — decisão pendente:** consumir a #263 após integração, sem novo
-contrato paralelo. #264 e o PO precisam aprovar fundamento, impedimentos, encaminhamento,
+**Contestação/revisão — decisão pendente:** reutilizar RF25 da #263 integrado em d99916e,
+sem novo contrato paralelo. RF25 permite pedido de revisão por complemento e resposta
+restrita ao solicitante; não autoriza alterar notas. #264 e o PO precisam aprovar
+fundamento, impedimentos, encaminhamento,
 comunicação segura e possibilidade de manter a avaliação. Discordância, denúncia e
 suspeita não devem ser documentadas como confirmação automática de fraude.
 
@@ -149,11 +157,14 @@ reportar. Casos propostos não comprovam precisão em produção nem eficácia a
 
 ## 6. Retomada e textos para publicação pelo responsável
 
-Pendências recebidas: regras numéricas de #261/#262/#264 e integração de #263.
+Pendências recebidas: regras numéricas de #261/#262/#264 e integração de #263
+(esta última resolvida na conferência final de merge, sem homologar ativação).
 O épico não retornou comentários; os exemplos de execução fora de ordem são exemplos,
-sem evidência de pendência concreta resolvida pela #270. A PR #275 foi conferida somente
-pela descrição/estado: não incorpora por si só revisão numérica e permanece não integrada.
-Nenhuma pendência funcional/jurídica foi declarada resolvida. Foi entregue o diagnóstico
+sem evidência de pendência concreta resolvida pela #270. A PR #275 foi conferida inicialmente
+como aberta e, na conferência final, como integrada em d99916e. Foram lidos somente os
+novos requisitos RF25 e documentos de contrato/continuidade, sem código da dependência.
+O canal não altera notas; as pendências de revisão numérica continuam. Nenhuma pendência
+de política numérica ou jurídica foi declarada resolvida. Foi entregue o diagnóstico
 rastreável que pode alimentar inventário, canal, política, Termos e metodologia.
 
 **Texto para #272 (não publicado por esta execução):**
@@ -161,8 +172,8 @@ rastreável que pode alimentar inventário, canal, política, Termos e metodolog
 > Origem #270: entregue levantamento documental dos controles atuais, portão de
 > aprovação e plano sintético em `docs/estudos/integridade-notas-issue-270.md`.
 > Não há alteração funcional antecipada. Insumos ausentes: minimização/fontes e avaliação
-> de privacidade (#261), retenção e efeito sobre avaliações (#262), contrato integrado de
-> contestação (#263, PR #275 em revisão) e regras/responsável de revisão (#264).
+> de privacidade (#261), retenção e efeito sobre avaliações (#262), ativação/homologação do contrato de
+> contestação (#263, PR #275 já integrada em d99916e) e regras/responsável de revisão (#264).
 > Impacto: declaração, sinais, revisão, invalidação/restauração e recálculo correspondente
 > continuam pendentes; fórmulas e controles atuais preservados. Cada issue fornecedora
 > deve conferir esta entrega ao produzir o insumo e reconciliar documentação, código e
@@ -175,7 +186,7 @@ rastreável que pode alimentar inventário, canal, política, Termos e metodolog
       sinais; fornecer decisão de privacidade à #270 e revisar este diagnóstico.
 - [ ] #262: aprovar retenção/eventos/descarte e efeitos sobre avaliações; reconciliar com
       futura invalidação/reversão da #270, sem ampliar retenção vigente.
-- [ ] #263: depois da integração/homologação do contrato da PR #275, conferir categorias,
+- [ ] #263: com RF25 integrado pela PR #275, após homologação/ativação, conferir categorias,
       encaminhamento de notas e comunicação segura com #270; não criar contrato paralelo.
 - [ ] #264: fornecer regras/responsável/impedimentos e revisão motivada, inclusive manter
       avaliação legítima; depois retomar #270 e conferir testes e comunicação.
@@ -187,8 +198,9 @@ seguem abertas na consulta. Não há ajuste em entrega incompatível identificad
 base; quando produzirem texto/funcionalidade, conferir contra este registro e contra
 requisitos aprovados. Esses encaminhamentos não são critérios funcionais atendidos.
 
-Pendências resolvidas: somente levantamento dos controles e classificação documental.
-Remanescentes: decisões de produto/dados/retenção, validação jurídica, integração do
+Pendências resolvidas: levantamento/classificação documental e confirmação da integração
+do contrato RF25 pela #263; esta entrega apenas reconhece esse insumo, não o reimplementa.
+Remanescentes: decisões de produto/dados/retenção, validação jurídica, homologação/ativação do
 canal e implementação/testes dos comportamentos aprovados posteriormente. Nenhuma issue
 ou comentário externo foi editado; estes textos seguem no PR para publicação humana.
 
