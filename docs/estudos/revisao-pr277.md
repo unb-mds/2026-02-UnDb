@@ -81,6 +81,22 @@ próxima pendência.” O aceite editorial se limita ao parágrafo reproduzido, 
 na PR; não altera autenticação, agregação ou requisitos. Revisão jurídica, evidência
 FGA, demais trechos e encaminhamentos continuam pendentes conforme seus registros.
 
+### A4 — Mínimo de avaliações: aprovado
+
+Em 16/11/2026 (America/Sao_Paulo), Gabriel aprovou explicitamente nesta conversa
+o seguinte parágrafo da seção Metodologia e limites do Sobre:
+
+> Os indicadores são calculados por professor e disciplina. A partir de três
+> avaliações, os critérios agregados ficam disponíveis. Com zero, uma ou duas,
+> mostramos a contagem e a insuficiência de dados, sem valores dos critérios.
+> Esse mínimo se aplica aos indicadores, não à publicação de comentários, e não
+> garante anonimato.
+
+Manifestação do solicitante: “Aprovo essa redação. Pode registrar e vamos para a
+próxima pendência.” Aceite editorial do trecho já presente na PR; preserva o mínimo
+vigente de RNF02 e não altera comentários ou agregação. Revisão jurídica e os demais
+pontos permanecem pendentes conforme seus registros.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
@@ -89,7 +105,7 @@ localizada evidência verificável de data/contexto/consulta em 2026.2. Obter es
 e decidir eventual publicação específica continua com o PO, sem inferir ausência
 universal de dados institucionais.
 
-A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1, A2 e A3 acima,
+A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A4 acima,
 os demais pontos de revisão humana da comunicação,
 validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
