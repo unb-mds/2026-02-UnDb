@@ -97,6 +97,22 @@ próxima pendência.” Aceite editorial do trecho já presente na PR; preserva 
 vigente de RNF02 e não altera comentários ou agregação. Revisão jurídica e os demais
 pontos permanecem pendentes conforme seus registros.
 
+### A5 — Moderação dos comentários: aprovado
+
+Em 16/11/2026 (America/Sao_Paulo), Gabriel aprovou explicitamente nesta conversa
+o seguinte parágrafo da seção Metodologia e limites do Sobre:
+
+> A triagem usa filtro local e IA quando habilitada. Sinais, possível exposição de
+> dados, falhas, limites ou configuração incompleta mantêm o texto pendente para
+> revisão humana; não há rejeição automática. Sem habilitação, a aprovação humana
+> é prévia. A ausência de sinais não garante adequação nem detecção de todo conteúdo
+> problemático. A moderação do texto não altera os critérios estruturados.
+
+Manifestação do solicitante: “Aprovo essa redação. Pode registrar e vamos para a
+próxima pendência.” Aceite editorial do trecho já presente na PR; não altera a
+triagem nem autoriza sua ativação. Política/revisão/escalonamento da #264, análise
+jurídica e demais pontos continuam pendentes conforme seus registros.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
@@ -105,7 +121,7 @@ localizada evidência verificável de data/contexto/consulta em 2026.2. Obter es
 e decidir eventual publicação específica continua com o PO, sem inferir ausência
 universal de dados institucionais.
 
-A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A4 acima,
+A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A5 acima,
 os demais pontos de revisão humana da comunicação,
 validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
