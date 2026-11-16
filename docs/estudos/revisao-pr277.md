@@ -214,6 +214,24 @@ O adiamento autorizado vale para a confirmação dos fatos; não encerra as issu
 dispensa validação pertinente. Aprovações editoriais anteriores e encaminhamento FGA
 permanecem; sem ativação, revisão formal da PR ou merge.
 
+### Conferência de pendências independentes de Nicolas
+
+Em 16/11/2026, Gabriel pediu resolver outras pendências que não dependessem de Nicolas.
+Foram reconferidos o diff editorial, fontes, estado do CI e revisões do GitHub em
+`c69e660`. Não há novo finding técnico confirmado nesta conferência. CI aprovado;
+nenhuma thread de revisão aberta e nenhuma revisão formal submetida.
+
+O [pacote de aceite complementar E1–E6](aceite-complementar-pr277.md) identifica os
+trechos da Home, o cartão de moderação do Sobre e a rastreabilidade dos derivados que
+continuavam sob a expressão genérica “demais trechos”. Conferência técnica concluída;
+manifestação humana complementar ainda pendente. Não foi inferida da solicitação de
+resolver pendências, nem se solicitam novamente os aceites A1–A6.
+
+Revisão jurídica e definições futuras de #264/#265 também não são atribuições exclusivas
+de Nicolas. Os insumos e encaminhamentos já estão preparados; decisões materiais e
+aprovação formal exigem os respectivos responsáveis. Não há novo requisito, mudança
+no produto, ativação ou merge nesta conferência documental.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
