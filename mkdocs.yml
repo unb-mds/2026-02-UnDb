@@ -69,6 +69,7 @@ nav:
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:
+      - Integridade das notas — Issue 270 (decisões pendentes): estudos/integridade-notas-issue-270.md
       - Comunicação e preparação jurídica — PR 277:
           - Revisão e aceites: estudos/revisao-pr277.md
           - Análise preliminar: estudos/revisao-juridica-preliminar-pr277.md
