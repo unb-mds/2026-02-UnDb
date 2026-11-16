@@ -202,7 +202,7 @@ canal e implementação/testes dos comportamentos aprovados posteriormente. Na e
 original não houve edição externa; os registros acima foram publicados durante a revisão
 autorizada. Nenhuma pendência funcional foi resolvida apenas por esses encaminhamentos.
 
-## 7. Verificações desta entrega
+## 7. Verificações da entrega original
 
 Ambiente local: Python 3.12.16 no `backend/.venv`; Node 24.14.1 (CI usa Node 22).
 Ferramentas Ruff, coverage e MkDocs instaladas das listas já versionadas usando `uv pip`,
@@ -239,3 +239,22 @@ A revisão visual em 320/390/768/1440 px não se aplica à entrega documental; f
 interface dependerá dessa checagem. Testes de novos controles continuam condicionados
 às decisões da seção 1. Aceite e merge permanecem humanos.
 
+## 8. Revisão da PR #276 — 16/11/2026
+
+Escopo: os dois arquivos do diff em `c2725ec` contra `develop@d99916e`, incluindo
+controles da seção 3 confrontados com os cinco arquivos de código citados em `0717614`
+(sem alterações nesses arquivos em `d99916e`), requisitos vigentes e RF25 integrado.
+Descrições e comentários da #270, do épico e das dependências de retomada foram conferidos.
+
+Finding confirmado: a seção 6 deixava os registros exigidos pelo fluxo de execução fora
+de ordem da #270 somente como textos para publicação. Sem registro no épico e checklists
+nos destinos, as entregas fornecedoras não recebiam a retomada da #270. Correção em
+`d49c732`: publicação autorizada e conferida dos cinco comentários, com links e estados
+na seção 6.
+
+Verificação local da revisão: `venv/Scripts/python.exe -m mkdocs build --strict --site-dir
+site/review-pr276` e `git diff --check`, na raiz, aprovados com Python 3.14 e MkDocs 1.6.1.
+O build valida a documentação local; o conteúdo dos comentários remotos foi conferido
+separadamente. As suítes e builds da seção 7 são evidências da entrega original, não
+reexecutadas nesta revisão documental. Sem mudança funcional, novos testes, ativação,
+merge ou conclusão da #270.
