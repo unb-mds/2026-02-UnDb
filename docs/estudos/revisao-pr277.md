@@ -31,6 +31,26 @@ origem, no destino e no épico. PO valida destinos, responsáveis e decisões; o
 não designam pessoas nem resolvem pendências funcionais, jurídicas ou operacionais.
 PEND-263-RET/INV/ESC/OPS/ABUSO continuam com seus estados anteriores.
 
+## Aceites humanos da comunicação
+
+### A1 — Independência e papel complementar: aprovado
+
+Em 16/11/2026 (America/Sao_Paulo), Gabriel aprovou explicitamente nesta conversa
+a redação do parágrafo da seção Nossa proposta do Sobre:
+
+> O UnDb é um projeto acadêmico estudantil independente. Sua motivação é facilitar o
+> acesso a experiências que circulam em contatos pessoais. É uma fonte complementar
+> aos processos oficiais de avaliação e matrícula da UnB, sem representar autorização
+> ou endosso institucional.
+
+Manifestação do solicitante: “Aprovo essa redação. Pode registrar e vamos para a
+próxima pendência.” O aceite é editorial, limitado ao trecho reproduzido. O texto já estava na PR;
+este registro não altera código, requisito ou comportamento.
+
+Continuam pendentes o aceite dos demais trechos, a revisão jurídica, a conciliação
+com #264/#265/#268/#269 e a evidência FGA. Esta aprovação não é parecer jurídico,
+aceite integral da #271, aprovação formal da PR ou autorização de merge/ativação.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
@@ -39,7 +59,8 @@ localizada evidência verificável de data/contexto/consulta em 2026.2. Obter es
 e decidir eventual publicação específica continua com o PO, sem inferir ausência
 universal de dados institucionais.
 
-A #271 continua aberta e a #277 permanece em rascunho. Revisão humana da comunicação,
+A #271 continua aberta e a #277 permanece em rascunho. Com exceção do aceite A1 acima,
+os demais pontos de revisão humana da comunicação,
 validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
 
