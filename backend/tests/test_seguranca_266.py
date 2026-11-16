@@ -1,6 +1,7 @@
 """#266: fronteiras HTTP/logs e limitações do orçamento, somente dados sintéticos."""
 
 import logging
+import asyncio
 import os
 import sys
 import unittest
@@ -12,6 +13,7 @@ os.environ.setdefault("SECRET_KEY", "teste-local")
 
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
+from starlette.responses import Response
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
@@ -24,7 +26,7 @@ from app.core.database import Base, engine, get_db
 from app.core.security import gerar_hash_senha
 from app.models.usuario import Usuario
 from app.core.safe_logging import FormatoSeguro
-from app.main import app
+from app.main import app, proteger_cache_privado
 from app.schemas.auth import LoginRequest
 from app.services import auth_service
 from app.services.email_service import ConsoleEmailSender, EmailDeliveryError, ResendEmailSender
@@ -158,6 +160,61 @@ class FronteiraHttpTest(unittest.TestCase):
             )
         self.assertEqual(r.status_code, 403)
         validar.assert_not_called()
+
+    def test_cache_privado_em_erros_de_origem_metodo_e_rota(self):
+        for prefixo in (
+            "/api/auth",
+            "/api/avaliacoes",
+            "/api/comentarios",
+            "/api/agradecimentos",
+            "/api/moderacao",
+            "/api/moderacao/identidades",
+            "/api/solicitacoes",
+            "/api/atendimento",
+        ):
+            for metodo, sufixo, headers, esperado in (
+                ("GET", "/rota-inexistente", {}, 404),
+                ("POST", "/rota-inexistente", {"Origin": "null"}, 403),
+            ):
+                with self.subTest(prefixo=prefixo, metodo=metodo):
+                    r = self.client.request(metodo, prefixo + sufixo, headers=headers)
+                    self.assertEqual(r.status_code, esperado)
+                    self.assertEqual(r.headers["cache-control"], "no-store")
+                    self.assertEqual(r.headers["referrer-policy"], "no-referrer")
+        for caminho in ("/health", "/api/auth-publico", "/api/moderacao-publica"):
+            r = self.client.get(caminho)
+            self.assertNotIn("cache-control", r.headers)
+            self.assertNotIn("referrer-policy", r.headers)
+
+    def test_cache_preserva_cookies_cors_e_outros_cabecalhos(self):
+        async def verificar(caminho):
+            resposta = Response(
+                headers={
+                    "Cache-Control": "public, max-age=60",
+                    "Referrer-Policy": "same-origin",
+                    "Access-Control-Allow-Origin": "https://frontend.example",
+                    "Vary": "Origin",
+                }
+            )
+            resposta.set_cookie("sintetico", "valor", httponly=True)
+
+            async def proximo(request):
+                return resposta
+
+            request = Request({"type": "http", "path": caminho, "method": "GET"})
+            r = await proteger_cache_privado(request, proximo)
+            self.assertIs(r, resposta)
+            self.assertIn("sintetico=valor", r.headers["set-cookie"])
+            self.assertEqual(r.headers["access-control-allow-origin"], "https://frontend.example")
+            self.assertEqual(r.headers["vary"], "Origin")
+            return r
+
+        privado = asyncio.run(verificar("/api/comentarios/meu"))
+        self.assertEqual(privado.headers["cache-control"], "no-store")
+        self.assertEqual(privado.headers["referrer-policy"], "no-referrer")
+        publico = asyncio.run(verificar("/health"))
+        self.assertEqual(publico.headers["cache-control"], "public, max-age=60")
+        self.assertEqual(publico.headers["referrer-policy"], "same-origin")
 
 
 class LogsTest(unittest.TestCase):

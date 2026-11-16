@@ -71,6 +71,7 @@ nav:
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:
+      - Integridade das notas — Issue 270 (decisões pendentes): estudos/integridade-notas-issue-270.md
       - Moderação — avaliação da Issue 252:
           - Ampliação com substituições numéricas: estudos/implementacao-substituicoes-issue-252.md
           - Resultados das substituições: estudos/evidencias/issue-252/resultados-leet.md
@@ -83,6 +84,13 @@ nav:
           - Avaliação técnica: estudos/avaliacao-busca-autocomplete-issue-251.md
           - Casos e medições: estudos/evidencias/issue-251/resultados.md
           - Reprodução e validação: estudos/evidencias/issue-251/reproducao.md
+      - Comunicação e preparação jurídica — PR 277:
+          - Revisão e aceites: estudos/revisao-pr277.md
+          - Análise preliminar: estudos/revisao-juridica-preliminar-pr277.md
+          - Casos para validação: estudos/casos-juridicos-pr277.md
+          - Inventário técnico: estudos/inventario-tecnico-pr277.md
+          - Verificação das pendências: estudos/verificacao-pendencias-pr277.md
+          - Aceite editorial complementar: estudos/aceite-complementar-pr277.md
       - Auditoria e agenda SIGAA — Issue 164: estudos/verificacao-importacao-sigaa-issue-164.md
       - Acesso PostgreSQL — Issue 170: estudos/verificacao-acesso-postgresql-issue-170.md
       - Importação no Neon — 10/11/2026: estudos/importacao-neon-2026-11-10.md
