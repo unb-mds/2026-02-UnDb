@@ -155,11 +155,11 @@ em testes, logs, API pública ou exemplos.
 Não existem resultados de detecção, falsos positivos ou recálculo por invalidação a
 reportar. Casos propostos não comprovam precisão em produção nem eficácia antifraude.
 
-## 6. Retomada e textos para publicação pelo responsável
+## 6. Retomada e registros publicados
 
 Pendências recebidas: regras numéricas de #261/#262/#264 e integração de #263
 (esta última resolvida na conferência final de merge, sem homologar ativação).
-O épico não retornou comentários; os exemplos de execução fora de ordem são exemplos,
+Na consulta inicial, o épico não retornou comentários; os exemplos de execução fora de ordem são exemplos,
 sem evidência de pendência concreta resolvida pela #270. A PR #275 foi conferida inicialmente
 como aberta e, na conferência final, como integrada em d99916e. Foram lidos somente os
 novos requisitos RF25 e documentos de contrato/continuidade, sem código da dependência.
@@ -167,29 +167,26 @@ O canal não altera notas; as pendências de revisão numérica continuam. Nenhu
 de política numérica ou jurídica foi declarada resolvida. Foi entregue o diagnóstico
 rastreável que pode alimentar inventário, canal, política, Termos e metodologia.
 
-**Texto para #272 (não publicado por esta execução):**
+Na revisão de 16/11/2026 (America/Sao_Paulo), o solicitante autorizou explicitamente
+publicar os registros antes preparados como rascunhos. Foram reconferidos os comentários
+do épico e das dependências. O [registro da #263](https://github.com/unb-mds/2026-02-UnDb/issues/272#issuecomment-6905832664)
+já documentava PEND-263-RET/INV/ESC/OPS/ABUSO; os encaminhamentos da #270 abaixo
+complementam esse registro, sem declarar suas pendências resolvidas.
 
-> Origem #270: entregue levantamento documental dos controles atuais, portão de
-> aprovação e plano sintético em `docs/estudos/integridade-notas-issue-270.md`.
-> Não há alteração funcional antecipada. Insumos ausentes: minimização/fontes e avaliação
-> de privacidade (#261), retenção e efeito sobre avaliações (#262), ativação/homologação do contrato de
-> contestação (#263, PR #275 já integrada em d99916e) e regras/responsável de revisão (#264).
-> Impacto: declaração, sinais, revisão, invalidação/restauração e recálculo correspondente
-> continuam pendentes; fórmulas e controles atuais preservados. Cada issue fornecedora
-> deve conferir esta entrega ao produzir o insumo e reconciliar documentação, código e
-> testes da #270 no escopo aprovado. PO valida destino/responsáveis e decisões; nenhuma
-> pendência está resolvida somente por este registro.
+**Registro da #270 no épico:** [pendências e condições de retomada](https://github.com/unb-mds/2026-02-UnDb/issues/272#issuecomment-6915576664).
+Os checklists foram publicados nos destinos e seus conteúdos conferidos após a criação:
 
-**Checklist para as issues fornecedoras (publicação humana):**
+| ID | Insumo / condição de retomada | Checklist no destino | Estado |
+|---|---|---|---|
+| PEND-270-INV | Conferir categorias e necessidade dos dados de integridade antes de propor sinais; fornecer decisão de privacidade à #270 e revisar este diagnóstico | [#261](https://github.com/unb-mds/2026-02-UnDb/issues/261#issuecomment-6915584669) | Aguardando decisão/insumo |
+| PEND-270-RET | Aprovar retenção/eventos/descarte e efeitos sobre avaliações; reconciliar futura invalidação/reversão, sem ampliar retenção vigente | [#262](https://github.com/unb-mds/2026-02-UnDb/issues/262#issuecomment-6915586369) | Aguardando decisão/insumo |
+| PEND-270-CANAL | Com RF25 integrado pela #275, após homologação/ativação, conferir categorias, encaminhamento de notas e comunicação segura; não criar contrato paralelo | [#263](https://github.com/unb-mds/2026-02-UnDb/issues/263#issuecomment-6915587665) | Contrato integrado; operação pendente |
+| PEND-270-REV | Fornecer regras, responsável elegível, impedimentos e revisão motivada, inclusive manutenção de avaliação legítima; retomar testes e comunicação da #270 | [#264](https://github.com/unb-mds/2026-02-UnDb/issues/264#issuecomment-6915588958) | Aguardando decisão/insumo |
 
-- [ ] #261: conferir categorias e necessidade dos dados de integridade antes de propor
-      sinais; fornecer decisão de privacidade à #270 e revisar este diagnóstico.
-- [ ] #262: aprovar retenção/eventos/descarte e efeitos sobre avaliações; reconciliar com
-      futura invalidação/reversão da #270, sem ampliar retenção vigente.
-- [ ] #263: com RF25 integrado pela PR #275, após homologação/ativação, conferir categorias,
-      encaminhamento de notas e comunicação segura com #270; não criar contrato paralelo.
-- [ ] #264: fornecer regras/responsável/impedimentos e revisão motivada, inclusive manter
-      avaliação legítima; depois retomar #270 e conferir testes e comunicação.
+Cada issue fornecedora deve conferir esta entrega ao produzir o insumo e reconciliar
+documentação, código e testes da #270 no escopo aprovado, registrando evidências na
+origem, no destino e no épico. PO valida destino/responsáveis e decisões; publicação
+não cria designação pessoal ou jurídica nem aprova novas regras numéricas.
 
 **Impacto sobre as demais entregas:** #268 não deve anunciar coleta/invalidação futura;
 #269 não deve apresentar declaração ou sanção como existente; #271 pode consumir os
@@ -201,8 +198,9 @@ requisitos aprovados. Esses encaminhamentos não são critérios funcionais aten
 Pendências resolvidas: levantamento/classificação documental e confirmação da integração
 do contrato RF25 pela #263; esta entrega apenas reconhece esse insumo, não o reimplementa.
 Remanescentes: decisões de produto/dados/retenção, validação jurídica, homologação/ativação do
-canal e implementação/testes dos comportamentos aprovados posteriormente. Nenhuma issue
-ou comentário externo foi editado; estes textos seguem no PR para publicação humana.
+canal e implementação/testes dos comportamentos aprovados posteriormente. Na entrega
+original não houve edição externa; os registros acima foram publicados durante a revisão
+autorizada. Nenhuma pendência funcional foi resolvida apenas por esses encaminhamentos.
 
 ## 7. Verificações desta entrega
 
@@ -240,3 +238,4 @@ navegador ou produção. Não há migration, interface ou mudança funcional nes
 A revisão visual em 320/390/768/1440 px não se aplica à entrega documental; futura
 interface dependerá dessa checagem. Testes de novos controles continuam condicionados
 às decisões da seção 1. Aceite e merge permanecem humanos.
+
