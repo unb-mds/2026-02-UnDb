@@ -46,6 +46,10 @@ não comprova matrícula nem experiência na disciplina (RF01/RF14 e seção 11)
 conta não é divulgada publicamente, mas existe associação interna; texto livre e o mínimo
 de três não garantem anonimato (RF20.3/RNF02).
 
+O [registro de revisão da metodologia](estudos/revisao-pr277.md) acompanha os insumos
+pendentes de moderação, privacidade, Política e Termos para retomada pelas entregas
+responsáveis; não substitui a aprovação humana da comunicação.
+
 ## 4. Público e partes interessadas
 
 | Público | Necessidade | Papel no produto |
