@@ -68,6 +68,7 @@ nav:
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:
+      - Integridade das notas — Issue 270 (decisões pendentes): estudos/integridade-notas-issue-270.md
       - Moderação — avaliação da Issue 252:
           - Ampliação com substituições numéricas: estudos/implementacao-substituicoes-issue-252.md
           - Resultados das substituições: estudos/evidencias/issue-252/resultados-leet.md
