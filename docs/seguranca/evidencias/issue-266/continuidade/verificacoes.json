@@ -1,0 +1,84 @@
+{
+  "consultado_em": "2026-11-16T21:57:30.644419+00:00",
+  "base_remota": "757b12cdeaa7d6c061cb40181e346a0bb32063f4",
+  "commits_originais": [
+    "5e5ab50",
+    "dbde820"
+  ],
+  "merge_local": "3a1d46d",
+  "correcoes_regressoes": "9a186d2",
+  "python": [
+    "3.14.7",
+    "3.12.16"
+  ],
+  "postgresql": "16.16 (Windows, portable EDB)",
+  "node": "24.21.0",
+  "npm": "11.19.0",
+  "coverage_backend": "87% (3993 statements, 848 branches)",
+  "fases": [
+    {
+      "comando": "python -m unittest discover -s tests -q (antes das correções)",
+      "resultado": "334; failures=2 errors=2 skipped=2; reproduzido em dbde820"
+    },
+    {
+      "comando": "PYTHONUTF8=1 python -m unittest tests.test_ofensas_disfarcadas -q (antes da correção)",
+      "resultado": "13; OK; padrão cp1252 causava falhas"
+    },
+    {
+      "comando": "python -m unittest discover -s tests -q (3.14.7 final)",
+      "resultado": "341; OK; skipped=2 opcionais PG"
+    },
+    {
+      "comando": "python -m coverage run --branch --source=app -m unittest discover -s tests -q (3.12.16 sem PG)",
+      "resultado": "338; OK; skipped=2; anterior aos três testes adicionais"
+    },
+    {
+      "comando": "python docs/seguranca/evidencias/issue-266/homologar_postgres.py --confirm-disposable-local --password-file .audit-tools/pg-pass.txt",
+      "resultado": "migrações e legados OK; HTTP segurança OK; 341 testes OK sem skips; integrações avaliação/moderação OK; bancos/roles exclusivos removidos"
+    },
+    {
+      "comando": "python -m unittest tests.test_seguranca_266 tests.test_moderacao.ModeracaoTest.test_cache_privado_protege_sucesso_e_erros_sem_alterar_rota_publica tests.test_solicitacoes_titulares -q",
+      "resultado": "30; OK (22 testes de segurança #266 + 1 cache #277 + 7 canal)"
+    },
+    {
+      "comando": "python -m ruff check backend docs/seguranca/evidencias/issue-266/homologar_postgres.py; ruff format --check backend; compileall -q app alembic",
+      "resultado": "OK; 160 arquivos backend formatados"
+    },
+    {
+      "comando": "npm test; npm run lint; npm run typecheck; npm run build -- --webpack",
+      "resultado": "83 testes OK; lint/tipos/build OK"
+    },
+    {
+      "comando": "node tests/seguranca-266-browser.mjs; node tests/recuperacao-senha-browser.mjs",
+      "resultado": "headers/metadados OK; 18 combinações RF24 OK; API fictícia"
+    },
+    {
+      "comando": "npm audit --package-lock-only --ignore-scripts --json; API oficial GitHub advisories",
+      "resultado": "14 nós; 17 advisories; 1 novo GHSA-mfr8-8qww-v76h; nenhuma versão alterada"
+    },
+    {
+      "comando": "pip_audit -r continuidade/python-resolvido.txt --no-deps --disable-pip -f json",
+      "resultado": "35 pacotes runtime 3.12.16; zero advisories conhecidos"
+    },
+    {
+      "comando": "verificar_segredos.py",
+      "resultado": "2384 blobs; zero correspondências nos padrões limitados"
+    },
+    {
+      "comando": "python -m mkdocs build --strict --site-dir site; git diff --check",
+      "resultado": "OK; documentação final com rastreabilidade compilada estritamente"
+    },
+    {
+      "comando": "python -m unittest tests.test_seguranca_266.FronteiraHttpTest.test_erro_interno_generico_e_provedor_sem_corpo -q",
+      "resultado": "OK; assertiva adicional final de Referrer-Policy:no-referrer no erro 500"
+    }
+  ],
+  "nao_homologado": [
+    "CI Linux desta branch (sem push autorizado)",
+    "produção/CDN/proxy/logs/provedores e privilégios reais",
+    "política de limites e falha distribuída",
+    "atualização dirigida de dependências",
+    "bases/retencao/acesso/descarte/backups e validação jurídica"
+  ],
+  "binario_pg_sha256": "5c0d06f3d26a929ecb36dd931409f1e51a4181355794a259b90aae8bffc57a9f"
+}

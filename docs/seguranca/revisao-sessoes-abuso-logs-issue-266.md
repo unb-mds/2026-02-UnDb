@@ -452,3 +452,235 @@ Implementação no commit local `5e5ab50bb8d2e1dca4852a962869a7e799f5ff9b`; docu
 evidências em commit separado. Nenhum push/PR/merge/deploy foi realizado. Os comentários
 explicitam que os arquivos/commit ainda não estão disponíveis no remoto; publicação
 depende de autorização. A develop remota foi reconferida e permaneceu em `d99916e`.
+
+## Continuidade da implementação — 16/11/2026
+
+### Diagnóstico antes das correções desta retomada
+
+Branch `fix/266-sessoes-abuso-logs`, inicialmente limpa em `dbde820`. Os commits
+`5e5ab50` e `dbde820` existem e são ancestrais do HEAD; continuam locais. O fetch
+encontrou `origin/develop@757b12cdeaa7d6c061cb40181e346a0bb32063f4`, 31 commits
+após a base `d99916e`. Nenhuma branch remota da #266 foi localizada. O trabalho de
+outras worktrees e os arquivos locais da #251 foram preservados. O usuário autorizou
+expressamente integrar essa develop por merge **apenas local**, preservando ambos os
+commits. Não há autorização de push, PR, merge remoto ou deploy.
+
+Foram relidas #266/#272 e os comentários de #261/#262/#263/#265/#267/#268/#269/#271,
+além de #275/#277 e seus artefatos. A PR #277 está integrada em `757b12c`: a correção
+`8ca99fb`, antes referida pelo head `c69e660`, amplia o middleware de cache privado.
+O inventário T01–T18 e a matriz J1–J9/C01–C36 são insumos técnicos/documentais,
+sem homologar operação ou validar juridicamente os tratamentos. A #271 está fechada
+editorialmente; os acompanhamentos externos continuam nas issues de destino.
+
+| Item recebido | Classificação inicial e evidência | Encaminhamento autorizado |
+|---|---|---|
+| Sessões, CSRF e sanitização da #266 | Implementados e testados localmente; falta conciliar base e homologar | Preservar comportamento já aprovado e repetir regressões |
+| CACHE-277-01 / #265 | Implementado na develop; conflito textual apenas em `app/main.py` | Conciliar um único middleware com o evento HTTP seguro; reutilizar a regressão da #277 |
+| PEND-263-ABUSO | Parcial: limite compartilhado entre criar/consultar/complementar, por cliente/processo | Retestar proteções e exposição; não ativar canal, novo limite ou infraestrutura |
+| Suíte geral anterior | Reproduzida: 334 testes, duas falhas de corpus e dois erros de cleanup, dois skips | Investigar causa antes de alterar código ou testes |
+| Moderação no Windows | Confirmado: sem `PYTHONUTF8`, encoding padrão cp1252; os 13 testes de disfarces passam com `PYTHONUTF8=1` | Corrigir leitura de dados UTF-8, preservando lista, categorias, limiares e publicação |
+| Cleanup SQLite | Confirmado: `with sqlite3.connect()` encerra transação, não conexão; arquivo segue aberto | Fechar explicitamente o recurso do teste, sem skip nem supressão de erro |
+| Dependências | Inventário anterior disponível; nenhum manifest alterado pela develop recebida | Reconsultar advisories; atualização dirigida ainda depende de destino/responsável pelo PO |
+| PostgreSQL / Python 3.12 | Não homologados na entrega anterior; Docker sem daemon nesta retomada | Procurar ambiente descartável local, sem banco compartilhado |
+| Proxy, CDN, logs e disponibilidade reais | Dependentes de infraestrutura, com Nicolas conforme orientação de Gabriel na #277 | Preparar roteiro de evidências sanitizadas; sem afirmar proteção da borda |
+| Limites e falha do mecanismo | Dependentes de aprovação humana | Manter recomendação e riscos rastreáveis no épico |
+| Bases, retenção, acesso, descarte e backups | Dependentes de validação jurídica e fatos operacionais | Conciliar #261/#262/#267; nenhum prazo ou base legal novo |
+
+As duas famílias de arquivos associadas às quatro falhas não foram alteradas pelos
+commits originais da #266 nem pela develop posterior. Portanto são problemas
+preexistentes, reproduzidos nesta base; os resultados finais e seus limites serão
+registrados abaixo. A análise técnica do Codex não substitui validação jurídica.
+
+### Conciliação da PR #277
+
+**Implementado e testado.** Merge local `3a1d46d`, com pais `dbde820` e `757b12c`:
+preserva os dois commits originais. O único conflito foi em `backend/app/main.py`.
+Conservou-se `proteger_cache_privado` e seu limite de segmento, exatamente com as
+famílias de rotas de `8ca99fb`, acrescido do evento sanitizado `http.resposta` da #266.
+Não há segundo middleware concorrente. A navegação MkDocs, `specs.md` e alterações
+editoriais da develop foram conciliadas automaticamente, preservando a restrição de
+origens já aprovada. Nenhum contrato, campo ou permissão foi alterado nessa integração.
+
+Reutilizada a regressão de cache da #277, cobrindo sucesso e erros 401/403/404/422.
+Adicionadas verificações em todas as famílias privadas para erro de rota e rejeição
+de origem, fronteiras de prefixo público e preservação de Set-Cookie, CORS, Vary e
+cabeçalhos de respostas públicas. O handler 500 da #266 conserva ambos os cabeçalhos,
+mesmo quando a exceção ocorre fora do retorno normal do middleware. Catálogo e saúde
+continuam sem `no-store` forçado por esse mecanismo. Validações 422 têm sua proteção
+própria; isso não autoriza remover os cabeçalhos definidos por endpoints.
+
+### PEND-263-ABUSO: resultado e limite da correção
+
+**Parcialmente resolvida; dependente de infraestrutura e aprovação humana.** Foram
+preservados hash da chave, credencial somente no corpo, controle por sessão confirmada
+e allowlists separadas, separação de histórico público/interno e ativação desligada.
+Criar, consultar e complementar compartilham o mesmo contador. Atendimento é protegido
+por autorização, mas não tem orçamento HTTP específico; não foi criado um valor novo.
+
+`limitar()` usa `request.client.host` após o middleware do servidor; não interpreta
+diretamente X-Forwarded-For. Armazena HMAC do endereço com SECRET_KEY, janela monotônica
+de 60s, configuração existente `CANAL_TITULARES_LIMITE_MINUTO` (default 30) e teto de
+4.096 clientes por processo. O parâmetro temporário entregue na #263 **não** é aceite
+de uma política geral de bloqueio. O lock coordena threads do mesmo processo apenas.
+
+Evidências sintéticas, sem tráfego público: cabeçalho enviado por peer não confiável
+não muda a identidade no Uvicorn; peer configurado como confiável permite reescrita.
+Contador reiniciado ou estado de outra instância concede orçamento novo. Ao lotar a
+capacidade global, cliente novo recebe 429 mesmo sem atingir sua cota; um existente
+ainda abaixo do limite continua e os slots expiram pelo relógio controlado. Isso
+confirma risco de falso positivo em rede compartilhada ou capacidade global, sem
+demonstrar ocorrência no serviço hospedado. A resposta conserva Retry-After e não
+expõe IP/chave. Falha sintética do relógio não é convertida em orçamento livre; não
+simula indisponibilidade de um armazenamento compartilhado ainda inexistente.
+
+O teste HTTP adicional verifica que consulta/atendimento não põem protocolo, chave
+ou corpo nos eventos formatados; erros de contrato continuam genéricos e as rotas
+de atendimento preservam o template. Os testes existentes conferem leitor sem poder
+de resposta, atendente confirmado, chave incorreta, complementos e histórico privado.
+Nenhuma correção adicional no contador foi suficientemente definida/autorizada.
+
+Recomendação para decisão: comparar um controle compartilhado com a infraestrutura
+PostgreSQL já aprovada e um controle de borda do provedor, antes de escolher tecnologia.
+Avaliar atomicidade/janelas, retenção de identificadores mínimos, custo de consulta,
+concorrência e indisponibilidade. Redis não foi introduzido. Definir separadamente
+abertura, consulta, complemento e operação interna, considerando redes compartilhadas,
+recuperação de acesso e alternativa de atendimento. Falha que permite requisições
+mantém acesso legítimo, mas perde proteção; falha que nega pode impedir direitos.
+O PO/responsáveis devem aprovar limites, modo de falha e arquitetura; nem a proposta
+nem este teste encerram PEND-263-ABUSO.
+
+### Diagnóstico das quatro falhas anteriores
+
+**Implementado e testado.** Antes das mudanças desta retomada, reproduzidos 334 testes
+com as duas falhas lexicais e os dois erros de cleanup descritos na entrega parcial.
+Os arquivos envolvidos são idênticos entre `d99916e`, os commits originais e a nova
+develop. A execução antiga de `tests.test_ofensas_disfarcadas` com `PYTHONUTF8=1`
+passou todos os 13 testes, enquanto o padrão local cp1252 reproduziu as duas falhas.
+O JSON UTF-8 era lido pela codificação implícita, corrompendo termo acentuado.
+Correção: `read_text(encoding="utf-8")` na lista e na fixture do comando de avaliação.
+Lista, corpus, categorias, flags, limiares e política de publicação não mudaram.
+Resultado reaproveitável por #239/#252: correção de portabilidade, sem novo sinal.
+
+Nos testes de conexão de migração, `with sqlite3.connect()` gerencia transação e não
+fecha o recurso: ver [documentação Python](https://docs.python.org/3.12/library/sqlite3.html#how-to-use-the-connection-context-manager).
+O Windows recusava excluir o arquivo ainda aberto. `contextlib.closing` encerra a
+conexão antes do cleanup. Nenhum skip, espera arbitrária ou supressão foi adicionado.
+
+Também foi corrigido o adaptador HTTP de `integration_avaliacao`: ele enviava origem
+3000 enquanto o próprio ensaio inicia API/frontend com origem 3100. O cliente agora
+envia a origem legítima do ensaio; o controle CSRF não foi flexibilizado.
+
+### Homologação local e regressões
+
+**Implementado e testado localmente; CI desta branch e produção não homologados.**
+Python 3.12.16 foi obtido pelo uv em diretório isolado, sem registro do Windows/PATH;
+o projeto não passou a depender de uv. O Docker continua sem daemon disponível.
+Foi usado o arquivo portátil oficial PostgreSQL 16.16-1 para Windows, referenciado
+pelo [PostgreSQL](https://www.postgresql.org/download/windows/) e fornecido pela
+[EDB](https://www.enterprisedb.com/download-postgresql-binaries), sem instalar serviço.
+O cluster escutou somente em 127.0.0.1:55466, com senha sintética aleatória não exibida.
+
+O [ensaio reproduzível](evidencias/issue-266/homologar_postgres.py) cria somente bancos
+e roles reservados que ainda não existam, recusa reutilização e remove o que criou.
+Separa owner de migração e papel da aplicação, ambos sem superuser/createdb/createrole;
+o papel de aplicação recebe DML nas tabelas funcionais e USAGE no schema, sem CREATE
+ou DML na tabela do Alembic. Cadastro/confirmação/login/recuperação/logout foram
+exercitados contra esse DB, substituindo apenas o envio externo de e-mail. Inclui
+cookies seguros, CSRF, uso único, revogação das sessões e dos outros links **após a
+troca de senha**, conforme RF24. A solicitação de um segundo link não revoga o primeiro.
+Esses grants são evidência de compatibilidade em teste, não receita aplicada no Neon.
+
+O ciclo executou upgrade/check/downgrade base/upgrade e o fluxo de dados legados do CI,
+com verificação de upgrade/downgrade e schema. A suíte completa foi executada com o
+banco `undb_207_test` exclusivo para os testes de contenção real. Não houve migration
+nova. Evidências agregadas, comandos, versões e limitações ficam em
+[continuidade/README.md](evidencias/issue-266/continuidade/README.md).
+
+| Comando/ambiente desta retomada | Resultado final observado |
+|---|---|
+| `python -m unittest discover -s tests -q`, Python 3.14.7/Windows | 341 testes sem falhas, dois skips opcionais PostgreSQL |
+| `python -m coverage run --branch --source=app -m unittest discover -s tests -q`, Python 3.12.16/PostgreSQL 16.16 | 341 testes aprovados, **zero skips**, 87% de cobertura agregada |
+| Segurança #266 + regressão de cache #277 + canal | 30 testes aprovados, incluindo 22 da #266; 500 genérico também confere no-store/no-referrer |
+| Script de homologação local | 13 etapas de migrações/legado, jornada HTTP segura e integrações HTTP de avaliação/moderação aprovadas; recursos criados removidos, cluster encerrado |
+| `ruff check`, `ruff format --check`, `compileall` | Aprovados; 160 arquivos backend formatados |
+| `npm test`, `npm run lint`, `npm run typecheck`, `npm run build -- --webpack` | 83 testes e demais verificações aprovados |
+| `node tests/seguranca-266-browser.mjs`, `node tests/recuperacao-senha-browser.mjs` | Headers/metadados e 18 combinações RF24 aprovados em API fictícia |
+| `python -m mkdocs build --strict --site-dir site` | Aprovado, sem warning impeditivo; navegação conciliada com #276/#277 |
+| Busca limitada de segredos | 2.384 blobs, zero correspondências; resultado histórico preservado e nova evidência separada |
+
+Não foi possível executar o CI remoto desta branch sem publicação autorizada. O CI
+aprovado da PR #277 é histórico da sua própria versão, não valida os commits da #266.
+Também não foram executados testes de TLS/permissões/observabilidade no Neon ou nos
+provedores publicados, nem restauração de backup. As limitações de infraestrutura
+e validação humana/jurídica abaixo permanecem mesmo após a homologação local.
+
+### Homologação operacional pendente com Nicolas
+
+**Dependente de infraestrutura.** Conforme [orientação registrada na #277](https://github.com/unb-mds/2026-02-UnDb/pull/277#issuecomment-6917996624),
+Nicolas confirma fatos operacionais; a execução local não encerra estas verificações:
+
+| Conferência segura pelo responsável | Evidência sanitizada esperada | Risco se divergir |
+|---|---|---|
+| Caminho navegador → frontend → API, TLS, cookie e CORS | Diagrama/configuração sem valores de segredo; apenas atributos HttpOnly/Secure/SameSite e origem autorizada; não copiar Cookie/Set-Cookie completo | Sessão legítima indisponível ou confiança incorreta entre origens/sites |
+| Peer/proxy e interpretação de headers encaminhados | Comando efetivo e configuração de hosts confiáveis, documentação atual do provedor e teste em staging controlado com endereços sintéticos | Agrupar clientes indevidamente ou aceitar identidade encaminhada não confiável; não habilitar `*` por conveniência |
+| Número de workers/réplicas e reinícios | Quantidades, versão implantada e confirmação de que orçamento é por processo | Orçamento aparente divergente; não prometer cota distribuída |
+| Cache privado na borda | Com conta de teste autorizada, uma consulta legítima e um erro tratado por família: status + somente Cache-Control:no-store e Referrer-Policy:no-referrer; conferir ausência de reaproveitamento entre duas contas de teste | Conteúdo privado persistido/compartilhado; cache local correto não prova CDN |
+| Logs de API/worker/proxy/CDN/build/monitoramento | Lista de fontes, campos habilitados, planos, acesso/exportação, retenção/descarte e amostra somente sintética já sanitizada | URL/token ou corpo registrado fora do formatter, acesso excessivo ou guarda indefinida |
+| DB e migração | Privilégios efetivos/roles sem identificadores de conexão ou senhas; TLS e conexões API/migração separadas conforme #170 | Permissão indevida ou migração executada pelo papel da aplicação |
+| Canal de titulares | Disponibilidade, allowlists efetivas por papel sem publicar UUIDs, titular/substituto/capacidade de urgência e condição de ativação | Atendimento indisponível ou acesso indevido; flag permanece desligada |
+
+Usar staging e contas sintéticas autorizadas, sem teste de carga, cabeçalhos falsificados
+no serviço público ou divulgação de painéis/URLs com dados pessoais. Os registros
+operacionais devem referenciar versão/ambiente/data, sem prometer retenção antes da
+decisão pertinente. Se o responsável não puder verificar algum ponto, mantê-lo aberto.
+
+### Situação das decisões e consumidores
+
+| Item | Classificação nesta retomada | Destino/resultado |
+|---|---|---|
+| CACHE-277-01 | Implementado e testado localmente | #265 (Yasmin, conforme A8), #266 e épico recebem evidência da conciliação; não repetir a correção |
+| Encoding/cleanup e regressões | Implementado e testado | Corrigidos nesta #266; #252 recebe a evidência de portabilidade; nenhuma política de moderação nova |
+| PostgreSQL e Python 3.12 | Implementado e testado em ambiente descartável Windows | CI Linux desta branch depende de publicação autorizada; nenhum run novo foi disparado |
+| PEND-263-ABUSO | Recomendado, aguardando aprovação + dependente de infraestrutura | #263/#266/#272 continuam abertos no acompanhamento, sem declarar orçamento distribuído |
+| Atualização dirigida de dependências | Recomendado, aguardando aprovação de destino/responsável | Anexo atualizado: 17 advisories npm; Next candidato 16.4.5; nenhuma versão alterada |
+| Logs/CDN/proxy/Neon e ativação real | Dependente de infraestrutura | Nicolas conforme orientação de Gabriel; roteiro acima, sem deploy ou ativação |
+| Bases, retenção, acessos, descarte/backups e preservação | Dependente de validação jurídica | #261/#262/#267 devem conciliar inventário T01–T18, #266 e J1–J9/C01–C36; nenhum prazo geral aprovado |
+| Minimização e textos públicos | Insumo técnico; sem necessidade de alteração adicional nesta #266 | #265 e #268/#269 (Gabriel confirmado em A8) consomem cache/logs/fornecedores; retomar Home/Sobre da #271 somente quando suas definições mudarem |
+
+Nenhuma recomendação foi marcada como resolução de implementação, nenhum responsável
+novo foi designado. A revisão não encontrou autorização adicional para limites,
+falha do mecanismo, retenção ou atualização de dependências. A integração e validação
+em produção permanecem distintas da implementação local. A #266 não está integralmente
+concluída enquanto esses critérios relevantes permanecerem sem decisão/evidência.
+
+### Registros desta continuidade e situação final
+
+Comentários publicados e relidos integralmente; conteúdo conferido após gravação:
+
+| Registro | Resultado rastreável |
+|---|---|
+| [Épico #272](https://github.com/unb-mds/2026-02-UnDb/issues/272#issuecomment-6930694269) | Matriz e checklist da retomada; sete linhas reais acrescentadas à tabela de integração do corpo do épico, preservando modelo e demais registros; leitura posterior conferida |
+| [#266](https://github.com/unb-mds/2026-02-UnDb/issues/266#issuecomment-6930716693) | Integração #277, correções, homologação local, advisories e critérios ainda abertos |
+| [#263](https://github.com/unb-mds/2026-02-UnDb/issues/263#issuecomment-6930718232) | PEND-263-ABUSO retomada, parcial e aberta; sem ativação/política nova |
+| [#265](https://github.com/unb-mds/2026-02-UnDb/issues/265#issuecomment-6930719998) | CACHE-277-01 conciliado; checklist para integração e homologação operacional |
+| [#252](https://github.com/unb-mds/2026-02-UnDb/issues/252#issuecomment-6930721909) | Causa de encoding/cleanup e correção local; qualidade/ativação continuam pendentes |
+
+Os checklists já recebidos por #261/#262/#267/#268/#269/#271 foram preservados;
+nenhum novo requisito, prazo ou responsável foi inserido nessas entregas. O registro
+central e a tabela do épico vinculam seus checklists anteriores e os consumidores.
+A #271 permanece fechada editorialmente; não foi reaberta por uma limitação operacional.
+
+Commits locais desta retomada: `3a1d46d` (conciliação com a develop, preservando os
+originais) e `9a186d2` (correções e regressões). Documentação/evidências em commit final
+separado, identificável no histórico da mesma branch. A autoinspeção de review conferiu
+o diff, preservação de controles, escopo, ausência de nova política e rastreabilidade;
+não substitui revisão humana independente. Não houve push, PR, merge remoto ou deploy.
+
+**Situação da #266: bloqueada por decisões humanas, jurídicas ou de infraestrutura
+para seu aceite integral.** O trabalho técnico atualmente autorizado foi implementado
+e testado localmente. Permanecem a decisão de limites/controle compartilhado/falha,
+o encaminhamento da atualização de dependências, as evidências operacionais com Nicolas,
+a validação jurídica e o CI/integração pelo fluxo de publicação autorizado. Não há
+falha geral reproduzida remanescente nesta base, mas isso não certifica segurança
+integral nem conformidade à LGPD. As fontes jurídicas e suas limitações do relatório
+anterior foram preservadas; nenhuma obrigação ou prazo novo foi inferido nesta retomada.

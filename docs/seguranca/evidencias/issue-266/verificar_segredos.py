@@ -1,11 +1,15 @@
 """Inspeção limitada de blobs alcançáveis. Nunca imprime o valor de uma correspondência."""
 
 import json
+import argparse
 import re
 import subprocess
 from pathlib import Path
 
 raiz = Path(__file__).resolve().parents[4]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--output", type=Path, default=Path(__file__).with_name("segredos-resultado.json"))
+saida = parser.parse_args().output
 padroes = {
     "chave_provedor": re.compile(rb"(?:sk-(?:proj-|svcacct-)?[A-Za-z0-9_-]{32,}|re_[A-Za-z0-9]{30,})"),
     "token_github": re.compile(rb"(?:github_pat_[A-Za-z0-9_]{40,}|gh[pousr]_[A-Za-z0-9]{30,})"),
@@ -40,5 +44,6 @@ for oid, caminho in blobs:
 processo.stdin.close()
 processo.wait()
 relatorio = {"escopo": "refs locais alcançáveis por --all; padrões limitados; não é certificação", "blobs_examinados": examinados, "blobs_grandes_nao_analisados": grandes, "ocorrencias_para_revisao": achados}
-Path(__file__).with_name("segredos-resultado.json").write_text(json.dumps(relatorio,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+saida.parent.mkdir(parents=True, exist_ok=True)
+saida.write_text(json.dumps(relatorio,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({"blobs_examinados": examinados, "grandes_nao_analisados": grandes, "ocorrencias_para_revisao": len(achados)}))

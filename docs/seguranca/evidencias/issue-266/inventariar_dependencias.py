@@ -1,6 +1,7 @@
 """Snapshot local, não é lockfile de produção. Executar com a venv da revisão."""
 
 import json
+import argparse
 import sys
 from importlib.metadata import distribution
 from pathlib import Path
@@ -9,8 +10,11 @@ from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 
 raiz = Path(__file__).resolve().parents[4]
-saida = Path(__file__).resolve().parent
-pendentes = [Requirement(linha) for linha in (raiz / "backend/requirements.txt").read_text().splitlines() if linha.strip() and not linha.startswith("#")]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--output-dir", type=Path, default=Path(__file__).resolve().parent)
+saida = parser.parse_args().output_dir
+saida.mkdir(parents=True, exist_ok=True)
+pendentes = [Requirement(linha) for linha in (raiz / "backend/requirements.txt").read_text(encoding="utf-8").splitlines() if linha.strip() and not linha.startswith("#")]
 vistos = set()
 pacotes = {}
 while pendentes:

@@ -90,3 +90,45 @@ não foi criada issue ou atribuído trabalho por suposição. A #266 permanece c
 risco rastreável e sem aceite integral. Mesmo um scanner sem resultados não comprova
 ausência de vulnerabilidades; faltam versões de produção, dependências nativas,
 imagens por digest e validação de condições do provedor.
+
+## Continuidade — nova consulta de 16/11/2026
+
+Preservado o inventário histórico acima. A conciliação com `develop@757b12c` não mudou
+os quatro manifests/lockfiles inventariados: hashes conferidos novamente. O novo
+snapshot foi produzido em **Python 3.12.16/Windows**, a partir dos mesmos requirements
+sem pins: 35 pacotes de runtime, SQLAlchemy **2.1.9** em lugar de 2.1.8. As demais
+versões do inventário de runtime permaneceram iguais; não representa produção nem
+resolve a falta de lock Python. `pip-audit` 2.10.1 retornou zero advisories conhecidos
+também para esse snapshot. Ferramentas de auditoria/uv/coverage ficaram em venvs
+descartáveis, sem inclusão nos requirements do produto.
+
+O lock npm continua com 478 entradas. Nova consulta `npm audit` retornou 14 nós
+afetados (1 crítico, 3 altos, 10 moderados), mas agora **17 advisories distintos**.
+Todos foram reconsultados na API oficial do GitHub: os 16 anteriores mantiveram os
+metadados registrados; um advisory foi publicado na base hoje.
+
+| Pacote/versão | Advisory e gravidade da fonte | Correção e recomendação | Aplicabilidade, risco e validação necessária |
+|---|---|---|---|
+| next 16.3.5 | [GHSA-mfr8-8qww-v76h / CVE-2026-119790](https://github.com/advisories/GHSA-mfr8-8qww-v76h), Medium | Primeira correção **16.4.5**; considerar Next e eslint-config-next 16.4.5 em atualização dirigida, sujeita a nova consulta/compatibilidade | Intervalo afetado ≥16.3.0 e ≤16.4.4. Exige combinação de `use cache`, `unstable_cache()` e root params; nenhuma dessas diretivas/chamadas foi localizada no código versionado atual. Risco de divulgação entre contextos de cache descrito pelo mantenedor; ocorrência no UnDb não demonstrada. Testar build, metadados, imagens, navegação e ausência de mistura entre sessões/caches. |
+
+A recomendação anterior de 16.4.1 era histórica: **não cobre esse novo advisory**.
+Não aplicar `audit fix` indiscriminado. Para os demais pacotes, continuam os candidatos
+do quadro anterior: sharp 0.35.4 → 0.35.5, source-map-js 1.2.1 → 1.2.2,
+zod 4.6.5 → 4.6.6; glob 13.0.6 → 14.0.2 e minimatch 10.2.6 → 11.0.1 precisam
+de atualização do ascendente compatível, com atenção à mudança de major. Os três
+últimos grupos são de ferramentas/dev conforme o lock; conferir cadeia com `npm explain`,
+lint, 83 testes, tipos e build, sem forçar overrides que violem a faixa do ascendente.
+A classificação e condições individuais dos 16 advisories anteriores continuam no
+quadro histórico, não foram substituídas por uma conclusão genérica do scanner.
+
+**Recomendado, aguardando aprovação/encaminhamento:** o feedback atual não define
+destino e responsável da atualização dirigida. Nenhuma versão de produto foi alterada
+nesta retomada. O PO deve confirmar esse encaminhamento e quem fará a revisão antes
+da atualização, com prioridade para Next/sharp no runtime Linux. Não se afirma que o
+runtime hospedado seja igual ao lock nem que uma condição não localizada seja impossível.
+
+Evidências preservadas em [continuidade](evidencias/issue-266/continuidade/README.md):
+inventários Python/npm, resultados brutos dos scanners sem dados de usuários, metadados
+primários sem instruções de exploração e hashes dos manifests. A consulta não audita
+imagem base, binários de produção, sistema operacional, configuração privada ou todos
+os problemas ainda sem advisory. Ausência de achado Python não certifica segurança.

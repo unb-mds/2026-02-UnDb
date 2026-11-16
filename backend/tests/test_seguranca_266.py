@@ -124,6 +124,7 @@ class FronteiraHttpTest(unittest.TestCase):
         self.assertEqual(r.status_code, 500)
         self.assertNotIn(marcador, r.text + str(logs.output))
         self.assertEqual(r.headers["cache-control"], "no-store")
+        self.assertEqual(r.headers["referrer-policy"], "no-referrer")
         with patch(
             "app.services.email_service.resend.Emails.send", side_effect=RuntimeError(marcador)
         ):

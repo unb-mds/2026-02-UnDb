@@ -1,0 +1,74 @@
+[
+  {
+    "postgresql": "16.16",
+    "python": "3.12.16"
+  },
+  {
+    "etapa": "migration-up",
+    "exit_code": 0
+  },
+  {
+    "etapa": "migration-check",
+    "exit_code": 0
+  },
+  {
+    "etapa": "migration-down",
+    "exit_code": 0
+  },
+  {
+    "etapa": "migration-up-repeat",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-down",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-base",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-seed",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-up",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-verify",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-check",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-downgrade",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-verify-down",
+    "exit_code": 0
+  },
+  {
+    "etapa": "legacy-up-final",
+    "exit_code": 0
+  },
+  {
+    "etapa": "http-seguranca",
+    "exit_code": 0
+  },
+  {
+    "etapa": "suite312-postgres",
+    "exit_code": 0
+  },
+  {
+    "etapa": "integracao-avaliacao",
+    "exit_code": 0
+  },
+  {
+    "etapa": "integracao-moderacao",
+    "exit_code": 0
+  }
+]
