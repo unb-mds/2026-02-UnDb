@@ -19,9 +19,21 @@ app.include_router(solicitacoes_titulares.router)
 
 
 @app.middleware("http")
-async def proteger_cache_atendimento(request, call_next):
+async def proteger_cache_privado(request, call_next):
     response = await call_next(request)
-    if request.url.path.startswith(("/api/solicitacoes", "/api/atendimento")):
+    rotas_privadas = (
+        "/api/auth",
+        "/api/avaliacoes",
+        "/api/comentarios",
+        "/api/agradecimentos",
+        "/api/moderacao",
+        "/api/solicitacoes",
+        "/api/atendimento",
+    )
+    if any(
+        request.url.path == rota or request.url.path.startswith(f"{rota}/")
+        for rota in rotas_privadas
+    ):
         response.headers["Cache-Control"] = "no-store"
         response.headers["Referrer-Policy"] = "no-referrer"
     return response
