@@ -113,6 +113,27 @@ próxima pendência.” Aceite editorial do trecho já presente na PR; não alte
 triagem nem autoriza sua ativação. Política/revisão/escalonamento da #264, análise
 jurídica e demais pontos continuam pendentes conforme seus registros.
 
+### A6 — Fórmulas e comparação: aprovado
+
+Em 16/11/2026 (America/Sao_Paulo), Gabriel aprovou explicitamente nesta conversa
+a explicação abaixo, correspondente aos seis itens da metodologia no Sobre:
+
+- Didática: média de 1 a 5, com uma casa decimal e metades arredondadas para cima.
+- Dificuldade: moda, priorizando Difícil, Médio e Fácil no empate.
+- Chamada: controle de presença por maioria, com empate conflitante; chamada e
+  dificuldade são neutras.
+- Material: disponibilidade por maioria, com empate conflitante; qualidade somente
+  com maioria de Sim, usando a moda de quem informou material, com desempate
+  Bom, Médio e Ruim.
+- Recomendação: percentual de Sim arredondado ao inteiro, com metades para cima,
+  sem nota geral.
+- Comparação: recomendação decrescente, quantidade e nome, com insuficientes no final;
+  volume de avaliações não indica qualidade.
+
+Manifestação: “Aprovo essa explicação. Pode registrar e vamos para a próxima pendência.”
+O aceite é editorial e não modifica fórmulas, escalas ou ordenação. Revisão jurídica
+e demais encaminhamentos continuam pendentes conforme seus registros.
+
 ## Limites preservados
 
 Nenhuma fórmula, escala, ordenação, mínimo de exibição ou requisito foi alterado pela
@@ -121,7 +142,7 @@ localizada evidência verificável de data/contexto/consulta em 2026.2. Obter es
 e decidir eventual publicação específica continua com o PO, sem inferir ausência
 universal de dados institucionais.
 
-A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A5 acima,
+A #271 continua aberta e a #277 permanece em rascunho. Com exceção dos aceites A1–A6 acima,
 os demais pontos de revisão humana da comunicação,
 validação jurídica e conciliação com políticas futuras continuam pendentes. O registro
 da revisão não é aprovação dessas decisões nem autorização de merge ou ativação.
