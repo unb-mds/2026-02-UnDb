@@ -1,0 +1,112 @@
+{
+  "estado": "implementado",
+  "registrado_em": "2026-11-17T03:23:42.773620+00:00",
+  "commit_implementacao": "b955912e78cbff23b7ebef6c1f27471d69e6a1ee",
+  "ambiente": "Windows local Python 3.12.16 PostgreSQL 16.16 descartavel loopback, papel API sem DDL",
+  "testes": {
+    "selecionados": 83,
+    "suite_completa": 420,
+    "falhas": 0,
+    "skips_suite": 2,
+    "motivo_skips": "Identidades/reconciliacao exigem undb_207_test separado",
+    "retencao": 14,
+    "relogio": "Simulado na fronteira da janela; SQLite com FKs e PostgreSQL real"
+  },
+  "etapas": [
+    {
+      "etapa": "upgrade",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-bloco1",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-repetido",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "testes-bloco5",
+      "exit_code": 0
+    },
+    {
+      "etapa": "suite-completa",
+      "exit_code": 0
+    },
+    {
+      "etapa": "moderacao-http",
+      "exit_code": 0
+    },
+    {
+      "etapa": "integracao-avaliacao",
+      "exit_code": 0
+    },
+    {
+      "etapa": "integracao-acesso",
+      "exit_code": 0
+    },
+    {
+      "etapa": "limpeza-cli",
+      "exit_code": 0
+    },
+    {
+      "etapa": "purga-cli",
+      "exit_code": 0
+    },
+    {
+      "etapa": "rollback-com-dados",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check-final",
+      "exit_code": 0
+    }
+  ],
+  "checks": {
+    "ruff_check": 0,
+    "ruff_format": 0,
+    "compileall": 0,
+    "mkdocs_strict": 0,
+    "diff_check": 0,
+    "docker_compose_config_quiet": 0
+  },
+  "docker_engine": "Indisponivel localmente; nao executados build/up de containers",
+  "integracoes": "Moderacao, avaliacao e acesso passaram com HTTP real/PostgreSQL; acesso inclui 54 combinacoes e nenhum envio real",
+  "rollback": "Downgrade/reaplicacao com conta excluida sintetica preservou data e credencial NULL; schema check passou",
+  "frontend": "Sem alteracao de produto/dependencias; expectativa desatualizada de 503 no teste jornada-247 corrigida e browser passou usando build existente",
+  "ci_anterior": "Blocos 3/4: falha na expectativa antiga de 503 de jornada-247; demais jobs passaram; novo push pendente de validacao",
+  "ocorrencias": [
+    "Testes antigos de descarte atualizados para remocao definitiva/404 em vez de texto NULL",
+    "Testes de modelo reconhecem novas colunas nulas de estado",
+    "GET para caminho invalido de avaliacao agora encontra rota DELETE e retorna 405 com cache privado"
+  ],
+  "pendencias": [
+    "Base legal/prazo/revisao da conta minima e metadados de rejeicao",
+    "Operacao continua e supervisao do job na hospedagem",
+    "Retencao de backups e registro minimo de exclusoes para reaplicacao apos restauracao",
+    "Blocos 6-8 nao iniciados"
+  ],
+  "producao": "Sem acesso, alteracao ou backup; nenhuma validacao juridica declarada",
+  "frontend_checks": {
+    "npm_run_lint": 0,
+    "npm_run_typecheck": 0,
+    "npm_test": {
+      "total": 91,
+      "falhas": 0
+    },
+    "jornada_247_browser": 0,
+    "build": "Sem novo build; produto frontend inalterado"
+  }
+}
