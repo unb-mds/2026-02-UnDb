@@ -1,5 +1,25 @@
 # 📋 Engenharia de Requisitos — G7
 
+## Restrição transversal de origens — #266
+
+**Validada pelo solicitante em 16/11/2026 nesta conversa**, após apresentação da proposta
+de CSRF no relatório da #266 e resposta explícita “Aprovar a proposta de CSRF”.
+
+Operações mutáveis da API devem rejeitar origem explícita externa, nula ou inválida,
+antes de autenticar/renovar sessão ou produzir efeitos. Somente origens exatas da lista
+autorizada são aceitas. Sem origem explícita, conferir a origem da referência quando
+presente; sem ambas, rejeitar login e operações com cookie de sessão. Demais clientes
+sem cookie podem continuar usando as operações sem metadados de navegador, respeitando
+autenticação/autorização específicas. Não aceitar automaticamente subdomínios, curingas
+ou origens derivadas de cabeçalhos de proxy. Preservar o frontend autorizado e as consultas
+GET conforme seus contratos. Rejeição retorna HTTP 403 sem refletir os cabeçalhos.
+
+Esta decisão não define limites de abuso, nova duração de sessão, retenção ou permissão.
+Origem não autentica clientes HTTP e o controle não impede XSS. Critérios: origens exatas
+autorizadas passam ao fluxo normal; externas/null/malformadas/duplicadas são rejeitadas;
+ausência de metadados com cookie/login é rejeitada; clientes sem cookie nas demais
+operações e preflight legítimo permanecem compatíveis.
+
 ## RF25 — Canal de solicitações de titulares (#263)
 
 Validado por Nicolas nesta conversa em 15/11/2026: disponibilizar formulário sem login

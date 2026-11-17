@@ -34,6 +34,13 @@ O endereço usado é o cliente fornecido pelo servidor, sem interpretar X-Forwar
 diretamente. Validar a configuração de proxy do provedor para não agrupar visitantes.
 Isso complementa, mas não substitui, os controles de abuso da #266.
 
+Retomada de PEND-263-ABUSO: a [revisão #266](seguranca/revisao-sessoes-abuso-logs-issue-266.md)
+verificou autorização, janela, HMAC e isolamento do orçamento com dados sintéticos, e
+sanitizou validação/erros/logs da aplicação. O limite continua por processo; proxies,
+instâncias e logs de borda exigem homologação do operador. A pendência não está encerrada.
+Mutações seguem a restrição de origens aprovada na #266; leitura/consulta por chave mantém
+o contrato do canal. Nenhuma flag de recebimento foi ativada.
+
 Pedidos repetidos geram protocolos independentes, sem revelar se outra pessoa já pediu
 algo sobre o mesmo alvo. Referência indisponível ou evidência insuficiente deve receber
 triagem motivada; o servidor não acessa links fornecidos pelo solicitante.

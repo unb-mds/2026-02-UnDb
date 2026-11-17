@@ -26,7 +26,9 @@ def main():
     ):
         parser.error("configure chave e flags no ambiente privado antes de usar --openai")
     casos = json.loads(
-        (Path(__file__).resolve().parents[2] / "tests/fixtures/triagem_sintetica.json").read_text()
+        (Path(__file__).resolve().parents[2] / "tests/fixtures/triagem_sintetica.json").read_text(
+            encoding="utf-8"
+        )
     )
     totais = {
         "analisados": 0,

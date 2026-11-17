@@ -540,6 +540,7 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
     ) -> tuple[int, dict]:
         corpo = json.dumps(payload).encode("utf-8")
         headers = [
+            (b"origin", b"http://localhost:3000"),
             (b"content-type", b"application/json"),
             (b"content-length", str(len(corpo)).encode("ascii")),
         ]

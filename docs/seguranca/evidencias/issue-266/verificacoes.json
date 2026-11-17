@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-16",
+  "base": "d99916e93186864c2769ae95ea577bba477b4e17",
+  "python": "3.14.7",
+  "node": "24.21.0",
+  "npm": "11.19.0",
+  "tests": [
+    {
+      "cwd": "backend",
+      "command": "python -m unittest tests.test_auth tests.test_recuperacao_senha tests.test_solicitacoes_titulares tests.test_triagem -q",
+      "result": "baseline: 56 testes; sucesso"
+    },
+    {
+      "cwd": "backend",
+      "command": "python -m unittest tests.test_seguranca_266 -q",
+      "result": "17 testes; sucesso"
+    },
+    {
+      "cwd": "backend",
+      "command": "python -m unittest tests.test_auth tests.test_recuperacao_senha tests.test_solicitacoes_titulares tests.test_seguranca_266 tests.test_avaliacao tests.test_comentario tests.test_denuncia tests.test_moderacao tests.test_moderacao_automatica tests.test_triagem tests.test_identidade_docente tests.test_importacao_agendada_service tests.test_sigaa_import_service -q",
+      "result": "211 testes; sem falhas; 1 pulado"
+    },
+    {
+      "cwd": "backend",
+      "command": "python -m unittest discover -s tests -q",
+      "result": "334 testes; 2 falhas de ofensas; 2 erros cleanup SQLite/Windows; 2 pulados; NAO APROVADA"
+    },
+    {
+      "cwd": "backend",
+      "command": "python -m ruff check .",
+      "result": "sucesso"
+    },
+    {
+      "cwd": "backend",
+      "command": "python -m ruff format --check .",
+      "result": "160 arquivos formatados"
+    },
+    {
+      "cwd": "backend",
+      "command": "python -m compileall -q app alembic",
+      "result": "sucesso"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm ci --ignore-scripts --no-audit --no-fund",
+      "result": "398 pacotes instalados; lock sem alteracao"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm test",
+      "result": "83 testes; sucesso"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm run lint",
+      "result": "sucesso"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm run typecheck",
+      "result": "sucesso"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm run build -- --webpack",
+      "result": "sucesso com rede autorizada apos falha de download das fontes no sandbox"
+    },
+    {
+      "cwd": "frontend",
+      "command": "node tests/seguranca-266-browser.mjs",
+      "result": "sucesso com permissao adequada apos timeout CDP no sandbox; headers e metadados"
+    },
+    {
+      "cwd": "frontend",
+      "command": "node tests/recuperacao-senha-browser.mjs",
+      "result": "18 combinacoes aprovadas com API sintetica"
+    },
+    {
+      "cwd": ".",
+      "command": "python -m mkdocs build --strict --site-dir site",
+      "result": "sucesso"
+    },
+    {
+      "cwd": ".",
+      "command": "git diff --check",
+      "result": "sucesso"
+    },
+    {
+      "cwd": ".",
+      "command": "python docs/seguranca/evidencias/issue-266/verificar_segredos.py",
+      "result": "2296 blobs; zero correspondencias nos padroes limitados"
+    },
+    {
+      "cwd": ".",
+      "command": "python -m pip_audit -r docs/seguranca/evidencias/issue-266/python-resolvido.txt --no-deps --disable-pip -f json -o docs/seguranca/evidencias/issue-266/python-audit.json --progress-spinner off",
+      "result": "35 versoes; nenhum advisory conhecido retornado"
+    },
+    {
+      "cwd": "frontend",
+      "command": "npm audit --package-lock-only --ignore-scripts --json",
+      "result": "14 nos afetados; 16 advisories primarios; sem audit fix"
+    },
+    {
+      "cwd": ".",
+      "command": "docker info --format {{.ServerVersion}}",
+      "result": "daemon indisponivel; testes PostgreSQL/containers nao executados"
+    }
+  ],
+  "limitations": [
+    "Producao nao inspecionada",
+    "SQLite nao valida concorrencia PostgreSQL",
+    "CI Python 3.12 pendente",
+    "Revisao juridica pendente"
+  ]
+}

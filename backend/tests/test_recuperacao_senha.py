@@ -193,7 +193,10 @@ class RecuperacaoSenhaTest(unittest.TestCase):
         self.assertIn("200", caminhos["/api/auth/redefinir-senha"]["post"]["responses"])
 
     def test_adaptadores_enviam_link_com_finalidade_correta(self):
-        with self.assertLogs("app.services.email_service", level="WARNING") as logs:
+        with (
+            patch("app.services.email_service.config.DEBUG", True),
+            self.assertLogs("app.services.email_service", level="WARNING") as logs,
+        ):
             ConsoleEmailSender().enviar_recuperacao_senha(
                 "teste@aluno.unb.br", "http://localhost/redefinir-senha?token=teste"
             )

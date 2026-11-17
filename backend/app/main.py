@@ -1,7 +1,13 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 
 from app.core.config import CORS_ORIGINS
+from app.core.http_errors import erro_interno_seguro, validacao_segura
+from app.core.safe_logging import configurar_logs_seguros
+from app.core.origins import ProtecaoOrigem
 from app.routers import solicitacoes_titulares
 from app.routers import (
     identidade_docente,
@@ -14,13 +20,27 @@ from app.routers import (
     denuncias,
 )
 
+configurar_logs_seguros()
+http_logger = logging.getLogger("app.http")
+http_logger.setLevel(logging.INFO)
 app = FastAPI(title="G7 - Avaliação de Disciplinas")
+app.add_exception_handler(RequestValidationError, validacao_segura)
+app.add_exception_handler(Exception, erro_interno_seguro)
 app.include_router(solicitacoes_titulares.router)
 
 
 @app.middleware("http")
 async def proteger_cache_privado(request, call_next):
     response = await call_next(request)
+    rota = request.scope.get("route")
+    http_logger.info(
+        "http.resposta",
+        extra={
+            "metodo": request.method,
+            "rota": getattr(rota, "path", "nao_encontrada"),
+            "status_http": response.status_code,
+        },
+    )
     rotas_privadas = (
         "/api/auth",
         "/api/avaliacoes",
@@ -39,6 +59,7 @@ async def proteger_cache_privado(request, call_next):
     return response
 
 
+app.add_middleware(ProtecaoOrigem)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
