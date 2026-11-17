@@ -48,7 +48,7 @@ class MigrationConnectionTest(unittest.TestCase):
 
     def test_explicit_migration_connection_does_not_migrate_runtime_database(self):
         self.environment["MIGRATION_DATABASE_URL"] = (
-            f"sqlite+pysqlite:///{self.migration.as_posix()}"
+            f"sqlite+pysqlite:///{self.migration.as_posix().replace('%', '%25')}"
         )
         result = self.migrate()
         self.assertEqual(result.returncode, 0, result.stderr)
