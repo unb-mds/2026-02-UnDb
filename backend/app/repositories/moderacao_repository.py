@@ -1,3 +1,4 @@
+from app.models.voto_comentario import VotoComentario
 from datetime import datetime
 from uuid import UUID
 
@@ -13,6 +14,11 @@ from app.models.denuncia import Denuncia
 
 def descartar_vencidos(db: Session, agora: datetime) -> None:
     db.execute(delete(DecisaoModeracao).where(DecisaoModeracao.descartar_em <= agora))
+    vencidos = select(ComentarioVersao.id).where(
+        ComentarioVersao.descartar_em <= agora,
+        ComentarioVersao.estado.in_((EstadoComentario.RETIRADO, EstadoComentario.REMOVIDO)),
+    )
+    db.execute(delete(VotoComentario).where(VotoComentario.comentario_versao_id.in_(vencidos)))
     db.execute(
         update(ComentarioVersao)
         .where(

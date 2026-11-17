@@ -2,6 +2,8 @@
 
 from uuid import UUID
 
+from app.repositories import voto_comentario_repository
+
 from sqlalchemy.orm import Session
 
 from app.core import config
@@ -69,6 +71,7 @@ def processar(db: Session, versao_id: UUID) -> EstadoComentario | None:
         if atual is not None:
             atual.estado = EstadoComentario.SUBSTITUIDO
             atual.texto = None
+            voto_comentario_repository.apagar_da_versao(db, atual.id)
             atual.descartar_em = None
             atual.updated_at = agora
         versao.estado = EstadoComentario.PUBLICADO
