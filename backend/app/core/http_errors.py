@@ -9,6 +9,30 @@ from fastapi.responses import JSONResponse
 logger = logging.getLogger(__name__)
 
 
+async def abuso_excedido_seguro(request: Request, erro):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Muitas tentativas. Aguarde para tentar novamente."},
+        headers={
+            "Retry-After": str(erro.retry_after),
+            "Cache-Control": "no-store",
+            "Referrer-Policy": "no-referrer",
+        },
+    )
+
+
+async def limitador_indisponivel_seguro(request: Request, erro):
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Serviço temporariamente indisponível. Tente novamente em instantes."},
+        headers={
+            "Retry-After": str(erro.retry_after),
+            "Cache-Control": "no-store",
+            "Referrer-Policy": "no-referrer",
+        },
+    )
+
+
 async def validacao_segura(request: Request, erro: RequestValidationError):
     # Até loc/msg/ctx podem conter chaves ou valores fornecidos pelo cliente.
     return JSONResponse(

@@ -92,7 +92,11 @@ jobs:
 
       - name: Run deterministic tests with coverage
         id: backend-tests
-        run: python -m coverage run --branch --source=app -m unittest discover -s tests -v
+        env:
+          ABUSO_POSTGRES_TEST_URL: ${{ env.DATABASE_URL }}
+        run: |
+          alembic upgrade head
+          python -m coverage run --branch --source=app -m unittest discover -s tests -v
 
       - name: Generate backend coverage reports
         id: backend-coverage

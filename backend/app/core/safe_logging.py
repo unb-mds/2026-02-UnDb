@@ -13,6 +13,11 @@ EVENTOS = frozenset(
         "http.resposta",
         "auth.recuperacao.envio_falhou",
         "moderacao.descarte_falhou",
+        "abuso.negado",
+        "abuso.observado",
+        "abuso.atraso_observado",
+        "abuso.indisponivel",
+        "abuso.limpeza_falhou",
     }
 )
 _NOME = re.compile(r"[a-zA-Z0-9_.]{1,100}\Z")
@@ -39,6 +44,10 @@ class FormatoSeguro(logging.Formatter):
             )
         elif isinstance(record.msg, str) and record.msg in EVENTOS:
             seguro.msg = record.msg
+            if record.msg.startswith("abuso."):
+                motivo = getattr(record, "motivo", None)
+                if motivo in {"limite_identidade", "limite_global", "atraso"}:
+                    seguro.msg += f" motivo={motivo}"
             if record.msg == "http.resposta":
                 # Rota é o template do router, nunca request.url/path recebido.
                 metodo = getattr(record, "metodo", "")
