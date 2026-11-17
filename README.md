@@ -4,9 +4,13 @@
 
 # Experiências compartilhadas. Escolhas mais informadas.
 
-Conheça professores, explore disciplinas e decida sua próxima matrícula com a experiência de quem já cursou.
+Encontre professores, explore disciplinas e compare experiências para planejar sua próxima matrícula.
 
-[**Acessar o UnDb**](https://undb.app.br) · [Documentação](https://unb-mds.github.io/2026-02-UnDb/) · [Versões](https://github.com/unb-mds/2026-02-UnDb/releases) · [Sobre a equipe](https://undb.app.br/sobre)
+[**Usar o UnDb**](https://undb.app.br) · [Tutorial](docs/tutorial-uso.md) · [Documentação](https://unb-mds.github.io/2026-02-UnDb/) · [Versões](https://github.com/unb-mds/2026-02-UnDb/releases)
+
+[![CI de PRs](https://github.com/unb-mds/2026-02-UnDb/actions/workflows/pull-request.yml/badge.svg?event=pull_request)](https://github.com/unb-mds/2026-02-UnDb/actions/workflows/pull-request.yml)
+[![Documentação](https://github.com/unb-mds/2026-02-UnDb/actions/workflows/pages.yml/badge.svg?branch=main&event=push)](https://github.com/unb-mds/2026-02-UnDb/actions/workflows/pages.yml)
+[![Última versão](https://img.shields.io/github/v/release/unb-mds/2026-02-UnDb)](https://github.com/unb-mds/2026-02-UnDb/releases)
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Python%203.12-009688?logo=fastapi)
@@ -14,27 +18,58 @@ Conheça professores, explore disciplinas e decida sua próxima matrícula com a
 
 </div>
 
-## O que você encontra
+O UnDb é um projeto acadêmico estudantil independente e sem fins lucrativos, desenvolvido na disciplina de Métodos de
+Desenvolvimento de Software da UnB. O catálogo vem de dados públicos do SIGAA;
+as avaliações e os comentários são contribuições de estudantes. O serviço é complementar
+aos processos oficiais da universidade, sem endosso institucional comprovado.
 
-- **Busca pública:** professores, disciplinas e unidades acadêmicas com dados institucionais do SIGAA.
-- **Comparação com contexto:** avaliações de cada professor na disciplina que leciona, com acesso ao perfil completo.
-- **Cinco critérios:** didática, dificuldade, chamada, material e recomendação, sem nota geral que esconda as diferenças.
-- **Comentários e cuidado com a comunidade:** relatos opcionais, denúncia e moderação humana; avaliar exige conta institucional confirmada.
-- **Privacidade:** critérios agregados ficam disponíveis a partir de três avaliações. Dificuldade e chamada são informações neutras.
+## Como funciona
 
-A interface combina azul e verde da UnB, busca direta, cartões responsivos e navegação por teclado. A página inicial destaca disciplinas com maior quantidade de avaliações; o destaque não significa melhor nota.
+![Três passos: encontre professor ou disciplina; compare cinco critérios com quantidade e contexto; contribua com conta institucional confirmada.](docs/assets/images/como-funciona.svg)
 
-## Comece por aqui
+1. **Encontre:** pesquise professores, disciplinas ou unidades acadêmicas sem cadastro.
+2. **Compare:** leia didática, dificuldade, chamada, material e recomendação para a mesma disciplina, junto da quantidade de avaliações.
+3. **Contribua:** confirme seu e-mail `@aluno.unb.br` para avaliar; o comentário é opcional.
 
-| Quero… | Onde encontrar |
+Não existe nota geral. Os indicadores detalhados aparecem a partir de três avaliações;
+abaixo disso, mostramos contagem e insuficiência. Esse mínimo não condiciona a publicação
+de comentários nem garante anonimato. Dificuldade e chamada são informações neutras.
+A consulta pública não divulga a conta autora; texto/contexto podem identificar pessoas.
+Veja a [metodologia e os limites](https://undb.app.br/sobre#metodologia).
+
+## Documentação para cada público
+
+| Quero… | Começar por |
 |---|---|
-| Usar a plataforma | [undb.app.br](https://undb.app.br) |
-| Rodar o projeto | [Guia de desenvolvimento local](docs/desenvolvimento.md) |
-| Trabalhar no frontend | [Guia do frontend](frontend/README.md) |
-| Entender o produto | [Visão](docs/visao.md) e [requisitos](docs/requisitos.md) |
-| Entender a implementação | [Arquitetura](docs/arquitetura.md) e [ADRs](docs/adrs/index.md) |
-| Operar a aplicação | [Hospedagem](docs/hospedagem.md), [importação SIGAA](docs/operacao-importacao-sigaa.md) e [identidades docentes](docs/identidades-docentes.md) |
-| Contribuir | [CONTRIBUTING.md](CONTRIBUTING.md), [Issues](https://github.com/unb-mds/2026-02-UnDb/issues) e [board](https://github.com/orgs/unb-mds/projects/60) |
+| Pesquisar, comparar ou avaliar | [Tutorial de uso, passo a passo](docs/tutorial-uso.md) |
+| Instalar e subir o ambiente | [Desenvolvimento local](docs/desenvolvimento.md) |
+| Entender o código e contribuir | [Entrada para desenvolvedores](docs/para-desenvolvedores.md) e [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Trabalhar na interface | [Frontend](frontend/README.md) e [design system](docs/design-system.md) |
+| Entender produto e contratos | [Visão](docs/visao.md), [requisitos](docs/requisitos.md) e [specs.md](specs.md) |
+| Entender decisões técnicas | [Arquitetura](docs/arquitetura.md) e [ADRs](docs/adrs/index.md) |
+| Publicar e operar | [Implantação](docs/implantacao.md), [hospedagem](docs/hospedagem.md) e [operação SIGAA](docs/operacao-importacao-sigaa.md) |
+| Entender o apoio de IA | [Implementando com IA](docs/implementando-com-ia.md) e [AI_USAGE.md](AI_USAGE.md) |
+| Acompanhar reuniões e entregas | [Atas](docs/atas/README.md), [Issues](https://github.com/unb-mds/2026-02-UnDb/issues) e [board](https://github.com/orgs/unb-mds/projects/60) |
+
+## Arquitetura em uma página
+
+```mermaid
+flowchart LR
+    Pessoa["Estudante / navegador"] --> Front["Frontend Next.js · Vercel"]
+    Pessoa --> API["API FastAPI · Render"]
+    Front --> API
+    API --> Banco[("PostgreSQL · Neon")]
+    SIGAA["SIGAA público"] --> Importador["Importador Python"]
+    Importador --> Banco
+    API --> Email["Resend · confirmação e recuperação"]
+    API -. "quando habilitada" .-> IA["OpenAI · apoio à moderação"]
+    Descarte["Rotina de descarte de moderação"] --> Banco
+```
+
+Visão resumida da arquitetura e da hospedagem documentadas; não é um inventário ao vivo
+dos serviços. A API concentra regras, autorização e agregação. O frontend não acessa o
+banco diretamente. A integração de moderação tem [configuração e limites próprios](docs/moderacao-ia.md),
+com revisão humana para sinais/falhas e sem rejeição automática pela IA.
 
 ## Executar localmente
 
@@ -44,12 +79,13 @@ Com Docker e Docker Compose instalados:
 git clone https://github.com/unb-mds/2026-02-UnDb.git
 cd 2026-02-UnDb
 cp backend/.env.example backend/.env
-# Configure as credenciais e SECRET_KEY antes de iniciar.
+# Configure as credenciais locais e SECRET_KEY antes de iniciar.
 docker compose --env-file backend/.env up --build
 ```
 
 Frontend: `http://localhost:3000` · API: `http://localhost:8000/docs`.
-O catálogo depende de dados importados. O [guia completo](docs/desenvolvimento.md) explica variáveis, importação e execução com recarga automática. Não versione arquivos `.env`.
+O catálogo depende da importação. O [guia completo](docs/desenvolvimento.md) explica
+variáveis, importação, e-mail local e execução com recarga automática. Não versione `.env`.
 
 ## Tecnologias e qualidade
 
@@ -61,12 +97,17 @@ O catálogo depende de dados importados. O [guia completo](docs/desenvolvimento.
 | Operação | Docker Compose e GitHub Actions |
 | Documentação | MkDocs Material e GitHub Pages |
 
-O CI valida lint, tipos, testes determinísticos, navegação no navegador, documentação, migrations e jornadas com PostgreSQL real. Os [comandos de verificação](docs/qualidade.md) distinguem testes locais de integração e evidências históricas.
+Os workflows verificam lint, tipos, testes, documentação, Compose e jornadas com
+PostgreSQL real. Os badges mostram o estado dos workflows indicados; não certificam
+produção, disponibilidade contínua ou validação com participantes. Os
+[comandos de qualidade](docs/qualidade.md) explicam a execução local e as evidências.
 
-## Versões
+## Versões e acompanhamento
 
-A [1.4.0](docs/releases/1.4.0.md) reúne a revisão visual, os destaques da página inicial, a página Sobre e os ajustes de navegação e testes. Consulte o [histórico de mudanças](CHANGELOG.md).
-A publicação de uma versão de código não representa, por si só, conclusão de importação ou aceite de todos os marcos do produto.
+Consulte as [releases](https://github.com/unb-mds/2026-02-UnDb/releases), o
+[histórico de mudanças](CHANGELOG.md) e a [reconciliação da R2](docs/releases/2.0.0-reconciliacao.md).
+A entrega acadêmica da R2 está prevista para 25/11/2026; versão intermediária de software,
+PR aberta e publicação em produção são marcos distintos.
 
 ## Quem faz o UnDb
 
@@ -83,14 +124,8 @@ Conheça nossos perfis e redes na [página Sobre](https://undb.app.br/sobre).
 
 ## Contribuição e licença
 
-Usamos Gitflow: `develop` integra o trabalho e `main` registra releases. Alterações entram por PR, com checks e revisão humana, conforme o [guia de contribuição](CONTRIBUTING.md).
+Usamos Gitflow: `develop` integra o trabalho e `main` registra releases. Mudanças entram
+por PR com verificações e revisão humana, conforme [CONTRIBUTING.md](CONTRIBUTING.md).
+Apoio de assistentes/agentes é registrado em [AI_USAGE.md](AI_USAGE.md).
 
 A licença do projeto ainda está em definição; este repositório não declara uma licença de uso.
-
-
-### Apoio opcional à moderação
-
-A #239 prepara análise assistiva com a Moderation API gratuita da OpenAI e filtro de termos, desativados por
-padrão. A evolução autorizada permite publicar automaticamente sem sinais e encaminha
-os demais textos à revisão humana. Consulte [configuração, limites e
-validação](docs/moderacao-ia.md) antes de habilitar.

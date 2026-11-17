@@ -35,9 +35,17 @@ theme:
 
 nav:
   - Início: index.md
-  - Começar:
+  - Para usar:
+      - Tutorial passo a passo: tutorial-uso.md
+  - Para desenvolver:
+      - Por onde começar: para-desenvolvedores.md
       - Desenvolvimento local: desenvolvimento.md
+      - Como contribuir: https://github.com/unb-mds/2026-02-UnDb/blob/develop/CONTRIBUTING.md
       - Qualidade e verificações: qualidade.md
+      - Design system: design-system.md
+      - Implantação e operação: implantacao.md
+      - Implementando com IA: implementando-com-ia.md
+      - Registro de uso de IA: uso-ia.md
   - Produto:
       - Visão: visao.md
       - Requisitos: requisitos.md
@@ -72,6 +80,7 @@ nav:
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:
+      - Atas e documentação — Issue 241: estudos/registro-issue-241.md
       - Transparência e ciência dos Termos — Issue 269: estudos/transparencia-issue-269.md
       - Integridade das notas — Issue 270 (decisões pendentes): estudos/integridade-notas-issue-270.md
       - Moderação — avaliação da Issue 252:
@@ -125,7 +134,15 @@ nav:
   - Processo:
       - Template de ata de reunião: atas/template-ata-reuniao.md
   - Atas:
-      - 2026-09-17: atas/2026-09-17.md
+      - Índice e cobertura das semanas: atas/README.md
+      - 14/09 — Sprint 03: atas/2026-09-14.md
+      - 17/09 — Sprint 4: atas/2026-09-17.md
+      - 05–11/10 — após R1: atas/2026-10-05-a-11.md
+      - 12–18/10 — Meet: atas/2026-10-12-a-18.md
+      - 26/10–01/11 — presencial: atas/2026-10-26-a-11-01.md
+      - 02–08/11 — frontend: atas/2026-11-02-a-08.md
+      - 16/11 — R2 e pendências jurídicas: atas/2026-11-16.md
+      - Orientações relatadas em 17/11: orientacoes-2026-11-17.md
   - Relatórios:
       - Relatório RF19: relatorio_rf19.md
 
