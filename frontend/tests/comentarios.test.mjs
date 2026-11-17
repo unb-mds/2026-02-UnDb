@@ -250,3 +250,31 @@ test("envio de comentário preserva critérios e diferencia texto recusado de fa
   t.mock.method(globalThis,"fetch",async()=>Response.json({}));
   await assert.rejects(enviarAvaliacaoComComentario(entrada),/incompatível/);
 });
+
+const votos = await carregar("services/votos-comentario.js");
+test("#278: consulta privada, troca/retirada e resposta minimizada", async (t) => {
+  const chamadas = [];
+  t.mock.method(globalThis, "fetch", async (url, opcoes) => {
+    chamadas.push({ url, opcoes });
+    return new Response(JSON.stringify({ uteis: 2, nao_uteis: 1, meu_voto: "UTIL", usuario_id: "nao-repassar" }), { status: 200 });
+  });
+  assert.deepEqual(await votos.consultarUtilidade(versaoId), { uteis: 2, nao_uteis: 1, meu_voto: "UTIL" });
+  for (const voto of ["UTIL", "NAO_UTIL", null]) await votos.definirVoto(versaoId, voto);
+  assert.equal(chamadas[0].opcoes.cache, "no-store");
+  for (const chamada of chamadas) assert.equal(chamada.opcoes.credentials, "include");
+  assert.deepEqual(chamadas.slice(1).map(c => JSON.parse(c.opcoes.body)), [{ voto: "UTIL" }, { voto: "NAO_UTIL" }, { voto: null }]);
+  await assert.rejects(votos.definirVoto("invalido", "UTIL"));
+});
+
+test("#278: rejeita contagens/estado inválidos e propaga erros HTTP", async (t) => {
+  for (const dados of [{ uteis: -1, nao_uteis: 0, meu_voto: null }, { uteis: 0, nao_uteis: 1.5, meu_voto: null }, { uteis: 0, nao_uteis: 0, meu_voto: "outro" }, null]) {
+    t.mock.method(globalThis, "fetch", async () => new Response(JSON.stringify(dados)));
+    await assert.rejects(votos.consultarUtilidade(versaoId), /inválida/);
+    t.mock.restoreAll();
+  }
+  for (const status of [401, 403, 404, 503]) {
+    t.mock.method(globalThis, "fetch", async () => new Response(JSON.stringify({ detail: "Falha" }), { status }));
+    await assert.rejects(votos.definirVoto(versaoId, "UTIL"), e => e instanceof ApiError && e.status === status);
+    t.mock.restoreAll();
+  }
+});

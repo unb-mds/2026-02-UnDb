@@ -606,3 +606,19 @@ a análise antiga. Falha da segunda etapa não desfaz os critérios já confirma
 Decisões automáticas usam moderador_id nulo como ator sistema, mantendo retenção
 vigente; não existe conta fictícia de moderador. Migração 20261114_01 permite essa
 nulabilidade. Downgrade recusa-se a apagar auditoria automática ainda existente.
+
+
+### Extensão local de comentários — #278
+
+Fonte de comportamento: `docs/requisitos.md`, RF20 — Utilidade do comentário.
+Mantidas as camadas e o ADR 01. `VotoComentario` representa a relação conta/versão
+(N:N, um valor atômico dependente da chave inteira; sem contadores duplicados).
+PK `(comentario_versao_id, usuario_id)` garante unicidade; CHECK restringe o voto;
+FKs eliminam votos na exclusão física de versão/conta. O índice da PK atende resumos
+por versão; índice de usuário atende sua exclusão sem varrer votos de todas as contas.
+Repository concentra SQL/upsert/agregação; service aplica disponibilidade/autoria e
+lock existente de avaliação → versão. Escrita não atualiza comentário/avaliação.
+Descarte de texto manual, automático ou programado remove votos na mesma transação.
+O endpoint de resumo tem sessão opcional e no-store: a lista pública permanece igual,
+evita personalizar cache compartilhado e a UI consulta utilidade por versão no cliente.
+Trade-off: uma consulta adicional por comentário exibido; sem tecnologia/dependência nova.

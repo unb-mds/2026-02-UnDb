@@ -218,3 +218,13 @@ oficial/endosso comprovado da UnB. Termos e Política públicos explicam partici
 privacidade e limites reais. Novas contas registram ciência dos Termos com versão/data;
 contas anteriores mantêm acesso sem ciência retroativa inventada. Ciência não equivale
 a consentimento genérico. [Inventário e limites](transparencia.md).
+
+
+### Utilidade dos comentários — Release 2 (#278)
+
+Fonte: `docs/requisitos.md`, RF20 — Utilidade do comentário, escopo aprovado em
+16/11/2026. Conta estudantil confirmada vota útil/não útil em comentário publicado de
+outra conta, podendo trocar/retirar. Visitantes veem contagens; somente a própria conta
+recebe seu voto. Votos pertencem à versão, não passam a substitutos e seguem seu descarte,
+sem retenção ampliada. Não alteram ordem, notas, denúncias ou moderação. A disponibilidade
+da entrega depende das verificações registradas no PR, sem alegação de publicação.

@@ -3,6 +3,8 @@
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
+from app.repositories import voto_comentario_repository
+
 from sqlalchemy.orm import Session
 
 from app.models.enums import AcaoModeracao, EstadoComentario
@@ -117,12 +119,14 @@ def decidir(
                 denuncia_repository.encerrar(db, atual.id, "VERSAO_SUBSTITUIDA")
                 atual.estado = EstadoComentario.SUBSTITUIDO
                 atual.texto = None
+                voto_comentario_repository.apagar_da_versao(db, atual.id)
                 atual.descartar_em = None
                 atual.updated_at = agora
             versao.estado = EstadoComentario.PUBLICADO
         elif dados.acao == AcaoModeracao.REJEITAR:
             versao.estado = EstadoComentario.REJEITADO
             versao.texto = None
+            voto_comentario_repository.apagar_da_versao(db, versao.id)
         else:
             if dados.acao == AcaoModeracao.REMOVER:
                 if abertas:

@@ -1,3 +1,4 @@
+from typing import Literal
 from datetime import datetime
 from uuid import UUID
 
@@ -34,3 +35,14 @@ class ComentarioDoAutorResponse(ComentarioPublicoResponse):
     avaliacao_id: UUID
     substitui_id: UUID | None
     updated_at: datetime
+
+
+class VotoComentarioRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    voto: Literal["UTIL", "NAO_UTIL"] | None
+
+
+class UtilidadeComentarioResponse(BaseModel):
+    uteis: int = Field(ge=0)
+    nao_uteis: int = Field(ge=0)
+    meu_voto: Literal["UTIL", "NAO_UTIL"] | None

@@ -719,3 +719,23 @@ Derivado de `docs/requisitos.md`, RF26, autorizado pelo PO em 16–17/11/2026.
   cadastro e Sobre; ciência inicialmente desmarcada, sem novo bloqueio de contas antigas.
 - Natureza acadêmica estudantil independente e sem fins lucrativos; sem endosso oficial
   comprovado. Inventário factual e limites em `docs/transparencia.md`.
+
+
+### Votos de utilidade — #278
+
+Fonte: `docs/requisitos.md`, RF20 — Utilidade do comentário (R2, 16/11/2026).
+
+- `GET /api/comentarios/{id}/utilidade`: sessão opcional; 200 com
+  `{uteis: integer >= 0, nao_uteis: integer >= 0, meu_voto: "UTIL" | "NAO_UTIL" | null}`.
+  O voto é sempre da sessão atual, nunca de um identificador recebido. Sem sessão, null.
+- `POST /api/comentarios/{id}/voto`: sessão confirmada; corpo exclusivo
+  `{voto: "UTIL" | "NAO_UTIL" | null}`. null retira. Retorna o mesmo resumo (200).
+  Repetir/trocar/retirar é idempotente. 401 sem sessão; 403 e-mail não confirmado ou
+  voto no próprio comentário; 404 alvo inexistente/não publicado/sem texto, com mensagem
+  única; 422 corpo/UUID inválido. Respostas no-store/no-referrer, inclusive erros.
+- Tabela `votos_comentario`: PK composta `(comentario_versao_id, usuario_id)`, FKs com
+  ON DELETE CASCADE para versão/conta e CHECK de voto. Sem timestamp ou auditoria nova.
+  Escrita usa lock da avaliação/versão existente e upsert; não atualiza a versão.
+- Contagens são calculadas no banco somente para a versão publicada solicitada;
+  ordenação da lista pública e seu contrato atual são preservados. Nenhuma identidade
+  de votante integra respostas. Aplicar o ciclo de descarte da versão, sem retenção nova.

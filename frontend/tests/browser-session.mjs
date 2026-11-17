@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { contextoEmTransicao } from './browser-navigation.mjs';
 
-export async function comNavegador({ fixture, executar, diretorioFrontend }) {
+export async function comNavegador({ fixture, executar, diretorioFrontend, timeoutMs = 25000 }) {
   const navegador = process.env.BROWSER_PATH ?? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
   assert.ok(existsSync(navegador), 'Informe BROWSER_PATH com Edge/Chromium.');
   for (const porta of fixture ? [8000, 3100, 9228] : [3100, 9228]) {
@@ -32,7 +32,7 @@ export async function comNavegador({ fixture, executar, diretorioFrontend }) {
   };
   const aguardar = async (condicao, nome) => {
     const inicio = Date.now();
-    while (Date.now() - inicio < 25000) {
+    while (Date.now() - inicio < timeoutMs) {
       try {
         if (await condicao()) return;
       } catch (erro) {

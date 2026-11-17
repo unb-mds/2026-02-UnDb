@@ -132,6 +132,9 @@ jobs:
           python -m tests.migration_legacy_check verify-downgrade
           alembic upgrade head
 
+      - name: Verify concurrent comment votes on migrated PostgreSQL
+        run: VOTOS_POSTGRES_TEST_URL="$DATABASE_URL" python -m unittest tests.test_voto_comentario_postgres -v
+
       - name: Build backend image and check packaged migrations
         run: |
           docker build -t g7-backend-ci .
