@@ -89,6 +89,8 @@ def cadastrar(
         email=dados.email,
         password_hash=gerar_hash_senha(dados.senha),
         email_confirmado=False,
+        termos_versao=dados.termos_versao,
+        termos_ciencia_em=_agora_utc(),
     )
     token = TokenConfirmacaoEmail(
         usuario=usuario,

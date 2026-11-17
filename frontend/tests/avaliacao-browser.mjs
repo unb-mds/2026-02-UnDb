@@ -424,7 +424,7 @@ async function verificarCorrecoesInterface() {
   try {
     await cdp("Page.navigate", {url:"http://localhost:3100/cadastro"});
     await aguardar(async () => await avaliar('!!document.querySelector("[name=nome]")'), "cadastro");
-    await avaliar(`document.querySelector('[name=nome]').value='   '; document.querySelector('[name=email]').value='TESTE@ALUNO.UNB.BR'; document.querySelector('[name=senha]').value='senha-teste-local'`);
+    await avaliar(`document.querySelector('[name=ciencia_termos]').checked=true; document.querySelector('[name=nome]').value='   '; document.querySelector('[name=email]').value='TESTE@ALUNO.UNB.BR'; document.querySelector('[name=senha]').value='senha-teste-local'`);
     assert.equal(await avaliar('document.querySelector("main form").checkValidity()'), true);
     assert.ok(scriptsAtrasados.length > 0, "O cenário precisa atrasar scripts de hidratação");
     await avaliar('document.querySelector("main form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');

@@ -12,6 +12,8 @@ export type CadastroInput = {
   nome: string;
   email: string;
   senha: string;
+  ciencia_termos: true;
+  termos_versao: string;
   return_to?: string;
 };
 

@@ -203,6 +203,7 @@ try {
     await clicar(tab, 'a[href^="/cadastro?returnTo="]', "Criar conta");
     if (i === 0) await matriz(tab, "cadastro");
     await preencher(tab, { nome: `Estudante de acesso ${i + 1}`, email: fixture.emails[i], senha: fixture.senha });
+    await tab.avaliar("document.querySelector('[name=ciencia_termos]').checked=true");
     await enviar(tab, "Se o endereço informado estiver disponível");
     await aguardar(() => !!linkEmail(fixture.emails[i]), "link do adaptador console");
     const url = new URL(linkEmail(fixture.emails[i]));

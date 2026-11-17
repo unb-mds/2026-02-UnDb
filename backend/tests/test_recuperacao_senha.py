@@ -145,7 +145,13 @@ class RecuperacaoSenhaTest(unittest.TestCase):
         sender = Sender()
         service.cadastrar(
             self.db,
-            CadastroRequest(nome="Outra", email="outra@aluno.unb.br", senha="senha de cadastro"),
+            CadastroRequest(
+                ciencia_termos=True,
+                termos_versao="2026-11-17",
+                nome="Outra",
+                email="outra@aluno.unb.br",
+                senha="senha de cadastro",
+            ),
             sender,
         )
         confirmacao = parse_qs(urlsplit(sender.envios[0][1]).query)["token"][0]

@@ -12,7 +12,12 @@ DESTINO = "/professores/11111111-1111-4111-8111-111111111111/disciplinas/2222222
 class RetornoBuscaTest(unittest.TestCase):
     def cadastro(self, destino):
         return CadastroRequest(
-            nome="Estudante", email="teste@aluno.unb.br", senha="senha-teste", return_to=destino
+            ciencia_termos=True,
+            termos_versao="2026-11-17",
+            nome="Estudante",
+            email="teste@aluno.unb.br",
+            senha="senha-teste",
+            return_to=destino,
         )
 
     def test_preserva_rotas_antigas_e_contexto_permitido(self):

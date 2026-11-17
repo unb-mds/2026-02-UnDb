@@ -8,7 +8,7 @@ export default function Rodape() {
       <Image src="/brand/undb-logo.png" alt="UnDb" width={600} height={201} />
       <p>Experiências compartilhadas. Escolhas mais informadas.</p>
     </div>
-    <nav aria-label="Navegação do rodapé"><Link href="/professores">Professores</Link><Link href="/disciplinas">Disciplinas</Link><Link href="/departamentos">Unidades acadêmicas</Link><Link href="/sobre">Sobre o UnDb</Link><Link href="/contato">Contato e solicitações</Link><Link href="/atendimento">Atendimento da equipe</Link><LinkModeracao /></nav>
-    <p>UnDb · Feito por estudantes para estudantes · Dados institucionais públicos do SIGAA</p>
+    <nav aria-label="Navegação do rodapé"><Link href="/professores">Professores</Link><Link href="/disciplinas">Disciplinas</Link><Link href="/departamentos">Unidades acadêmicas</Link><Link href="/sobre">Sobre o UnDb</Link><Link href="/contato">Contato e solicitações</Link><Link href="/privacidade">Política de Privacidade</Link><Link href="/termos-de-uso">Termos de Uso</Link><Link href="/atendimento">Atendimento da equipe</Link><LinkModeracao /></nav>
+    <p>UnDb · Feito por estudantes para estudantes · Sem fins lucrativos · Dados institucionais públicos do SIGAA</p>
   </div></footer>;
 }

@@ -7,6 +7,7 @@ import OpcoesAcesso from "@/components/opcoes-acesso";
 import Link from "next/link";
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import { cadastrarUsuario } from "@/lib/services/auth";
+import { TERMOS_VERSAO } from "@/lib/termos";
 import { ApiError } from "@/lib/services/http-error";
 
 export default function CadastroForm({ retorno, contexto }: { retorno: string | null; contexto?: ReactNode }) {
@@ -32,10 +33,19 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
       return;
     }
 
+    if (formulario.get("ciencia_termos") !== "on") {
+      setErro("Confirme a ciência dos Termos de Uso para criar sua conta.");
+      setCarregando(false);
+      (elementoFormulario.elements.namedItem("ciencia_termos") as HTMLInputElement).focus();
+      return;
+    }
+
     enviandoRef.current = true;
     try {
       const resposta = await cadastrarUsuario({
         nome,
+        ciencia_termos: true,
+        termos_versao: TERMOS_VERSAO,
         email: String(formulario.get("email") ?? "").trim().toLowerCase(),
         senha: String(formulario.get("senha") ?? ""),
         ...(retorno ? { return_to: retorno } : {}),
@@ -88,6 +98,16 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
           </label>
 
           <CampoSenha cadastro />
+
+          <div className="space-y-3 text-sm leading-relaxed text-(--ink-soft)">
+            <div className="flex items-start gap-3">
+              <input id="ciencia-termos" name="ciencia_termos" type="checkbox" required
+                aria-describedby="ciencia-termos-ajuda"
+                className="mt-1 size-5 shrink-0 accent-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent" />
+              <label htmlFor="ciencia-termos">Li e estou ciente dos <Link href="/termos-de-uso" target="_blank" rel="noopener noreferrer" className="link">Termos de Uso (abre em outra aba)</Link>, versão {TERMOS_VERSAO}.</label>
+            </div>
+            <p id="ciencia-termos-ajuda">Veja como seus dados são usados na <Link href="/privacidade" target="_blank" rel="noopener noreferrer" className="link">Política de Privacidade (abre em outra aba)</Link>. Esta ciência não é consentimento genérico para tratamento de dados.</p>
+          </div>
 
           <button
             type="submit"

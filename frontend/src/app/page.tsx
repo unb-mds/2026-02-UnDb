@@ -32,7 +32,7 @@ export default function Home() {
       </div>
     </section>
     <div className="container flex flex-col gap-10 py-10 sm:py-14">
-      <p className="text-sm leading-relaxed text-(--muted)">Projeto acadêmico estudantil independente, complementar aos processos oficiais da UnB. Conta institucional confirmada não comprova experiência na disciplina. <Link href="/sobre#metodologia" className="link">Conheça a metodologia e os limites</Link>.</p>
+      <p className="text-sm leading-relaxed text-(--muted)">Projeto acadêmico estudantil independente e sem fins lucrativos, complementar aos processos oficiais da UnB. Conta institucional confirmada não comprova experiência na disciplina. <Link href="/sobre#metodologia" className="link">Conheça a metodologia e os limites</Link>.</p>
       <DestaquesHome />
       <CatalogoHome apenasUnidades />
       <details className="group border-t border-(--border) pt-5 text-sm">

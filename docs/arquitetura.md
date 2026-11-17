@@ -123,6 +123,8 @@ as tabelas da R1 são preservadas como recorte histórico.
 | `nome` | VARCHAR(100) | |
 | `email` | VARCHAR(150), UNIQUE | Domínio institucional da UnB |
 | `password_hash` | VARCHAR(255) | Hash forte (RNF03) |
+| `termos_versao` | VARCHAR(32), nullable | RF26: versão da ciência no novo cadastro; NULL nas contas anteriores |
+| `termos_ciencia_em` | TIMESTAMPTZ, nullable | RF26: instante gerado pelo servidor; CHECK exige o par completo ou ambos NULL |
 | `email_confirmado` | BOOLEAN | Avaliação só é aceita se verdadeiro |
 | `created_at` | TIMESTAMPTZ | |
 
