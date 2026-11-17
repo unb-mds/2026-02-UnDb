@@ -25,6 +25,7 @@ def excluir_conta(db, usuario):
         if conta.excluido_em is None:
             conta.excluido_em = agora
         conta.nome, conta.password_hash = "", None
+        conta.termos_versao, conta.termos_ciencia_em = None, None
         conta.email_confirmado = conta.moderador = conta.reconciliador = False
         for avaliacao in repo.avaliacoes_da_conta(db, conta.id):
             repo.ocultar(db, avaliacao, agora, prazo())

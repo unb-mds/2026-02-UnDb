@@ -3,14 +3,18 @@
 from alembic import op
 import sqlalchemy as sa
 
-revision = "20261117_02"
+revision = "20261117_02_retencao"
 down_revision = "20261117_01"
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
-    op.add_column("usuarios", sa.Column("excluido_em", sa.DateTime(timezone=True)))
+    def colunas(tabela):
+        return {c["name"] for c in sa.inspect(op.get_bind()).get_columns(tabela)}
+
+    if "excluido_em" not in colunas("usuarios"):
+        op.add_column("usuarios", sa.Column("excluido_em", sa.DateTime(timezone=True)))
     if sa.inspect(op.get_bind()).has_table("retencao_rollback_contas"):
         op.execute(
             "UPDATE usuarios SET excluido_em=r.excluido_em FROM retencao_rollback_contas r WHERE usuarios.id=r.id"
@@ -18,18 +22,24 @@ def upgrade():
         op.drop_table("retencao_rollback_contas")
     op.alter_column("usuarios", "password_hash", existing_type=sa.String(255), nullable=True)
     op.execute("UPDATE usuarios SET password_hash=NULL WHERE excluido_em IS NOT NULL")
-    op.add_column("avaliacoes", sa.Column("excluido_em", sa.DateTime(timezone=True)))
-    op.add_column("avaliacoes", sa.Column("purgar_em", sa.DateTime(timezone=True)))
-    op.create_index("ix_avaliacoes_purgar_em", "avaliacoes", ["purgar_em"])
-    op.add_column("denuncias", sa.Column("encerrada_em", sa.DateTime(timezone=True)))
-    op.drop_constraint("uq_denuncia_conta_versao", "denuncias", type_="unique")
-    op.create_index(
-        "uq_denuncia_conta_versao",
-        "denuncias",
-        ["comentario_versao_id", "denunciante_id"],
-        unique=True,
-        postgresql_where=sa.text("encerrada_em IS NULL"),
-    )
+    if "excluido_em" not in colunas("avaliacoes"):
+        op.add_column("avaliacoes", sa.Column("excluido_em", sa.DateTime(timezone=True)))
+    if "purgar_em" not in colunas("avaliacoes"):
+        op.add_column("avaliacoes", sa.Column("purgar_em", sa.DateTime(timezone=True)))
+    if "ix_avaliacoes_purgar_em" not in {
+        i["name"] for i in sa.inspect(op.get_bind()).get_indexes("avaliacoes")
+    }:
+        op.create_index("ix_avaliacoes_purgar_em", "avaliacoes", ["purgar_em"])
+    if "encerrada_em" not in colunas("denuncias"):
+        op.add_column("denuncias", sa.Column("encerrada_em", sa.DateTime(timezone=True)))
+        op.drop_constraint("uq_denuncia_conta_versao", "denuncias", type_="unique")
+        op.create_index(
+            "uq_denuncia_conta_versao",
+            "denuncias",
+            ["comentario_versao_id", "denunciante_id"],
+            unique=True,
+            postgresql_where=sa.text("encerrada_em IS NULL"),
+        )
 
 
 def downgrade():

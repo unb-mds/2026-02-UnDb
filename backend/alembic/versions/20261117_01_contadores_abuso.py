@@ -10,6 +10,9 @@ depends_on = None
 
 
 def upgrade():
+    # Banco da antiga #266 pode ter esta tabela, mas carimbar o ID ambíguo _02.
+    if sa.inspect(op.get_bind()).has_table("contadores_abuso"):
+        return
     op.create_table(
         "contadores_abuso",
         sa.Column("operacao", sa.String(64), primary_key=True),

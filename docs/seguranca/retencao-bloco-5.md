@@ -108,3 +108,13 @@ expirados, denúncias encerradas e contratos HTTP/autorização/origem.
 `tests.integration_retencao_migracao` ensaia downgrade/reaplicação com conta
 excluída sintética. Evidências finais em
 `evidencias/issue-266/bloco-5/resultados.json`; resultados de CI na PR.
+
+
+## Integracao com a ciencia dos Termos (#269)
+
+Contas ativas preservam a versao e data de ciencia explicita; conta excluida
+apaga ambos os campos para manter a guarda minima aprovada. A migracao de retencao
+usa agora o ID unico 20261117_02_retencao; o ID 20261117_02 permanece reservado
+para a migracao da develop de ciencia dos Termos. A revisao 20261117_04 une os
+grafos e reconcilia bancos do historico anterior da #266 sem apagar ciencia real.
+Rollback e reaplicacao devem manter API/jobs parados conforme o procedimento.

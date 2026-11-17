@@ -23,7 +23,7 @@ não declara nenhuma pendência concluída e não comprova configuração em pro
 | Backups / restauração | Implementado: ensaio sintético isolado; rotina real planejada | Operação: retenção/local/acesso/cifra, primeiro dado real, arquivo semestral, periodicidade de restauração e registro mínimo de exclusões | Perda de dados ou reexposição de conteúdo excluído após restaurar | Backup/restauração operacionais comprovados e reaplicação de IDs/datas antes de publicar; [ensaio](evidencias/issue-266/bloco-7/resultados.json), #267 |
 | Dependências residuais | Implementado: patches source-map-js/zod; audit ainda reporta Next/sharp | Manutenção com acompanhamento de Nicolas: investigar cada advisory/caminho efetivo e propor correção compatível | Risco de disponibilidade ou execução/informação conforme condições de cada aviso; não declarar audit limpo | Análise de aplicabilidade e correções/regressões comprovadas; [inventário e URLs](evidencias/issue-266/bloco-7/resultados.json) |
 | CI / release | Evidências locais implementadas; aceite e CI final pendentes de validação | Revisores/PO: verificar SHA do último push e todos os jobs, não reutilizar aprovação de SHA anterior | Entrega revisada diferente da publicada | Checks associados ao SHA final, revisão de riscos e aceite humano; PR #280 e evidências por bloco |
-| Textos públicos | Revisão factual implementada; revisão humana pendente | PO/responsável pelo tratamento: política e termos ausentes, privacidade e limites de retenção | Informação pública incompleta ou diferente da operação hospedada | Validar textos e suas condições operacionais; seção de alterações abaixo; contexto #268/#269 |
+| Textos públicos | Revisão factual implementada; revisão humana pendente | PO/responsável pelo tratamento: política/termos integrados da #269, privacidade e limites de retenção | Informação pública incompleta ou diferente da operação hospedada | Validar textos e suas condições operacionais; seção de alterações abaixo; contexto #268/#269 |
 
 ## Inventário técnico de fornecedores
 
@@ -71,9 +71,11 @@ sem exigir fechamento dessas issues e sem transferir registros para elas.
   revisão humana; não substitui política de privacidade ou termos.
 - Home revisada: não foram encontradas afirmações de retenção/exclusão/logs a
   corrigir; texto preservado. O limiar de três avaliações não promete anonimato.
-- Não foram encontrados documentos/páginas de política de privacidade ou termos
-  no código atual. Sua redação, publicação e validação ficam pendentes; nenhuma
-  base legal ou obrigação foi criada para preencher essa lacuna.
+- Na revisão inicial desta branch (c02396c), política e termos estavam ausentes.
+  A integração posterior de develop/#281 preserva as páginas da #269 e a ciência
+  explícita obrigatória no cadastro. A política foi reconciliada com retenção,
+  registros e limitador atuais; revisão humana/operação seguem pendentes. Nenhuma
+  base legal nova foi criada para resolver os conflitos.
 - Guias técnicos de canal, desenvolvimento e hospedagem passam a apontar para
   o comportamento atual; estudos históricos não são reescritos como execução atual.
 

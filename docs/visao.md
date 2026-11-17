@@ -209,3 +209,12 @@ verificação técnica integradas não representam aceite geral da Release 2.
 - [Arquitetura](arquitetura.md) — decisões e estrutura técnica;
 - [Board de desenvolvimento](https://github.com/orgs/unb-mds/projects/60) — acompanhamento
   das entregas.
+
+## Transparência da R2 — RF26
+
+Fonte: [RF26 em requisitos](requisitos.md#rf26-transparencia-termos-e-ciencia-no-cadastro-269).
+O UnDb é um projeto acadêmico estudantil independente e sem fins lucrativos, sem vínculo
+oficial/endosso comprovado da UnB. Termos e Política públicos explicam participação,
+privacidade e limites reais. Novas contas registram ciência dos Termos com versão/data;
+contas anteriores mantêm acesso sem ciência retroativa inventada. Ciência não equivale
+a consentimento genérico. [Inventário e limites](transparencia.md).

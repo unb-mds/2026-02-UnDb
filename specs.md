@@ -147,6 +147,8 @@ referenciado na seção 12. As tabelas deste recorte não representam todo o mod
 | `nome` | VARCHAR(100) | obrigatório |
 | `email` | VARCHAR(150) | UNIQUE, obrigatório, domínio `@aluno.unb.br` |
 | `password_hash` | VARCHAR(255) | hash forte |
+| `termos_versao` | VARCHAR(32), nullable | RF26: versão da ciência no novo cadastro; NULL nas contas anteriores |
+| `termos_ciencia_em` | TIMESTAMPTZ, nullable | RF26: instante gerado pelo servidor; CHECK exige o par completo ou ambos NULL |
 | `email_confirmado` | BOOLEAN | default `false` |
 | `created_at` | TIMESTAMPTZ | default now |
 
@@ -734,3 +736,19 @@ obrigatório, `used_at` TIMESTAMPTZ opcional e `created_at` TIMESTAMPTZ obrigat�
 Índice em `usuario_id` para invalidar os links da conta. Não armazena token aberto,
 senha ou cópia do e-mail; mantém o padrão de tokens de confirmação sem permitir
 uso cruzado entre as duas finalidades.
+
+## Transparência e ciência dos Termos — RF26 / #269
+
+Derivado de `docs/requisitos.md`, RF26, autorizado pelo PO em 16–17/11/2026.
+
+- `POST /api/auth/cadastro` exige `ciencia_termos: true` (booleano estrito) e
+  `termos_versao: "2026-11-17"`. Ausência/falso/tipo indevido/versão diferente retorna
+  422 antes dos efeitos. Não aceita data enviada pelo cliente. Resposta neutra 202 preservada.
+- `usuarios.termos_versao VARCHAR(32) NULL` e `termos_ciencia_em TIMESTAMPTZ NULL`:
+  par ausente nas contas antigas ou completo nas novas, garantido por CHECK. Sem default
+  ou backfill; serviço registra instante UTC na mesma transação da criação. Não são
+  adicionados a respostas públicas. Nenhum índice novo: não há consulta por esses campos.
+- Páginas públicas `/privacidade` e `/termos-de-uso` com versão/data e links no rodapé,
+  cadastro e Sobre; ciência inicialmente desmarcada, sem novo bloqueio de contas antigas.
+- Natureza acadêmica estudantil independente e sem fins lucrativos; sem endosso oficial
+  comprovado. Inventário factual e limites em `docs/transparencia.md`.

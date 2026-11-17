@@ -58,6 +58,10 @@ class AuthHttpFixture:
         app.dependency_overrides.update(self.overrides)
 
     def post(self, rota, corpo):
+        if rota == "cadastro":
+            from app.domain.termos import TERMOS_VERSAO
+
+            corpo = {"ciencia_termos": True, "termos_versao": TERMOS_VERSAO, **corpo}
         return self.client.post("/api/auth/" + rota, json=corpo)
 
     def usuario(self, *, email=None, confirmado=False, moderador=False):

@@ -43,26 +43,34 @@ SIGAA.
 
 </div>
 
-## Plataforma e versão atual
+## Para usar o programa
 
-Use o [UnDb](https://undb.app.br) para buscar professores e disciplinas, consultar
-os cinco critérios e contribuir com sua experiência. A [página Sobre](https://undb.app.br/sobre)
-apresenta a equipe e suas redes.
+Acesse [undb.app.br](https://undb.app.br) e siga o [tutorial de uso](tutorial-uso.md)
+para pesquisar, comparar e contribuir. Não é necessário instalar ferramentas para consultar.
 
-A [1.4.0](releases/1.4.0.md) reúne a revisão visual integrada pela PR #230,
-com destaques por quantidade de avaliações, comparação por cartões e perfis completos.
-As notas distinguem a candidata da publicação final no GitHub. O histórico anterior
-inclui [1.3.0](releases/1.3.0.md) e [1.3.1](releases/1.3.1.md).
+![Encontre, compare e contribua com o UnDb.](assets/images/como-funciona.svg)
 
-## Desenvolver, validar e operar
+A consulta é pública; avaliar exige conta institucional confirmada. O mínimo de três
+vale para indicadores agregados, não garante anonimato e não condiciona os comentários.
+A [página Sobre](https://undb.app.br/sobre#metodologia) explica a metodologia.
+
+## Para desenvolver e contribuir
 
 | Objetivo | Guia |
 |---|---|
+| Encontrar o caminho técnico | [Para desenvolvedores](para-desenvolvedores.md) |
 | Instalar e configurar | [Desenvolvimento local](desenvolvimento.md) |
 | Executar verificações | [Qualidade](qualidade.md) |
-| Publicar e acompanhar serviços | [Hospedagem](hospedagem.md) |
+| Reutilizar componentes/tokens | [Design system](design-system.md) |
+| Publicar e acompanhar serviços | [Implantação](implantacao.md) e [hospedagem](hospedagem.md) |
 | Atualizar dados institucionais | [Operação do SIGAA](operacao-importacao-sigaa.md) |
 | Revisar identidades docentes | [Identidades](identidades-docentes.md) |
+| Entender assistência de IA | [Implementando com IA](implementando-com-ia.md) e [registro](uso-ia.md) |
+| Consultar reuniões | [Índice de atas](atas/README.md) |
+
+Versões: consulte o [histórico de releases](https://github.com/unb-mds/2026-02-UnDb/releases)
+e a [reconciliação da R2](releases/2.0.0-reconciliacao.md), distinguindo código integrado,
+prévia, publicação e aceite acadêmico.
 
 ## Planejamento e evidências
 

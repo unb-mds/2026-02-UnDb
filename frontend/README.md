@@ -368,3 +368,15 @@ usa a arte aprovada em `public/undb-preview.png`, com Open Graph e Twitter Card.
 `node tests/preview-compartilhamento-browser.mjs` verifica o PNG e o HTML inicial de
 produção local e integra `test:browser`. Publicação HTTPS e teste real no WhatsApp
 continuam pendentes; veja a [auditoria da PR](../docs/estudos/auditoria-pr248.md).
+
+## Transparência e ciência dos Termos — #269
+
+`/privacidade` e `/termos-de-uso` são páginas públicas com versão/data, sumário e links
+no rodapé, Sobre e cadastro. A ciência no novo cadastro é inicialmente desmarcada e
+exige versão vigente; o backend registra a data. Contas anteriores mantêm acesso.
+Fontes: [RF26](../docs/requisitos.md) e [inventário e limites](../docs/transparencia.md).
+
+Após o build, `npm run test:termos` usa a infraestrutura CDP existente, API controlada
+e `BROWSER_PATH` para verificar 320/768/1280 px, teclado, links e cadastro.
+`PREVIEW_DIR` salva capturas; teste HTTP/persistência real está em `backend/tests/test_termos.py`.
+O tema do produto permanece escuro nas duas preferências do sistema.

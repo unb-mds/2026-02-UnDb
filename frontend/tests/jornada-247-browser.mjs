@@ -142,6 +142,7 @@ await comNavegador({ fixture, diretorioFrontend: process.env.UI247_FRONTEND, exe
   await preencher({ nome: 'Pessoa sintética', email: 'teste@example.com', senha: 'senha-sintetica' });
   assert.equal(await avaliar("document.querySelector('main [name=email]').validity.patternMismatch"), true);
   await submeter(); assert.equal(cadastros, 0);
+  await avaliar("document.querySelector('[name=ciencia_termos]').checked=true");
   await preencher({ email: 'teste@aluno.unb.br' }); cadastroStatus = 422; await submeter(); await esperar('Revise os dados');
   cadastroStatus = 202;
   await avaliar("const f = document.querySelector('main form'); f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))");

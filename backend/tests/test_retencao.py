@@ -123,6 +123,8 @@ class Casos:
         )
         self.p = Professor(id=uuid4(), nome="Ensaio", departamento="CIC")
         self.d = Disciplina(id=uuid4(), codigo=uuid4().hex[:18], nome="Ensaio", departamento="CIC")
+        self.u.termos_versao = "2026-11-17"
+        self.u.termos_ciencia_em = self.agora
         self.db.add_all([self.u, self.mod, self.p, self.d])
         self.db.flush()
         self.a = Avaliacao(
@@ -228,6 +230,8 @@ class Casos:
         self.assertEqual(self.u.estado, "EXCLUIDA")
         self.assertEqual(self.u.nome, "")
         self.assertIsNone(self.u.password_hash)
+        self.assertIsNone(self.u.termos_versao)
+        self.assertIsNone(self.u.termos_ciencia_em)
         for modelo in (SessaoUsuario, TokenConfirmacaoEmail, TokenRecuperacaoSenha):
             self.assertEqual(
                 self.db.scalar(
@@ -241,7 +245,15 @@ class Casos:
 
         sender = TransporteEmMemoria()
         auth_service.cadastrar(
-            self.db, CadastroRequest(nome="Novo", email=self.email, senha=self.senha), sender
+            self.db,
+            CadastroRequest(
+                nome="Novo",
+                email=self.email,
+                senha=self.senha,
+                ciencia_termos=True,
+                termos_versao="2026-11-17",
+            ),
+            sender,
         )
         auth_service.solicitar_recuperacao_senha(self.db, self.email, sender)
         auth_service.reenviar_confirmacao(self.db, self.email, sender)
