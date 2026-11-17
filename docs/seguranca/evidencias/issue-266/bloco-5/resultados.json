@@ -108,5 +108,11 @@
     },
     "jornada_247_browser": 0,
     "build": "Sem novo build; produto frontend inalterado"
+  },
+  "ci_primeiro_push_bloco5": {
+    "run": 44009982998,
+    "job_moderacao": 133794402759,
+    "ocorrencia": "Percurso browser passou; checagem final exigia zero denuncias armazenadas, premissa anterior ao Bloco 5. Corrigida para zero denuncias ativas; encerradas sao preservadas.",
+    "regressao_local": "tests.test_retencao: 7 passaram, 7 PostgreSQL ignorados nesta repeticao SQLite; os 14 casos haviam passado com PostgreSQL na validacao completa."
   }
 }
