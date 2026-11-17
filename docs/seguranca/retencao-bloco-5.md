@@ -40,6 +40,9 @@ denúncias, agradecimentos e decisões vinculadas. Referências `substitui_id` s
 desligadas antes da remoção. Exclusão da avaliação remove todas as suas versões.
 A cascata é explícita, transacional e protegida pelas FKs existentes; não depende
 de cascade de ORM ou de FKs desabilitadas. Não há cópia do texto em outra tabela.
+Se uma versão removida for substituída por outra aprovada, o prazo de descarte
+original é preservado: a purga também remove versões SUBSTITUIDO com prazo vencido
+e seus registros vinculados. Substituições sem descarte agendado continuam sem prazo.
 
 Comentário é entidade separada dos critérios estruturados da avaliação. Rejeitar
 comentário PENDENTE apaga seu texto, mantém apenas seus metadados e a decisão e

@@ -11,7 +11,9 @@ recriação de serviços ou migração sobre um ambiente compartilhado sem coord
 
 O arquivo `backend/.env` deve definir `SECRET_KEY`, `DEBUG`, as credenciais locais do
 PostgreSQL (`POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_DB`) e a `DATABASE_URL` com
-o host `db`. O `.env` real nunca deve ser versionado.
+o host `db`. Defina também `ABUSO_HMAC_SECRET` com um segredo aleatório exclusivo;
+o Compose o repassa à API. Sem ele, os fluxos de autenticação retornam 503.
+O `.env` real nunca deve ser versionado.
 
 ```bash
 # clonar o repositório

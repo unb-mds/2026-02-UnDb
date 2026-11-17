@@ -19,6 +19,7 @@ services:
       context: ./backend
     environment: &backend_environment
       SECRET_KEY: ${SECRET_KEY:-troque-por-um-valor-aleatorio}
+      ABUSO_HMAC_SECRET: ${ABUSO_HMAC_SECRET:-}
       DEBUG: ${DEBUG:-True}
       POSTGRES_DB: ${POSTGRES_DB:-g7}
       POSTGRES_USER: ${POSTGRES_USER:-g7}

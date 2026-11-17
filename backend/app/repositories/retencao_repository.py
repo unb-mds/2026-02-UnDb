@@ -107,7 +107,13 @@ def purgar_conteudo(db, agora, lote):
             select(ComentarioVersao.id)
             .where(
                 ComentarioVersao.descartar_em <= agora,
-                ComentarioVersao.estado.in_((EstadoComentario.RETIRADO, EstadoComentario.REMOVIDO)),
+                ComentarioVersao.estado.in_(
+                    (
+                        EstadoComentario.RETIRADO,
+                        EstadoComentario.REMOVIDO,
+                        EstadoComentario.SUBSTITUIDO,
+                    )
+                ),
             )
             .order_by(ComentarioVersao.id)
             .limit(lote)

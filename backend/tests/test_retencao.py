@@ -260,6 +260,65 @@ class Casos:
         self.assertEqual(sender.envios, [])
         self.assertIsNotNone(self.db.get(Avaliacao, self.a.id).excluido_em)
 
+    def test_substituir_removido_preserva_prazo_e_purga_dependentes(self):
+        from app.schemas.moderacao import AcaoModeracaoRequest
+        from app.services import moderacao_service
+
+        denuncia = self.db.scalar(
+            select(Denuncia).where(Denuncia.comentario_versao_id == self.c.id)
+        )
+        denuncia.denunciante_id = self.u.id
+        self.db.commit()
+        with patch.object(moderacao_service, "agora_utc", return_value=self.agora):
+            moderacao_service.decidir(
+                self.db, self.mod, self.c.id, AcaoModeracaoRequest(acao="REMOVER", motivo="SPAM")
+            )
+        prazo_original = self.agora + timedelta(days=config.RETENCAO_CONTEUDO_DIAS)
+        antiga_id = self.c.id
+        nova = ComentarioVersao(
+            avaliacao_id=self.a.id,
+            estado=EstadoComentario.PENDENTE,
+            texto="Novo texto sintético",
+            substitui_id=antiga_id,
+        )
+        self.db.add(nova)
+        self.db.commit()
+        nova_id = nova.id
+        with patch.object(
+            moderacao_service, "agora_utc", return_value=self.agora + timedelta(days=1)
+        ):
+            moderacao_service.decidir(
+                self.db, self.mod, nova_id, AcaoModeracaoRequest(acao="APROVAR", motivo="Revisado")
+            )
+        self.db.expire_all()
+        self.assertEqual(self.c.estado, EstadoComentario.SUBSTITUIDO)
+        self.assertIsNone(self.c.texto)
+        self.assertIsNotNone(self.c.descartar_em)
+        self.assertEqual(self.c.descartar_em.replace(tzinfo=timezone.utc), prazo_original)
+
+        self.relogio.return_value = prazo_original - timedelta(microseconds=1)
+        service.purgar(self.db)
+        self.db.expire_all()
+        self.assertIsNotNone(self.db.get(ComentarioVersao, antiga_id))
+        self.relogio.return_value = prazo_original
+        service.purgar(self.db)
+        self.db.expire_all()
+        self.assertIsNone(self.db.get(ComentarioVersao, antiga_id))
+        for modelo in (Denuncia, Agradecimento, DecisaoModeracao):
+            self.assertEqual(
+                self.db.scalar(
+                    select(func.count())
+                    .select_from(modelo)
+                    .where(modelo.comentario_versao_id == antiga_id)
+                ),
+                0,
+            )
+        self.assertEqual(nova.estado, EstadoComentario.PUBLICADO)
+        self.assertIsNone(nova.substitui_id)
+        self.assertIsNone(nova.descartar_em)
+        self.assertIsNotNone(self.db.get(Avaliacao, self.a.id))
+        self.assertEqual(service.purgar(self.db), 0)
+
     def test_exclusao_sem_permissao_e_rollback(self):
         with self.assertRaises(HTTPException) as erro:
             service.excluir_avaliacao(self.db, self.mod, self.a.id)

@@ -119,7 +119,7 @@ def decidir(
                 denuncia_repository.encerrar(db, atual.id, "VERSAO_SUBSTITUIDA")
                 atual.estado = EstadoComentario.SUBSTITUIDO
                 atual.texto = None
-                atual.descartar_em = None
+                # A substituição não cancela o descarte de uma versão removida.
                 atual.updated_at = agora
             versao.estado = EstadoComentario.PUBLICADO
         elif dados.acao == AcaoModeracao.REJEITAR:
