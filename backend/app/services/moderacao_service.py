@@ -3,6 +3,8 @@
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
+from app.repositories import voto_comentario_repository
+
 from sqlalchemy.orm import Session
 
 from app.models.enums import AcaoModeracao, EstadoComentario
@@ -120,11 +122,13 @@ def decidir(
                 atual.estado = EstadoComentario.SUBSTITUIDO
                 atual.texto = None
                 # A substituição não cancela o descarte de uma versão removida.
+                voto_comentario_repository.apagar_da_versao(db, atual.id)
                 atual.updated_at = agora
             versao.estado = EstadoComentario.PUBLICADO
         elif dados.acao == AcaoModeracao.REJEITAR:
             versao.estado = EstadoComentario.REJEITADO
             versao.texto = None
+            voto_comentario_repository.apagar_da_versao(db, versao.id)
         else:
             if dados.acao == AcaoModeracao.REMOVER:
                 if abertas:

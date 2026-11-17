@@ -334,6 +334,32 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
     entre versão pública e substituto em revisão. Isso não dá acesso a identidades de
     denunciantes ou aos registros privados de moderação.
 
+### RF20 — Utilidade do comentário (#278, R2 de 16/11/2026)
+
+**Estado:** escopo autorizado pelo PO na #278 e na solicitação de implementação.
+
+- Conta estudantil com e-mail confirmado pode marcar útil ou não útil na versão publicada
+  de comentário de outra conta. Uma conta tem no máximo um voto por versão; repetir,
+  trocar e retirar são operações idempotentes, com identidade validada no servidor.
+- Visitantes e contas não confirmadas podem consultar contagens. Somente a própria conta
+  recebe seu estado de voto; não há lista pública ou interna nova de votantes.
+- Versão indisponível não aceita votos nem divulga contagens/estado. Substituto começa
+  sem votos herdados. Suspensão conserva os votos junto da versão; restauração da mesma
+  versão preserva-os. Rejeição/substituição descarta votos com o texto; retirada/remoção
+  segue os sete dias existentes, apagando votos no descarte. Exclusão física da versão
+  ou da conta elimina os respectivos votos. Não há arquivo ou histórico de votos.
+- Essa aplicação do ciclo da versão aos votos não amplia retenção. Não foi localizada
+  regra anterior específica de votos: registrar no PR como ponto a confirmar na #263.
+- Votos não alteram ordenação, notas/agregados, denúncias, publicação ou moderação.
+  Crítica impopular permanece sujeita às mesmas regras de qualquer comentário.
+- Controles têm rótulos, foco visível preservado após o envio, teclado e estados de
+  carregamento e erro, em desktop e celular. Falha não apresenta sucesso ou contagem inventada.
+
+Critérios verificáveis: autorização (visitante/não confirmado/próprio autor), identidade
+não fornecida pelo cliente, unicidade inclusive concorrente, repetição/troca/retirada,
+privacidade por sessão, versões sem herança, indisponibilidade, descarte e isolamento de
+notas/denúncias/estado/ordenação. Sem ranking, fraude ou serviço/dependência novos.
+
 ### RF21 — Regras de denúncia
 
 **Estado:** regras de produto aprovadas na discussão da #154; implementação posterior.

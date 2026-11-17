@@ -1,3 +1,4 @@
+from app.repositories import voto_comentario_repository
 from uuid import UUID
 
 from sqlalchemy import and_, select
@@ -18,6 +19,7 @@ def bloquear_avaliacao(db: Session, avaliacao_id: UUID) -> None:
 
 
 def apagar(db: Session, comentario: ComentarioVersao) -> None:
+    voto_comentario_repository.apagar_da_versao(db, comentario.id)
     db.delete(comentario)
 
 

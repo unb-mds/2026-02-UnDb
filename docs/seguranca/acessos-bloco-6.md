@@ -4,7 +4,7 @@ Estado: implementado. Fonte: decisão C do PO. Premissa de não aplicação do a
 do Marco Civil por ausência de fins econômicos: pendente de validação jurídica.
 Não é evidência de produção. Nenhum ambiente de produção foi acessado.
 
-Migração reversível 20261117_03 cria registros_acesso, sem endpoint/painel ou FK
+Migração reversível 20261117_03_acessos cria registros_acesso, sem endpoint/painel ou FK
 que impeça exclusão de conta. Usuário é ID interno, sem nome/e-mail. Middleware
 ASGI registra sucesso/falha das mutações de autenticação (inclusive falhas e
 reenvio), avaliações, comentários, denúncias, moderação, identidade, exclusões e

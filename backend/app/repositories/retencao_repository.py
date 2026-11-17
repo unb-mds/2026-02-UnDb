@@ -11,6 +11,7 @@ from app.models import (
     SessaoUsuario,
     TokenConfirmacaoEmail,
     TokenRecuperacaoSenha,
+    VotoComentario,
 )
 from app.models.contador_abuso import ContadorAbuso
 from app.models.enums import EstadoComentario
@@ -67,7 +68,13 @@ def ocultar(db, avaliacao, agora, prazo):
 
 
 def remover_credenciais(db, id):
-    for modelo in (SessaoUsuario, TokenConfirmacaoEmail, TokenRecuperacaoSenha, Agradecimento):
+    for modelo in (
+        SessaoUsuario,
+        TokenConfirmacaoEmail,
+        TokenRecuperacaoSenha,
+        Agradecimento,
+        VotoComentario,
+    ):
         db.execute(delete(modelo).where(modelo.usuario_id == id))
 
 
@@ -76,7 +83,7 @@ def apagar_comentarios(db, ids):
         return
     # FKs preservam integridade; cascata explícita no mesmo commit funciona também
     # em bancos existentes sem ON DELETE CASCADE. Ninguém pode apagar só o pai.
-    for modelo in (Denuncia, Agradecimento, DecisaoModeracao):
+    for modelo in (Denuncia, Agradecimento, DecisaoModeracao, VotoComentario):
         db.execute(delete(modelo).where(modelo.comentario_versao_id.in_(ids)))
     db.execute(
         update(ComentarioVersao)

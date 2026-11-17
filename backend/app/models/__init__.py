@@ -1,3 +1,4 @@
+from app.models.voto_comentario import VotoComentario
 from app.models.avaliacao import Avaliacao
 from app.models.contador_abuso import ContadorAbuso
 from app.models.solicitacao_titular import SolicitacaoTitular, EventoSolicitacao
@@ -17,6 +18,7 @@ from app.models.denuncia import Denuncia, Agradecimento
 
 __all__ = [
     "ContadorAbuso",
+    "VotoComentario",
     "SolicitacaoTitular",
     "EventoSolicitacao",
     "IdentidadeDocente",

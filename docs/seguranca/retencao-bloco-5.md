@@ -121,3 +121,19 @@ usa agora o ID unico 20261117_02_retencao; o ID 20261117_02 permanece reservado
 para a migracao da develop de ciencia dos Termos. A revisao 20261117_04 une os
 grafos e reconcilia bancos do historico anterior da #266 sem apagar ciencia real.
 Rollback e reaplicacao devem manter API/jobs parados conforme o procedimento.
+
+## Integração com votos de utilidade (#278)
+
+A migração `20261117_03` de develop permanece reservada aos votos. Acesso usa
+`20261117_03_acessos`, e `20261117_05` une os ramos. Bancos antigos da #266
+carimbados com `_03` ou `_04` são reconciliados sem recriar registros de acesso
+ou apagar votos existentes. A nova união cria votos somente se o schema estiver
+ausente no histórico ambíguo. O ensaio `tests.integration_conflito_migracoes`
+percorre ciência `_02`, votos `_03`, retenção antiga `_02`, acessos antigos `_03`
+e o head anterior `_04`, com upgrade/check e retorno à base em banco descartável.
+
+A purga de comentários também remove seus votos. Excluir conta remove os votos
+feitos por ela em comentários alheios e impede novas escritas da conta excluída;
+o comentário alheio e os votos das demais contas permanecem. A escrita de voto
+usa o bloqueio da conta antes do bloqueio do comentário para serializar com a
+exclusão. Substituição e rejeição preservam o descarte de votos da #278.

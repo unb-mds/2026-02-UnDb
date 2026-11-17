@@ -27,6 +27,7 @@ from app.models import (
     SessaoUsuario,
     TokenConfirmacaoEmail,
     TokenRecuperacaoSenha,
+    VotoComentario,
 )
 from app.models.enums import EstadoComentario, MotivoDenuncia
 from app.schemas.auth import CadastroRequest, LoginRequest
@@ -164,6 +165,9 @@ class Casos:
                 created_at=self.agora,
             )
         )
+        self.db.add(
+            VotoComentario(comentario_versao_id=self.c.id, usuario_id=self.mod.id, voto="UTIL")
+        )
         self.db.commit()
         self.ids = (self.u.id, self.mod.id, self.a.id, self.p.id, self.d.id)
 
@@ -213,6 +217,7 @@ class Casos:
         self.assertIsNone(self.db.get(ComentarioVersao, cid))
         self.assertEqual(self.db.scalar(select(func.count()).select_from(Denuncia)), 0)
         self.assertEqual(self.db.scalar(select(func.count()).select_from(Agradecimento)), 0)
+        self.assertEqual(self.db.scalar(select(func.count()).select_from(VotoComentario)), 0)
         self.assertEqual(service.purgar(self.db), 0)
 
     def test_conta_minima_sem_login_tokens_ou_recadastro(self):
@@ -304,7 +309,7 @@ class Casos:
         service.purgar(self.db)
         self.db.expire_all()
         self.assertIsNone(self.db.get(ComentarioVersao, antiga_id))
-        for modelo in (Denuncia, Agradecimento, DecisaoModeracao):
+        for modelo in (Denuncia, Agradecimento, DecisaoModeracao, VotoComentario):
             self.assertEqual(
                 self.db.scalar(
                     select(func.count())
@@ -318,6 +323,23 @@ class Casos:
         self.assertIsNone(nova.descartar_em)
         self.assertIsNotNone(self.db.get(Avaliacao, self.a.id))
         self.assertEqual(service.purgar(self.db), 0)
+
+    def test_exclusao_conta_remove_votos_e_impede_escrita_com_usuario_obsoleto(self):
+        from app.services import voto_comentario_service
+
+        # A avaliação pertence a outra conta, portanto seu comentário fica publicado.
+        self.a.usuario_id = self.mod.id
+        self.db.add(
+            VotoComentario(comentario_versao_id=self.c.id, usuario_id=self.u.id, voto="UTIL")
+        )
+        self.db.commit()
+        service.excluir_conta(self.db, self.u)
+        self.assertIsNone(self.db.get(VotoComentario, (self.c.id, self.u.id)))
+        self.assertEqual(self.c.estado, EstadoComentario.PUBLICADO)
+        usuario_obsoleto = Usuario(id=self.u.id, email_confirmado=True)
+        with self.assertRaises(voto_comentario_service.VotoComentarioError) as erro:
+            voto_comentario_service.definir(self.db, self.c.id, usuario_obsoleto, "UTIL")
+        self.assertEqual(erro.exception.status_code, 401)
 
     def test_exclusao_sem_permissao_e_rollback(self):
         with self.assertRaises(HTTPException) as erro:
