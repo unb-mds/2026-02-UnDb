@@ -113,6 +113,7 @@ await comNavegador({fixture, timeoutMs:60000, executar:async ({cdp,avaliar,aguar
     await avaliar(`${selecionar(botao(1))}.click()`);
     await aguardar(()=>avaliar(`${selecionar(grupo)}.getAttribute('aria-busy')==='true'`),'carregamento');
     assert.equal(await avaliar(`${selecionar(botao(1))}.getAttribute('aria-disabled')`),'true','carregamento anunciado');
+    await aguardar(async()=>envios.length===antes+1,'uma escrita recebida');
     const contrasteCarregando = await medirContraste();
     assert.equal(contrasteCarregando.every(c=>c.razao>=4.5),true,'contraste durante carregamento');
     await avaliar(`${selecionar(botao(1))}.click()`);
@@ -140,8 +141,10 @@ await comNavegador({fixture, timeoutMs:60000, executar:async ({cdp,avaliar,aguar
   await pronto();
   // Uma resposta antiga não devolve estado privado depois de troca de sessão.
   atraso=700;
+  const antesDaTroca=envios.length;
   await avaliar(`${selecionar(botao(1))}.click()`);
   await aguardar(()=>avaliar(`${selecionar(grupo)}.getAttribute('aria-busy')==='true'`),'escrita em andamento');
+  await aguardar(async()=>envios.length===antesDaTroca+1,'escrita recebida antes da troca');
   voto=null;
   await avaliar("window.dispatchEvent(new Event('undb:sessao-alterada'))");
   await pronto();
