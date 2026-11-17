@@ -27,7 +27,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.core.auth import SESSION_COOKIE_NAME, obter_usuario_confirmado
 from app.core.database import Base, get_db
-from app.core.limite_atendimento import _janelas
+from app.core.dependencia_limite_abuso import obter_limitador
 from app.core.security import gerar_hash_token
 from app.main import app
 from app.models.avaliacao import Avaliacao
@@ -44,11 +44,12 @@ from app.models.voto_comentario import VotoComentario
 from app.repositories import moderacao_repository
 from app.repositories import denuncia_repository
 from app.services import solicitacao_titular_service as canal_service
+from tests.auth_abuso_fixtures import protecao_permitida
 
 
 class PoliticaModeracaoETitularesTest(unittest.TestCase):
     def setUp(self):
-        _janelas.clear()
+        app.dependency_overrides[obter_limitador] = lambda: protecao_permitida().limitador
         self.engine = create_engine(
             "sqlite+pysqlite:///:memory:",
             connect_args={"check_same_thread": False},
