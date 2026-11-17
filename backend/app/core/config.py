@@ -8,7 +8,6 @@ CANAL_TITULARES_RETENCAO_APROVADA = config(
 )
 CANAL_TITULARES_LEITORES = config("CANAL_TITULARES_LEITORES", default="", cast=Csv())
 CANAL_TITULARES_ATENDENTES = config("CANAL_TITULARES_ATENDENTES", default="", cast=Csv())
-CANAL_TITULARES_LIMITE_MINUTO = config("CANAL_TITULARES_LIMITE_MINUTO", default=30, cast=int)
 DEBUG = config("DEBUG", default=False, cast=bool)
 PORT = config("PORT", default=10000, cast=int)
 DATABASE_URL = config("DATABASE_URL")

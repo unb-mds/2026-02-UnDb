@@ -288,6 +288,7 @@ jobs:
           set -euo pipefail
           export BROWSER_PATH="$(command -v google-chrome)"
           export FLUXO_MODERACAO_FIXTURE_FILE="$RUNNER_TEMP/undb-moderacao-fixture.json"
+          export ABUSO_HMAC_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
           cd backend
           python -m tests.denuncia_browser_fixture > "$FLUXO_MODERACAO_FIXTURE_FILE"
           uvicorn app.main:app --host 127.0.0.1 --port 8000 &
