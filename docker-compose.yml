@@ -42,6 +42,7 @@ services:
       MODERACAO_IA_POR_DIA: ${MODERACAO_IA_POR_DIA:-100}
       RETENCAO_CONTEUDO_DIAS: ${RETENCAO_CONTEUDO_DIAS:-7}
       PURGA_INTERVALO_SEGUNDOS: ${PURGA_INTERVALO_SEGUNDOS:-60}
+      ACESSO_RETENCAO_MESES: ${ACESSO_RETENCAO_MESES:-6}
       PURGA_LOTE: ${PURGA_LOTE:-1000}
     ports:
       - "8000:8000"
@@ -51,7 +52,7 @@ services:
     command:
       - sh
       - -c
-      - alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+      - alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-proxy-headers
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
       interval: 5s

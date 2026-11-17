@@ -30,6 +30,7 @@ __all__ = [
     "Professor",
     "ProfessorCorrespondencia",
     "SessaoUsuario",
+    "RegistroAcesso",
     "Turma",
     "TokenConfirmacaoEmail",
     "Unidade",
@@ -42,3 +43,5 @@ __all__ = [
 
 from app.models.identidade_docente import IdentidadeDocente, PendenciaIdentidade, DecisaoIdentidade
 from app.models.identidade_docente import IdentidadeLocal
+
+from app.models.registro_acesso import RegistroAcesso

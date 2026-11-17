@@ -1,4 +1,5 @@
 import logging
+from app.core.registros_acesso import RegistrosAcesso
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -92,3 +93,5 @@ def health_check():
 
 
 app.include_router(retencao.router)
+
+app.add_middleware(RegistrosAcesso)

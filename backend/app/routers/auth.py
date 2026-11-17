@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.auth import (
@@ -80,6 +80,7 @@ def login(
     response: Response,
     session: Annotated[Session, Depends(get_db)],
     protecao: Protecao,
+    request: Request = None,
 ) -> MensagemResponse:
     protecao.login(dados.email)
     try:
@@ -92,6 +93,8 @@ def login(
             detail=str(erro),
         ) from erro
 
+    if request is not None:
+        request.scope["acesso_usuario_id"] = autenticacao.usuario.id
     definir_cookie_sessao(response, autenticacao.token)
     return MensagemResponse(message=auth_service.LOGIN_MESSAGE)
 

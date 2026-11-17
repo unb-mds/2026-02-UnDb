@@ -1,5 +1,15 @@
 # 📋 Engenharia de Requisitos — G7
 
+## Registros de acesso — #266, Bloco 6
+
+Fonte: decisão C do PO e EXECUTAR: BLOCO 6 e 7. Estado: implementado.
+Mutações de autenticação, avaliação/comentário, denúncia, moderação, exclusão e
+canal de titulares devem registrar UTC, operação, usuário autenticado quando
+resolvido, IP de conexão, encaminhamento bruto não confiável, resultado e ID de
+requisição. Sem corpo, senha, token ou texto de avaliação. Tabela privada, sem
+endpoint/interface, retenção configurável de seis meses corridos e purga automática.
+Premissa sobre Marco Civil e configurações externas permanecem pendentes de validação.
+
 ## Retenção e exclusão — #266, Bloco 5
 
 Fonte: decisão B e EXECUTAR: BLOCO 5 do PO. Estado: implementado;

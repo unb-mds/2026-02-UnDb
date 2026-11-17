@@ -8,6 +8,7 @@ import time
 EVENTOS = frozenset(
     {
         "http.falha_interna",
+        "acesso.gravacao_falhou",
         "http.resposta",
         "auth.recuperacao.envio_falhou",
         "auth.confirmacao.envio_falhou",

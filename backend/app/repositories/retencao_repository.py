@@ -119,7 +119,9 @@ def purgar_conteudo(db, agora, lote):
 
 
 def purgar_expirados(db, agora, lote):
-    total = purgar_conteudo(db, agora, lote)
+    from app.repositories.registro_acesso_repository import purgar
+
+    total = purgar_conteudo(db, agora, lote) + purgar(db, agora, lote)
     for modelo in (SessaoUsuario, TokenConfirmacaoEmail, TokenRecuperacaoSenha):
         ids = select(modelo.id).where(modelo.expires_at <= agora).limit(lote)
         total += db.execute(delete(modelo).where(modelo.id.in_(ids))).rowcount
