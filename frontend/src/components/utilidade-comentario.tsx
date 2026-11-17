@@ -84,9 +84,9 @@ export default function UtilidadeDoComentario({ versaoId }: { versaoId: string }
           </button>
         ))}
       </div>}
-      {resumo?.meu_voto && <p className="text-sm text-muted">Selecione o voto marcado novamente para retirá-lo.</p>}
-      <p role="status" className="text-sm text-muted">{carregando ? "Atualizando utilidade…" : ""}</p>
-      {erro && <p role="alert" className="text-sm text-danger">{erro}</p>}
+      {resumo?.meu_voto && <p className="text-sm text-[var(--muted)]">Selecione o voto marcado novamente para retirá-lo.</p>}
+      <p role="status" className="text-sm text-[var(--muted)]">{carregando ? "Atualizando utilidade…" : ""}</p>
+      {erro && <p role="alert" className="text-sm text-[var(--danger)]">{erro}</p>}
       {!resumo && !carregando && <button type="button" className="button self-start" onClick={() => setConsulta((v) => v + 1)}>Tentar novamente</button>}
     </div>
   );
