@@ -40,7 +40,9 @@ from app.models.sessao_usuario import SessaoUsuario
 from app.models.turma import Turma
 from app.models.unidade import Unidade
 from app.models.usuario import Usuario
+from app.models.voto_comentario import VotoComentario
 from app.repositories import moderacao_repository
+from app.repositories import denuncia_repository
 from app.services import solicitacao_titular_service as canal_service
 
 
@@ -324,12 +326,36 @@ class PoliticaModeracaoETitularesTest(unittest.TestCase):
         fila = moderacao_repository.listar_fila(self.db)
         self.assertNotIn(versao.id, [v.id for v in fila])
 
-        # Se existissem 100 votos (simulando feature de utilidade futura da #278),
-        # nenhuma entrada em denuncias_comentarios é permitida por votos
+        # Votos reais da #278 não criam denúncias nem entram no limiar de suspensão.
+        votantes = [
+            Usuario(
+                id=uuid4(),
+                nome=f"Votante sintético {i}",
+                email=f"votante-{i}@aluno.unb.br",
+                password_hash="hash-teste",
+                email_confirmado=True,
+            )
+            for i in range(50)
+        ]
+        self.db.add_all(votantes)
+        self.db.flush()
+        self.db.add_all(
+            [
+                VotoComentario(
+                    comentario_versao_id=versao.id, usuario_id=votante.id, voto="NAO_UTIL"
+                )
+                for votante in votantes
+            ]
+        )
+        self.db.commit()
+
         denuncias = self.db.scalars(
             select(Denuncia).where(Denuncia.comentario_versao_id == versao.id)
         ).all()
         self.assertEqual(len(denuncias), 0)
+        self.assertEqual(denuncia_repository.contar_contas(self.db, versao.id), 0)
+        fila = moderacao_repository.listar_fila(self.db)
+        self.assertNotIn(versao.id, [v.id for v in fila])
 
         # O gatilho de suspensão (50 contas) avalia estritamente denúncias de contas autenticadas
         # Garantir que contagem_denuncias retorna 0 e o comentário permanece PUBLICADO
@@ -343,9 +369,9 @@ class PoliticaModeracaoETitularesTest(unittest.TestCase):
         # 1. Envio sem login estudantil
         payload = {
             "categoria": "DIREITO_LGPD",
-            "alvo": "conta-usuario-sintetico",
+            "alvo": f"conta-sintetica:{self.estudante.id}",
             "descricao": "Solicito retificação do meu nome social no cadastro institucional.",
-            "evidencia": "Endereço institucional comprovado via contato acadêmico.",
+            "evidencia": "Caso fictício; confirmação proporcional simulada, sem documento civil.",
         }
         res_envio = self.client.post("/api/solicitacoes", json=payload)
         self.assertEqual(res_envio.status_code, 201)
@@ -357,12 +383,22 @@ class PoliticaModeracaoETitularesTest(unittest.TestCase):
         path_eventos = f"/api/atendimento/{protocolo}/eventos"
         app.dependency_overrides[obter_usuario_confirmado] = lambda: self.atendente
 
-        # Registro de triagem interna (não exposta ao público)
+        # Exercício manual com identidade e conta inteiramente sintéticas.
         self.client.post(
             path_eventos,
             json={
                 "tipo": "TRIAGEM",
-                "texto": "Verificação proporcional: solicitar confirmação do e-mail acadêmico.",
+                "texto": "Exercício sintético: confirmação proporcional registrada; sem coletar documento civil.",
+            },
+        )
+
+        self.estudante.nome = "Pessoa Titular Sintética"
+        self.db.commit()
+        self.client.post(
+            path_eventos,
+            json={
+                "tipo": "PROVIDENCIA",
+                "texto": "Exercício sintético: correção do nome aplicada ao registro de teste.",
             },
         )
 
@@ -371,7 +407,7 @@ class PoliticaModeracaoETitularesTest(unittest.TestCase):
             path_eventos,
             json={
                 "tipo": "RESPOSTA",
-                "texto": "Pedido acolhido. Para confirmar a titularidade, responda por complemento.",
+                "texto": "Pedido de acesso e correção atendido no exercício: o nome sintético foi atualizado.",
             },
         )
         self.assertEqual(res_atendimento.status_code, 200)
@@ -383,11 +419,13 @@ class PoliticaModeracaoETitularesTest(unittest.TestCase):
         self.assertEqual(res_consulta.status_code, 200)
         consulta = res_consulta.json()
         self.assertEqual(consulta["categoria"], "DIREITO_LGPD")
+        self.assertEqual(self.estudante.nome, "Pessoa Titular Sintética")
 
         # Histórico público só contém RESPOSTA, sem vazar TRIAGEM ou identificador do operador
         tipos_historico = [e["tipo"] for e in consulta["historico"]]
         self.assertIn("RESPOSTA", tipos_historico)
         self.assertNotIn("TRIAGEM", tipos_historico)
+        self.assertNotIn("PROVIDENCIA", tipos_historico)
         for evento in consulta["historico"]:
             self.assertNotIn("responsavel_id", evento)
 
