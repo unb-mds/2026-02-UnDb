@@ -58,18 +58,22 @@ Schema independente: `solicitacoes_titulares` 1:N `eventos_solicitacoes`; autor 
 referencia `usuarios`, sem mudar privilégios de moderadores/reconciliadores.
 Recebimento exige flags de ativação/retenção e lista de atendentes configurada.
 
-Pedidos de titulares (LGPD): verificação proporcional de identidade. Distinção entre:
+Pedidos de titulares: atendimento manual por `/contato`; a equipe verifica identidade
+proporcionalmente antes de divulgar dados privados ou executar mutações. Distinção entre:
 (a) retirada de comentário (autor retira texto, denúncias viram CONTEUDO_RETIRADO, texto descartado
 em 7 dias pela rotina; critérios estruturados permanecem); (b) desativação de conta (revogação de
-sessões e tokens); e (c) exclusão de conta (limite: destino de avaliações e notas exige decisão do PO;
-não apagar nem desvincular notas sem aprovação).
+sessões e tokens, sem operação independente de desativação nesta entrega); e (c) exclusão lógica
+da conta conforme a decisão B/#266: credenciais e sessões removidas, conta mínima preservada,
+avaliações e comentários ocultos imediatamente e purgados após sete dias configuráveis. Não há
+desvinculação das notas; avaliações permanecem vinculadas à conta mínima até a purga. A restauração
+de cópias e reaplicação de exclusões não foram validadas em produção.
 
 Política de moderação: crítica acadêmica legítima é permitida; ofensas, ameaças, discriminação
 e exposição de dados são proibidas. Discordância docente não causa remoção. Triagem não rejeita
 automaticamente; casos com sinal aguardam revisão humana. Gatilho de 50 contas suspende exibição,
 mas uma única ocorrência fundamentada pode ser atendida manualmente. Revisão de decisão de
 moderação é solicitada via protocolo/complemento. Moderação de texto não altera notas; votos de
-utilidade (#278) não são denúncias e não acionam moderação.
+utilidade (#278) não são denúncias e não acionam moderação; seguem o ciclo de descarte aprovado das versões.
 
 Documento **derivado**. Fontes de verdade: [`docs/requisitos.md`](docs/requisitos.md) e
 [`docs/arquitetura.md`](docs/arquitetura.md).

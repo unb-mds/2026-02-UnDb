@@ -143,8 +143,10 @@ de moderação sem criar novos prazos ou automações excessivas.
 - Separação de visibilidade: eventos de triagem e providências são estritamente internos com
   identificação do responsável; eventos de resposta são visíveis ao solicitante e omitem a
   identidade do operador.
-- Proteção contra abuso por orçamento técnico temporário por cliente em memória (HMAC de IP
-  com expiração de 60 segundos), sem persistir endereços IP.
+- Proteção contra abuso pelo limitador compartilhado no PostgreSQL da #266: contas usam ID
+  interno e envios anônimos compartilham capacidade global, sem IP como chave. Na falha, o
+  canal público é suspenso; excesso responde 429/Retry-After. Atendimento autenticado não
+  passa pelo limitador. Ver configuração e limites em `docs/canal-titulares.md`.
 - Recebimento de novas solicitações permanece desativado por padrão (`CANAL_TITULARES_ATIVO=False`),
   condicionado à retenção aprovada e à configuração explícita de operadores em produção.
 
@@ -159,28 +161,31 @@ de moderação sem criar novos prazos ou automações excessivas.
      da visualização pública, encerra denúncias abertas como `CONTEUDO_RETIRADO` e agenda o descarte
      do texto em 7 dias pela rotina vigente; as notas estruturadas dos 5 critérios permanecem
      ativas nos agregados estatísticos;
-  2. **Desativação de conta:** encerramento imediato de sessões ativas (`sessoes_usuarios`) e
-     invalidação de tokens de confirmação e recuperação de senha, bloqueando novos logins sem
-     excluir o registro de `usuarios` para manter a integridade referencial;
-  3. **Exclusão de conta:** remoção do registro em `usuarios` e seus reflexos no banco de dados.
-- Mapeamento de efeitos de exclusão sobre chaves estrangeiras (FKs):
-  - `avaliacoes.usuario_id` possui restrição `NOT NULL` e chave estrangeira obrigatória sem CASCADE;
-  - `comentario_versoes` referencia `avaliacoes.id` obrigatoriamente;
-  - `decisoes_moderacao.moderador_id` permite `NULL`;
-  - `denuncias_comentarios.denunciante_id` permite `NULL`;
-  - `agradecimentos_denuncia.usuario_id` possui restrição `NOT NULL`;
-  - `decisoes_identidades_docentes.usuario_id` possui restrição `NOT NULL`;
-  - `sessoes_usuarios.usuario_id`, `tokens_confirmacao_email.usuario_id` e
-    `tokens_recuperacao_senha.usuario_id` possuem restrição `NOT NULL`.
-- **Limite deliberado e encaminhamento ao PO:** o destino das avaliações estruturadas e notas
-  ao excluir uma conta exige decisão específica do PO (Nicolas). O sistema não deve apagar
-  silenciosamente as avaliações (o que distorceria o histórico e as médias estatísticas) nem
-  forçar a desvinculação para nulo (o que violaria a integridade do schema atual). A definição
-  permanece como pendência de produto para o PO, sem automação silenciosa nesta entrega.
-- Limites reais de backups: cópias de segurança do banco hospedado não possuem eliminação
-  seletiva por titular. Backups são destinados à recuperação de integridade do sistema;
-  em eventual restauração, procedimentos operacionais devem consultar os registros de
-  exclusão e retirada para não reexpor dados apagados.
+  2. **Desativação de acesso:** descrição operacional de bloqueio/revogação de credenciais;
+     não há uma operação independente de desativação de conta implementada nesta entrega;
+  3. **Exclusão de conta (#266, decisão B):** exclusão lógica transacional. Remove nome,
+     senha, papéis, sessões, tokens e agradecimentos; preserva ID, e-mail reservado, datas
+     de criação/exclusão e estado. Bloqueia login e não reativa por recadastro.
+- Efeitos efetivos da exclusão lógica e FKs: avaliações e comentários ficam ocultos de imediato,
+  deixam de compor agregados/consultas públicas e são purgados após sete dias configuráveis.
+  `avaliacoes.usuario_id` é obrigatório e sem `ON DELETE CASCADE`, portanto a conta mínima
+  preserva a referência durante a janela; não há desvinculação/anomização manual das notas.
+  Na purga, avaliações, versões, denúncias, agradecimentos, decisões vinculadas e votos da
+  versão são removidos transacionalmente; FKs são tratadas pela purga explícita (não por uma
+  exclusão física direta da conta). Sessões e tokens são removidos na exclusão lógica.
+  `votos_comentario.usuario_id` usa `ON DELETE CASCADE`, mas o serviço também remove votos
+  feitos pela conta; votos de outras contas só saem quando a versão é purgada. FKs para
+  `decisoes_moderacao.moderador_id` e `denuncias_comentarios.denunciante_id` aceitam NULL;
+  `decisoes_identidades_docentes.usuario_id` é obrigatório e reforça a preservação da conta
+  mínima. `sessoes_usuarios`, tokens e votos têm suas próprias FKs e remoção no ciclo descrito.
+- Retirada de comentário permanece distinta: oculta o texto, encerra denúncias como
+  `CONTEUDO_RETIRADO` e mantém a avaliação estruturada. Desativação de acesso não equivale
+  à retirada nem à exclusão lógica, que oculta as avaliações/comentários da conta.
+- Limites reais de backups: não foi criado backup de produção nem validada restauração real.
+  A #266 ensaiou `pg_dump`/`pg_restore` com dados sintéticos em banco local; não comprovou
+  rotina, retenção nem deleção seletiva em cópias hospedadas. Restauração/reaplicação de
+  exclusões é procedimento operacional pendente de validação; não prometer apagamento
+  instantâneo em backups.
 
 ### 3. Política de moderação e revisão de decisões (#264)
 - Critérios objetivos de conteúdo proibido em comentários textuais: ofensas pessoais,
@@ -210,9 +215,10 @@ de moderação sem criar novos prazos ou automações excessivas.
   fundamentação do pedido. A revisão é realizada por moderador elegível diferente do que tomou a
   decisão original, observados os impedimentos de autoria e denúncia.
 - Independência das avaliações e votos: a moderação de texto não altera as notas ou critérios
-  estruturados da avaliação (RF14/RF15). Votos de utilidade de comentários (#278), quando
-  disponibilizados, destinam-se exclusivamente à ordenação/apresentação de relevância, não
-  constituem denúncia e não acionam a moderação nem interferem no cômputo das notas.
+  estruturados da avaliação (RF14/RF15). Votos de utilidade de comentários (#278), já integrados
+  em develop, destinam-se à relevância; não constituem denúncia, não acionam moderação e não
+  interferem no cômputo das notas. Seguem o ciclo de descarte aprovado da versão, sem retenção
+  adicional.
 
 Especificação de requisitos do sistema de **Avaliação de Professores e Disciplinas da UnB**,
 desenvolvido para a disciplina de Métodos de Desenvolvimento de Software (MDS) 2026/2.
