@@ -1,0 +1,207 @@
+{
+  "data_inicio_utc": "2026-11-17T15:30:18.219911+00:00",
+  "etapas": [
+    {
+      "etapa": "seed",
+      "resultado": {
+        "fixtures_sinteticas": true,
+        "tabelas_povoadas": [
+          "alembic_version",
+          "professores",
+          "disciplinas",
+          "turmas",
+          "unidades",
+          "turmas_professores",
+          "email_confirmation_tokens",
+          "sessoes_usuario",
+          "comentario_versoes",
+          "password_reset_tokens",
+          "solicitacoes_titulares",
+          "eventos_solicitacoes",
+          "votos_comentario",
+          "usuarios",
+          "avaliacoes",
+          "registros_acesso"
+        ]
+      }
+    },
+    {
+      "etapa": "late",
+      "resultado": {
+        "eventos_posteriores_ao_backup": 7,
+        "diario": "sintético em tmpfs; não operacional"
+      }
+    },
+    {
+      "etapa": "verify",
+      "resultado": {
+        "schema_e_valores_iguais": true,
+        "revisao": "20261117_05",
+        "contagens": {
+          "disciplinas": 1,
+          "alembic_version": 1,
+          "professores": 1,
+          "avaliacoes": 5,
+          "contadores_abuso": 0,
+          "decisoes_moderacao": 0,
+          "denuncias": 0,
+          "email_confirmation_tokens": 1,
+          "eventos_solicitacoes": 2,
+          "identidades_docentes": 0,
+          "importacao_execucoes": 0,
+          "sessoes_usuario": 1,
+          "pendencias_identidade": 0,
+          "registros_acesso": 2,
+          "comentario_versoes": 5,
+          "agradecimentos": 0,
+          "decisoes_identidade": 0,
+          "identidades_locais": 0,
+          "password_reset_tokens": 1,
+          "professor_correspondencias": 0,
+          "unidades": 1,
+          "turmas_professores": 1,
+          "votos_comentario": 1,
+          "usuarios": 5,
+          "solicitacoes_titulares": 1,
+          "turmas": 1
+        },
+        "constraints": 58,
+        "copia_ainda_insegura_antes_da_reaplicacao": true
+      }
+    },
+    {
+      "etapa": "replay",
+      "resultado": {
+        "exclusoes_retirada_revogacoes_reaplicadas": true,
+        "idempotencia": true,
+        "limite_comparacao_replay": "updated_at técnico pode mudar; exclusão e janela originais preservadas"
+      }
+    },
+    {
+      "etapa": "journey",
+      "resultado": {
+        "jornada_api_no_destino": [
+          "busca",
+          "agregado",
+          "cadastro/Termos",
+          "confirmação",
+          "login",
+          "avaliação",
+          "voto/retirada",
+          "logout"
+        ],
+        "controles": [
+          "sessão/token revogados",
+          "conta excluída",
+          "papel revogado",
+          "autoria",
+          "origem",
+          "cookie",
+          "no-store",
+          "pedido/eventos/hash"
+        ],
+        "constraints_exercitadas": [
+          "check",
+          "fk",
+          "unique",
+          "not_null",
+          "termos"
+        ],
+        "transporte_email": "memória; sem envio externo"
+      }
+    },
+    {
+      "etapa": "retention",
+      "resultado": {
+        "fronteira_sete_dias": true,
+        "cascata_votos": true,
+        "acesso_expirado_purgado": true,
+        "acesso_vigente_preservado": true,
+        "conta_minima_e_pedidos_sem_prazo_inventado": true
+      }
+    }
+  ],
+  "ambiente": "Docker, rede interna exclusiva sem portas, dados/tmp em tmpfs; somente sintético",
+  "imagem_dependencias": "undb267-disposable-tools:20261117",
+  "producao_acessada": false,
+  "sha_base": "cea7d6bdd01aedce51ce8db857377a483ed72e49",
+  "fontes_sha256": {
+    "scripts/recovery_drill.py": "61fdbd2a05da9057fe222cc6c1840d2519940c40ca3a3f5981c812dfcdd93609",
+    "backend/tests/recovery_scenario.py": "784a845a78c5231bac01e20bdcd3554aa968de633c8a163d9f9f43193363a9a0"
+  },
+  "docker_contexto_local": true,
+  "docker": "29.8.0",
+  "imagem_id": "sha256:06470388cfe8738c191ce9b485e5a2e589dbd7687e7535a4a3c35ad391e7503f",
+  "postgres": "postgres (PostgreSQL) 16.15 (Debian 16.15-1.pgdg13+2)",
+  "python": "Python 3.12.16",
+  "dependencias": [
+    "alembic==1.20.1",
+    "annotated-doc==0.0.6",
+    "annotated-types==0.8.0",
+    "anyio==4.16.0",
+    "argon2-cffi==25.1.0",
+    "argon2-cffi-bindings==26.2.0",
+    "certifi==2026.10.23",
+    "cffi==2.1.1",
+    "charset-normalizer==3.5.2",
+    "click==8.5.1",
+    "fastapi==0.163.1",
+    "h11==0.16.0",
+    "httpcore==1.0.9",
+    "httptools==0.9.0",
+    "httpx==0.28.1",
+    "idna==3.20",
+    "Mako==1.4.3",
+    "MarkupSafe==3.0.4",
+    "opentelemetry-api==1.45.2",
+    "psycopg2-binary==2.9.13",
+    "pwdlib==0.4.2",
+    "pycparser==3.12",
+    "pydantic==2.14.3",
+    "pydantic_core==2.50.4",
+    "python-decouple==3.8",
+    "python-dotenv==1.2.4",
+    "PyYAML==6.0.3",
+    "requests==2.34.2",
+    "resend==2.54.0",
+    "ruff==0.17.3",
+    "SQLAlchemy==2.1.9",
+    "starlette==1.10.0",
+    "typing-inspection==0.4.5",
+    "typing_extensions==4.16.0",
+    "urllib3==2.8.0",
+    "uvicorn==0.54.0",
+    "uvloop==0.23.0",
+    "watchfiles==1.3.0",
+    "websockets==17.4"
+  ],
+  "alembic": {
+    "upgrade_origem_head": 0,
+    "check_origem": 0,
+    "check_restaurado": 0
+  },
+  "dump": {
+    "formato": "custom",
+    "modo": "600",
+    "listagem_valida": true,
+    "destino_distinto": true,
+    "local": "tmpfs privado no container, sem exportação"
+  },
+  "resultado": "aprovado",
+  "descarte": [
+    {
+      "tipo": "container",
+      "removido": true
+    },
+    {
+      "tipo": "container",
+      "removido": true
+    },
+    {
+      "tipo": "network",
+      "removido": true
+    }
+  ],
+  "dump_diario_conexoes_removidos": true,
+  "data_fim_utc": "2026-11-17T15:31:47.067228+00:00"
+}

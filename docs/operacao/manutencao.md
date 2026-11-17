@@ -40,6 +40,15 @@ sem valores de segredo, dump ou dados de avaliadores.
 
 ## Backups e recuperação
 
+Atualização #267 (17/11/2026): Nicolas relata backups manuais no Docker quando
+necessário. Cobertura, histórico disponível, local e demais acessos ainda não
+foram informados/verificados. O plano abaixo não comprova automação instalada.
+O [roteiro curto de incidentes e recuperação](incidentes-recuperacao.md) reúne
+esses limites, as pendências de canal/registro de exclusões e a proposta para o
+time. A [extensão sintética do ensaio](../seguranca/evidencias/issue-267/README.md)
+acrescenta schema, vínculos, jornada e reaplicação; preserva a evidência histórica
+do Bloco 7 abaixo. A quantidade de tabelas não é critério fixo de cobertura.
+
 Não criar cópia de dados reais por este plano antes do primeiro dado real.
 Planejado: automáticos diários a partir desse marco, mais cópia de arquivo no
 início de cada semestre e testes periódicos de restauração. Retenção, local,
@@ -108,6 +117,11 @@ pendências da passagem anterior. Estado: planejado; medição/aceite dos limite
 continua pendente de validação (item 4).
 
 ## Incidentes e canal de titulares
+
+O procedimento curto vigente para esta entrega e o modelo mínimo de aviso estão
+no [roteiro #267](incidentes-recuperacao.md). A confirmação de Nicolas nesta sessão
+mantém canal privado e acompanhamento pendentes, com Gabriel/Vinicius informados
+de memória como recebedores. O texto planejado abaixo não comprova canal ativo.
 
 Planejado: quem detecta avisa Nicolas e substituto aceito por canal privado da
 equipe, ainda a confirmar; não usar issue/PR para dados, credenciais ou evidências

@@ -91,6 +91,14 @@ Isso não é backup nem registro de acesso do Bloco 6.
 
 ## Backups e pendências
 
+Complemento #267 (17/11/2026): o [ensaio ampliado](evidencias/issue-267/README.md)
+exercita reaplicação de exclusões, retirada e revogações com IDs/datas sintéticos
+antes da jornada restaurada, preservando a janela original e as cascatas. O
+[roteiro](../operacao/incidentes-recuperacao.md#exclusoes-e-revogacoes-antes-de-liberar-uma-copia)
+explica a limitação: Nicolas não confirmou registro operacional protegido; sem
+essa fonte não se garante reaplicação completa numa recuperação real. Não foi
+criada política de guarda, exportação nem comando de produção por esta entrega.
+
 Nenhum backup criado ou produção acessada. A retenção de backups precisa ser
 compatível com exclusões; uma restauração precisa reaplicá-las usando registro
 mínimo de IDs e datas. Responsável operacional deve definir local protegido,
