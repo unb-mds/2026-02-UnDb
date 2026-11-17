@@ -162,5 +162,14 @@ alembic upgrade head
 
 Tipagem do frontend não se aplica a este bloco, que não altera TypeScript.
 Não foi introduzido verificador de tipos Python novo.
-Estado das verificações locais e CI será registrado nesta entrega; produção,
-quota real, calibração e operação do job são **pendentes de validação**.
+Resultado local: 32 testes do núcleo sem skips; suíte completa com 373 testes,
+sem falhas e dois skips opcionais anteriores (contenção em identidades e
+reconciliação, que exigem outro banco). Ruff check/format, compileall, migrações
+de upgrade/check/downgrade/reaplicação e limpeza CLI terminaram com exit code 0.
+O papel da API no ensaio não tinha superuser/createdb/createrole/CREATE no schema.
+Bancos/papéis exclusivos foram removidos e o cluster portátil foi encerrado.
+
+[Evidência sanitizada](evidencias/issue-266/bloco-1/resultados.json).
+Continuidade em [PR #280](https://github.com/unb-mds/2026-02-UnDb/pull/280), em
+rascunho na mesma branch, conforme orientação posterior do PO. CI do novo head,
+produção, quota real, calibração e operação do job são **pendentes de validação**.
