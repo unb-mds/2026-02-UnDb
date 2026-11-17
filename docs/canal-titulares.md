@@ -97,7 +97,7 @@ A documentação e a equipe distinguem formal e tecnicamente três operações:
 
 | Operação | Escopo e mecanismo | Efeito sobre comentários | Efeito sobre notas/avaliações | Reversibilidade |
 |---|---|---|---|---|
-| **Retirada de comentário** | Executada pelo autor em `/api/comentarios/{id}/retirar` ou por atendente manual. | O texto sai de exibição pública; denúncias são encerradas como `CONTEUDO_RETIRADO`; estado muda para `RETIRADO`; rotina de descarte zera o texto após 7 dias. | **Nenhum**. As notas dos 5 critérios estruturados permanecem ativas na base e nos agregados. | Não reversível pelo autor; novo texto exige nova submissão. |
+| **Retirada de comentário** | Executada somente pelo autor autenticado: `PATCH /api/comentarios/{id}/retirar`. Atendente registra/encaminha; sua allowlist não concede retirada de texto alheio. | O texto sai de exibição pública; denúncias são encerradas como `CONTEUDO_RETIRADO`; estado muda para `RETIRADO`; rotina de purga remove a versão e seus dependentes após sete dias configuráveis. | **Nenhum**. As notas dos 5 critérios estruturados permanecem ativas na base e nos agregados. | Não reversível pelo autor; novo texto exige nova submissão. |
 | **Desativação de acesso** | Conceito de bloqueio/revogação; não há operação independente implementada nesta entrega. | Não implica, por si, retirar texto. | Não altera avaliações. | Não há procedimento autônomo definido aqui. |
 | **Exclusão de conta (#266, decisão B)** | Exclusão lógica transacional; preserva conta mínima (ID, e-mail reservado, datas e estado), remove nome, senha e papéis, revoga sessões/tokens e agradecimentos. Não reativa por recadastro. | Oculta de imediato versões associadas e encerra denúncias abertas; conteúdo é purgado pela rotina após sete dias configuráveis. | Avaliações são ocultadas dos agregados imediatamente e purgadas após sete dias configuráveis; sem desvinculação das notas. | O acesso é bloqueado; a purga do conteúdo é definitiva. |
 
@@ -107,9 +107,9 @@ A inspeção do schema real do PostgreSQL/SQLAlchemy revela as seguintes restri�
 
 1. **`avaliacoes.usuario_id`:** FK obrigatória (`NOT NULL`, sem `ON DELETE CASCADE`) e unicidade por conta/professor/disciplina. Exclusão lógica preserva o usuário mínimo e o vínculo; avaliações ficam ocultas dos agregados e são purgadas em sete dias configuráveis. Exclusão física direta do usuário não é o fluxo implementado.
 2. **`comentario_versoes.avaliacao_id`:** FK obrigatória. Versões são ocultadas/retiradas junto da avaliação e removidas na purga transacional. Denúncias, agradecimentos, decisões e votos vinculados à versão são removidos pela purga explícita antes das versões.
-3. **Sessões e tokens** (`sessoes_usuarios`, `tokens_confirmacao_email`, `tokens_recuperacao_senha`): FKs obrigatórias; serviço de exclusão os remove na mesma transação que marca a conta excluída. Links deixam de autenticar.
+3. **Sessões e tokens** (`sessoes_usuario`, `email_confirmation_tokens`, `password_reset_tokens`): FKs obrigatórias; serviço de exclusão os remove na mesma transação que marca a conta excluída. Links deixam de autenticar.
 4. **`votos_comentario`:** FKs para versão e usuário com `ON DELETE CASCADE`; serviço remove todos os votos feitos pela conta na exclusão lógica. Votos de terceiros na versão oculta permanecem até purga da versão, quando também são descartados. Votos não são denúncias.
-5. **`decisoes_moderacao.moderador_id`** e **`denuncias_comentarios.denunciante_id`** aceitam `NULL`; **`agradecimentos_denuncia.usuario_id`** é obrigatório mas o agradecimento do usuário é removido. **`decisoes_identidades_docentes.usuario_id`** é obrigatório: a conta mínima evita quebra dessa referência; não há exclusão física direta.
+5. **`decisoes_moderacao.moderador_id`** e **`denuncias.denunciante_id`** aceitam `NULL`; **`agradecimentos.usuario_id`** é obrigatório mas o agradecimento do usuário é removido. **`decisoes_identidade.usuario_id`** é obrigatório: a conta mínima evita quebra dessa referência; não há exclusão física direta.
 
 ### 3.4 Limite deliberado: destino das avaliações e encaminhamento ao PO
 
@@ -122,6 +122,25 @@ A inspeção do schema real do PostgreSQL/SQLAlchemy revela as seguintes restri�
 - **O que foi efetivamente realizado:** migração do canal; rotinas de exclusão lógica e purga; ensaio `pg_dump`/`pg_restore` em banco local descartável com dados sintéticos, contagens conferidas e artefatos removidos, conforme evidência da #266. Nesta issue foram acrescentados testes sintéticos para o atendimento e a política; comandos e resultados ficam no relatório de validação do PR.
 - **O que é somente procedimento/pendência:** agenda, retenção, permissões, cópias efetivas e restauração em produção, registro mínimo protegido para reaplicar exclusões e comprovação de eliminação em backups. Não foi criado nem inspecionado backup real; Neon/PITR e política de cópias hospedadas não foram confirmados nesta entrega.
 - **Limite confirmado:** o ensaio local não informa as características das cópias hospedadas. Cópias de banco não foram verificadas como suportando remoção seletiva individual; não se promete apagamento instantâneo. A reaplicação das exclusões após restauração é procedimento proposto e depende de registro/rotina operacional ainda não validados.
+
+---
+
+## 3.6 Procedimento manual de execução e resposta
+
+1. **Receber e triar:** obter protocolo e referência mínima; registrar categoria, alcance e providência em `TRIAGEM` interna. Nunca pedir senha, cookie ou token de sessão. Não publicar identidade de avaliador nem usar o protocolo como prova de identidade da conta.
+2. **Verificar proporcionalmente:** antes de entregar dados privados ou alterar uma conta, conferir controle do contato institucional pelo procedimento humano do item 3.1. O canal não envia códigos de verificação automaticamente; qualquer comunicação externa depende de meio privado e executor autorizados. Sem comprovação suficiente, solicitar complemento e manter a execução pendente.
+3. **Executar conforme o tipo e a permissão:**
+
+| Pedido | Executor e fluxo existente | Conferência antes de responder |
+|---|---|---|
+| Acesso a dados da própria conta | Atendente encaminha a executor técnico com autorização e acesso próprios. Separar apenas os dados do titular; não existe exportador de titulares nesta entrega. Entrega privada depende de destinatário verificado e meio autorizado. | Conferir minimização, destinatário e resultado; não anexar dados de terceiros ao histórico público. |
+| Correção cadastral | Após verificação, executor técnico autorizado identifica a conta e corrige o campo aprovado em transação; não há endpoint administrativo de edição nesta entrega. Caso sintético exercita correção do nome, não troca de e-mail ou autoria. Correção de catálogo segue reconciliação própria. | Reler o registro persistido e registrar campo/resultado sem copiar conteúdo sensível ao log. |
+| Retirada do texto próprio | Titular autenticado usa `PATCH /api/comentarios/{id}/retirar`; atendente orienta e acompanha, sem se passar pelo autor. | Texto deixa de aparecer; critérios permanecem; denúncias encerram e purga fica agendada. |
+| Violação em texto alheio | Atendente encaminha relato fundamentado a moderador elegível. Usar denúncia/triagem e ações existentes em `/moderacao`; uma solicitação de contato não cria denúncia automaticamente. | Conferir decisão, ocultação e notas preservadas; não usar exclusão da avaliação para retirar somente texto. |
+| Exclusão de conta | Titular usa `DELETE /api/auth/conta` com sua sessão. Se precisar de execução assistida, encaminhar a executor técnico com acesso e autorização próprios, após identidade conferida; reutilizar a transação de `retencao_service.excluir_conta`, sem apagar usuário diretamente. A allowlist de atendimento não concede esse acesso. | Confirmar credenciais revogadas, conta mínima, ocultação de avaliações/comentários, votos próprios removidos e purga agendada. |
+
+4. **Registrar o resultado:** em `PROVIDENCIA`, registrar referência, executor autorizado, verificação realizada e efeito observado sem segredos; em `RESPOSTA`, explicar o que foi efetivamente executado, prazo configurado de purga e limites de conta mínima/backups. Se execução ou entrega privada não puder ocorrer, informar o encaminhamento pendente em vez de responder “atendido”.
+5. **Revisão e urgência:** usar o item 4.4 e os impedimentos; escala, contato privado efetivo e configuração hospedada continuam para confirmação operacional na #168. Ausência desses insumos não é autorização de acesso nem evidência de atendimento real.
 
 ---
 
@@ -142,7 +161,8 @@ flowchart TD
     Fila --> Analise{"Análise por moderador humano"}
     Analise -- "Crítica acadêmica legítima" --> Mantido["Manter / Aprovar"]
     Analise -- "Violação comprovada" --> Removido["Rejeitar / Remover"]
-    Removido --> Descarte["Descarte do texto após 7 dias"]
+    Removido -- "REJEITAR" --> Imediato["Texto apagado imediatamente; metadados preservados"]
+    Removido -- "REMOVER" --> Descarte["Purga da versão e dependentes em sete dias configuráveis"]
 ```
 
 | Categoria | Critério | Exemplos permitidos (Crítica Legítima) | Exemplos proibidos (Violação) |
@@ -171,8 +191,9 @@ flowchart TD
 
 ### 4.4 Revisão manual de decisão de moderação
 - Solicitantes ou autores de comentários que tiverem seus textos removidos ou rejeitados podem solicitar **revisão manual formal**.
-- O pedido deve ser feito em `/contato`, informando o protocolo original e a chave secreta, e submetendo um `COMPLEMENTO` com a fundamentação do pedido.
-- **Regra de impedimento:** a revisão manual não pode ser julgada pelo moderador que tomou a decisão original nem por quem denunciou o comentário (RF22). Outro moderador elegível da equipe analisa o caso e emite resposta motivada via evento `RESPOSTA`.
+- Quem já tem solicitação consulta com protocolo/chave e envia um `COMPLEMENTO`. Quem ainda não tem protocolo cria uma solicitação em `/contato`, com referência do comentário/decisão e justificativa; a decisão de moderação não gera protocolo de contato automaticamente.
+- **Regra de impedimento:** a revisão manual não pode ser julgada pelo moderador que tomou a decisão original nem por quem denunciou o comentário (RF22). Outro moderador elegível analisa o caso; o atendente registra a resposta motivada em `RESPOSTA`. Os papéis são independentes: ser atendente não concede moderação.
+- Em versão SUSPENSA, moderador elegível pode usar RESTAURAR. REMOVIDO/REJEITADO não admitem restauração pelo endpoint: a revisão registra a análise e explica o limite, sem recuperar texto apagado. Não contornar o estado com alteração direta do banco. Se não houver executor elegível, registrar o encaminhamento pendente, sem afirmar conclusão.
 
 ---
 
@@ -180,6 +201,6 @@ flowchart TD
 
 Este pacote de entrega consolida:
 1. **Canal de contato e solicitações (#263):** funcionalidade integral com proteção por chave, hash no banco, isolamento de notas internas e controle de acesso leitor/atendente.
-2. **Disciplina de titulares (#262):** procedimento manual documentado, verificação proporcional de identidade, distinção clara de operações e mapeamento técnico das restrições de banco. Limite de decisão de notas encaminhado ao PO.
+2. **Disciplina de titulares (#262):** procedimento manual documentado, verificação proporcional, papéis distintos e mapeamento técnico do banco. Destino do conteúdo segue decisão B/#280; guarda mínima continua pendente de validação.
 3. **Política de moderação (#264):** diretrizes objetivas de convivência, neutralidade das avaliações e mecanismo de revisão manual de decisões.
 4. **Validação automatizada:** suíte de testes com cobertura de integridade estatística, separação de histórico, controle de acesso e quatro casos sintéticos completos.

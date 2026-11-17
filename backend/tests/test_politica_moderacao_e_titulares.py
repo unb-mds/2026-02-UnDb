@@ -32,6 +32,7 @@ from app.core.security import gerar_hash_token
 from app.main import app
 from app.models.avaliacao import Avaliacao
 from app.models.comentario_versao import ComentarioVersao
+from app.models.decisao_moderacao import DecisaoModeracao
 from app.models.denuncia import Denuncia
 from app.models.disciplina import Disciplina
 from app.models.enums import Dificuldade, EstadoComentario, QualidadeMaterial
@@ -504,9 +505,17 @@ class PoliticaModeracaoETitularesTest(unittest.TestCase):
     def test_caso_sintetico_4_revisao_manual_de_decisao_via_complemento(self):
         """Autor contesta decisão de moderação via canal de contato com protocolo e chave."""
         # 1. Criação de solicitação referente à contestação
+        avaliacao = self._criar_avaliacao()
+        versao = ComentarioVersao(
+            avaliacao_id=avaliacao.id,
+            texto="A prova exigiu conteúdos não discutidos em aula.",
+            estado=EstadoComentario.SUSPENSO,
+        )
+        self.db.add(versao)
+        self.db.commit()
         payload = {
             "categoria": "COMENTARIO_ILICITO",
-            "alvo": "comentario-versao-12345",
+            "alvo": str(versao.id),
             "descricao": "Meu comentário foi suspenso por denúncias, mas expressa apenas crítica sobre a prova.",
             "evidencia": "Transcrição do comentário e contexto da turma 2026.2.",
         }
@@ -529,7 +538,23 @@ class PoliticaModeracaoETitularesTest(unittest.TestCase):
         historico_apos_complemento = res_complemento.json()["historico"]
         self.assertEqual(historico_apos_complemento[-1]["tipo"], "COMPLEMENTO")
 
-        # 3. Equipe atende e registra resposta
+        # 3. Moderador elegível analisa e executa uma transição real.
+        # A escolha de elegibilidade é humana; o teste não prova escala operacional.
+        code, resultado = asyncio.run(
+            self._request(
+                "POST",
+                f"/api/moderacao/comentarios/{versao.id}/acoes",
+                {"acao": "RESTAURAR", "motivo": "Crítica acadêmica legítima, sem ofensa."},
+                self.token_moderador,
+            )
+        )
+        self.assertEqual(code, 200)
+        self.assertEqual(resultado["estado_posterior"], "PUBLICADO")
+        self.db.expire_all()
+        self.assertEqual(versao.estado, EstadoComentario.PUBLICADO)
+        self.assertEqual(avaliacao.didatica, 4)
+
+        # Atendimento registra apenas o resultado efetivamente executado.
         app.dependency_overrides[obter_usuario_confirmado] = lambda: self.atendente
         res_atender = self.client.post(
             f"/api/atendimento/{protocolo}/eventos",
@@ -581,3 +606,81 @@ class PoliticaModeracaoETitularesTest(unittest.TestCase):
             json={"tipo": "RESPOSTA", "texto": "Resposta autorizada do atendente"},
         )
         self.assertEqual(res_autorizado.status_code, 200)
+
+    def test_atendente_nao_retira_comentario_alheio_autor_retira(self):
+        avaliacao = self._criar_avaliacao()
+        versao = ComentarioVersao(
+            avaliacao_id=avaliacao.id,
+            texto="Crítica sintética.",
+            estado=EstadoComentario.PUBLICADO,
+        )
+        self.db.add(versao)
+        self.db.commit()
+        rota = f"/api/comentarios/{versao.id}/retirar"
+        app.dependency_overrides[obter_usuario_confirmado] = lambda: self.atendente
+        self.assertEqual(self.client.patch(rota).status_code, 403)
+        self.db.expire_all()
+        self.assertEqual(versao.estado, EstadoComentario.PUBLICADO)
+        app.dependency_overrides[obter_usuario_confirmado] = lambda: self.estudante
+        self.assertEqual(self.client.patch(rota).status_code, 200)
+        self.db.expire_all()
+        self.assertEqual(versao.estado, EstadoComentario.RETIRADO)
+        self.assertIsNotNone(versao.descartar_em)
+        self.assertEqual(avaliacao.didatica, 4)
+
+    def test_revisao_rejeicao_nao_recupera_texto_e_preserva_metadados(self):
+        avaliacao = self._criar_avaliacao()
+        versao = ComentarioVersao(
+            avaliacao_id=avaliacao.id,
+            texto="Texto sintético rejeitado.",
+            estado=EstadoComentario.PENDENTE,
+        )
+        self.db.add(versao)
+        self.db.commit()
+        rota = f"/api/moderacao/comentarios/{versao.id}/acoes"
+        code, _ = asyncio.run(
+            self._request(
+                "POST",
+                rota,
+                {"acao": "REJEITAR", "motivo": "Violação sintética."},
+                self.token_moderador,
+            )
+        )
+        self.assertEqual(code, 200)
+        self.db.expire_all()
+        self.assertIsNone(versao.texto)
+
+        # Outro moderador examina o caso sem contornar o estado final.
+        self.leitor.moderador = True
+        self.db.add(
+            SessaoUsuario(
+                usuario_id=self.leitor.id,
+                token_hash=gerar_hash_token("revisor-sintetico"),
+                expires_at=datetime.now(timezone.utc) + timedelta(days=1),
+            )
+        )
+        self.db.commit()
+        code, _ = asyncio.run(
+            self._request(
+                "POST",
+                rota,
+                {"acao": "RESTAURAR", "motivo": "Pedido de revisão sintético."},
+                "revisor-sintetico",
+            )
+        )
+        self.assertEqual(code, 409)
+        moderacao_repository.descartar_vencidos(
+            self.db, datetime.now(timezone.utc) + timedelta(days=100)
+        )
+        self.db.commit()
+        self.db.expire_all()
+        self.assertEqual(versao.estado, EstadoComentario.REJEITADO)
+        self.assertIsNone(versao.texto)
+        self.assertIsNotNone(
+            self.db.scalar(
+                select(DecisaoModeracao).where(
+                    DecisaoModeracao.comentario_versao_id == versao.id,
+                    DecisaoModeracao.acao == "REJEITAR",
+                )
+            )
+        )

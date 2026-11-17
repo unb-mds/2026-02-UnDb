@@ -60,7 +60,7 @@ Recebimento exige flags de ativação/retenção e lista de atendentes configura
 
 Pedidos de titulares: atendimento manual por `/contato`; a equipe verifica identidade
 proporcionalmente antes de divulgar dados privados ou executar mutações. Distinção entre:
-(a) retirada de comentário (autor retira texto, denúncias viram CONTEUDO_RETIRADO, texto descartado
+(a) retirada de comentário (somente autor autenticado retira texto, denúncias viram CONTEUDO_RETIRADO, versão purgada
 em 7 dias pela rotina; critérios estruturados permanecem); (b) desativação de conta (revogação de
 sessões e tokens, sem operação independente de desativação nesta entrega); e (c) exclusão lógica
 da conta conforme a decisão B/#266: credenciais e sessões removidas, conta mínima preservada,
@@ -72,7 +72,12 @@ Política de moderação: crítica acadêmica legítima é permitida; ofensas, a
 e exposição de dados são proibidas. Discordância docente não causa remoção. Triagem não rejeita
 automaticamente; casos com sinal aguardam revisão humana. Gatilho de 50 contas suspende exibição,
 mas uma única ocorrência fundamentada pode ser atendida manualmente. Revisão de decisão de
-moderação é solicitada via protocolo/complemento. Moderação de texto não altera notas; votos de
+moderação é solicitada por nova solicitação ou protocolo/complemento existente. Atendimento
+não concede autoria/moderação nem acesso administrativo ao banco; execução manual segue
+`docs/canal-titulares.md`, com identidade conferida e executor autorizado. Somente SUSPENSO
+admite RESTAURAR; REMOVIDO/REJEITADO não são restauráveis. REJEITAR descarta texto
+imediatamente e preserva metadados sem prazo geral novo; REMOVER/RETIRAR agendam purga
+da versão e dependentes em sete dias configuráveis. Moderação de texto não altera notas; votos de
 utilidade (#278) não são denúncias e não acionam moderação; seguem o ciclo de descarte aprovado das versões.
 
 Documento **derivado**. Fontes de verdade: [`docs/requisitos.md`](docs/requisitos.md) e

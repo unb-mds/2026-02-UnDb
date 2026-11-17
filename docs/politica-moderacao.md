@@ -44,7 +44,8 @@ flowchart TD
     FilaHumana --> Julgamento{"Análise por moderador humano"}
     Julgamento -- "Legítimo" --> Manter["Manter / Restaurar publicação"]
     Julgamento -- "Violação" --> Remover["Rejeitar / Remover texto"]
-    Remover --> Descarte["Texto zerado após 7 dias"]
+    Remover -- "REJEITAR" --> Imediato["Texto apagado imediatamente; metadados preservados"]
+    Remover -- "REMOVER" --> Descarte["Purga da versão e dependentes em sete dias configuráveis"]
 ```
 
 ### 3.1 Triagem automática (quando habilitada)
@@ -62,7 +63,7 @@ flowchart TD
 ### 3.3 Julgamento humano e impedimentos
 - A equipe de moderadores é designada pelo PO (Nicolas) entre os membros da equipe com conta confirmada.
 - **Regra estrita de impedimento:** um moderador está expressamente proibido de julgar denúncias contra comentários de sua própria autoria ou casos em que ele mesmo seja o denunciante (RF22). Nesses casos, o julgamento é transferido a outro moderador elegível.
-- A decisão motivada registra o motivo e a transição no banco interno de auditoria, com retenção máxima de 7 dias, após o qual o registro e o texto descartado são eliminados pela rotina periódica.
+- A decisão motivada registra motivo e transição internamente. REJEITAR apaga o texto imediatamente e preserva metadados da decisão, sem novo prazo geral de descarte definido. REMOVER agenda purga da versão e seus dependentes após sete dias configuráveis; outras decisões vencidas são descartadas pela rotina de moderação. A execução hospedada continua a verificar; não há garantia de eliminação de todas as decisões em sete dias.
 
 ---
 
@@ -72,10 +73,11 @@ Qualquer autor ou solicitante que se sinta prejudicado por uma decisão de moder
 
 ### 4.1 Como solicitar revisão de moderação
 1. Acesse o canal público em `/contato` (não exige login estudantil).
-2. Consulte a solicitação original com **Protocolo** e **Chave secreta**.
+2. Se já tiver solicitação, consulte com **Protocolo** e **Chave secreta**. Caso contrário, crie uma solicitação com a referência e a justificativa: a decisão de moderação não gera protocolo de contato automaticamente.
 3. No **Complemento**, informe a referência do comentário/decisão e explique por que pede revisão, com o contexto necessário e sem dados de terceiros desnecessários.
 4. Um atendente verifica os impedimentos existentes e encaminha a revisão a moderador elegível, diferente de quem decidiu originalmente e de quem denunciou o caso. Se não houver pessoa elegível disponível, o pedido permanece para atendimento manual; não há julgamento automático.
-5. A equipe registra internamente referência, justificativa, responsável elegível e providência em evento restrito. A resposta motivada é registrada como `RESPOSTA`; nomes de operadores e dados de denunciantes não são expostos ao solicitante.
+5. A revisão respeita as transições existentes: versão SUSPENSA pode ser restaurada; REMOVIDO/REJEITADO não podem ser restaurados pelo endpoint, e texto apagado não é recuperado. A resposta explica o resultado e eventuais limites; não se altera estado diretamente no banco para contorná-los.
+6. A equipe registra internamente referência, justificativa, responsável elegível e providência em evento restrito. A resposta motivada é registrada como `RESPOSTA`; nomes de operadores e dados de denunciantes não são expostos ao solicitante.
 
 ### 4.2 Atendimento a urgências
 - Casos de **exposição de dados pessoais**, vazamento de dados de contato ou ameaças podem ser reportados na categoria `EXPOSICAO_PESSOAL` em `/contato`, quando o recebimento estiver habilitado.

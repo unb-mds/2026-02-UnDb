@@ -157,7 +157,7 @@ de moderação sem criar novos prazos ou automações excessivas.
   ao risco antes de divulgar dados privados ou executar mutações, vedada a exigência
   generalizada de documentos pessoais sensíveis ou cópias integrais de documentos.
 - Distinção conceitual e técnica obrigatória entre três operações:
-  1. **Retirada de comentário:** ação do próprio autor ou atendimento manual que oculta o texto
+  1. **Retirada de comentário:** ação autenticada do próprio autor que oculta o texto
      da visualização pública, encerra denúncias abertas como `CONTEUDO_RETIRADO` e agenda o descarte
      do texto em 7 dias pela rotina vigente; as notas estruturadas dos 5 critérios permanecem
      ativas nos agregados estatísticos;
@@ -175,9 +175,14 @@ de moderação sem criar novos prazos ou automações excessivas.
   exclusão física direta da conta). Sessões e tokens são removidos na exclusão lógica.
   `votos_comentario.usuario_id` usa `ON DELETE CASCADE`, mas o serviço também remove votos
   feitos pela conta; votos de outras contas só saem quando a versão é purgada. FKs para
-  `decisoes_moderacao.moderador_id` e `denuncias_comentarios.denunciante_id` aceitam NULL;
-  `decisoes_identidades_docentes.usuario_id` é obrigatório e reforça a preservação da conta
-  mínima. `sessoes_usuarios`, tokens e votos têm suas próprias FKs e remoção no ciclo descrito.
+  `decisoes_moderacao.moderador_id` e `denuncias.denunciante_id` aceitam NULL;
+  `decisoes_identidade.usuario_id` é obrigatório e reforça a preservação da conta
+  mínima. `sessoes_usuario`, tokens e votos têm suas próprias FKs e remoção no ciclo descrito.
+- Atendimento registra e encaminha pedidos; a allowlist de atendentes não concede autoria,
+  moderação ou acesso administrativo ao banco. Retirada exige sessão do autor; remoção
+  por violação exige moderador elegível no fluxo existente. Operações manuais sobre
+  conta exigem verificação proporcional e executor técnico com acesso/autorização próprios,
+  sem solicitar senha, cookie ou token de sessão do titular.
 - Retirada de comentário permanece distinta: oculta o texto, encerra denúncias como
   `CONTEUDO_RETIRADO` e mantém a avaliação estruturada. Desativação de acesso não equivale
   à retirada nem à exclusão lógica, que oculta as avaliações/comentários da conta.
@@ -213,7 +218,14 @@ de moderação sem criar novos prazos ou automações excessivas.
 - Revisão manual de decisão: solicitantes ou autores que discordem de uma decisão de moderação
   podem requerer revisão manual pelo canal de contato em `/contato`, enviando complemento com a
   fundamentação do pedido. A revisão é realizada por moderador elegível diferente do que tomou a
-  decisão original, observados os impedimentos de autoria e denúncia.
+  decisão original, observados os impedimentos de autoria e denúncia. A revisão não
+  recupera texto apagado nem cria transições: somente uma versão SUSPENSA pode usar
+  RESTAURAR; REMOVIDO/REJEITADO não são restauráveis pelo fluxo existente. A resposta
+  deve explicar a providência possível ou o limite encontrado, sem prometer reversão.
+- Na retenção vigente, REJEITAR apaga o texto imediatamente e preserva metadados da
+  decisão sem novo prazo geral definido. REMOVER/RETIRAR agendam purga da versão e
+  dependentes após sete dias configuráveis. Outras decisões vencidas são descartadas
+  pela rotina de moderação; não prometer eliminação de toda decisão em sete dias.
 - Independência das avaliações e votos: a moderação de texto não altera as notas ou critérios
   estruturados da avaliação (RF14/RF15). Votos de utilidade de comentários (#278), já integrados
   em develop, destinam-se à relevância; não constituem denúncia, não acionam moderação e não

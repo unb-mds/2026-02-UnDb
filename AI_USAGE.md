@@ -54,3 +54,5 @@ de avaliadores. Não registrar aceite humano, revisão ou teste que ainda não o
 A revisão de código, as verificações e as autorizações seguem as regras canônicas em
 `skills/` e o fluxo de `CONTRIBUTING.md`. Este documento é um registro de uso e não cria
 regras novas de avaliação individual ou governança.
+
+- 17/11/2026 — Codex (GPT-6), solicitado por Nicolas: correção dos findings da PR #285 e alinhamento aos critérios técnicos da #263. Ajustados RF25/derivados, retenção de rejeição/remoção, papéis de autor/atendente/moderador, procedimento manual e resumo para #168. Testes exercitam retirada com autoria, restauração real de suspensão e limite de revisão de rejeição. Verificações: Python 3.12.14, 57 aprovados/9 ignorados; Ruff e MkDocs estrito aprovados. Sem operação de produção; aceite humano e verificações operacionais não foram simulados como concluídos. Na continuação, Nicolas autorizou commit e envio da correção à PR #285, sem merge.
