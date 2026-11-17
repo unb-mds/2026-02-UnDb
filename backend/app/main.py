@@ -1,4 +1,5 @@
 import logging
+from app.core.registros_acesso import RegistrosAcesso
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,9 +7,13 @@ from fastapi.exceptions import RequestValidationError
 
 from app.core.config import CORS_ORIGINS
 from app.core.http_errors import erro_interno_seguro, validacao_segura
+from app.core.http_errors import abuso_excedido_seguro, limitador_indisponivel_seguro
+from app.core.http_errors import email_indisponivel_seguro
+from app.services.email_service import EmailDeliveryError
+from app.core.dependencia_limite_abuso import AbusoExcedido, LimitadorIndisponivel
 from app.core.safe_logging import configurar_logs_seguros
 from app.core.origins import ProtecaoOrigem
-from app.routers import solicitacoes_titulares
+from app.routers import solicitacoes_titulares, retencao
 from app.routers import (
     identidade_docente,
     auth,
@@ -26,6 +31,9 @@ http_logger.setLevel(logging.INFO)
 app = FastAPI(title="G7 - Avaliação de Disciplinas")
 app.add_exception_handler(RequestValidationError, validacao_segura)
 app.add_exception_handler(Exception, erro_interno_seguro)
+app.add_exception_handler(AbusoExcedido, abuso_excedido_seguro)
+app.add_exception_handler(LimitadorIndisponivel, limitador_indisponivel_seguro)
+app.add_exception_handler(EmailDeliveryError, email_indisponivel_seguro)
 app.include_router(solicitacoes_titulares.router)
 
 
@@ -66,6 +74,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Retry-After"],
 )
 
 app.include_router(identidade_docente.router)
@@ -81,3 +90,8 @@ app.include_router(denuncias.router)
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+app.include_router(retencao.router)
+
+app.add_middleware(RegistrosAcesso)

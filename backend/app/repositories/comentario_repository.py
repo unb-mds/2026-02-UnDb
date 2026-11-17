@@ -106,6 +106,7 @@ def listar_publicados(
             .join(ComentarioVersao.avaliacao)
             .where(
                 ComentarioVersao.estado == EstadoComentario.PUBLICADO,
+                Avaliacao.excluido_em.is_(None),
                 ComentarioVersao.avaliacao.has(
                     professor_id=professor_id, disciplina_id=disciplina_id
                 ),

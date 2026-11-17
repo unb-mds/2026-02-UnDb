@@ -92,7 +92,11 @@ jobs:
 
       - name: Run deterministic tests with coverage
         id: backend-tests
-        run: python -m coverage run --branch --source=app -m unittest discover -s tests -v
+        env:
+          ABUSO_POSTGRES_TEST_URL: ${{ env.DATABASE_URL }}
+        run: |
+          alembic upgrade head
+          python -m coverage run --branch --source=app -m unittest discover -s tests -v
 
       - name: Generate backend coverage reports
         id: backend-coverage
@@ -132,6 +136,11 @@ jobs:
           python -m tests.migration_legacy_check verify-downgrade
           alembic upgrade head
 
+      - name: Verify migration histories from retention and comment votes
+        env:
+          MIGRATION_DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: python -m tests.integration_conflito_migracoes
+
       - name: Verify concurrent comment votes on migrated PostgreSQL
         run: VOTOS_POSTGRES_TEST_URL="$DATABASE_URL" python -m unittest tests.test_voto_comentario_postgres -v
 
@@ -159,10 +168,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          export ABUSO_HMAC_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
           docker compose config --quiet
           docker compose up --build --wait backend db
           curl --fail --retry 10 --retry-delay 2 --retry-all-errors \
             http://127.0.0.1:8000/health
+
+      - name: Verify authentication protection through Compose
+        shell: bash
+        run: |
+          set -euo pipefail
+          login_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            --header 'Origin: http://localhost:3000' \
+            --header 'Content-Type: application/json' \
+            --data '{"email":"compose-ci@aluno.unb.br","senha":"senha-sintetica-ci"}' \
+            http://127.0.0.1:8000/api/auth/login)"
+          test "$login_status" = 401
 
       - name: Verify migrations and named-volume persistence
         shell: bash
@@ -287,6 +308,7 @@ jobs:
           set -euo pipefail
           export BROWSER_PATH="$(command -v google-chrome)"
           export FLUXO_MODERACAO_FIXTURE_FILE="$RUNNER_TEMP/undb-moderacao-fixture.json"
+          export ABUSO_HMAC_SECRET="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
           cd backend
           python -m tests.denuncia_browser_fixture > "$FLUXO_MODERACAO_FIXTURE_FILE"
           uvicorn app.main:app --host 127.0.0.1 --port 8000 &

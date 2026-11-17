@@ -1,4 +1,5 @@
 "use client";
+import { mensagemErroTemporario } from "@/lib/services/http-error";
 
 import Link from "next/link";
 import MolduraConta from "@/components/moldura-conta";
@@ -21,8 +22,8 @@ export default function RecuperacaoForm() {
     try {
       const resposta = await recuperarSenha(String(dados.get("email") ?? ""));
       setMensagem(resposta.message);
-    } catch {
-      setErro("Não foi possível solicitar a recuperação agora. Confira o e-mail institucional e tente novamente.");
+    } catch (falha) {
+      setErro(mensagemErroTemporario(falha) ?? "Não foi possível solicitar a recuperação agora. Confira o e-mail institucional e tente novamente.");
     } finally {
       enviandoRef.current = false;
       setEnviando(false);

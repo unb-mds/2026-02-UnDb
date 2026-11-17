@@ -1,5 +1,72 @@
 # 📋 Engenharia de Requisitos — G7
 
+## Registros de acesso — #266, Bloco 6
+
+Fonte: decisão C do PO e EXECUTAR: BLOCO 6 e 7. Estado: implementado.
+Mutações de autenticação, avaliação/comentário, denúncia, moderação, exclusão e
+canal de titulares devem registrar UTC, operação, usuário autenticado quando
+resolvido, IP de conexão, encaminhamento bruto não confiável, resultado e ID de
+requisição. Sem corpo, senha, token ou texto de avaliação. Tabela privada, sem
+endpoint/interface, retenção configurável de seis meses corridos e purga automática.
+Premissa sobre Marco Civil e configurações externas permanecem pendentes de validação.
+
+## Retenção e exclusão — #266, Bloco 5
+
+Fonte: decisão B e EXECUTAR: BLOCO 5 do PO. Estado: implementado;
+guarda mínima e operação em hospedagem permanecem pendentes de validação.
+Exclusão de conta preserva identificador, e-mail, datas e estado de exclusão,
+remove nome, senha, papéis, sessões e tokens e impede autenticação. E-mail fica
+reservado: recadastro não reativa a conta e mantém resposta neutra. Base legal,
+prazo e revisão dessa guarda permanecem pendentes de validação.
+Avaliações e comentários excluídos são ocultados imediatamente e removidos
+definitivamente após sete dias configuráveis, inclusive em cascata da conta.
+Conteúdo rejeitado antes de publicar é apagado, mantendo metadados da decisão.
+Denúncias encerradas permanecem até a purga do conteúdo, fora da fila/contagem
+ativa. A purga automática também remove sessões/tokens/contadores expirados.
+Restauração de backup deve reaplicar exclusões mediante registro mínimo de IDs
+e datas; retenção e operação dos backups permanecem pendentes de validação.
+
+## Restrição transversal — #266, Blocos 3 e 4
+
+Fonte: decisão A e pedido EXECUTAR: BLOCO 3 e 4 do PO. Estado: implementado;
+calibração e validações humanas permanecem pendentes de validação.
+Avaliações e denúncias devem rejeitar excesso antes de escrita. Na falha do
+limitador, avaliações seguem com alerta; denúncias usam teto local por processo.
+Canal de titulares usa contadores compartilhados, continua desativado por padrão
+e suspende acesso público na falha. Sem IP nas chaves. Contas usam ID interno;
+anônimos compartilham capacidade global. Moderação/reconciliação usam limites por
+papel; fila não tem bypass. Remoção urgente, retirada própria e atendimento pela
+equipe mantêm autorização e registro de uso sem limitador. Operações administrativas
+ausentes não são criadas por este escopo. Valores são PROVISÓRIOS, pendentes de
+validação (item 4). O frontend apresenta 429/503 sem detalhes internos, informa
+espera de Retry-After quando disponível, preserva preenchimento e anuncia erro
+de forma acessível.
+
+## Restrição transversal de autenticação — #266, Bloco 2
+
+Fonte: decisões A e pedido `EXECUTAR: BLOCO 2` do PO nesta conversa. Estado de
+entrega: **implementado**, com evidências na PR #280 e em
+`docs/seguranca/limitador-auth-bloco-2.md`.
+
+Cadastro, login, confirmação, reenvio de confirmação e recuperação/redefinição
+devem limitar tentativas antes de efeitos. Restrições temporárias retornam 429
+com Retry-After; indisponibilidade do limitador suspende esses fluxos com 503.
+Cadastro, recuperação e reenvio não distinguem existência da conta nas respostas
+e não enviam e-mail durante a restrição. Falha do provedor mantém resposta neutra.
+Login tem atraso progressivo limitado e orçamento de até 100 tentativas entre
+sucesso ou término da janela provisória, sem desativar permanentemente a conta;
+sucesso reinicia o orçamento individual, preservando o global.
+Confirmação/redefinição combinam orçamento do token com orçamento global contra
+troca de tokens. Nenhum desses fluxos usa IP como chave ou bypass por papel.
+
+Cadastro, reenvio e recuperação compartilham intervalo mínimo por destino e
+orçamento diário de e-mail inferior à cota configurada do provedor. Reservas são
+feitas também para destinos sem conta para não revelar existência; isso pode
+consumir orçamento sem envio. Números são PROVISÓRIOS, pendentes de validação
+(item 4). Logout e sessão válida mantêm o contrato, sem passar pelo limitador.
+Reenvio solicita apenas e-mail institucional e retorno interno opcional; contas
+confirmadas/inexistentes recebem a mesma resposta. Links anteriores não são
+revogados por simples reenvio. RF02/RF24 e seus prazos vigentes são preservados.
 ## RF26 — Transparência, Termos e ciência no cadastro (#269)
 
 **Validado pelo PO:** escopo consolidado da #269 em 16/11/2026 e solicitação

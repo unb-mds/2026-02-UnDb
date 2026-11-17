@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.enums import EstadoComentario
 from app.models.usuario import Usuario
-from app.repositories import comentario_repository, voto_comentario_repository
+from app.repositories import comentario_repository, voto_comentario_repository, retencao_repository
 
 
 class VotoComentarioError(Exception):
@@ -36,7 +36,10 @@ def consultar(db: Session, versao_id: UUID, usuario: Usuario | None):
 
 def definir(db: Session, versao_id: UUID, usuario: Usuario, voto: str | None):
     try:
-        if not usuario.email_confirmado:
+        conta = retencao_repository.bloquear_conta(db, usuario.id)
+        if conta is None or conta.excluido_em is not None:
+            raise VotoComentarioError(401, "Sessão inválida.")
+        if not conta.email_confirmado:
             raise VotoComentarioError(403, "Confirme seu e-mail para votar.")
         versao = _publicado(db, versao_id)
         if versao.avaliacao.usuario_id == usuario.id:

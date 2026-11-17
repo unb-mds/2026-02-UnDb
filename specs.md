@@ -1,5 +1,38 @@
 # specs.md — Especificação de implementação
 
+## Retenção — #266, Bloco 5
+
+Derivado de docs/requisitos.md, decisão B do PO. DELETE /api/auth/conta exclui
+logicamente a própria conta autenticada, revoga credenciais e oculta conteúdo.
+DELETE /api/avaliacoes/{id} exclui avaliação própria; DELETE
+/api/moderacao/avaliacoes/{id} permite remoção urgente por moderador confirmado.
+Essas ações não passam pelo limitador e preservam CSRF/autorização. Conteúdo
+oculto não participa das consultas públicas e não pode ser reativado por upsert
+antes da purga. Estado/migração e job seguem docs/seguranca/retencao-bloco-5.md.
+
+## Abuso e respostas temporárias — #266, Blocos 3 e 4
+
+Derivado da restrição transversal em docs/requisitos.md, fonte PO. Avaliações,
+denúncias, canal público e operações de moderação/reconciliação recebem adaptadores
+do núcleo existente; nenhuma alteração de esquema. 429 e 503 incluem Retry-After.
+O cliente HTTP interpreta segundos ou data HTTP sem mostrar detalhes internos,
+preserva formulários e mantém alertas acessíveis. Matriz e parâmetros documentados
+em docs/seguranca/limitador-fluxos-blocos-3-4.md.
+
+## Autenticação e abuso — #266, Bloco 2
+
+Derivada da restrição transversal de autenticação em `docs/requisitos.md`, fonte:
+pedido `EXECUTAR: BLOCO 2` do PO. Núcleo do Bloco 1 será usado em todos os POST de
+autenticação, exceto logout. Conta/papel não libera login, cadastro ou tokens.
+429/503 usam Retry-After e respostas sem detalhes internos. Erros do provedor nos
+fluxos de envio recebem 202 neutro, sem expor se houve envio/conta existente.
+Novo POST `/api/auth/reenviar-confirmacao`: `{email, return_to?}`, mesmos validadores
+de cadastro/retorno, 202 neutro para conta pendente, confirmada ou inexistente.
+Sob restrição, nenhum desses endpoints pode criar usuário, sessão, token, trocar
+senha ou enviar e-mail. Confirmação/redefinição preservam prazo e uso único.
+O orçamento diário de e-mail é compartilhado e alinhado à meia-noite UTC, incluindo
+reservas sem envio; não é uma janela fixa ancorada na primeira solicitação.
+
 ## Proteção de origens — #266
 
 Derivada da restrição transversal aprovada em `docs/requisitos.md` em 16/11/2026.
@@ -317,9 +350,9 @@ dados suficientes. Não atribuir percentual artificial aos resultados insuficien
    seu hash é persistido.
 10. Cadastro repetido retorna a mesma resposta genérica `202`, não altera a conta existente
     e não informa se o endereço já está cadastrado.
-11. Na Release 1, `EMAIL_BACKEND=console` escreve o link no terminal e é o único modo
-    previsto. A ativação de `EMAIL_BACKEND=resend`, com chave e remetente configurados
-    externamente, fica planejada para a Release 2.
+11. `EMAIL_BACKEND=console` simula envio somente em DEBUG, sem registrar link ou
+    destinatário. O transporte Resend exige chave e remetente externos; sua configuração
+    operacional permanece pendente de validação. Ensaios usam transporte sintético privado.
 12. O cookie de sessão chama-se `undb_session`. O servidor persiste somente o hash do token
     aleatório e renova tanto `expires_at` quanto o `Max-Age` do cookie quando uma rota passa
     pela dependência de autenticação. Rotas públicas não renovam sessão.

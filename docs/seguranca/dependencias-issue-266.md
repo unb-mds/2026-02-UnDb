@@ -1,3 +1,9 @@
+> Registro historico de 16/11/2026. Para o estado da entrega #266 apos os blocos,
+> consultar [validacoes pendentes](validacoes-pendentes-266.md) e
+> [evidencias do Bloco 7](evidencias/issue-266/bloco-7/resultados.json).
+> Patches de source-map-js/zod foram implementados posteriormente; isso nao elimina
+> os avisos residuais nem comprova aplicabilidade ou seguranca em producao.
+
 # Dependências auditadas — #266
 
 Base `d99916e`, consulta em 16/11/2026. Complementa o

@@ -33,6 +33,7 @@ from app.routers import auth as auth_router
 from app.schemas.auth import CadastroRequest, LoginRequest
 from app.services import auth_service
 from app.services.email_service import EmailDeliveryError
+from tests.auth_abuso_fixtures import protecao_permitida
 
 
 class FakeEmailSender:
@@ -309,6 +310,7 @@ class AuthServiceTest(unittest.TestCase):
             ),
             response,
             self.db,
+            protecao_permitida(),
         )
 
         self.assertEqual(resultado.message, auth_service.LOGIN_MESSAGE)
@@ -322,6 +324,7 @@ class AuthServiceTest(unittest.TestCase):
                 ),
                 Response(),
                 self.db,
+                protecao_permitida(),
             )
         self.assertEqual(contexto.exception.status_code, 401)
 

@@ -19,6 +19,8 @@ from app.core.database import Base, get_db
 from app.core.security import gerar_hash_senha
 from app.domain.termos import TERMOS_VERSAO
 from app.main import app
+from app.core.dependencia_auth_abuso import obter_protecao_auth
+from tests.auth_abuso_fixtures import protecao_permitida
 from app.models.usuario import Usuario
 from app.services.email_service import get_email_sender
 
@@ -41,6 +43,7 @@ class TermosTest(unittest.TestCase):
         Base.metadata.create_all(self.engine)
         self.db = Session(self.engine)
         self.email = EmailSintetico()
+        app.dependency_overrides[obter_protecao_auth] = protecao_permitida
         app.dependency_overrides[get_db] = lambda: self.db
         app.dependency_overrides[get_email_sender] = lambda: self.email
         self.client = TestClient(app, base_url="https://testserver")

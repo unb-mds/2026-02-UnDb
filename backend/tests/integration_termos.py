@@ -25,9 +25,9 @@ def main():
     if (
         os.environ.get("UNDB_269_POSTGRES_TEST") != "1"
         or url.host != "127.0.0.1"
-        or url.port != 55469
+        or url.port not in {55469, 55466}
         or url.database != "undb_269_test"
-        or os.environ.get("MIGRATION_DATABASE_URL", str(url)) != str(url)
+        or make_url(os.environ.get("MIGRATION_DATABASE_URL", os.environ["DATABASE_URL"])) != url
     ):
         raise SystemExit("Exige autorização de teste e banco local exclusivo undb_269_test:55469.")
     ambiente = {**os.environ, "MIGRATION_DATABASE_URL": os.environ["DATABASE_URL"]}
@@ -54,6 +54,8 @@ def main():
     from app.core.security import gerar_hash_senha
     from app.domain.termos import TERMOS_VERSAO
     from app.main import app
+    from app.core.dependencia_auth_abuso import obter_protecao_auth
+    from tests.auth_abuso_fixtures import protecao_permitida
     from app.models.usuario import Usuario
     from app.services.email_service import get_email_sender
     from tests.test_termos import EmailSintetico
@@ -73,6 +75,7 @@ def main():
     with Session(engine) as db:
         antiga = db.scalar(select(Usuario))
         assert antiga.termos_versao is None and antiga.termos_ciencia_em is None
+        app.dependency_overrides[obter_protecao_auth] = protecao_permitida
         app.dependency_overrides[get_db] = lambda: db
         app.dependency_overrides[get_email_sender] = lambda: email
         try:

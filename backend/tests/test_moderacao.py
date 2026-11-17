@@ -258,6 +258,7 @@ class ModeracaoTest(unittest.TestCase):
         with patch("app.services.moderacao_service.agora_utc", return_value=inicio):
             self.assertEqual(self.acao(versao.id, "REMOVER")[0], 200)
         self.db.refresh(versao)
+        versao_id = versao.id
         decisao = self.db.scalar(select(DecisaoModeracao))
         pendente = self.versao(usuario=self.outro_usuario)
         from app.models.comentario_versao import ComentarioVersao
@@ -280,13 +281,13 @@ class ModeracaoTest(unittest.TestCase):
                 self._request("GET", "/api/comentarios/meu", token=self.token)
             )
         self.assertEqual(code, 200)
-        self.assertIsNone(comentarios_autor[0]["texto"])
+        self.assertEqual(comentarios_autor, [])
         self.db.expire_all()
-        self.assertIsNone(versao.texto)
+        self.assertIsNone(self.db.get(ComentarioVersao, versao_id))
         self.assertIsNone(self.db.scalar(select(DecisaoModeracao)))
         self.assertEqual(pendente.texto, "texto")
         self.assertEqual(suspenso.texto, "texto suspenso")
-        self.assertIsNotNone(self.db.scalar(select(Agradecimento)))
+        self.assertIsNone(self.db.scalar(select(Agradecimento)))
 
     def test_transacao_reverte_acao_e_encerramento_em_falha(self):
         from app.repositories import denuncia_repository

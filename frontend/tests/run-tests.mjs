@@ -33,6 +33,7 @@ function executarTestes() {
       ...comando,
       "--test",
       "tests/avaliacao.test.mjs",
+      "tests/abuso.test.mjs",
       "tests/busca.test.mjs",
       "tests/comentarios.test.mjs",
       "tests/moderacao.test.mjs",

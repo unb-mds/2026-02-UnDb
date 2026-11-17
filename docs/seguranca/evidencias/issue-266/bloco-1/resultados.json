@@ -1,0 +1,104 @@
+{
+  "estado": "implementado",
+  "registrado_em": "2026-11-17T01:44:38.080310+00:00",
+  "fonte": "Pedido EXECUTAR: BLOCO 1 e autorização posterior para nova PR na mesma branch e nova worktree",
+  "base": "f8efeffdd57906a3af4202a5583672533ce690d2",
+  "commit_nucleo": "c896d5a6ca6b4d7014eb633431710727c95d8f89",
+  "pr": "https://github.com/unb-mds/2026-02-UnDb/pull/280",
+  "ambiente": {
+    "sistema": "Windows local",
+    "python": "3.12.16",
+    "postgresql": "16.16 portátil, loopback, banco undb_266_test descartável",
+    "papel_api": "sem superuser/createdb/createrole/CREATE no schema; DML nas tabelas funcionais"
+  },
+  "verificacoes": [
+    {
+      "comando": "python -m unittest tests.test_limite_abuso tests.test_limite_abuso_postgres -q",
+      "exit_code": 0,
+      "total": 32,
+      "skips": 0,
+      "resultado": "atomicidade/concorrência entre processos, janelas, expiração, observe/transição de modos, atrasos, falhas reais de lock/statement/pool, limpeza e contratos HTTP"
+    },
+    {
+      "comando": "python -m unittest discover -s tests -q",
+      "exit_code": 0,
+      "total": 373,
+      "skips": 2,
+      "resultado": "sem falhas; skips anteriores de contenção PostgreSQL em identidades e reconciliação, que exigem undb_207_test separado"
+    },
+    {
+      "comando": "python -m ruff check backend",
+      "exit_code": 0
+    },
+    {
+      "comando": "python -m ruff format --check backend",
+      "exit_code": 0,
+      "arquivos": 171
+    },
+    {
+      "comando": "python -m compileall -q backend/app backend/alembic",
+      "exit_code": 0
+    },
+    {
+      "comando": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "comando": "python -m app.commands.limpar_contadores_abuso",
+      "exit_code": 0
+    }
+  ],
+  "migracoes_e_postgres": [
+    {
+      "etapa": "upgrade",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-bloco1",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-repetido",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "testes-bloco1",
+      "exit_code": 0
+    },
+    {
+      "etapa": "suite-completa",
+      "exit_code": 0
+    },
+    {
+      "etapa": "limpeza-cli",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check-final",
+      "exit_code": 0
+    }
+  ],
+  "limpeza": "banco e papéis reservados criados foram removidos pelo ensaio; cluster portátil encerrado",
+  "limites": [
+    "Sem endpoints de produto vinculados",
+    "Sem uso de IP nas chaves",
+    "Sem implantação ou acesso a produção",
+    "Contador antigo do canal preservado até Bloco 3",
+    "Limites PROVISÓRIOS, pendentes de validação (item 4)",
+    "Sem quota comprovada de e-mail: configuração por fluxo no Bloco 2",
+    "Sem alteração TypeScript; typecheck frontend não se aplica",
+    "CI do último head pendente de validação ao preparar este registro"
+  ]
+}

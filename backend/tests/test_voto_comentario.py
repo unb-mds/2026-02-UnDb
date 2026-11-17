@@ -170,8 +170,8 @@ class VotoComentarioTest(unittest.TestCase):
         moderacao_repository.descartar_vencidos(self.db, prazo)
         self.db.commit()
         self.assertEqual(self.db.scalar(select(func.count()).select_from(VotoComentario)), 0)
-        self.db.refresh(versao)
-        self.assertIsNone(versao.texto)
+        self.db.expire_all()
+        self.assertIsNone(self.db.get(ComentarioVersao, self.versao_id))
 
     def test_substituto_sem_heranca_e_descarte_manual(self):
         self.preparar()

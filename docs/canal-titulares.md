@@ -26,20 +26,16 @@ O operador deve ativar ambos somente após validação dos insumos. Suspender re
 não impede acompanhar/complementar pedidos existentes nem responder pela área restrita.
 Não incluir corpos de requisições ou chaves em logs, métricas ou ferramentas de analytics.
 
-As rotas públicas de criação, consulta e complemento compartilham orçamento técnico
-temporário por cliente e processo (`CANAL_TITULARES_LIMITE_MINUTO`, padrão 30/minuto).
-Os identificadores são HMAC em memória, com expiração de 60 segundos e limite de entradas;
-não são persistidos. Reinícios zeram o orçamento; múltiplas instâncias não o compartilham.
-O endereço usado é o cliente fornecido pelo servidor, sem interpretar X-Forwarded-For
-diretamente. Validar a configuração de proxy do provedor para não agrupar visitantes.
-Isso complementa, mas não substitui, os controles de abuso da #266.
-
-Retomada de PEND-263-ABUSO: a [revisão #266](seguranca/revisao-sessoes-abuso-logs-issue-266.md)
-verificou autorização, janela, HMAC e isolamento do orçamento com dados sintéticos, e
-sanitizou validação/erros/logs da aplicação. O limite continua por processo; proxies,
-instâncias e logs de borda exigem homologação do operador. A pendência não está encerrada.
-Mutações seguem a restrição de origens aprovada na #266; leitura/consulta por chave mantém
-o contrato do canal. Nenhuma flag de recebimento foi ativada.
+As rotas públicas usam o limitador compartilhado no PostgreSQL do Bloco 3 da
+#266. Contas usam ID interno; anônimos compartilham capacidade global, sem IP.
+Falha suspende o canal público com 503; excesso retorna 429/Retry-After. O antigo
+contador por cliente/processo foi removido. Atendimento pela equipe preserva
+acessos/autorização e fica fora do limitador. Recebimento segue DESATIVADO.
+Consultar [manutenção](operacao/manutencao.md) e
+[validações pendentes](seguranca/validacoes-pendentes-266.md) para escala semanal,
+substituto, integração futura de contato e condições de ativação. Sem IA no
+atendimento. Proxy, logs externos e operação em hospedagem permanecem pendentes
+de validação. Nenhuma flag foi ativada por esta entrega.
 
 Pedidos repetidos geram protocolos independentes, sem revelar se outra pessoa já pediu
 algo sobre o mesmo alvo. Referência indisponível ou evidência insuficiente deve receber

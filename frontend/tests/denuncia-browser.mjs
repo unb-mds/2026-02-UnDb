@@ -342,6 +342,15 @@ try {
       const contrasteBotao = await contrasteTexto(avaliar, `[data-testid="botao-denunciar-${versaoId}"]`);
       assert.ok(contrasteBotao >= 4.5, `Denunciar, sistema ${tema}, ${largura}px: ${contrasteBotao}`);
       await abrir();
+      if (!real) {
+        for (const status of [429,503]) {
+          statusDenuncia = status;
+          await enviar("Tente novamente em instantes");
+          assert.equal(await avaliar('document.querySelector("#motivo-SPAM").checked'), true);
+          assert.ok(!(await texto()).includes("erro simulado"));
+        }
+        statusDenuncia = 201;
+      }
       assert.equal(await avaliar("document.documentElement.scrollWidth <= innerWidth"), true);
       await captura(`denuncia-modal-${tema}-${largura}`);
       await enviar("registrada");

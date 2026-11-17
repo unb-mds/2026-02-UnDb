@@ -176,7 +176,7 @@ await comNavegador({ fixture, diretorioFrontend: process.env.UI247_FRONTEND, exe
     await cdp('Page.reload'); await esperar('Enviar avaliação'); assert.doesNotMatch(await texto(), /Obrigado por contribuir/);
   }
   for (const status of [401, 403, 503]) {
-    moderacaoStatus = status; await navegar('/moderacao'); await esperar(status === 401 ? 'Entre na sua conta' : status === 403 ? 'Acesso não permitido' : 'Não foi possível carregar');
+    moderacaoStatus = status; await navegar('/moderacao'); await esperar(status === 401 ? 'Entre na sua conta' : status === 403 ? 'Acesso não permitido' : 'Serviço temporariamente indisponível');
     assert.equal(await avaliar("document.querySelector('[aria-label=\"Comentários na fila\"]')"), null);
     assert.doesNotMatch(await texto(), /autor.teste@/);
   }

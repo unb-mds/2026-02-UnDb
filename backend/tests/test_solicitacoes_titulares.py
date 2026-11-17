@@ -20,7 +20,8 @@ from sqlalchemy.pool import StaticPool
 
 from app.core.auth import obter_usuario_confirmado
 from app.core.database import Base, get_db
-from app.core.limite_atendimento import _janelas
+from app.core.dependencia_limite_abuso import obter_limitador
+from tests.auth_abuso_fixtures import protecao_permitida
 from app.main import app
 from app.models.solicitacao_titular import SolicitacaoTitular, EventoSolicitacao
 from app.models.usuario import Usuario
@@ -29,7 +30,7 @@ from app.services import solicitacao_titular_service as service
 
 class CanalTest(unittest.TestCase):
     def setUp(self):
-        _janelas.clear()
+        app.dependency_overrides[obter_limitador] = lambda: protecao_permitida().limitador
         self.engine = create_engine(
             "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
         )
@@ -158,16 +159,6 @@ class CanalTest(unittest.TestCase):
         r = self.client.post("/api/solicitacoes/consultar", json=credenciais)
         self.assertEqual(r.status_code, 404)
         self.assertEqual(r.headers["cache-control"], "no-store")
-
-    def test_limite_temporario_sem_identificador_em_claro(self):
-        with patch.object(service.config, "CANAL_TITULARES_LIMITE_MINUTO", 1):
-            self.criar()
-            r = self.client.post(
-                "/api/solicitacoes/consultar", json={"protocolo": str(uuid4()), "chave": "x" * 43}
-            )
-            self.assertEqual(r.status_code, 429)
-            self.assertEqual(r.headers["Retry-After"], "60")
-            self.assertTrue(all(len(k) == 64 for k in _janelas))
 
     def test_migracao_cria_tabelas_e_indice_somente_em_banco_sintetico(self):
         self.db.close()

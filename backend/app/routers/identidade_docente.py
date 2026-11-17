@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 from app.core.auth import obter_usuario_confirmado
 from app.core.database import get_db
+from app.core.protecao_fluxos import moderar
 from app.models.usuario import Usuario
 from app.repositories import identidade_docente_repository as repo
 from app.schemas.identidade_docente import (
@@ -29,7 +30,11 @@ def autorizado(usuario: Annotated[Usuario, Depends(obter_usuario_confirmado)]):
 Revisor = Annotated[Usuario, Depends(autorizado)]
 
 
-@router.get("", response_model=list[PendenciaResponse])
+@router.get(
+    "",
+    response_model=list[PendenciaResponse],
+    dependencies=[Depends(moderar("identidade.fila", autorizado))],
+)
 def listar(
     db: Db,
     usuario: Revisor,
@@ -41,7 +46,11 @@ def listar(
     return repo.listar(db, estado, offset=offset)
 
 
-@router.get("/{id}/decisoes", response_model=list[DecisaoResponse])
+@router.get(
+    "/{id}/decisoes",
+    response_model=list[DecisaoResponse],
+    dependencies=[Depends(moderar("identidade.fila", autorizado))],
+)
 def historico(id: UUID, db: Db, usuario: Revisor, response: Response):
     response.headers["Cache-Control"] = "no-store"
     if repo.por_id(db, id) is None:
@@ -49,7 +58,11 @@ def historico(id: UUID, db: Db, usuario: Revisor, response: Response):
     return repo.decisoes(db, id)
 
 
-@router.post("/{id}/decisoes", response_model=PendenciaResponse)
+@router.post(
+    "/{id}/decisoes",
+    response_model=PendenciaResponse,
+    dependencies=[Depends(moderar("identidade.decidir", autorizado))],
+)
 def decidir(id: UUID, dados: DecidirRequest, db: Db, usuario: Revisor, response: Response):
     response.headers["Cache-Control"] = "no-store"
     try:
@@ -58,7 +71,11 @@ def decidir(id: UUID, dados: DecidirRequest, db: Db, usuario: Revisor, response:
         raise HTTPException(erro.status_code, str(erro)) from erro
 
 
-@router.get("/{id}/previa", response_model=PreviaResponse)
+@router.get(
+    "/{id}/previa",
+    response_model=PreviaResponse,
+    dependencies=[Depends(moderar("identidade.fila", autorizado))],
+)
 def previa(id: UUID, identificador: str, db: Db, usuario: Revisor, response: Response):
     response.headers["Cache-Control"] = "no-store"
     item = repo.por_id(db, id)

@@ -1,0 +1,110 @@
+{
+  "estado": "implementado",
+  "registrado_em": "2026-11-17T03:02:53.525321+00:00",
+  "fonte": "EXECUTAR: BLOCO 3 e 4 do PO",
+  "ambiente": "Windows local, Python 3.12.16, PostgreSQL 16.16 descartavel loopback, Edge headless, Next.js 16.3.5",
+  "backend": {
+    "selecionados": 69,
+    "suite_total": 406,
+    "falhas": 0,
+    "skips": 2,
+    "skips_motivo": "Identidades/reconciliacao exigem undb_207_test"
+  },
+  "frontend": {
+    "total": 91,
+    "falhas": 0,
+    "skips": 0,
+    "checks": [
+      "npm run lint",
+      "npm run typecheck",
+      "npm test",
+      "npm run build"
+    ],
+    "exit_codes": 0,
+    "dependencias_lockfile": "preservados"
+  },
+  "browser_controlado": {
+    "scripts": [
+      "avaliacao-browser.mjs",
+      "recuperacao-senha-browser.mjs",
+      "denuncia-browser.mjs",
+      "moderacao-browser.mjs"
+    ],
+    "exit_codes": 0,
+    "cobertura": "429/503, Retry-After, campos preservados, alerta acessivel, detalhes internos omitidos; suite de avaliacao inclui cadastro/confirmacao"
+  },
+  "postgres_integrado": [
+    {
+      "etapa": "upgrade",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-bloco1",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-repetido",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "testes-bloco3",
+      "exit_code": 0
+    },
+    {
+      "etapa": "suite-completa",
+      "exit_code": 0
+    },
+    {
+      "etapa": "moderacao-http",
+      "exit_code": 0
+    },
+    {
+      "etapa": "integracao-avaliacao",
+      "exit_code": 0
+    },
+    {
+      "etapa": "integracao-acesso",
+      "exit_code": 0
+    },
+    {
+      "etapa": "limpeza-cli",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check-final",
+      "exit_code": 0
+    }
+  ],
+  "checks_adicionais": {
+    "ruff_check": 0,
+    "ruff_format": 0,
+    "compileall": 0,
+    "mkdocs_strict": 0,
+    "git_diff_check": 0
+  },
+  "ocorrencias": [
+    "Timeout inicial Page.enable no sandbox; ensaio executado fora da restricao de subprocesso passou",
+    "Suite apos integracao encontrou contadores expirados de outro ensaio; suite isolada antes das integracoes passou",
+    "CI anterior sem segredo HMAC no percurso de moderacao; segredo efemero gerado no job",
+    "Ensaio intensivo de persistencia recebeu override sintetico de tentativas; testes de excesso separados"
+  ],
+  "pendencias": [
+    "Calibracao item 4",
+    "Topologia item 8",
+    "CI Linux do novo push pendente de validacao",
+    "Demais blocos e validacoes humanas"
+  ],
+  "producao": "Sem acesso, envio real ou validacao juridica"
+}

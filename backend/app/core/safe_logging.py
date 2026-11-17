@@ -5,14 +5,24 @@ import logging
 import re
 import time
 
-from app.core import config
-
 EVENTOS = frozenset(
     {
         "http.falha_interna",
+        "acesso.gravacao_falhou",
         "http.resposta",
         "auth.recuperacao.envio_falhou",
+        "auth.confirmacao.envio_falhou",
+        "auth.confirmacao.simulado",
+        "auth.recuperacao.simulado",
+        "auth.transporte.indisponivel",
         "moderacao.descarte_falhou",
+        "abuso.negado",
+        "abuso.fluxo_seguiu",
+        "abuso.acao_isenta",
+        "abuso.observado",
+        "abuso.atraso_observado",
+        "abuso.indisponivel",
+        "abuso.limpeza_falhou",
     }
 )
 _NOME = re.compile(r"[a-zA-Z0-9_.]{1,100}\Z")
@@ -39,6 +49,10 @@ class FormatoSeguro(logging.Formatter):
             )
         elif isinstance(record.msg, str) and record.msg in EVENTOS:
             seguro.msg = record.msg
+            if record.msg.startswith("abuso."):
+                motivo = getattr(record, "motivo", None)
+                if motivo in {"limite_identidade", "limite_global", "atraso"}:
+                    seguro.msg += f" motivo={motivo}"
             if record.msg == "http.resposta":
                 # Rota é o template do router, nunca request.url/path recebido.
                 metodo = getattr(record, "metodo", "")
@@ -50,13 +64,6 @@ class FormatoSeguro(logging.Formatter):
                     seguro.msg += f" rota={rota}"
                 if type(status) is int:
                     seguro.msg += f" status={status}"
-        elif (
-            config.DEBUG
-            and record.name == "app.services.email_service"
-            and getattr(record, "email_console_local", False)
-        ):
-            # Exceção local já aprovada em ADR03/RF24. Nunca habilitar com dados reais.
-            seguro.msg = record.getMessage()
         else:
             # Não é possível sanitizar com regex texto livre de bibliotecas/provedores.
             seguro.msg = "registro_tecnico detalhes_omitidos"

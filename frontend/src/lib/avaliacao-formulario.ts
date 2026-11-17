@@ -47,6 +47,7 @@ const rotulosCampos: Record<string, string> = {
 };
 
 export function mensagemErroAvaliacao(erro: unknown): string {
+  if (erro instanceof ApiError && erro.temporario) return erro.message;
   if (!(erro instanceof ApiError)) {
     return "Não foi possível confirmar o envio. Verifique sua conexão e tente novamente. Suas respostas foram mantidas.";
   }

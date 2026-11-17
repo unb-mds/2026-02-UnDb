@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import obter_moderador, obter_sessao_opcional, obter_usuario_autenticado
 from app.core.database import get_db
+from app.core.protecao_fluxos import denunciar, moderar
 from app.models.sessao_usuario import SessaoUsuario
 from app.models.usuario import Usuario
 from app.schemas.denuncia import (
@@ -30,7 +31,10 @@ def executar(operacao, *args):
 
 
 @router.post(
-    "/comentarios/{versao_id}/denuncias", response_model=ConfirmacaoDenuncia, status_code=201
+    "/comentarios/{versao_id}/denuncias",
+    response_model=ConfirmacaoDenuncia,
+    status_code=201,
+    dependencies=[Depends(denunciar)],
 )
 def registrar(
     versao_id: UUID,
@@ -43,7 +47,11 @@ def registrar(
     )
 
 
-@router.get("/moderacao/comentarios/{versao_id}/denuncias", response_model=DenunciasDaVersao)
+@router.get(
+    "/moderacao/comentarios/{versao_id}/denuncias",
+    response_model=DenunciasDaVersao,
+    dependencies=[Depends(moderar("moderacao.fila"))],
+)
 def consultar(versao_id: UUID, db: Db, usuario: Annotated[Usuario, Depends(obter_moderador)]):
     return executar(denuncia_service.consultar, db, usuario, versao_id)
 

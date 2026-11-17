@@ -5,7 +5,7 @@ import MolduraConta from "@/components/moldura-conta";
 import { useRef, useState, type FormEvent } from "react";
 import CampoSenha from "@/components/campo-senha";
 import { redefinirSenha } from "@/lib/services/auth";
-import { ApiError } from "@/lib/services/http-error";
+import { ApiError, mensagemErroTemporario } from "@/lib/services/http-error";
 
 export default function RedefinicaoForm({ token }: { token: string | null }) {
   const enviandoRef = useRef(false);
@@ -34,7 +34,7 @@ export default function RedefinicaoForm({ token }: { token: string | null }) {
       if (falha instanceof ApiError && falha.status === 400) {
         setInvalido(true);
       } else {
-        setErro("Não foi possível redefinir a senha agora. Tente novamente.");
+        setErro(mensagemErroTemporario(falha) ?? "Não foi possível redefinir a senha agora. Tente novamente.");
       }
     } finally {
       enviandoRef.current = false;

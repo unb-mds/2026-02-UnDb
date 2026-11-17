@@ -6,6 +6,7 @@ Não cria schema nem substitui dependências da aplicação. Remove só suas fix
 
 import json
 import os
+import secrets
 import socket
 import subprocess
 import sys
@@ -277,6 +278,10 @@ def main():
             "CORS_ORIGINS": "http://localhost:3100",
             "E2E_FIXTURE": json.dumps(fixture),
             "E2E_PYTHON": sys.executable,
+            "ABUSO_HMAC_SECRET": os.environ.get("ABUSO_HMAC_SECRET") or secrets.token_urlsafe(32),
+            # Este ensaio repete muitas operações em segundos para testar persistência.
+            # Limites reais e excesso são cobertos separadamente em test_protecao_fluxos.
+            "ABUSO_POLITICAS": json.dumps({"avaliacao.escrever": {"quantidade": 100}}),
         }
         api = subprocess.Popen(
             [sys.executable, "-m", "uvicorn", "app.main:app", "--port", "8000"],

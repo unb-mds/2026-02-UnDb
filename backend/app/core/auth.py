@@ -56,6 +56,7 @@ def _validar_sessao(
 
     if renovar_cookie:
         definir_cookie_sessao(response, token)
+    request.scope["acesso_usuario_id"] = sessao.usuario_id
     return sessao
 
 

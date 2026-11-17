@@ -18,7 +18,9 @@ from app.schemas.moderacao import (
     IdentidadeInterna,
 )
 
-RETENCAO = timedelta(days=7)
+from app.core import config
+
+RETENCAO = timedelta(days=config.RETENCAO_CONTEUDO_DIAS)
 
 
 class ModeracaoError(Exception):
@@ -119,8 +121,8 @@ def decidir(
                 denuncia_repository.encerrar(db, atual.id, "VERSAO_SUBSTITUIDA")
                 atual.estado = EstadoComentario.SUBSTITUIDO
                 atual.texto = None
+                # A substituição não cancela o descarte de uma versão removida.
                 voto_comentario_repository.apagar_da_versao(db, atual.id)
-                atual.descartar_em = None
                 atual.updated_at = agora
             versao.estado = EstadoComentario.PUBLICADO
         elif dados.acao == AcaoModeracao.REJEITAR:

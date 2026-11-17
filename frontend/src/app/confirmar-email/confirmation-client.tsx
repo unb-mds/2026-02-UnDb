@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { confirmarEmail } from "@/lib/services/auth";
-import { ApiError } from "@/lib/services/http-error";
+import { ApiError, mensagemErroTemporario } from "@/lib/services/http-error";
 import Icone from "@/components/icone";
 import IconeResultado from "@/components/icone-resultado";
 
@@ -34,9 +34,9 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
           const linkInvalido = falha instanceof ApiError && [400, 422].includes(falha.status);
           setEstado("erro");
           setPodeTentar(!linkInvalido);
-          setMensagem(linkInvalido
+          setMensagem(mensagemErroTemporario(falha) ?? (linkInvalido
             ? "Este link é inválido ou expirou."
-            : "Não foi possível confirmar seu e-mail agora. Verifique sua conexão e tente novamente.");
+            : "Não foi possível confirmar seu e-mail agora. Verifique sua conexão e tente novamente."));
         }
       }), 0);
 

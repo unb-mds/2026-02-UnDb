@@ -83,5 +83,6 @@ def listar_por_professor_e_disciplina(
     consulta = select(Avaliacao).where(
         Avaliacao.professor_id == professor_id,
         Avaliacao.disciplina_id == disciplina_id,
+        Avaliacao.excluido_em.is_(None),
     )
     return list(db.scalars(consulta).all())

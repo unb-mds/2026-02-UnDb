@@ -1,6 +1,7 @@
 import re
 from urllib.parse import parse_qsl
 
+from app.domain.email import normalizar_email
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, field_validator
 
 from app.domain.termos import TERMOS_VERSAO
@@ -78,7 +79,7 @@ class CadastroRequest(BaseModel):
     @field_validator("email")
     @classmethod
     def validar_email(cls, email: str) -> str:
-        email_normalizado = email.strip().casefold()
+        email_normalizado = normalizar_email(email)
         if not EMAIL_INSTITUCIONAL.fullmatch(email_normalizado):
             raise ValueError("email deve pertencer ao domínio @aluno.unb.br")
         return email_normalizado
@@ -99,7 +100,7 @@ class LoginRequest(BaseModel):
     @field_validator("email")
     @classmethod
     def normalizar_email(cls, email: str) -> str:
-        return email.strip().casefold()
+        return normalizar_email(email)
 
 
 class SessaoResponse(BaseModel):
@@ -123,3 +124,12 @@ class RecuperarSenhaRequest(BaseModel):
 
 class RedefinirSenhaRequest(ConfirmacaoEmailRequest):
     senha: str = Field(min_length=8, max_length=128)
+
+
+class ReenvioConfirmacaoRequest(RecuperarSenhaRequest):
+    return_to: str | None = Field(default=None, max_length=2048)
+
+    @field_validator("return_to")
+    @classmethod
+    def validar_retorno(cls, valor: str | None) -> str | None:
+        return CadastroRequest.validar_retorno(valor)

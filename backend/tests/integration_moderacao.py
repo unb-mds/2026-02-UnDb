@@ -5,6 +5,8 @@ fixtures identified by its generated professor UUID. Use a disposable test datab
 """
 
 import json
+import os
+import secrets
 import socket
 import subprocess
 import sys
@@ -95,6 +97,12 @@ def main():
             "--port",
             str(porta),
         ],
+        env={
+            **os.environ,
+            "ABUSO_HMAC_SECRET": os.environ.get("ABUSO_HMAC_SECRET") or secrets.token_urlsafe(32),
+            # Ensaio intensivo de unicidade/concorrência; não calibra limites de produção.
+            "ABUSO_POLITICAS": json.dumps({"denuncia.criar": {"quantidade": 100}}),
+        },
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
@@ -267,10 +275,8 @@ def main():
                 .values(descartar_em=datetime.now(timezone.utc) - timedelta(seconds=1))
             )
             db.commit()
-        assert (
-            esperar("GET", f"/api/moderacao/comentarios/{versao}", 200, conta=53)["texto"] is None
-        )
-        assert esperar("GET", f"/api/moderacao/comentarios/{versao}/decisoes", 200, conta=53) == []
+        esperar("GET", f"/api/moderacao/comentarios/{versao}", 404, conta=53)
+        esperar("GET", f"/api/moderacao/comentarios/{versao}/decisoes", 404, conta=53)
 
         # Conflict of interest and concurrent report/removal on the other version.
         assert denunciar(outra, 53)[0] == 201
