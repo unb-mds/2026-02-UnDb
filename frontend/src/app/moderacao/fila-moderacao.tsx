@@ -117,7 +117,7 @@ export default function FilaModeracao() {
       if (statusModeracao(erro) === 403) setImpedidos((anteriores) => new Set([...anteriores, id]));
       setAviso({ tipo: "erro", mensagem: mensagemModeracao(erro, "acao") });
       // Não reutiliza dados anteriores a uma ação incerta, impedida ou concorrente.
-      if (statusModeracao(erro) !== 422) atualizar(false);
+      if (![422, 429, 503].includes(statusModeracao(erro) ?? 0)) atualizar(false);
     }
   }
 

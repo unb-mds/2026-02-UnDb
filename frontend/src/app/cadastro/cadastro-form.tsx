@@ -7,7 +7,7 @@ import OpcoesAcesso from "@/components/opcoes-acesso";
 import Link from "next/link";
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import { cadastrarUsuario } from "@/lib/services/auth";
-import { ApiError } from "@/lib/services/http-error";
+import { ApiError, mensagemErroTemporario } from "@/lib/services/http-error";
 
 export default function CadastroForm({ retorno, contexto }: { retorno: string | null; contexto?: ReactNode }) {
   const [carregando, setCarregando] = useState(false);
@@ -43,9 +43,9 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
       setMensagem(resposta.message);
       elementoFormulario.reset();
     } catch (falha) {
-      setErro(falha instanceof ApiError && falha.status === 422
+      setErro(mensagemErroTemporario(falha) ?? (falha instanceof ApiError && falha.status === 422
         ? `Revise os dados do cadastro. ${falha.message}`
-        : "Não foi possível realizar o cadastro agora. Tente novamente em instantes.");
+        : "Não foi possível realizar o cadastro agora. Tente novamente em instantes."));
     } finally {
       enviandoRef.current = false;
       setCarregando(false);

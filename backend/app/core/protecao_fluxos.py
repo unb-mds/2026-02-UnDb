@@ -88,7 +88,7 @@ def titular(operacao):
 
 def moderar(operacao, autorizacao=obter_moderador):
     def dependencia(usuario=Depends(autorizacao), limitador=Depends(obter_limitador)):
-        papel = "moderador" if usuario.moderador else "reconciliador"
+        papel = "reconciliador" if operacao.startswith("identidade.") else "moderador"
         verificar(operacao, usuario, limitador, papel)
 
     return dependencia

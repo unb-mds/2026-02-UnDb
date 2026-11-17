@@ -90,6 +90,10 @@ class FluxosTest(unittest.TestCase):
         politica, identidade = self.lim.consumir.call_args.args
         self.assertEqual(politica.operacao, "avaliacao.escrever")
         self.assertEqual(identidade.valor, str(self.usuario.id))
+        guard.moderar("identidade.fila")(self.usuario, self.lim)
+        self.assertEqual(
+            self.lim.consumir.call_args.args[0].operacao, "identidade.fila.reconciliador"
+        )
         for papel in ("moderador", "reconciliador"):
             p = guard.politica_fluxo("moderacao.fila", papel)
             self.assertGreater(p.quantidade, politica.quantidade)
@@ -104,6 +108,7 @@ class FluxosTest(unittest.TestCase):
             )
         self.assertEqual(r.status_code, 429)
         self.assertEqual(r.headers["retry-after"], "17")
+        self.assertIn("retry-after", r.headers["access-control-expose-headers"].lower())
         escrever.assert_not_called()
         self.assertIsNone(self.lim.consumir.call_args.args[1])
 

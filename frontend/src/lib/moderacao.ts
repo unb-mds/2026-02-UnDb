@@ -26,6 +26,7 @@ export function statusModeracao(erro: unknown): number | null {
 }
 
 export function mensagemModeracao(erro: unknown, operacao: "consulta" | "acao"): string {
+  if (erro instanceof ApiError && erro.temporario) return erro.message;
   switch (statusModeracao(erro)) {
     case 401: return "Sua sessão não está disponível. Entre com uma conta de moderador e retorne à fila.";
     case 403: return operacao === "acao"

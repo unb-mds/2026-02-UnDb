@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { consultarSessao, entrar, sair, EVENTO_SESSAO_ALTERADA } from "@/lib/services/auth";
-import { ApiError } from "@/lib/services/http-error";
+import { ApiError, mensagemErroTemporario } from "@/lib/services/http-error";
 
 export default function LoginForm({ retorno, contexto }: { retorno: string | null; contexto?: ReactNode }) {
   const router = useRouter();
@@ -79,9 +79,9 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
     } catch (falha) {
       setSessao("visitante");
       setErro(
-        falha instanceof ApiError && falha.status === 401
+        mensagemErroTemporario(falha) ?? (falha instanceof ApiError && falha.status === 401
           ? "E-mail ou senha inválidos."
-          : "Não foi possível entrar agora. Tente novamente em instantes.",
+          : "Não foi possível entrar agora. Tente novamente em instantes."),
       );
     } finally {
       enviandoRef.current = false;

@@ -1,4 +1,4 @@
-import { ApiError } from "./http-error";
+import { ApiError, interpretarRetryAfter } from "./http-error";
 
 /**
  * Base da API institucional pública (Issue #25) — sem autenticação, RF04.
@@ -29,7 +29,7 @@ async function request<T>(path: string, query: Record<string, string | undefined
 
   if (!response.ok) {
     const detalhe = await response.json().catch(() => null);
-    throw new ApiError(mensagemErro(detalhe?.detail), response.status, detalhe?.detail);
+    throw new ApiError(mensagemErro(detalhe?.detail), response.status, detalhe?.detail, interpretarRetryAfter(response.headers.get("Retry-After")));
   }
 
   if (response.status === 204) {
@@ -51,7 +51,7 @@ async function post<TResponse, TBody>(path: string, body: TBody, opcoes: OpcoesR
   if (!response.ok) {
     const detalhe = await response.json().catch(() => null);
     const mensagem = mensagemErro(detalhe?.detail);
-    throw new ApiError(mensagem, response.status, detalhe?.detail);
+    throw new ApiError(mensagem, response.status, detalhe?.detail, interpretarRetryAfter(response.headers.get("Retry-After")));
   }
 
   if (response.status === 204) {

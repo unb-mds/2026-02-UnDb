@@ -2,7 +2,8 @@
 
 ## Restrição transversal — #266, Blocos 3 e 4
 
-Fonte: decisão A e pedido EXECUTAR: BLOCO 3 e 4 do PO. Estado: planejado.
+Fonte: decisão A e pedido EXECUTAR: BLOCO 3 e 4 do PO. Estado: implementado;
+calibração e validações humanas permanecem pendentes de validação.
 Avaliações e denúncias devem rejeitar excesso antes de escrita. Na falha do
 limitador, avaliações seguem com alerta; denúncias usam teto local por processo.
 Canal de titulares usa contadores compartilhados, continua desativado por padrão

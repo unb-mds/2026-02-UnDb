@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { analisarComentario } from "@/lib/services/moderacao";
+import { mensagemErroTemporario } from "@/lib/services/http-error";
 import { rotulosMotivo } from "@/lib/moderacao";
 import { rotulosOpenAI } from "@/lib/types/moderacao";
 import type { TriagemComentario } from "@/lib/types/moderacao";
@@ -17,6 +18,7 @@ type Estado = { tipo: "inicial" | "carregando" | "erro" } | { tipo: "pronto"; da
 
 export default function ApoioModeracao({ versaoId, desabilitado }: { versaoId: string; desabilitado: boolean }) {
   const [estado, setEstado] = useState<Estado>({ tipo: "inicial" });
+  const [erroTemporario, setErroTemporario] = useState<string | null>(null);
   const controlador = useRef<AbortController | null>(null);
   useEffect(() => () => controlador.current?.abort(), [versaoId]);
   async function analisar() {
@@ -24,11 +26,15 @@ export default function ApoioModeracao({ versaoId, desabilitado }: { versaoId: s
     const consulta = new AbortController();
     controlador.current = consulta;
     setEstado({ tipo: "carregando" });
+    setErroTemporario(null);
     try {
       const dados = await analisarComentario(versaoId, consulta.signal);
       if (!consulta.signal.aborted) setEstado({ tipo: "pronto", dados });
-    } catch {
-      if (!consulta.signal.aborted) setEstado({ tipo: "erro" });
+    } catch (erro) {
+      if (!consulta.signal.aborted) {
+        setErroTemporario(mensagemErroTemporario(erro));
+        setEstado({ tipo: "erro" });
+      }
     }
   }
   return <section aria-label="Apoio à revisão" className="space-y-3 rounded-lg border border-foreground/15 p-4">
@@ -40,7 +46,7 @@ export default function ApoioModeracao({ versaoId, desabilitado }: { versaoId: s
       {estado.tipo === "carregando" ? "Analisando…" : "Consultar apoio à revisão"}
     </button>
     <div aria-live="polite">
-      {estado.tipo === "erro" && <p role="alert" className="text-sm">Não foi possível analisar esta versão. Atualize a fila ou continue com a revisão humana.</p>}
+      {estado.tipo === "erro" && <p role="alert" className="text-sm">{erroTemporario ?? "Não foi possível analisar esta versão. Atualize a fila ou continue com a revisão humana."}</p>}
       {estado.tipo === "pronto" && <div className="space-y-2 text-sm">
         <p>{mensagens[estado.dados.status]}</p>
         <p>Filtro de termos: {estado.dados.filtro_ativo ? "habilitado" : "desativado"}.</p>
