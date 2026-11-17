@@ -57,3 +57,8 @@ A revisão de código, as verificações e as autorizações seguem as regras ca
 regras novas de avaliação individual ou governança.
 
 - 17/11/2026 — Codex (GPT-6), por solicitação de Nicolas: correção do finding da PR #284 no preflight Docker, com socket local fixado e quatro testes de regressão simulados aprovados. Alterações locais em `scripts/recovery_drill.py`, `scripts/test_recovery_drill.py` e registro da evidência; sem nova execução do ensaio PostgreSQL. Na continuação, Nicolas autorizou commit e envio da correção à PR #284; sem merge ou encerramento da issue nesta etapa.
+
+- 17/11/2026 — Codex (GPT-6), solicitado por Nicolas: correção dos findings da PR #285 e alinhamento aos critérios técnicos da #263. Ajustados RF25/derivados, retenção de rejeição/remoção, papéis de autor/atendente/moderador, procedimento manual e resumo para #168. Testes exercitam retirada com autoria, restauração real de suspensão e limite de revisão de rejeição. Verificações: Python 3.12.14, 57 aprovados/9 ignorados; Ruff e MkDocs estrito aprovados. Sem operação de produção; aceite humano e verificações operacionais não foram simulados como concluídos. Na continuação, Nicolas autorizou commit e envio da correção à PR #285, sem merge.
+
+- 17/11/2026 — Codex: por solicitação de Nicolas, resolução dos conflitos da PR #285 com develop após a integração da #284. Preservados o procedimento/retencão da #263 e o ensaio ampliado/limites de restauração da #267, sem alterar permissões ou ativar produção. Integração da base na branch da PR; não é merge da PR em develop.
+Validação da conciliação: frontend lint, typecheck e testes aprovados; MkDocs estrito e `git diff --check` aprovados. Nenhum endpoint ou regra de autorização alterado na resolução.

@@ -29,12 +29,12 @@ acesso direto depende das permissões operacionais, não da atribuição de uma 
 | T05–T08; nomes/identificadores docentes, unidades, disciplinas, turmas, vínculos e execução vindos do SIGAA público/revisão | Catálogo, atualização e reconciliação | Catálogo público; revisão por reconciliador; tabelas próprias em PostgreSQL; importador local | Sem prazo geral; preservação de histórico e atualização não são exclusão de todos os dados |
 | T09; conta, cinco critérios, professor/disciplina e datas informados na avaliação | Unicidade, substituição e agregados | `avaliacoes`, vínculo privado; agregado público a partir de três, sem notas individuais | Exclusão própria/da conta oculta imediatamente e purga após sete dias configuráveis; janela deve ser preservada ao reaplicar exclusões |
 | T10; texto opcional, versões, estados e datas enviados pelo autor | Publicação/revisão/retirada | `comentario_versoes`; público só publicado; autor e moderação autorizados | Retirado/removido e substituído com descarte agendado: purga após sete dias; exclusão da avaliação abrange todas as versões. Rejeitado perde texto e mantém metadados; execução hospedada não verificada |
-| T11–T13; denúncia/motivo, conta quando existente, decisões/atores e agradecimentos | Análise, impedimentos, revisão e comunicação | Tabelas de moderação, acesso por papel/objeto; sem denunciantes públicos | Denúncias encerradas ficam fora da fila até purga do conteúdo; dependentes são removidos junto do comentário. Metadados de rejeição sem prazo novo |
+| T11–T13; denúncia/motivo, conta quando existente, decisões/atores e agradecimentos | Análise, impedimentos, revisão e comunicação | Tabelas de moderação, acesso por papel/objeto; sem denunciantes públicos | Denúncias e dependentes saem com a purga da versão; outras decisões vencidas são descartadas pela rotina de moderação. REJEITAR apaga texto imediatamente e preserva metadados sem novo prazo geral; agradecimentos têm ciclo próprio |
 | T14; texto integral elegível e resultado de classificação | Apoio à triagem, quando habilitada | OpenAI Moderations API; sem envio pelo canal de contato | Contrato, regiões, retenção externa e suboperadores não confirmados; filtros não garantem anonimização |
 | T15; categoria, alvo, descrição/evidência textual, protocolo, hash de chave, complementos e respostas | Contato e atendimento manual sem login estudantil | `solicitacoes_titulares/eventos_solicitacoes`; portador da chave consulta respostas/complementos; triagem/providências internas; allowlists de atendimento | Sem descarte geral implementado. Recebimento depende de configuração/retenção aprovada; não ativado por esta entrega; #263 acompanha |
 | T16–T17; identificadores HMAC, contadores e metadados de conexão | Proteção contra abuso e operação | Contadores PostgreSQL compartilhados `UNLOGGED`; registros privados de acesso separados de logs de console/provedores | Contadores expiram/purgam conforme o fluxo; não são garantia de recuperação do orçamento. Acesso: padrão de seis meses corridos, purga implementada; configuração/execução e logs externos a verificar |
 | T18; possíveis cópias dos dados anteriores | Recuperação | Nicolas relata backups manuais no Docker; demais acessos/cobertura/histórico ainda não verificados | Ensaio sintético ampliado #267 não comprova recuperação real. Diário operacional de exclusões/revogações não confirmado; não liberar cópia antiga presumindo reaplicação completa |
-| #278; conta, voto e versão do comentário | Unicidade, troca/retirada e contagem | Integrado em develop e conciliado pela #280: `votos_comentario`, vínculo interno; API só contagens e estado da própria sessão, no-store | Sem herança; purga com o texto e remoção dos votos feitos pela conta excluída. Suspensão conserva; cópia restaurada exige reaplicar exclusões. Ver [evidências da #278](estudos/votos-utilidade-issue-278.md) |
+| #278; conta, voto e versão do comentário | Unicidade, troca/retirada e contagem | Integrado em develop e conciliado pela #280: `votos_comentario`, vínculo interno; API só contagens e estado da própria sessão, no-store | Sem herança; purga com o texto e remoção dos votos feitos pela conta excluída. Suspensão conserva; votos não são denúncias nem acionam moderação; cópia restaurada exige reaplicar exclusões. Ver [evidências da #278](estudos/votos-utilidade-issue-278.md) |
 
 ## Serviços conhecidos e o que não foi confirmado
 
@@ -51,23 +51,13 @@ A Política expõe esses limites; não afirma anonimato absoluto nem conformidad
 Não são atribuídas bases legais genéricas ou consentimento em nome de terceiros.
 Revisão jurídica formal não é pré-condição desta R2 conforme autorização da #269.
 
-## Contato, pedidos e moderação
+## Contato, pedidos de titulares e política de moderação (#263)
 
-O fluxo existente é `/contato` → protocolo/chave → consulta/complementos → resposta
-manual autorizada; triagem/providências internas ficam separadas. Ver [canal](canal-titulares.md).
-A página informa indisponibilidade do recebimento; esta entrega não ativa flags nem
-promete SLA. Nicolas acompanha a operação; permissões documentadas continuam vigentes.
+O fluxo consolidado opera em `/contato` → protocolo UUID e chave de 32 bytes urlsafe (apenas hash SHA-256 no banco) → consulta protegida por chave e complementos → atendimento manual autorizado em `/atendimento`. Notas internas de triagem e providências permanecem isoladas do histórico público. Detalhes em [canal de titulares](canal-titulares.md) e [política de moderação](politica-moderacao.md). Nicolas Zanin acompanha; a configuração e disponibilidade operacional dos atendentes precisam ser confirmadas por ele. Não há SLA nem promessa de suporte ininterrupto.
 
-A #263 acompanha política operacional, pedidos e efeitos da exclusão; a #267,
-roteiro/recuperação. Esses insumos não exigem fechamento integral para redigir a Política.
-A decisão B da #266 já define ocultação e purga das avaliações na exclusão da conta;
-não reabrir essa entrega. Guarda mínima e execução hospedada seguem com seus limites.
-Excluir conta, retirar comentário e desativar acesso são operações distintas.
+Pedidos de titulares são tratados manualmente, com verificação proporcional antes de divulgar dados privados ou executar mutações. Retirada de comentário oculta o texto, encerra denúncias e preserva os critérios estruturados; desativação é bloqueio de acesso sem operação independente nesta entrega; exclusão lógica remove credenciais e sessões, mantém conta mínima com e-mail reservado, oculta avaliações/comentários imediatamente e agenda a purga após sete dias configuráveis, conforme decisão B/#266 já integrada. `avaliacoes.usuario_id` obrigatório mantém o vínculo até a purga. Não foi inspecionado backup real; o ensaio ampliado da #267 comprovou recuperação sintética e reaplicação de exclusões/revogações. Rotina, retenção e recuperação das cópias reais e registro operacional de exclusões continuam não comprovados. Não liberar restauração antiga presumindo reaplicação completa.
 
-Crítica legítima negativa é permitida; discordância docente e impopularidade não
-removem conteúdo. Triagem externa não rejeita automaticamente; sinais/falhas aguardam
-revisão humana. 50 contas distintas continuam como gatilho de suspensão, não mínimo
-para analisar um relato fundamentado. Votos não alteram notas ou moderação.
+Crítica acadêmica legítima é assegurada; ofensas, ameaças, preconceito e vazamento de dados são proibidos. Discordância docente ou impopularidade não motivam remoção nem conferem direito de veto. A triagem automática não rejeita por IA: qualquer sinal ou falha mantém o caso pendente para moderação humana. O gatilho de 50 contas autenticadas distintas é apenas suspensão cautelar automática, não mínimo para atendimento. Qualquer decisão de moderação admite revisão manual motivada via protocolo e complemento. Votos de utilidade (#278) não são denúncias e não acionam moderação; moderar texto não altera notas.
 
 ## Publicação e ciência
 

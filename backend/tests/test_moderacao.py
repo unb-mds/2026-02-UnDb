@@ -184,6 +184,9 @@ class ModeracaoTest(unittest.TestCase):
                     ("/api/solicitacoes/disponibilidade", None, 200),
                 ):
                     with self.subTest(caminho=caminho, status=esperado):
+                        # O cliente persiste cookies emitidos por respostas anteriores;
+                        # cada cenário precisa representar apenas o token declarado.
+                        client.cookies.clear()
                         headers = {"Cookie": f"undb_session={token}"} if token else {}
                         resposta = await client.get(caminho, headers=headers)
                         self.assertEqual(resposta.status_code, esperado)
