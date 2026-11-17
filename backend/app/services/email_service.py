@@ -27,21 +27,11 @@ class ConsoleEmailSender:
 
     def enviar_confirmacao(self, destinatario: str, link: str) -> None:
         self._validar_ambiente()
-        logger.warning(
-            "EMAIL_BACKEND=console: confirmacao para %s: %s",
-            destinatario,
-            link,
-            extra={"email_console_local": True},
-        )
+        logger.warning("auth.confirmacao.simulado")
 
     def enviar_recuperacao_senha(self, destinatario: str, link: str) -> None:
         self._validar_ambiente()
-        logger.warning(
-            "EMAIL_BACKEND=console: recuperacao de senha para %s: %s",
-            destinatario,
-            link,
-            extra={"email_console_local": True},
-        )
+        logger.warning("auth.recuperacao.simulado")
 
 
 class ResendEmailSender:
@@ -63,7 +53,7 @@ class ResendEmailSender:
                         "<p>Confirme seu e-mail institucional para poder avaliar "
                         "professores e disciplinas no UnDb.</p>"
                         f'<p><a href="{link}">Confirmar e-mail</a></p>'
-                        "<p>Este link expira em 24 horas.</p>"
+                        f"<p>Este link expira em {config.AUTH_CONFIRMACAO_TTL_HORAS} horas.</p>"
                     ),
                 }
             )
@@ -81,7 +71,8 @@ class ResendEmailSender:
                     "html": (
                         "<p>Recebemos uma solicitação para redefinir sua senha no UnDb.</p>"
                         f'<p><a href="{link}">Redefinir senha</a></p>'
-                        "<p>Este link expira em uma hora e só pode ser usado uma vez.</p>"
+                        f"<p>Este link expira em {config.AUTH_RECUPERACAO_TTL_MINUTOS} minutos "
+                        "e só pode ser usado uma vez.</p>"
                         "<p>Se você não fez esta solicitação, ignore este e-mail.</p>"
                     ),
                 }

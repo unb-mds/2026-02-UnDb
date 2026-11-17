@@ -1,10 +1,14 @@
 from dataclasses import dataclass
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
+import secrets
 from urllib.parse import urlencode
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core import config
 from app.core.config import FRONTEND_URL
 from app.core.security import (
     gerar_hash_senha,
@@ -29,8 +33,8 @@ LOGIN_MESSAGE = "Autenticação realizada com sucesso."
 LOGOUT_MESSAGE = "Sessão encerrada com sucesso."
 SESSION_INVALIDA_MESSAGE = "Sessão ausente, inválida ou expirada."
 EMAIL_NAO_CONFIRMADO_MESSAGE = "Confirme seu e-mail antes de registrar avaliações."
-TOKEN_TTL = timedelta(hours=24)
-SESSION_TTL = timedelta(days=7)
+TOKEN_TTL = timedelta(hours=config.AUTH_CONFIRMACAO_TTL_HORAS)
+SESSION_TTL = timedelta(days=config.AUTH_SESSAO_TTL_DIAS)
 
 
 class TokenConfirmacaoInvalidoError(Exception):
@@ -52,7 +56,10 @@ REDEFINICAO_MESSAGE = "Senha redefinida. Entre novamente com sua nova senha."
 RECUPERACAO_TOKEN_INVALIDO_MESSAGE = (
     "Link de recuperação inválido ou expirado. Solicite um novo link."
 )
-RECUPERACAO_TTL = timedelta(hours=1)
+RECUPERACAO_TTL = timedelta(minutes=config.AUTH_RECUPERACAO_TTL_MINUTOS)
+REENVIO_MESSAGE = (
+    "Se o endereço informado possuir uma conta pendente, enviaremos um link de confirmação."
+)
 
 
 class TokenRecuperacaoInvalidoError(Exception):
@@ -136,10 +143,25 @@ def confirmar_email(db: Session, token_aberto: str) -> str:
     return CONFIRMACAO_MESSAGE
 
 
-def autenticar(db: Session, dados: LoginRequest) -> Autenticacao:
+@lru_cache(maxsize=1)
+def _hash_ficticio_login() -> str:
+    return gerar_hash_senha(secrets.token_urlsafe(32))
+
+
+def autenticar(
+    db: Session,
+    dados: LoginRequest,
+    *,
+    antes_de_criar_sessao: Callable[[], None] | None = None,
+) -> Autenticacao:
+    ficticio = _hash_ficticio_login()
     usuario = usuario_repository.obter_para_login(db, dados.email)
-    if usuario is None or not verificar_senha(dados.senha, usuario.password_hash):
+    credencial_valida = verificar_senha(dados.senha, usuario.password_hash if usuario else ficticio)
+    if usuario is None or not credencial_valida:
         raise CredenciaisInvalidasError("E-mail ou senha inválidos.")
+
+    if antes_de_criar_sessao:
+        antes_de_criar_sessao()
 
     token_aberto = gerar_token_confirmacao()
     sessao = SessaoUsuario(
@@ -200,7 +222,13 @@ def solicitar_recuperacao_senha(db: Session, email: str, email_sender: EmailSend
     return RECUPERACAO_MESSAGE
 
 
-def redefinir_senha(db: Session, token_aberto: str, senha: str) -> str:
+def redefinir_senha(
+    db: Session,
+    token_aberto: str,
+    senha: str,
+    *,
+    antes_de_confirmar: Callable[[Usuario], None] | None = None,
+) -> str:
     token_hash = gerar_hash_token(token_aberto)
     try:
         usuario = recuperacao_senha_repository.obter_usuario_por_token(db, token_hash)
@@ -215,8 +243,39 @@ def redefinir_senha(db: Session, token_aberto: str, senha: str) -> str:
             raise TokenRecuperacaoInvalidoError(RECUPERACAO_TOKEN_INVALIDO_MESSAGE)
         usuario.password_hash = gerar_hash_senha(senha)
         recuperacao_senha_repository.invalidar_links_e_sessoes(db, usuario, agora)
+        if antes_de_confirmar:
+            antes_de_confirmar(usuario)
         db.commit()
     except Exception:
         db.rollback()
         raise
     return REDEFINICAO_MESSAGE
+
+
+def reenviar_confirmacao(
+    db: Session, email: str, email_sender: EmailSender, return_to: str | None = None
+) -> str:
+    try:
+        usuario = usuario_repository.obter_para_login(db, email)
+        if usuario is None or usuario.email_confirmado:
+            return REENVIO_MESSAGE
+        token_aberto = gerar_token_confirmacao()
+        usuario_repository.adicionar_token(
+            db,
+            TokenConfirmacaoEmail(
+                usuario_id=usuario.id,
+                token_hash=gerar_hash_token(token_aberto),
+                expires_at=_agora_utc() + TOKEN_TTL,
+            ),
+        )
+        parametros = {"token": token_aberto}
+        if return_to:
+            parametros["returnTo"] = return_to
+        link = f"{FRONTEND_URL.rstrip('/')}/confirmar-email?{urlencode(parametros)}"
+        db.flush()
+        email_sender.enviar_confirmacao(email, link)
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    return REENVIO_MESSAGE

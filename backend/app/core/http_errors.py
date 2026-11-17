@@ -5,6 +5,7 @@ import logging
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from app.core import config
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,19 @@ async def limitador_indisponivel_seguro(request: Request, erro):
         content={"detail": "Serviço temporariamente indisponível. Tente novamente em instantes."},
         headers={
             "Retry-After": str(erro.retry_after),
+            "Cache-Control": "no-store",
+            "Referrer-Policy": "no-referrer",
+        },
+    )
+
+
+async def email_indisponivel_seguro(request: Request, erro):
+    logger.error("auth.transporte.indisponivel")
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Serviço temporariamente indisponível. Tente novamente em instantes."},
+        headers={
+            "Retry-After": str(max(1, config.ABUSO_RETRY_FALHA_SEGUNDOS)),
             "Cache-Control": "no-store",
             "Referrer-Policy": "no-referrer",
         },

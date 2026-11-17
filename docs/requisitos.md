@@ -3,7 +3,8 @@
 ## Restrição transversal de autenticação — #266, Bloco 2
 
 Fonte: decisões A e pedido `EXECUTAR: BLOCO 2` do PO nesta conversa. Estado de
-entrega: **planejado** até a integração registrada na PR #280.
+entrega: **implementado**, com evidências na PR #280 e em
+`docs/seguranca/limitador-auth-bloco-2.md`.
 
 Cadastro, login, confirmação, reenvio de confirmação e recuperação/redefinição
 devem limitar tentativas antes de efeitos. Restrições temporárias retornam 429

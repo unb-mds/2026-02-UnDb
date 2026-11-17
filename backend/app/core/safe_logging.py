@@ -5,13 +5,15 @@ import logging
 import re
 import time
 
-from app.core import config
-
 EVENTOS = frozenset(
     {
         "http.falha_interna",
         "http.resposta",
         "auth.recuperacao.envio_falhou",
+        "auth.confirmacao.envio_falhou",
+        "auth.confirmacao.simulado",
+        "auth.recuperacao.simulado",
+        "auth.transporte.indisponivel",
         "moderacao.descarte_falhou",
         "abuso.negado",
         "abuso.observado",
@@ -59,13 +61,6 @@ class FormatoSeguro(logging.Formatter):
                     seguro.msg += f" rota={rota}"
                 if type(status) is int:
                     seguro.msg += f" status={status}"
-        elif (
-            config.DEBUG
-            and record.name == "app.services.email_service"
-            and getattr(record, "email_console_local", False)
-        ):
-            # Exceção local já aprovada em ADR03/RF24. Nunca habilitar com dados reais.
-            seguro.msg = record.getMessage()
         else:
             # Não é possível sanitizar com regex texto livre de bibliotecas/provedores.
             seguro.msg = "registro_tecnico detalhes_omitidos"

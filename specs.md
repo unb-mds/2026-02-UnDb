@@ -329,9 +329,9 @@ dados suficientes. Não atribuir percentual artificial aos resultados insuficien
    seu hash é persistido.
 10. Cadastro repetido retorna a mesma resposta genérica `202`, não altera a conta existente
     e não informa se o endereço já está cadastrado.
-11. Na Release 1, `EMAIL_BACKEND=console` escreve o link no terminal e é o único modo
-    previsto. A ativação de `EMAIL_BACKEND=resend`, com chave e remetente configurados
-    externamente, fica planejada para a Release 2.
+11. `EMAIL_BACKEND=console` simula envio somente em DEBUG, sem registrar link ou
+    destinatário. O transporte Resend exige chave e remetente externos; sua configuração
+    operacional permanece pendente de validação. Ensaios usam transporte sintético privado.
 12. O cookie de sessão chama-se `undb_session`. O servidor persiste somente o hash do token
     aleatório e renova tanto `expires_at` quanto o `Max-Age` do cookie quando uma rota passa
     pela dependência de autenticação. Rotas públicas não renovam sessão.

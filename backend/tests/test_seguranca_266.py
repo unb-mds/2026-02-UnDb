@@ -21,6 +21,7 @@ from starlette.requests import Request
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from app.core import config, limite_atendimento
+from app.core.dependencia_auth_abuso import obter_protecao_auth
 from app.core.auth import definir_cookie_sessao, remover_cookie_sessao
 from app.core.database import Base, engine, get_db
 from app.core.security import gerar_hash_senha
@@ -31,12 +32,14 @@ from app.schemas.auth import LoginRequest
 from app.services import auth_service
 from app.services.email_service import ConsoleEmailSender, EmailDeliveryError, ResendEmailSender
 from tests import test_auth as auth_tests
+from tests.auth_abuso_fixtures import protecao_permitida
 
 
 class FronteiraHttpTest(unittest.TestCase):
     def setUp(self):
         self.override = dict(app.dependency_overrides)
         app.dependency_overrides[get_db] = lambda: None
+        app.dependency_overrides[obter_protecao_auth] = protecao_permitida
         self.client = TestClient(app, raise_server_exceptions=False)
         self.flags = patch.object(config, "CORS_ORIGINS", ["https://frontend.example"])
         self.flags.start()
@@ -286,7 +289,9 @@ class LogsTest(unittest.TestCase):
             ConsoleEmailSender().enviar_confirmacao(
                 "teste@example.com", "http://localhost/?token=teste"
             )
-        self.assertIn("token=teste", logs.output[0])
+        self.assertIn("auth.confirmacao.simulado", logs.output[0])
+        self.assertNotIn("token=teste", logs.output[0])
+        self.assertNotIn("teste@example.com", logs.output[0])
 
     def test_parametros_sql_ocultos_sem_perder_categoria_da_falha(self):
         self.assertTrue(engine.hide_parameters)
@@ -429,6 +434,7 @@ class FluxoNavegadorTest(unittest.TestCase):
 
         anterior = dict(app.dependency_overrides)
         app.dependency_overrides[get_db] = banco
+        app.dependency_overrides[obter_protecao_auth] = protecao_permitida
         try:
             with TestClient(
                 app, base_url="https://api.example", headers={"Origin": "http://localhost:3000"}
