@@ -142,3 +142,17 @@ lacunas impedem afirmar prontidão ou recuperação hospedada. Sem produção ou
 O usuário autorizou publicar a entrega e encerrar a #267 com essas ressalvas;
 isso não equivale a cumprimento das pendências operacionais. A #168 deve consumir esta evidência
 e identificar a versão efetivamente publicada, sem repetir o ensaio por rotina.
+
+## Correção do preflight após revisão da PR #284
+
+Em 17/11/2026, corrigida a precedência de `DOCKER_CONTEXT` sobre `DOCKER_HOST`:
+contexto remoto não pode ser aceito por existir um host local no ambiente. Após
+validar o destino local, o runner fixa o socket com `--host` e remove ambas as
+variáveis do ambiente das chamadas Docker seguintes, inclusive as de descarte.
+
+Verificação da correção: `python3 -m unittest discover -s scripts -p test_recovery_drill.py -v`
+com quatro testes aprovados, usando subprocessos simulados e sem acessar daemon:
+recusa de contexto remoto com host local; contexto local com host remoto; host
+local explícito; contexto padrão local. `git diff --check` aprovado. Ruff 0.17.3: lint e formatação aprovados nos dois scripts alterados. O ensaio
+PostgreSQL não foi repetido. Os hashes e resultados anteriores permanecem como
+evidência histórica da versão ensaiada, não da correção posterior do runner.

@@ -55,8 +55,16 @@ def main():
     }
     owned = []
     phase = "preflight"
+    docker_endpoint = None
 
     def run(*command, environment=env, timeout=180):
+        if command[0] == "docker" and docker_endpoint is not None:
+            command = ("docker", "--host", docker_endpoint, *command[1:])
+            environment = {
+                key: value
+                for key, value in environment.items()
+                if key not in {"DOCKER_CONTEXT", "DOCKER_HOST"}
+            }
         completed = subprocess.run(
             command,
             check=False,
@@ -128,9 +136,14 @@ def main():
             "--format",
             '{{(index .Endpoints "docker").Host}}',
         )
-        effective_endpoint = os.environ.get("DOCKER_HOST") or endpoint
+        # DOCKER_CONTEXT tem precedência sobre DOCKER_HOST no cliente Docker.
+        effective_endpoint = (
+            endpoint if env.get("DOCKER_CONTEXT") else env.get("DOCKER_HOST") or endpoint
+        )
         if not effective_endpoint.startswith(("npipe://", "unix://")):
             raise RuntimeError("Exige Docker local via named pipe/socket, sem endpoint remoto")
+        # Fixar o socket validado também evita mudanças posteriores de contexto.
+        docker_endpoint = effective_endpoint
         result["docker_contexto_local"] = True
         result["docker"] = run("docker", "version", "--format", "{{.Server.Version}}")
         result["imagem_id"] = run("docker", "image", "inspect", args.image, "--format", "{{.Id}}")

@@ -55,3 +55,5 @@ de avaliadores. Não registrar aceite humano, revisão ou teste que ainda não o
 A revisão de código, as verificações e as autorizações seguem as regras canônicas em
 `skills/` e o fluxo de `CONTRIBUTING.md`. Este documento é um registro de uso e não cria
 regras novas de avaliação individual ou governança.
+
+- 17/11/2026 — Codex (GPT-6), por solicitação de Nicolas: correção do finding da PR #284 no preflight Docker, com socket local fixado e quatro testes de regressão simulados aprovados. Alterações locais em `scripts/recovery_drill.py`, `scripts/test_recovery_drill.py` e registro da evidência; sem nova execução do ensaio PostgreSQL. Na continuação, Nicolas autorizou commit e envio da correção à PR #284; sem merge ou encerramento da issue nesta etapa.
