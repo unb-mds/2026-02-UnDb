@@ -1,0 +1,113 @@
+{
+  "estado": "implementado",
+  "registrado_em": "2026-11-17T02:35:59.725575+00:00",
+  "commit_implementacao": "b1ed84ac41a713cf3a089652ad6103a8982071a9",
+  "commits": [
+    "c31c7fe",
+    "b1ed84a"
+  ],
+  "pr": "https://github.com/unb-mds/2026-02-UnDb/pull/280",
+  "ambiente": "Windows local, Python 3.12.16, PostgreSQL 16.16 descartavel loopback, API sem DDL",
+  "etapas_postgres": [
+    {
+      "etapa": "upgrade",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-bloco1",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-repetido",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "testes-bloco2",
+      "exit_code": 0
+    },
+    {
+      "etapa": "integracao-avaliacao",
+      "exit_code": 0
+    },
+    {
+      "etapa": "integracao-acesso",
+      "exit_code": 0
+    },
+    {
+      "etapa": "suite-completa",
+      "exit_code": 0
+    },
+    {
+      "etapa": "limpeza-cli",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check-final",
+      "exit_code": 0
+    }
+  ],
+  "testes_especificos": {
+    "total": 61,
+    "skips": 0,
+    "falhas": 0,
+    "comando": "python -m unittest tests.test_limite_abuso tests.test_limite_abuso_postgres tests.test_auth_abuso tests.test_auth_abuso_http tests.test_auth_abuso_postgres -q"
+  },
+  "suite": {
+    "total": 402,
+    "skips": 2,
+    "falhas": 0,
+    "comando": "python -m unittest discover -s tests -q",
+    "skips_motivo": "Testes anteriores de identidades/reconciliacao exigem undb_207_test separado"
+  },
+  "outros_checks": [
+    {
+      "comando": "python -m ruff check backend",
+      "exit_code": 0
+    },
+    {
+      "comando": "python -m ruff format --check backend",
+      "exit_code": 0
+    },
+    {
+      "comando": "python -m compileall -q backend/app backend/tests",
+      "exit_code": 0
+    },
+    {
+      "comando": "python -m mkdocs build --strict",
+      "exit_code": 0
+    },
+    {
+      "comando": "npm ci --ignore-scripts",
+      "exit_code": 0
+    },
+    {
+      "comando": "npm run build",
+      "exit_code": 0
+    },
+    {
+      "comando": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "navegador": "Edge local, acesso com 54 combinacoes; transporte sintetico privado, nenhum envio real",
+  "frontend": "Next.js 16.3.5, lockfile preservado; nenhum arquivo frontend alterado",
+  "ci_linux": "pendente de validacao na PR apos push",
+  "pendencias": [
+    "Calibracao item 4 e cota efetiva/reserva do provedor",
+    "UNLOGGED pode perder contadores; segredo privado obrigatorio",
+    "Demais blocos e validacoes humanas nao executados"
+  ],
+  "producao": "Sem acesso ou alteracao; nenhuma validacao juridica declarada"
+}
