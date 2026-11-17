@@ -1,5 +1,15 @@
 # specs.md — Especificação de implementação
 
+## Retenção — #266, Bloco 5
+
+Derivado de docs/requisitos.md, decisão B do PO. DELETE /api/auth/conta exclui
+logicamente a própria conta autenticada, revoga credenciais e oculta conteúdo.
+DELETE /api/avaliacoes/{id} exclui avaliação própria; DELETE
+/api/moderacao/avaliacoes/{id} permite remoção urgente por moderador confirmado.
+Essas ações não passam pelo limitador e preservam CSRF/autorização. Conteúdo
+oculto não participa das consultas públicas e não pode ser reativado por upsert
+antes da purga. Estado/migração e job seguem docs/seguranca/retencao-bloco-5.md.
+
 ## Abuso e respostas temporárias — #266, Blocos 3 e 4
 
 Derivado da restrição transversal em docs/requisitos.md, fonte PO. Avaliações,

@@ -1,5 +1,21 @@
 # 📋 Engenharia de Requisitos — G7
 
+## Retenção e exclusão — #266, Bloco 5
+
+Fonte: decisão B e EXECUTAR: BLOCO 5 do PO. Estado: implementado;
+guarda mínima e operação em hospedagem permanecem pendentes de validação.
+Exclusão de conta preserva identificador, e-mail, datas e estado de exclusão,
+remove nome, senha, papéis, sessões e tokens e impede autenticação. E-mail fica
+reservado: recadastro não reativa a conta e mantém resposta neutra. Base legal,
+prazo e revisão dessa guarda permanecem pendentes de validação.
+Avaliações e comentários excluídos são ocultados imediatamente e removidos
+definitivamente após sete dias configuráveis, inclusive em cascata da conta.
+Conteúdo rejeitado antes de publicar é apagado, mantendo metadados da decisão.
+Denúncias encerradas permanecem até a purga do conteúdo, fora da fila/contagem
+ativa. A purga automática também remove sessões/tokens/contadores expirados.
+Restauração de backup deve reaplicar exclusões mediante registro mínimo de IDs
+e datas; retenção e operação dos backups permanecem pendentes de validação.
+
 ## Restrição transversal — #266, Blocos 3 e 4
 
 Fonte: decisão A e pedido EXECUTAR: BLOCO 3 e 4 do PO. Estado: implementado;

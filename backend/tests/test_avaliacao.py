@@ -183,6 +183,8 @@ class AvaliacaoModelTest(unittest.TestCase):
                 "recomenda",
                 "created_at",
                 "updated_at",
+                "excluido_em",
+                "purgar_em",
             },
         )
 

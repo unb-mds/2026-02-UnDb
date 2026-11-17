@@ -195,7 +195,14 @@ class FronteiraHttpTest(unittest.TestCase):
             "/api/atendimento",
         ):
             for metodo, sufixo, headers, esperado in (
-                ("GET", "/rota-inexistente", {}, 401 if prefixo == "/api/atendimento" else 404),
+                (
+                    "GET",
+                    "/rota-inexistente",
+                    {},
+                    401
+                    if prefixo == "/api/atendimento"
+                    else (405 if prefixo == "/api/avaliacoes" else 404),
+                ),
                 ("POST", "/rota-inexistente", {"Origin": "null"}, 403),
             ):
                 with self.subTest(prefixo=prefixo, metodo=metodo):

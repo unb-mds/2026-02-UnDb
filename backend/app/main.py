@@ -12,7 +12,7 @@ from app.services.email_service import EmailDeliveryError
 from app.core.dependencia_limite_abuso import AbusoExcedido, LimitadorIndisponivel
 from app.core.safe_logging import configurar_logs_seguros
 from app.core.origins import ProtecaoOrigem
-from app.routers import solicitacoes_titulares
+from app.routers import solicitacoes_titulares, retencao
 from app.routers import (
     identidade_docente,
     auth,
@@ -89,3 +89,6 @@ app.include_router(denuncias.router)
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+app.include_router(retencao.router)

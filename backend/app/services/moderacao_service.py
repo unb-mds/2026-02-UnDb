@@ -16,7 +16,9 @@ from app.schemas.moderacao import (
     IdentidadeInterna,
 )
 
-RETENCAO = timedelta(days=7)
+from app.core import config
+
+RETENCAO = timedelta(days=config.RETENCAO_CONTEUDO_DIAS)
 
 
 class ModeracaoError(Exception):

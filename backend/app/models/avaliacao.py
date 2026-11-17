@@ -48,6 +48,9 @@ class Avaliacao(Base):
         DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
     )
 
+    excluido_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    purgar_em: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
+
     usuario = relationship("Usuario", back_populates="avaliacoes")
     professor = relationship("Professor", back_populates="avaliacoes")
     disciplina = relationship("Disciplina", back_populates="avaliacoes")

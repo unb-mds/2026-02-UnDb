@@ -275,10 +275,8 @@ def main():
                 .values(descartar_em=datetime.now(timezone.utc) - timedelta(seconds=1))
             )
             db.commit()
-        assert (
-            esperar("GET", f"/api/moderacao/comentarios/{versao}", 200, conta=53)["texto"] is None
-        )
-        assert esperar("GET", f"/api/moderacao/comentarios/{versao}/decisoes", 200, conta=53) == []
+        esperar("GET", f"/api/moderacao/comentarios/{versao}", 404, conta=53)
+        esperar("GET", f"/api/moderacao/comentarios/{versao}/decisoes", 404, conta=53)
 
         # Conflict of interest and concurrent report/removal on the other version.
         assert denunciar(outra, 53)[0] == 201

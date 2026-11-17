@@ -131,7 +131,7 @@ def confirmar_email(db: Session, token_aberto: str) -> str:
     if token is None:
         raise TokenConfirmacaoInvalidoError(TOKEN_INVALIDO_MESSAGE)
 
-    if token.used_at is not None:
+    if token.used_at is not None or token.usuario.excluido_em is not None:
         raise TokenConfirmacaoInvalidoError(TOKEN_INVALIDO_MESSAGE)
 
     if _como_utc(token.expires_at) <= _agora_utc():
@@ -156,8 +156,10 @@ def autenticar(
 ) -> Autenticacao:
     ficticio = _hash_ficticio_login()
     usuario = usuario_repository.obter_para_login(db, dados.email)
-    credencial_valida = verificar_senha(dados.senha, usuario.password_hash if usuario else ficticio)
-    if usuario is None or not credencial_valida:
+    credencial_valida = verificar_senha(
+        dados.senha, usuario.password_hash if usuario and usuario.password_hash else ficticio
+    )
+    if usuario is None or usuario.excluido_em is not None or not credencial_valida:
         raise CredenciaisInvalidasError("E-mail ou senha inválidos.")
 
     if antes_de_criar_sessao:
@@ -179,7 +181,7 @@ def validar_e_renovar_sessao(db: Session, token_aberto: str | None) -> SessaoUsu
         raise SessaoInvalidaError(SESSION_INVALIDA_MESSAGE)
 
     sessao = sessao_repository.obter_por_token_hash(db, gerar_hash_token(token_aberto))
-    if sessao is None:
+    if sessao is None or sessao.usuario.excluido_em is not None:
         raise SessaoInvalidaError(SESSION_INVALIDA_MESSAGE)
 
     agora = _agora_utc()
@@ -201,7 +203,7 @@ def encerrar_sessao(db: Session, sessao: SessaoUsuario) -> str:
 
 def solicitar_recuperacao_senha(db: Session, email: str, email_sender: EmailSender) -> str:
     usuario = usuario_repository.obter_por_email(db, email)
-    if usuario is None:
+    if usuario is None or usuario.excluido_em is not None:
         return RECUPERACAO_MESSAGE
 
     token_aberto = gerar_token_confirmacao()
@@ -236,6 +238,7 @@ def redefinir_senha(
         agora = _agora_utc()
         if (
             usuario is None
+            or usuario.excluido_em is not None
             or token is None
             or token.used_at is not None
             or _como_utc(token.expires_at) <= agora
@@ -257,7 +260,7 @@ def reenviar_confirmacao(
 ) -> str:
     try:
         usuario = usuario_repository.obter_para_login(db, email)
-        if usuario is None or usuario.email_confirmado:
+        if usuario is None or usuario.excluido_em is not None or usuario.email_confirmado:
             return REENVIO_MESSAGE
         token_aberto = gerar_token_confirmacao()
         usuario_repository.adicionar_token(

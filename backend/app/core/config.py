@@ -112,3 +112,8 @@ FLUXOS_ABUSO_POLITICAS = {
         ("identidade.decidir", "ABUSO_IDENTIDADE_DECIDIR_QUANTIDADE", 30, "fechar"),
     )
 }
+
+# #266 bloco 5: guarda de conta excluida depende de validacao humana.
+RETENCAO_CONTEUDO_DIAS = config("RETENCAO_CONTEUDO_DIAS", default=7, cast=int)
+PURGA_INTERVALO_SEGUNDOS = config("PURGA_INTERVALO_SEGUNDOS", default=60, cast=int)
+PURGA_LOTE = config("PURGA_LOTE", default=1000, cast=int)

@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import delete, select, update, or_, exists
+from sqlalchemy import delete, select, or_, exists
 from sqlalchemy.orm import Session
 
 from app.models.comentario_versao import ComentarioVersao
@@ -12,15 +12,15 @@ from app.models.denuncia import Denuncia
 
 
 def descartar_vencidos(db: Session, agora: datetime) -> None:
-    db.execute(delete(DecisaoModeracao).where(DecisaoModeracao.descartar_em <= agora))
+    from app.core import config
+    from app.repositories.retencao_repository import purgar_conteudo
+
     db.execute(
-        update(ComentarioVersao)
-        .where(
-            ComentarioVersao.descartar_em <= agora,
-            ComentarioVersao.estado.in_((EstadoComentario.RETIRADO, EstadoComentario.REMOVIDO)),
+        delete(DecisaoModeracao).where(
+            DecisaoModeracao.descartar_em <= agora, DecisaoModeracao.acao != "REJEITAR"
         )
-        .values(texto=None, descartar_em=None)
     )
+    purgar_conteudo(db, agora, config.PURGA_LOTE)
 
 
 def listar_fila(db: Session, estado: EstadoComentario | None = None) -> list[ComentarioVersao]:
@@ -28,7 +28,10 @@ def listar_fila(db: Session, estado: EstadoComentario | None = None) -> list[Com
         or_(
             ComentarioVersao.estado.in_((EstadoComentario.PENDENTE, EstadoComentario.SUSPENSO)),
             (ComentarioVersao.estado == EstadoComentario.PUBLICADO)
-            & exists().where(Denuncia.comentario_versao_id == ComentarioVersao.id),
+            & exists().where(
+                Denuncia.comentario_versao_id == ComentarioVersao.id,
+                Denuncia.encerrada_em.is_(None),
+            ),
         )
     )
     if estado is not None:
