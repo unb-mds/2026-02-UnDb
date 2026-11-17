@@ -121,25 +121,98 @@ autorizadas passam ao fluxo normal; externas/null/malformadas/duplicadas são re
 ausência de metadados com cookie/login é rejeitada; clientes sem cookie nas demais
 operações e preflight legítimo permanecem compatíveis.
 
-## RF25 — Canal de solicitações de titulares (#263)
+## RF25 — Contato, solicitações de titulares e política de moderação (#263)
 
-Validado por Nicolas nesta conversa em 15/11/2026: disponibilizar formulário sem login
-estudantil para as sete categorias da #263, com referência ao alvo, descrição e evidência
-textual mínima, sem anexos. Gerar protocolo aleatório e chave secreta de acompanhamento,
-guardar somente hash da chave e confirmar recebimento com data na tela. Permitir consulta
-das respostas e envio de complementos/pedido de revisão por quem possuir protocolo/chave.
-Não enviar chave ou dados por e-mail nem exibir registros de outros solicitantes.
+**Validado pelo PO:** consolidação das issues #262, #263 e #264 autorizada por Nicolas
+em 17/11/2026 para execução integral na Release 2, com base no contrato inicial de 15/11/2026.
+Esta consolidação unifica canal de contato, atendimento aos titulares (LGPD) e política
+de moderação sem criar novos prazos ou automações excessivas.
 
-Atendimento restrito às contas autorizadas: Vinicius e Gabriel registram triagem,
-providências e respostas; Nicolas e Tiago podem visualizar. Cada registro guarda autor
-e data; triagem/providências são internas e respostas são visíveis ao solicitante.
-Atendimento não altera automaticamente notas, comentários, identidades ou contas.
-Uma ocorrência fundamentada independe de volume; preservar a identidade de avaliadores.
+### 1. Canal de contato e atendimento (#263)
+- Formulário e consulta públicos em `/contato`, acessíveis sem login estudantil, com links
+  no rodapé e na página Sobre. Sete categorias válidas: `DADO_INCORRETO`, `COMENTARIO_ILICITO`,
+  `NOTA_SUSPEITA`, `FRAUDE_COORDENADA`, `EXPOSICAO_PESSOAL`, `DIREITO_LGPD`, `OUTRA`.
+- Protocolo aleatório em formato UUID e chave secreta alfanumérica de acompanhamento
+  (32 bytes urlsafe). O banco persiste unicamente o hash SHA-256 da chave.
+- O solicitante acompanha respostas da equipe e envia complementos ou pedidos de revisão
+  usando o protocolo e a chave secreta. Não há envio de chaves ou respostas por e-mail, nem
+  exibição pública de registros de outros solicitantes.
+- Atendimento restrito às contas autorizadas: `CANAL_TITULARES_ATENDENTES` (Vinicius Gavaldao
+  e Gabriel) registram triagem, providências e respostas; `CANAL_TITULARES_LEITORES` (Nicolas
+  Zanin e Tiago Vieira) têm permissão de visualização restrita.
+- Separação de visibilidade: eventos de triagem e providências são estritamente internos com
+  identificação do responsável; eventos de resposta são visíveis ao solicitante e omitem a
+  identidade do operador.
+- Proteção contra abuso por orçamento técnico temporário por cliente em memória (HMAC de IP
+  com expiração de 60 segundos), sem persistir endereços IP.
+- Recebimento de novas solicitações permanece desativado por padrão (`CANAL_TITULARES_ATIVO=False`),
+  condicionado à retenção aprovada e à configuração explícita de operadores em produção.
 
-Nicolas aprovou persistência em tabelas próprias. A ativação em produção fica bloqueada
-até aprovação de retenção na #262 e configuração dos responsáveis. Não há prazo/SLA
-aprovado nesta entrega. Inventário/minimização e regras de escalonamento/revisão devem ser
-conciliados com #261, #264 e #267. Release permanece a definir.
+### 2. Atendimento a pedidos de titulares (#262)
+- Atendimento manual aos direitos dos titulares previstos na LGPD (confirmação, acesso,
+  correção e avaliação de eliminação), registrado pelo canal de contato na categoria `DIREITO_LGPD`.
+- Verificação proporcional de identidade: a equipe deve solicitar comprovação proporcional
+  ao risco antes de divulgar dados privados ou executar mutações, vedada a exigência
+  generalizada de documentos pessoais sensíveis ou cópias integrais de documentos.
+- Distinção conceitual e técnica obrigatória entre três operações:
+  1. **Retirada de comentário:** ação do próprio autor ou atendimento manual que oculta o texto
+     da visualização pública, encerra denúncias abertas como `CONTEUDO_RETIRADO` e agenda o descarte
+     do texto em 7 dias pela rotina vigente; as notas estruturadas dos 5 critérios permanecem
+     ativas nos agregados estatísticos;
+  2. **Desativação de conta:** encerramento imediato de sessões ativas (`sessoes_usuarios`) e
+     invalidação de tokens de confirmação e recuperação de senha, bloqueando novos logins sem
+     excluir o registro de `usuarios` para manter a integridade referencial;
+  3. **Exclusão de conta:** remoção do registro em `usuarios` e seus reflexos no banco de dados.
+- Mapeamento de efeitos de exclusão sobre chaves estrangeiras (FKs):
+  - `avaliacoes.usuario_id` possui restrição `NOT NULL` e chave estrangeira obrigatória sem CASCADE;
+  - `comentario_versoes` referencia `avaliacoes.id` obrigatoriamente;
+  - `decisoes_moderacao.moderador_id` permite `NULL`;
+  - `denuncias_comentarios.denunciante_id` permite `NULL`;
+  - `agradecimentos_denuncia.usuario_id` possui restrição `NOT NULL`;
+  - `decisoes_identidades_docentes.usuario_id` possui restrição `NOT NULL`;
+  - `sessoes_usuarios.usuario_id`, `tokens_confirmacao_email.usuario_id` e
+    `tokens_recuperacao_senha.usuario_id` possuem restrição `NOT NULL`.
+- **Limite deliberado e encaminhamento ao PO:** o destino das avaliações estruturadas e notas
+  ao excluir uma conta exige decisão específica do PO (Nicolas). O sistema não deve apagar
+  silenciosamente as avaliações (o que distorceria o histórico e as médias estatísticas) nem
+  forçar a desvinculação para nulo (o que violaria a integridade do schema atual). A definição
+  permanece como pendência de produto para o PO, sem automação silenciosa nesta entrega.
+- Limites reais de backups: cópias de segurança do banco hospedado não possuem eliminação
+  seletiva por titular. Backups são destinados à recuperação de integridade do sistema;
+  em eventual restauração, procedimentos operacionais devem consultar os registros de
+  exclusão e retirada para não reexpor dados apagados.
+
+### 3. Política de moderação e revisão de decisões (#264)
+- Critérios objetivos de conteúdo proibido em comentários textuais: ofensas pessoais,
+  xingamentos, palavrões, ameaças, discriminação de qualquer natureza, exposição de dados
+  pessoais de estudantes/terceiros, spam e manifestações comprovadamente falsas.
+- Exemplos claros distinguem crítica acadêmica legítima de infração:
+  - *Crítica permitida:* avaliações sobre metodologia, ritmo de aula, disponibilidade de material,
+    critérios de avaliação, clareza didática e exigência da disciplina (mesmo com tom severo
+    ou desfavorável);
+  - *Violação:* atribuição de adjetivos pejorativos à pessoa do docente, ataques à honra,
+    ameaças, assédio, menção a dados de contato particulares ou declarações discriminatórias.
+- Discordância do docente com a avaliação, notas desfavoráveis ou impopularidade de turmas
+  não justificam remoção de comentário nem conferem poder de veto ao professor ou departamento.
+- Fluxo real de moderação:
+  - Triagem automática (quando habilitada) executa filtro local (léxico, homoglifos e substituições
+    numéricas autorizadas) e API de moderação externa. Comentários sem nenhum sinal são
+    publicados automaticamente;
+  - Comentários com sinal, possível exposição de dados, falha de conexão, indisponibilidade ou
+    exaustão de cota permanecem no estado `pendente` para revisão humana; não há rejeição
+    automática pela IA;
+  - Uma única ocorrência fundamentada independe de volume de denúncias para ser analisada por
+    um moderador humano. O limiar de 50 contas autenticadas distintas com denúncia aberta é
+    apenas um gatilho de suspensão preventiva automática do texto público, e não um requisito
+    mínimo para análise manual.
+- Revisão manual de decisão: solicitantes ou autores que discordem de uma decisão de moderação
+  podem requerer revisão manual pelo canal de contato em `/contato`, enviando complemento com a
+  fundamentação do pedido. A revisão é realizada por moderador elegível diferente do que tomou a
+  decisão original, observados os impedimentos de autoria e denúncia.
+- Independência das avaliações e votos: a moderação de texto não altera as notas ou critérios
+  estruturados da avaliação (RF14/RF15). Votos de utilidade de comentários (#278), quando
+  disponibilizados, destinam-se exclusivamente à ordenação/apresentação de relevância, não
+  constituem denúncia e não acionam a moderação nem interferem no cômputo das notas.
 
 Especificação de requisitos do sistema de **Avaliação de Professores e Disciplinas da UnB**,
 desenvolvido para a disciplina de Métodos de Desenvolvimento de Software (MDS) 2026/2.
