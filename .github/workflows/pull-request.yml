@@ -137,6 +137,8 @@ jobs:
           alembic upgrade head
 
       - name: Verify migration histories from retention and comment votes
+        env:
+          MIGRATION_DATABASE_URL: ${{ env.DATABASE_URL }}
         run: python -m tests.integration_conflito_migracoes
 
       - name: Verify concurrent comment votes on migrated PostgreSQL
