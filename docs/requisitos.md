@@ -1,5 +1,20 @@
 # 📋 Engenharia de Requisitos — G7
 
+## Restrição transversal — #266, Blocos 3 e 4
+
+Fonte: decisão A e pedido EXECUTAR: BLOCO 3 e 4 do PO. Estado: planejado.
+Avaliações e denúncias devem rejeitar excesso antes de escrita. Na falha do
+limitador, avaliações seguem com alerta; denúncias usam teto local por processo.
+Canal de titulares usa contadores compartilhados, continua desativado por padrão
+e suspende acesso público na falha. Sem IP nas chaves. Contas usam ID interno;
+anônimos compartilham capacidade global. Moderação/reconciliação usam limites por
+papel; fila não tem bypass. Remoção urgente, retirada própria e atendimento pela
+equipe mantêm autorização e registro de uso sem limitador. Operações administrativas
+ausentes não são criadas por este escopo. Valores são PROVISÓRIOS, pendentes de
+validação (item 4). O frontend apresenta 429/503 sem detalhes internos, informa
+espera de Retry-After quando disponível, preserva preenchimento e anuncia erro
+de forma acessível.
+
 ## Restrição transversal de autenticação — #266, Bloco 2
 
 Fonte: decisões A e pedido `EXECUTAR: BLOCO 2` do PO nesta conversa. Estado de

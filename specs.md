@@ -1,5 +1,14 @@
 # specs.md — Especificação de implementação
 
+## Abuso e respostas temporárias — #266, Blocos 3 e 4
+
+Derivado da restrição transversal em docs/requisitos.md, fonte PO. Avaliações,
+denúncias, canal público e operações de moderação/reconciliação recebem adaptadores
+do núcleo existente; nenhuma alteração de esquema. 429 e 503 incluem Retry-After.
+O cliente HTTP interpreta segundos ou data HTTP sem mostrar detalhes internos,
+preserva formulários e mantém alertas acessíveis. Matriz e parâmetros documentados
+em docs/seguranca/limitador-fluxos-blocos-3-4.md.
+
 ## Autenticação e abuso — #266, Bloco 2
 
 Derivada da restrição transversal de autenticação em `docs/requisitos.md`, fonte:

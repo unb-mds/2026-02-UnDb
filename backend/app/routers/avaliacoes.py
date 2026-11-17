@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import obter_usuario_confirmado
 from app.core.database import get_db
+from app.core.protecao_fluxos import avaliar
 from app.models.usuario import Usuario
 from app.schemas.avaliacao import AvaliacaoCreate, AvaliacaoResponse
 from app.services import avaliacao_service
@@ -12,7 +13,7 @@ from app.services import avaliacao_service
 router = APIRouter(prefix="/api/avaliacoes", tags=["avaliacoes"])
 
 
-@router.post("", response_model=AvaliacaoResponse)
+@router.post("", response_model=AvaliacaoResponse, dependencies=[Depends(avaliar)])
 def registrar_avaliacao(
     dados: AvaliacaoCreate,
     usuario: Annotated[Usuario, Depends(obter_usuario_confirmado)],

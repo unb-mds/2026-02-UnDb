@@ -78,3 +78,38 @@ AUTH_REDEFINICAO_GLOBAL_MINUTO = config("AUTH_REDEFINICAO_GLOBAL_MINUTO", defaul
 AUTH_CONFIRMACAO_TTL_HORAS = config("AUTH_CONFIRMACAO_TTL_HORAS", default=24, cast=int)
 AUTH_SESSAO_TTL_DIAS = config("AUTH_SESSAO_TTL_DIAS", default=7, cast=int)
 AUTH_RECUPERACAO_TTL_MINUTOS = config("AUTH_RECUPERACAO_TTL_MINUTOS", default=60, cast=int)
+
+# #266 bloco 3: PROVISÓRIOS, pendentes de validação (item 4).
+FLUXOS_ABUSO_MODO = config("FLUXOS_ABUSO_MODO", default="enforce")
+FLUXOS_ABUSO_JANELA_SEGUNDOS = config("FLUXOS_ABUSO_JANELA_SEGUNDOS", default=60, cast=int)
+FLUXOS_ABUSO_GLOBAL = config("FLUXOS_ABUSO_GLOBAL", default=300, cast=int)
+FLUXOS_ABUSO_POR_PAPEL = {
+    "moderador": config("ABUSO_MODERADOR_QUANTIDADE", default=120, cast=int),
+    "reconciliador": config("ABUSO_RECONCILIADOR_QUANTIDADE", default=120, cast=int),
+}
+DENUNCIA_FALLBACK_QUANTIDADE = config("DENUNCIA_FALLBACK_QUANTIDADE", default=3, cast=int)
+DENUNCIA_FALLBACK_JANELA_SEGUNDOS = config(
+    "DENUNCIA_FALLBACK_JANELA_SEGUNDOS", default=60, cast=int
+)
+FLUXOS_ABUSO_POLITICAS = {
+    nome: {
+        "quantidade": config(variavel, default=padrao, cast=int),
+        "janela_segundos": FLUXOS_ABUSO_JANELA_SEGUNDOS,
+        "quantidade_global": FLUXOS_ABUSO_GLOBAL,
+        "janela_global_segundos": FLUXOS_ABUSO_JANELA_SEGUNDOS,
+        "modo": FLUXOS_ABUSO_MODO,
+        "falha": falha,
+    }
+    for nome, variavel, padrao, falha in (
+        ("avaliacao.escrever", "ABUSO_AVALIACAO_QUANTIDADE", 10, "seguir"),
+        ("denuncia.criar", "ABUSO_DENUNCIA_QUANTIDADE", 5, "local"),
+        ("titular.criar", "ABUSO_TITULAR_CRIAR_QUANTIDADE", 3, "fechar"),
+        ("titular.consultar", "ABUSO_TITULAR_CONSULTAR_QUANTIDADE", 10, "fechar"),
+        ("titular.complementar", "ABUSO_TITULAR_COMPLEMENTAR_QUANTIDADE", 3, "fechar"),
+        ("moderacao.fila", "ABUSO_MODERACAO_FILA_QUANTIDADE", 60, "fechar"),
+        ("moderacao.decidir", "ABUSO_MODERACAO_DECIDIR_QUANTIDADE", 30, "fechar"),
+        ("moderacao.triagem", "ABUSO_MODERACAO_TRIAGEM_QUANTIDADE", 10, "fechar"),
+        ("identidade.fila", "ABUSO_IDENTIDADE_FILA_QUANTIDADE", 60, "fechar"),
+        ("identidade.decidir", "ABUSO_IDENTIDADE_DECIDIR_QUANTIDADE", 30, "fechar"),
+    )
+}

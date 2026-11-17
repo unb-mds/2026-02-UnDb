@@ -6,6 +6,10 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import obter_moderador
 from app.core.database import get_db
+from app.core.protecao_fluxos import moderar, verificar, registrar_bypass
+from app.core.dependencia_limite_abuso import obter_limitador
+from app.services.limite_abuso_service import LimitadorAbuso
+from app.models.enums import AcaoModeracao
 from app.models.enums import EstadoComentario
 from app.models.usuario import Usuario
 from app.schemas.moderacao import AcaoModeracaoRequest, ComentarioModeracaoResponse, DecisaoResponse
@@ -24,27 +28,56 @@ def executar(operacao, *args):
         raise HTTPException(erro.status_code, str(erro)) from erro
 
 
-@router.get("", response_model=list[ComentarioModeracaoResponse])
+def proteger_decisao(
+    dados: AcaoModeracaoRequest,
+    usuario: Moderador,
+    limitador: Annotated[LimitadorAbuso, Depends(obter_limitador)],
+):
+    if dados.acao == AcaoModeracao.REMOVER:
+        registrar_bypass()
+    else:
+        verificar("moderacao.decidir", usuario, limitador, "moderador")
+
+
+@router.get(
+    "",
+    response_model=list[ComentarioModeracaoResponse],
+    dependencies=[Depends(moderar("moderacao.fila"))],
+)
 def listar(db: Db, usuario: Moderador, estado: EstadoComentario | None = None):
     return executar(moderacao_service.listar, db, usuario, estado)
 
 
-@router.get("/{versao_id}", response_model=ComentarioModeracaoResponse)
+@router.get(
+    "/{versao_id}",
+    response_model=ComentarioModeracaoResponse,
+    dependencies=[Depends(moderar("moderacao.fila"))],
+)
 def consultar(versao_id: UUID, db: Db, usuario: Moderador):
     return executar(moderacao_service.consultar, db, usuario, versao_id)
 
 
-@router.get("/{versao_id}/decisoes", response_model=list[DecisaoResponse])
+@router.get(
+    "/{versao_id}/decisoes",
+    response_model=list[DecisaoResponse],
+    dependencies=[Depends(moderar("moderacao.fila"))],
+)
 def decisoes(versao_id: UUID, db: Db, usuario: Moderador):
     return executar(moderacao_service.decisoes, db, usuario, versao_id)
 
 
-@router.post("/{versao_id}/acoes", response_model=DecisaoResponse)
+@router.post(
+    "/{versao_id}/acoes", response_model=DecisaoResponse, dependencies=[Depends(proteger_decisao)]
+)
 def decidir(versao_id: UUID, dados: AcaoModeracaoRequest, db: Db, usuario: Moderador):
     return executar(moderacao_service.decidir, db, usuario, versao_id, dados)
 
 
-@router.post("/{versao_id}/triagem", response_model=TriagemResponse)
+@router.post(
+    "/{versao_id}/triagem",
+    response_model=TriagemResponse,
+    dependencies=[Depends(moderar("moderacao.triagem"))],
+)
 def analisar_com_apoio(versao_id: UUID, db: Db, usuario: Moderador, response: Response):
     response.headers["Cache-Control"] = "no-store"
     return executar(triagem_service.analisar, db, usuario, versao_id)

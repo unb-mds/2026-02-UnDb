@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import obter_usuario_confirmado
 from app.core.database import get_db
+from app.core.protecao_fluxos import registrar_bypass
 from app.models.usuario import Usuario
 from app.schemas.comentario import ComentarioDoAutorResponse
 from app.services import comentario_service
@@ -38,6 +39,7 @@ def retirar_comentario(
     session: Annotated[Session, Depends(get_db)],
 ) -> ComentarioDoAutorResponse:
     """Retira um comentario pelo autor (PUBLICADO, PENDENTE ou SUSPENSO)."""
+    registrar_bypass()
     try:
         return comentario_service.retirar(session, comentario_id, usuario)
     except comentario_service.RecursoNaoEncontradoError as erro:

@@ -11,7 +11,6 @@ from datetime import datetime, timedelta, timezone
 os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 os.environ.setdefault("SECRET_KEY", "teste-local")
 
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from starlette.responses import Response
 from sqlalchemy import create_engine, text
@@ -20,24 +19,27 @@ from sqlalchemy.pool import StaticPool
 from starlette.requests import Request
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
-from app.core import config, limite_atendimento
+from app.core import config
 from app.core.dependencia_auth_abuso import obter_protecao_auth
 from app.core.auth import definir_cookie_sessao, remover_cookie_sessao
 from app.core.database import Base, engine, get_db
 from app.core.security import gerar_hash_senha
 from app.models.usuario import Usuario
 from app.core.safe_logging import FormatoSeguro
-from app.main import app, proteger_cache_privado
+from app.main import app
+from app.core.dependencia_limite_abuso import obter_limitador
+from tests.auth_abuso_fixtures import protecao_permitida
+from app.main import proteger_cache_privado
 from app.schemas.auth import LoginRequest
 from app.services import auth_service
 from app.services.email_service import ConsoleEmailSender, EmailDeliveryError, ResendEmailSender
 from tests import test_auth as auth_tests
-from tests.auth_abuso_fixtures import protecao_permitida
 
 
 class FronteiraHttpTest(unittest.TestCase):
     def setUp(self):
         self.override = dict(app.dependency_overrides)
+        app.dependency_overrides[obter_limitador] = lambda: protecao_permitida().limitador
         app.dependency_overrides[get_db] = lambda: None
         app.dependency_overrides[obter_protecao_auth] = protecao_permitida
         self.client = TestClient(app, raise_server_exceptions=False)
@@ -49,7 +51,6 @@ class FronteiraHttpTest(unittest.TestCase):
         self.flags.stop()
         app.dependency_overrides.clear()
         app.dependency_overrides.update(self.override)
-        limite_atendimento._janelas.clear()
 
     def test_mutacoes_rejeitadas_antes_de_efeitos(self):
         headers = [
@@ -310,61 +311,6 @@ class LogsTest(unittest.TestCase):
 
 
 class OrcamentoTest(unittest.IsolatedAsyncioTestCase):
-    def setUp(self):
-        limite_atendimento._janelas.clear()
-
-    def tearDown(self):
-        limite_atendimento._janelas.clear()
-
-    def request(self, cliente="192.0.2.1", headers=()):
-        return Request({"type": "http", "client": (cliente, 1234), "headers": list(headers)})
-
-    def test_janela_compartilhamento_reinicio_e_instancias(self):
-        with (
-            patch.object(config, "CANAL_TITULARES_LIMITE_MINUTO", 1),
-            patch.object(limite_atendimento, "monotonic", return_value=100) as relogio,
-        ):
-            limite_atendimento.limitar(self.request())
-            with self.assertRaises(HTTPException) as erro:
-                limite_atendimento.limitar(
-                    self.request(headers=[(b"x-forwarded-for", b"192.0.2.2")])
-                )
-            self.assertEqual(erro.exception.status_code, 429)
-            limite_atendimento.limitar(self.request("192.0.2.2"))
-            self.assertTrue(all(len(k) == 64 for k in limite_atendimento._janelas))
-            relogio.return_value = 160
-            limite_atendimento.limitar(self.request())
-            # Outro estado de processo e reinício recebem orçamento novo: limitação confirmada.
-            with patch.object(limite_atendimento, "_janelas", {}):
-                limite_atendimento.limitar(self.request())
-            limite_atendimento._janelas.clear()
-            limite_atendimento.limitar(self.request())
-
-    def test_capacidade_global_nao_impede_cliente_existente_e_expira(self):
-        # Estado sintético direto; não produz tráfego nem define um limite novo.
-        estado = {f"chave-{i}": (100, 1) for i in range(4095)}
-        with (
-            patch.object(limite_atendimento, "_janelas", estado),
-            patch.object(config, "CANAL_TITULARES_LIMITE_MINUTO", 3),
-            patch.object(limite_atendimento, "monotonic", return_value=100) as relogio,
-        ):
-            limite_atendimento.limitar(self.request())
-            limite_atendimento.limitar(self.request())
-            with self.assertRaises(HTTPException) as erro:
-                limite_atendimento.limitar(self.request("192.0.2.2"))
-            self.assertEqual(erro.exception.status_code, 429)
-            self.assertEqual(erro.exception.headers, {"Retry-After": "60"})
-            self.assertNotIn("192.0.2.2", str(erro.exception.detail))
-            relogio.return_value = 160
-            limite_atendimento.limitar(self.request("192.0.2.2"))
-            self.assertEqual(len(estado), 1)
-
-    def test_falha_local_nao_e_convertida_em_orcamento_livre(self):
-        with patch.object(limite_atendimento, "monotonic", side_effect=RuntimeError("sintetico")):
-            with self.assertRaises(RuntimeError):
-                limite_atendimento.limitar(self.request())
-        self.assertEqual(limite_atendimento._janelas, {})
-
     async def test_cabecalhos_so_alteram_cliente_se_peer_e_confiavel_no_servidor(self):
         clientes = []
 
@@ -433,6 +379,7 @@ class FluxoNavegadorTest(unittest.TestCase):
                 yield db
 
         anterior = dict(app.dependency_overrides)
+        app.dependency_overrides[obter_limitador] = lambda: protecao_permitida().limitador
         app.dependency_overrides[get_db] = banco
         app.dependency_overrides[obter_protecao_auth] = protecao_permitida
         try:

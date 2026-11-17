@@ -16,6 +16,8 @@ EVENTOS = frozenset(
         "auth.transporte.indisponivel",
         "moderacao.descarte_falhou",
         "abuso.negado",
+        "abuso.fluxo_seguiu",
+        "abuso.acao_isenta",
         "abuso.observado",
         "abuso.atraso_observado",
         "abuso.indisponivel",

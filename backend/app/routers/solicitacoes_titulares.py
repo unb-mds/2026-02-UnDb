@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import obter_usuario_confirmado
 from app.core.database import get_db
-from app.core.limite_atendimento import limitar
+from app.core.protecao_fluxos import titular, registrar_bypass
 from app.models.usuario import Usuario
 from app.repositories import solicitacao_titular_repository as repo
 from app.schemas.solicitacao_titular import (
@@ -42,7 +42,7 @@ def disponibilidade():
 @router.post(
     "/api/solicitacoes",
     status_code=201,
-    dependencies=[Depends(limitar)],
+    dependencies=[Depends(titular("titular.criar"))],
     response_model=ReciboSolicitacao,
 )
 def criar(dados: CriarSolicitacao, db: Db):
@@ -50,7 +50,9 @@ def criar(dados: CriarSolicitacao, db: Db):
 
 
 @router.post(
-    "/api/solicitacoes/consultar", dependencies=[Depends(limitar)], response_model=ConsultaPublica
+    "/api/solicitacoes/consultar",
+    dependencies=[Depends(titular("titular.consultar"))],
+    response_model=ConsultaPublica,
 )
 def consultar(dados: ConsultarSolicitacao, db: Db):
     return service.apresentar(db, service.autenticar_pedido(db, dados))
@@ -58,7 +60,7 @@ def consultar(dados: ConsultarSolicitacao, db: Db):
 
 @router.post(
     "/api/solicitacoes/complementos",
-    dependencies=[Depends(limitar)],
+    dependencies=[Depends(titular("titular.complementar"))],
     response_model=ConsultaPublica,
 )
 def complementar(dados: ComplementarSolicitacao, db: Db):
@@ -67,6 +69,7 @@ def complementar(dados: ComplementarSolicitacao, db: Db):
 
 @router.get("/api/atendimento/permissao", response_model=Permissao)
 def permissao(usuario: UsuarioConfirmado):
+    registrar_bypass()
     service.autorizar(usuario)
     from app.core.config import CANAL_TITULARES_ATENDENTES
 
@@ -75,6 +78,7 @@ def permissao(usuario: UsuarioConfirmado):
 
 @router.get("/api/atendimento", response_model=list[ResumoSolicitacao])
 def listar(db: Db, usuario: UsuarioConfirmado, offset: int = Query(default=0, ge=0)):
+    registrar_bypass()
     service.autorizar(usuario)
     return [
         {"protocolo": str(i.id), "categoria": i.categoria, "recebido_em": i.created_at}
@@ -84,6 +88,7 @@ def listar(db: Db, usuario: UsuarioConfirmado, offset: int = Query(default=0, ge
 
 @router.get("/api/atendimento/{protocolo}", response_model=ConsultaInterna)
 def detalhe(protocolo: UUID, db: Db, usuario: UsuarioConfirmado):
+    registrar_bypass()
     service.autorizar(usuario)
     item = repo.buscar(db, protocolo)
     if not item:
@@ -93,4 +98,5 @@ def detalhe(protocolo: UUID, db: Db, usuario: UsuarioConfirmado):
 
 @router.post("/api/atendimento/{protocolo}/eventos", response_model=ConsultaInterna)
 def atender(protocolo: UUID, dados: AtenderSolicitacao, db: Db, usuario: UsuarioConfirmado):
+    registrar_bypass()
     return service.atender(db, protocolo, usuario, dados)
