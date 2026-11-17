@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ComentarioPublico } from "@/lib/types/comentario";
+import UtilidadeDoComentario from "./utilidade-comentario";
 import ModalDenuncia from "./modal-denuncia";
 
 type ItemComentarioProps = {
@@ -38,6 +39,8 @@ export default function ItemComentario({ comentario }: ItemComentarioProps) {
       <p className="break-words text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
         {comentario.texto}
       </p>
+
+      <UtilidadeDoComentario versaoId={comentario.id} />
 
       <ModalDenuncia
         versaoId={comentario.id}
