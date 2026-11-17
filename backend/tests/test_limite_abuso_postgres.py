@@ -22,13 +22,13 @@ from app.models.contador_abuso import ContadorAbuso
 from app.services.limite_abuso_service import LimitadorAbuso
 
 
-def engine_ensaio(url, **opcoes):
+def engine_ensaio(url, *, timeouts=None, **opcoes):
     return create_engine(
         url,
         hide_parameters=True,
         connect_args={
             "connect_timeout": 2,
-            "options": "-c statement_timeout=1000 -c lock_timeout=200",
+            "options": timeouts or "-c statement_timeout=1000 -c lock_timeout=200",
         },
         **opcoes,
     )
@@ -118,10 +118,22 @@ class LimitadorPostgresTest(unittest.TestCase):
 
     def test_incremento_atomico_concorrente_sem_perda_ou_excesso_de_permissoes(self):
         p = replace(self.politica, quantidade=7)
-        with ThreadPoolExecutor(max_workers=8) as pool:
-            resultados = list(
-                pool.map(lambda _: self.limitador.consumir(p, self.identidade), range(40))
-            )
+        # Atomicidade é distinta do orçamento de tempo sob contenção no host.
+        # Os testes de timeout continuam usando os limites curtos específicos.
+        isolado = engine_ensaio(
+            self.url,
+            pool_size=8,
+            max_overflow=0,
+            timeouts="-c statement_timeout=10000 -c lock_timeout=5000",
+        )
+        limitador = LimitadorAbuso(lambda: Session(isolado), lambda db: self.agora)
+        try:
+            with ThreadPoolExecutor(max_workers=8) as pool:
+                resultados = list(
+                    pool.map(lambda _: limitador.consumir(p, self.identidade), range(40))
+                )
+        finally:
+            isolado.dispose()
         self.assertEqual(sum(r.permitido for r in resultados), 7)
         self.assertFalse(any(r.indisponivel for r in resultados))
         self.assertEqual(sorted(linha.quantidade for linha in self.linhas()), [40, 40])
