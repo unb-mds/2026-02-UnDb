@@ -1,0 +1,287 @@
+{
+  "dados": "HTTP sintético exclusivo; não comprova produção",
+  "viewports": [
+    {
+      "largura": 320,
+      "semOverflow": true,
+      "alvos": [
+        {
+          "altura": 44,
+          "largura": 84,
+          "esquerda": 33,
+          "direita": 117
+        },
+        {
+          "altura": 44,
+          "largura": 112,
+          "esquerda": 125,
+          "direita": 237
+        }
+      ],
+      "teclado": "Tab/Enter/Space",
+      "foco": {
+        "visivel": true,
+        "outline": "solid",
+        "espessura": 2
+      }
+    },
+    {
+      "largura": 390,
+      "semOverflow": true,
+      "alvos": [
+        {
+          "altura": 44,
+          "largura": 84,
+          "esquerda": 33,
+          "direita": 117
+        },
+        {
+          "altura": 44,
+          "largura": 112,
+          "esquerda": 125,
+          "direita": 237
+        }
+      ],
+      "teclado": "Tab/Enter/Space",
+      "foco": {
+        "visivel": true,
+        "outline": "solid",
+        "espessura": 2
+      }
+    },
+    {
+      "largura": 768,
+      "semOverflow": true,
+      "alvos": [
+        {
+          "altura": 44,
+          "largura": 84,
+          "esquerda": 57,
+          "direita": 141
+        },
+        {
+          "altura": 44,
+          "largura": 112,
+          "esquerda": 149,
+          "direita": 261
+        }
+      ],
+      "teclado": "Tab/Enter/Space",
+      "foco": {
+        "visivel": true,
+        "outline": "solid",
+        "espessura": 2
+      }
+    },
+    {
+      "largura": 1440,
+      "semOverflow": true,
+      "alvos": [
+        {
+          "altura": 44,
+          "largura": 84,
+          "esquerda": 57,
+          "direita": 141
+        },
+        {
+          "altura": 44,
+          "largura": 112,
+          "esquerda": 149,
+          "direita": 261
+        }
+      ],
+      "teclado": "Tab/Enter/Space",
+      "foco": {
+        "visivel": true,
+        "outline": "solid",
+        "espessura": 2
+      }
+    }
+  ],
+  "estados": [
+    {
+      "codigo": 401,
+      "carregamento": true,
+      "erroAcessivel": true,
+      "semDuplicata": true,
+      "contrasteCarregando": [
+        {
+          "texto": "Este comentário foi útil?",
+          "razao": 19.543931973672837
+        },
+        {
+          "texto": "Útil (0)",
+          "razao": 17.59950045630494
+        },
+        {
+          "texto": "Não útil (0)",
+          "razao": 17.59950045630494
+        },
+        {
+          "texto": "Atualizando utilidade…",
+          "razao": 7.824323788998628
+        }
+      ],
+      "contrasteErro": [
+        {
+          "texto": "Este comentário foi útil?",
+          "razao": 19.543931973672837
+        },
+        {
+          "texto": "Útil (0)",
+          "razao": 14.138653412161647
+        },
+        {
+          "texto": "Não útil (0)",
+          "razao": 14.138653412161647
+        },
+        {
+          "texto": "Entre em uma conta estudantil confirmada para votar.",
+          "razao": 9.446568064435477
+        }
+      ]
+    },
+    {
+      "codigo": 403,
+      "carregamento": true,
+      "erroAcessivel": true,
+      "semDuplicata": true,
+      "contrasteCarregando": [
+        {
+          "texto": "Este comentário foi útil?",
+          "razao": 19.543931973672837
+        },
+        {
+          "texto": "Útil (0)",
+          "razao": 16.42341282242664
+        },
+        {
+          "texto": "Não útil (0)",
+          "razao": 16.42341282242664
+        },
+        {
+          "texto": "Atualizando utilidade…",
+          "razao": 7.824323788998628
+        }
+      ],
+      "contrasteErro": [
+        {
+          "texto": "Este comentário foi útil?",
+          "razao": 19.543931973672837
+        },
+        {
+          "texto": "Útil (0)",
+          "razao": 7.450677474484888
+        },
+        {
+          "texto": "Não útil (0)",
+          "razao": 7.450677474484888
+        },
+        {
+          "texto": "Confirme seu e-mail para votar. Não é permitido votar no próprio comentário.",
+          "razao": 9.446568064435477
+        }
+      ]
+    },
+    {
+      "codigo": 404,
+      "carregamento": true,
+      "erroAcessivel": true,
+      "semDuplicata": true,
+      "contrasteCarregando": [
+        {
+          "texto": "Este comentário foi útil?",
+          "razao": 19.543931973672837
+        },
+        {
+          "texto": "Útil (0)",
+          "razao": 17.59950045630494
+        },
+        {
+          "texto": "Não útil (0)",
+          "razao": 17.59950045630494
+        },
+        {
+          "texto": "Atualizando utilidade…",
+          "razao": 7.824323788998628
+        }
+      ],
+      "contrasteErro": [
+        {
+          "texto": "Este comentário foi útil?",
+          "razao": 19.543931973672837
+        },
+        {
+          "texto": "Útil (0)",
+          "razao": 12.291497984614812
+        },
+        {
+          "texto": "Não útil (0)",
+          "razao": 12.291497984614812
+        },
+        {
+          "texto": "Este comentário não está mais disponível para votos.",
+          "razao": 9.446568064435477
+        }
+      ]
+    },
+    {
+      "codigo": 503,
+      "carregamento": true,
+      "erroAcessivel": true,
+      "semDuplicata": true,
+      "contrasteCarregando": [
+        {
+          "texto": "Este comentário foi útil?",
+          "razao": 19.543931973672837
+        },
+        {
+          "texto": "Útil (0)",
+          "razao": 17.59950045630494
+        },
+        {
+          "texto": "Não útil (0)",
+          "razao": 17.59950045630494
+        },
+        {
+          "texto": "Atualizando utilidade…",
+          "razao": 7.824323788998628
+        }
+      ],
+      "contrasteErro": [
+        {
+          "texto": "Este comentário foi útil?",
+          "razao": 19.543931973672837
+        },
+        {
+          "texto": "Útil (0)",
+          "razao": 16.42341282242664
+        },
+        {
+          "texto": "Não útil (0)",
+          "razao": 16.42341282242664
+        },
+        {
+          "texto": "Não foi possível atualizar a utilidade. Tente novamente.",
+          "razao": 9.446568064435477
+        }
+      ]
+    }
+  ],
+  "contraste": [
+    {
+      "texto": "Este comentário foi útil?",
+      "razao": 19.543931973672837
+    },
+    {
+      "texto": "Útil (0)",
+      "razao": 17.59950045630494
+    },
+    {
+      "texto": "Não útil (0)",
+      "razao": 17.59950045630494
+    }
+  ],
+  "retry": true,
+  "respostaObsoletaIgnorada": true
+}

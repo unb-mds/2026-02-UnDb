@@ -285,8 +285,8 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
   regra anterior específica de votos: registrar no PR como ponto a confirmar na #263.
 - Votos não alteram ordenação, notas/agregados, denúncias, publicação ou moderação.
   Crítica impopular permanece sujeita às mesmas regras de qualquer comentário.
-- Controles têm rótulos, foco visível, teclado, estados de carregamento e erro, em desktop
-  e celular. Falha não apresenta sucesso ou contagem inventada.
+- Controles têm rótulos, foco visível preservado após o envio, teclado e estados de
+  carregamento e erro, em desktop e celular. Falha não apresenta sucesso ou contagem inventada.
 
 Critérios verificáveis: autorização (visitante/não confirmado/próprio autor), identidade
 não fornecida pelo cliente, unicidade inclusive concorrente, repetição/troca/retirada,

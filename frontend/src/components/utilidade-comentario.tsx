@@ -54,6 +54,7 @@ export default function UtilidadeDoComentario({ versaoId }: { versaoId: string }
   }, [versaoId, consulta]);
 
   async function votar(voto: VotoComentario) {
+    // aria-disabled mantém o foco; esta trava também impede envios repetidos por teclado.
     if (ocupada.current || !resumo) return;
     ocupada.current = true;
     const controller = new AbortController();
@@ -79,7 +80,7 @@ export default function UtilidadeDoComentario({ versaoId }: { versaoId: string }
       {resumo && <div className="flex flex-wrap gap-2">
         {([ ["UTIL", "Útil", resumo.uteis], ["NAO_UTIL", "Não útil", resumo.nao_uteis] ] as const).map(([voto, label, total]) => (
           <button key={voto} type="button" className="button min-h-11 gap-2"
-            aria-pressed={resumo.meu_voto === voto} disabled={carregando} onClick={() => votar(voto)}>
+            aria-pressed={resumo.meu_voto === voto} aria-disabled={carregando} onClick={() => votar(voto)}>
             {resumo.meu_voto === voto && <span aria-hidden="true">✓</span>}{label} ({total})
           </button>
         ))}
