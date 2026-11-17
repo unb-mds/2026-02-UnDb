@@ -1,0 +1,153 @@
+{
+  "data": "2026-11-17",
+  "sha_base": "cea7d6bdd01aedce51ce8db857377a483ed72e49",
+  "estado": "verificações executadas e aprovadas, com skips/limites explícitos",
+  "executados": [
+    {
+      "comando": "ruff check --config backend/pyproject.toml backend scripts/recovery_drill.py",
+      "exit_code": 0
+    },
+    {
+      "comando": "ruff format --check --config backend/pyproject.toml backend scripts/recovery_drill.py",
+      "exit_code": 0,
+      "arquivos": 206
+    },
+    {
+      "comando": "python -m unittest tests.test_retencao tests.test_termos tests.test_voto_comentario tests.test_solicitacoes_titulares tests.test_registros_acesso -v",
+      "ambiente": "Python 3.12, container sem rede, SQLite",
+      "exit_code": 0,
+      "descobertos": 40,
+      "aprovados": 31,
+      "pulados": 9,
+      "motivo_pulados": "URL PostgreSQL específica não configurada; não contabilizados como aprovados"
+    },
+    {
+      "comando": "npm ci --no-audit --no-fund",
+      "exit_code": 0,
+      "pacotes": 398
+    },
+    {
+      "comando": "npm test",
+      "exit_code": 0,
+      "aprovados": 93
+    },
+    {
+      "comando": "npm run build",
+      "exit_code": 0
+    },
+    {
+      "comando": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "comando": "runner sem confirmação / sobrescrita / Docker remoto",
+      "exit_codes": [
+        2,
+        2,
+        1
+      ],
+      "resultado": "recusas esperadas; nenhum recurso criado"
+    },
+    {
+      "comando": "npm run lint",
+      "exit_code": 0
+    },
+    {
+      "comando": "npm run typecheck",
+      "exit_code": 0
+    },
+    {
+      "comando": "npm run test:termos",
+      "exit_code": 0,
+      "resultado": "18 combinações de tema/largura/página, teclado, links e fluxo de ciência; HTTP sintético, não banco restaurado"
+    },
+    {
+      "comando": "python scripts/recovery_drill.py --confirm-disposable --image undb267-disposable-tools:20261117 --output <novo-relatorio>",
+      "exit_code": 0,
+      "resultado": "PostgreSQL restaurado, schema/dados/vínculos/jornada/replay/retenção aprovados; recursos removidos"
+    },
+    {
+      "comando": "docker ps -a / network ls --filter label=undb.issue=267",
+      "exit_code": 0,
+      "resultado": "nenhum recurso remanescente"
+    },
+    {
+      "comando": "docker image history undb267-disposable-tools:20261117 --no-trunc",
+      "exit_code": 0,
+      "resultado": "imagem só com dependências; sem COPY de .env, código ou dados"
+    },
+    {
+      "comando": "mkdocs build --strict",
+      "exit_code": 0,
+      "resultado": "build documental aprovado; pendência de arquivo do primeiro build corrigida"
+    },
+    {
+      "comando": "docker image rm undb267-disposable-tools:20261117",
+      "exit_code": 0,
+      "digest_conferido": "sha256:06470388cfe8738c191ce9b485e5a2e589dbd7687e7535a4a3c35ad391e7503f",
+      "resultado": "somente imagem criada nesta sessão removida; sem prune"
+    },
+    {
+      "comando": "git status --short --branch no checkout original após mover worktree",
+      "exit_code": 0,
+      "resultado": "checkout original limpo, branch docs/271-transparencia-metodologia preservada em da9f47c"
+    },
+    {
+      "comando": "conferência de links/IDs no HTML gerado de incidentes, evidência #267 e transparência",
+      "exit_code": 0,
+      "destinos_locais_e_ancoras": 386,
+      "paginas": 3
+    }
+  ],
+  "limites": [
+    "Sem CI remoto ou deploy",
+    "Sem produção",
+    "Nove regressões PostgreSQL puladas; ensaio próprio executado em PostgreSQL real",
+    "Primeiro MkDocs estrito falhou porque este manifesto ainda não existia; falha de preparação documental, sem falha de produto"
+  ],
+  "arquivos_alterados": [
+    "AI_USAGE.md",
+    "specs.md",
+    "mkdocs.yml",
+    "backend/tests/recovery_scenario.py",
+    "scripts/recovery.Dockerfile",
+    "scripts/recovery_drill.py",
+    "docs/requisitos.md",
+    "docs/operacao/incidentes-recuperacao.md",
+    "docs/hospedagem.md",
+    "docs/continuidade-operacional.md",
+    "docs/operacao/manutencao.md",
+    "docs/seguranca/retencao-bloco-5.md",
+    "docs/seguranca/validacoes-pendentes-266.md",
+    "docs/transparencia.md",
+    "docs/seguranca/evidencias/issue-267/README.md",
+    "docs/seguranca/evidencias/issue-267/resultados.json",
+    "docs/seguranca/evidencias/issue-267/tentativas.json",
+    "docs/seguranca/evidencias/issue-267/verificacoes.json",
+    "frontend/src/app/privacidade/page.tsx",
+    "frontend/src/app/termos-de-uso/page.tsx"
+  ],
+  "branch": "fix/267-incidentes-recuperacao",
+  "revisao": {
+    "escopo": "diff da #267 e fontes do runner/cenário; requisitos, cleanup, conexões sintéticas, docs e evidências",
+    "fontes": [
+      "issue #267 atual e solicitação da sessão",
+      "docs/requisitos.md",
+      "skills/engineering/code-review/SKILL.md"
+    ],
+    "resultado": "sem findings adicionais confirmados na autoconsferência",
+    "limites": "não é revisão independente, aceite humano ou homologação de produção"
+  },
+  "inspecao_segredos": {
+    "escopo": "20 arquivos alterados/novos, incluindo evidências; padrões limitados e conferência do conteúdo",
+    "arquivos": 20,
+    "ocorrencias": [],
+    "limite": "não é certificação ou varredura de toda a história Git"
+  },
+  "hashes_executaveis_conferidos": true,
+  "autorizacao_continuacao": {
+    "data": "2026-11-17",
+    "escopo": "um único commit, push, PR para develop, merge e encerramento da #267 com pendências operacionais explícitas",
+    "limites": "sem produção/ativação; resultados do GitHub não são presumidos"
+  }
+}

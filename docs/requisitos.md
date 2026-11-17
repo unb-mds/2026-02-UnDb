@@ -1,5 +1,21 @@
 # 📋 Engenharia de Requisitos — G7
 
+## Recuperação isolada e roteiro de incidentes — #267
+
+Fonte autorizada: escopo simplificado vigente da [#267](https://github.com/unb-mds/2026-02-UnDb/issues/267)
+e solicitação de implementação de 17/11/2026. Exige roteiro curto com aviso privado,
+acompanhamento de Nicolas, fatos mínimos e referência aos procedimentos existentes;
+descrição factual do backup disponível; ensaio sintético em origem/destino novos e
+distintos, com schema, revisão, vínculos e jornada pela aplicação restaurada.
+Verificar sessão, autorização e retenção, reaplicando exclusões/revogações posteriores
+ao backup antes de liberar a cópia. Registrar versão, resultados, limites e descarte.
+Reutilizar o Bloco 7 da #266 como evidência parcial, sem presumir backup de produção.
+Canal, acessos, janela real de backup e guarda do registro de exclusões precisam de
+fonte operacional; ausências permanecem pendentes. Não cria política de guarda,
+SLA, prazo legal, papel jurídico ou mecanismo de produção. Revisão jurídica formal
+e estrutura empresarial ficam fora desta R2. Derivados: [roteiro](operacao/incidentes-recuperacao.md),
+[manutenção](operacao/manutencao.md) e [transparência](transparencia.md).
+
 ## Registros de acesso — #266, Bloco 6
 
 Fonte: decisão C do PO e EXECUTAR: BLOCO 6 e 7. Estado: implementado.

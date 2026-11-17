@@ -6,6 +6,14 @@ Autorização: consolidação pelo PO em 16/11/2026 e pedido de execução integ
 Este registro substitui as pendências de R2 absorvidas de #261/#268; os estudos antigos
 preservam seu contexto histórico. Não é auditoria de produção nem parecer jurídico.
 
+Atualização factual #267 em 17/11/2026, fonte [requisitos autorizados](requisitos.md)
+e base `cea7d6b` (PR #280 integrada): ensaio ampliado e limites de recuperação no
+[roteiro](operacao/incidentes-recuperacao.md) e na [evidência](seguranca/evidencias/issue-267/README.md).
+Nicolas relata cópias manuais no Docker; cobertura, histórico e demais acessos não
+verificados. Canal privado/acompanhamento e registro operacional protegido de
+exclusões/revogações continuam pendentes. A versão/data dos textos continua
+`2026-11-17`; não foi criado novo reaceite. Publicação não executada nesta sessão.
+
 ## Inventário factual simplificado
 
 Reaproveita [T01–T18](estudos/inventario-tecnico-pr277.md), a PR #277 e as correções de
@@ -15,18 +23,18 @@ acesso direto depende das permissões operacionais, não da atribuição de uma 
 
 | Origem / dados | Finalidade | Acesso / armazenamento ou fornecedor | Descarte vigente / limite |
 |---|---|---|---|
-| T01; nome, e-mail, UUID, hash de senha, confirmação, papéis e criação fornecidos pela conta | Cadastro e autorização | `usuarios`; própria conta e funções autorizadas; PostgreSQL/Neon | Sem prazo geral de descarte implementado; sem exclusão integral automática |
-| RF26; versão dos Termos e instante UTC gerado pelo servidor | Registrar ciência no novo cadastro | `usuarios.termos_versao/termos_ciencia_em`, sem exposição na consulta pública | Par nulo nas contas antigas, sem backfill; mesma lacuna de guarda da conta |
-| T02–T04; links/tokens, hashes e validades gerados pelo sistema | Confirmação, sessão e recuperação | Tabelas de tokens/sessão; cookie HttpOnly; destinatário e link no Resend | Confirmação 24 h, sessão 7 dias de inatividade, recuperação 1 h/uso único; validade não é limpeza geral. Logout remove sessão; redefinição invalida sessões/links |
+| T01; nome, e-mail, UUID, hash de senha, confirmação, papéis e criação fornecidos pela conta | Cadastro e autorização | `usuarios`; própria conta e funções autorizadas; PostgreSQL/Neon | Exclusão lógica remove nome/senha/papéis/credenciais/ciência; preserva ID/e-mail/datas e bloqueia login/reativação. Guarda mínima sem prazo validado |
+| RF26; versão dos Termos e instante UTC gerado pelo servidor | Registrar ciência no novo cadastro | `usuarios.termos_versao/termos_ciencia_em`, sem exposição na consulta pública | Par nulo nas contas antigas, sem backfill; apagado na exclusão lógica da conta |
+| T02–T04; links/tokens, hashes e validades gerados pelo sistema | Confirmação, sessão e recuperação | Tabelas de tokens/sessão; cookie HttpOnly; destinatário e link no Resend | Confirmação 24 h, sessão 7 dias de inatividade, recuperação 1 h/uso único; purga de expirados implementada, operação hospedada a verificar. Logout/exclusão/redefinição revogam conforme o fluxo; restauração antiga exige reaplicar revogações |
 | T05–T08; nomes/identificadores docentes, unidades, disciplinas, turmas, vínculos e execução vindos do SIGAA público/revisão | Catálogo, atualização e reconciliação | Catálogo público; revisão por reconciliador; tabelas próprias em PostgreSQL; importador local | Sem prazo geral; preservação de histórico e atualização não são exclusão de todos os dados |
-| T09; conta, cinco critérios, professor/disciplina e datas informados na avaliação | Unicidade, substituição e agregados | `avaliacoes`, vínculo privado; agregado público a partir de três, sem notas individuais | Novo envio substitui; destino ao excluir conta ainda depende de decisão específica na #263 |
-| T10; texto opcional, versões, estados e datas enviados pelo autor | Publicação/revisão/retirada | `comentario_versoes`; público só publicado; autor e moderação autorizados | Limpeza de texto RETIRADO/REMOVIDO após 7 dias via rotina; pendente/suspenso preservado; execução hospedada não verificada |
-| T11–T13; denúncia/motivo, conta quando existente, decisões/atores e agradecimentos | Análise, impedimentos, revisão e comunicação | Tabelas de moderação, acesso por papel/objeto; sem denunciantes públicos | Denúncia encerrada descartada pelo fluxo; decisões com prazo próprio de 7 dias; agradecimentos têm ciclo próprio |
+| T09; conta, cinco critérios, professor/disciplina e datas informados na avaliação | Unicidade, substituição e agregados | `avaliacoes`, vínculo privado; agregado público a partir de três, sem notas individuais | Exclusão própria/da conta oculta imediatamente e purga após sete dias configuráveis; janela deve ser preservada ao reaplicar exclusões |
+| T10; texto opcional, versões, estados e datas enviados pelo autor | Publicação/revisão/retirada | `comentario_versoes`; público só publicado; autor e moderação autorizados | Retirado/removido e substituído com descarte agendado: purga após sete dias; exclusão da avaliação abrange todas as versões. Rejeitado perde texto e mantém metadados; execução hospedada não verificada |
+| T11–T13; denúncia/motivo, conta quando existente, decisões/atores e agradecimentos | Análise, impedimentos, revisão e comunicação | Tabelas de moderação, acesso por papel/objeto; sem denunciantes públicos | Denúncias encerradas ficam fora da fila até purga do conteúdo; dependentes são removidos junto do comentário. Metadados de rejeição sem prazo novo |
 | T14; texto integral elegível e resultado de classificação | Apoio à triagem, quando habilitada | OpenAI Moderations API; sem envio pelo canal de contato | Contrato, regiões, retenção externa e suboperadores não confirmados; filtros não garantem anonimização |
 | T15; categoria, alvo, descrição/evidência textual, protocolo, hash de chave, complementos e respostas | Contato e atendimento manual sem login estudantil | `solicitacoes_titulares/eventos_solicitacoes`; portador da chave consulta respostas/complementos; triagem/providências internas; allowlists de atendimento | Sem descarte geral implementado. Recebimento depende de configuração/retenção aprovada; não ativado por esta entrega; #263 acompanha |
-| T16–T17; identificador HMAC temporário do cliente, eventos e metadados de conexão | Proteção contra abuso e operação | HMAC em memória por processo, janela 60 s; logs de aplicação/servidor/provedores separados | Janela do HMAC não equivale à guarda de IP/logs. #279 sanitiza aplicação; borda/proxy e prazos não verificados |
-| T18; possíveis cópias dos dados anteriores | Recuperação | Backups/exportações e permissões reais ainda a conferir na #267 | Não há período/cobertura/restauração comprovados nesta revisão; não prometer apagamento instantâneo ou recuperação garantida |
-| #278; conta, voto e versão do comentário | Unicidade, troca/retirada e contagem | Implementado na branch da #278, sem alegação de publicação: `votos_comentario`, vínculo interno; API só contagens e estado da própria sessão, no-store | Sem herança; descarte com o texto, exclusão de versão/conta em cascata. Suspensão conserva; retirado/removido segue sete dias existentes. Aplicação do ciclo da versão como ponto a confirmar na #263; ver [evidências da #278](estudos/votos-utilidade-issue-278.md) |
+| T16–T17; identificadores HMAC, contadores e metadados de conexão | Proteção contra abuso e operação | Contadores PostgreSQL compartilhados `UNLOGGED`; registros privados de acesso separados de logs de console/provedores | Contadores expiram/purgam conforme o fluxo; não são garantia de recuperação do orçamento. Acesso: padrão de seis meses corridos, purga implementada; configuração/execução e logs externos a verificar |
+| T18; possíveis cópias dos dados anteriores | Recuperação | Nicolas relata backups manuais no Docker; demais acessos/cobertura/histórico ainda não verificados | Ensaio sintético ampliado #267 não comprova recuperação real. Diário operacional de exclusões/revogações não confirmado; não liberar cópia antiga presumindo reaplicação completa |
+| #278; conta, voto e versão do comentário | Unicidade, troca/retirada e contagem | Integrado em develop e conciliado pela #280: `votos_comentario`, vínculo interno; API só contagens e estado da própria sessão, no-store | Sem herança; purga com o texto e remoção dos votos feitos pela conta excluída. Suspensão conserva; cópia restaurada exige reaplicar exclusões. Ver [evidências da #278](estudos/votos-utilidade-issue-278.md) |
 
 ## Serviços conhecidos e o que não foi confirmado
 
@@ -52,8 +60,9 @@ promete SLA. Nicolas acompanha a operação; permissões documentadas continuam 
 
 A #263 acompanha política operacional, pedidos e efeitos da exclusão; a #267,
 roteiro/recuperação. Esses insumos não exigem fechamento integral para redigir a Política.
-A decisão ausente sobre avaliações na exclusão não é resolvida aqui e não bloqueia
-contato/textos. Excluir conta, retirar comentário e desativar acesso são operações distintas.
+A decisão B da #266 já define ocultação e purga das avaliações na exclusão da conta;
+não reabrir essa entrega. Guarda mínima e execução hospedada seguem com seus limites.
+Excluir conta, retirar comentário e desativar acesso são operações distintas.
 
 Crítica legítima negativa é permitida; discordância docente e impopularidade não
 removem conteúdo. Triagem externa não rejeita automaticamente; sinais/falhas aguardam
@@ -76,8 +85,10 @@ A migração Alembic é aditiva e reversível. Downgrade remove exclusivamente o
 de ciência; não executar downgrade em produção sem avaliar perda dessa evidência.
 Deploy exige coordenar backend/migração e frontend: clientes antigos sem os campos
 novos passam a receber 422 no cadastro; login existente permanece compatível.
-Commit, push e PR foram autorizados por Nicolas na continuação desta sessão, com um
-único commit preparado. Deploy, ativação do contato e aceite final permanecem fora desta etapa.
+A entrega original #269 teve autorização própria de commit/push/PR, preservada no
+histórico. Ela não foi transferida à #267: na continuação desta sessão, o usuário
+deu autorização própria para um único commit, push, PR/merge e encerramento técnico
+com pendências explícitas. Deploy e ativação do contato permanecem fora desta etapa.
 
 ## Fontes públicas de referência
 
