@@ -1,0 +1,70 @@
+{
+  "estado": "implementado",
+  "ambiente": "Windows local Python 3.12.16 PostgreSQL 16.16 descartavel, API sem DDL",
+  "suite": {
+    "total": 424,
+    "falhas": 0,
+    "skips": 2
+  },
+  "selecionados": 87,
+  "etapas": [
+    {
+      "etapa": "upgrade",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-bloco1",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-repetido",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "testes-bloco6",
+      "exit_code": 0
+    },
+    {
+      "etapa": "suite-completa",
+      "exit_code": 0
+    },
+    {
+      "etapa": "moderacao-http",
+      "exit_code": 0
+    },
+    {
+      "etapa": "limpeza-cli",
+      "exit_code": 0
+    },
+    {
+      "etapa": "purga-cli",
+      "exit_code": 0
+    },
+    {
+      "etapa": "rollback-com-dados",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check-final",
+      "exit_code": 0
+    }
+  ],
+  "checks": "ruff check/format, compileall, MkDocs estrito, Compose config e diff check passaram",
+  "pendencias": [
+    "Topologia e peer ASGI em hospedagem",
+    "Monitoramento de falha de gravacao",
+    "Premissa juridica e acesso operacional"
+  ]
+}
