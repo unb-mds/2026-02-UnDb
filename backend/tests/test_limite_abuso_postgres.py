@@ -176,6 +176,25 @@ class LimitadorPostgresTest(unittest.TestCase):
         self.assertEqual(r.motivo, MotivoLimite.IDENTIDADE)
         self.assertEqual(r.retry_after, 50)
 
+    def test_janela_calendario_reseta_na_meia_noite_utc(self):
+        self.agora = self.agora.replace(hour=23, minute=59, second=59, microsecond=0)
+        dia = int(timedelta(days=1).total_seconds())
+        p = replace(
+            self.politica,
+            quantidade_global=2,
+            janela_segundos=dia,
+            janela_global_segundos=dia,
+            alinhar_janela_utc=True,
+        )
+        self.assertTrue(self.limitador.consumir(p).permitido)
+        self.assertTrue(self.limitador.consumir(p).permitido)
+        negado = self.limitador.consumir(p)
+        self.assertFalse(negado.permitido)
+        self.assertEqual(negado.retry_after, 1)
+        self.agora += timedelta(seconds=1)
+        self.assertTrue(self.limitador.consumir(p).permitido)
+        self.assertEqual(self.linhas()[0].quantidade, 1)
+
     def test_observe_registra_excesso_mas_nao_nega(self):
         p = replace(self.politica, quantidade=1, modo=ModoLimite.OBSERVE)
         self.limitador.consumir(p, self.identidade)
@@ -263,11 +282,11 @@ class LimitadorPostgresTest(unittest.TestCase):
         original = repo.incrementar
         chamadas = []
 
-        def incrementar(*args):
+        def incrementar(*args, **kwargs):
             chamadas.append(True)
             if len(chamadas) == 2:
                 raise RuntimeError("falha sintética")
-            return original(*args)
+            return original(*args, **kwargs)
 
         with patch.object(repo, "incrementar", side_effect=incrementar):
             self.assertTrue(self.limitador.consumir(self.politica, self.identidade).indisponivel)

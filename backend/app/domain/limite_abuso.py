@@ -36,6 +36,7 @@ class PoliticaAbuso:
     atraso_apos: int = 0
     atraso_inicial_segundos: int = 0
     atraso_maximo_segundos: int = 0
+    alinhar_janela_utc: bool = False
 
     def __post_init__(self):
         if not re.fullmatch(r"[a-z][a-z0-9_.-]{0,63}", self.operacao):
@@ -56,6 +57,8 @@ class PoliticaAbuso:
                 raise ValueError("Configuração de atraso inválida.")
         if self.atraso_inicial_segundos > self.atraso_maximo_segundos:
             raise ValueError("Atraso inicial maior que o máximo.")
+        if type(self.alinhar_janela_utc) is not bool:
+            raise ValueError("Alinhamento da janela inválido.")
 
 
 @dataclass(frozen=True)

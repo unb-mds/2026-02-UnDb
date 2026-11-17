@@ -28,6 +28,7 @@ def incrementar(
     janela_segundos: int,
     agora: datetime,
     respeitar_espera: bool = True,
+    expira_em: datetime | None = None,
 ) -> EstadoContador:
     tabela = ContadorAbuso.__table__
     vencido = tabela.c.expira_em <= agora
@@ -37,7 +38,7 @@ def incrementar(
         chave=chave,
         quantidade=1,
         inicio_em=agora,
-        expira_em=agora + timedelta(seconds=janela_segundos),
+        expira_em=expira_em or agora + timedelta(seconds=janela_segundos),
         proxima_tentativa_em=None,
     )
     comando = comando.on_conflict_do_update(

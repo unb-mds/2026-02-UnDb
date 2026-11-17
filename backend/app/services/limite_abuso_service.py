@@ -2,7 +2,7 @@
 
 import logging
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from math import ceil
 
 from sqlalchemy.orm import Session
@@ -20,6 +20,11 @@ from app.domain.limite_abuso import (
 from app.repositories import limite_abuso_repository as repo
 
 logger = logging.getLogger(__name__)
+
+
+def fim_janela_utc(agora: datetime, segundos: int) -> datetime:
+    fim = (int(agora.timestamp()) // segundos + 1) * segundos
+    return datetime.fromtimestamp(fim, timezone.utc)
 
 
 def carregar_politica(operacao: str) -> PoliticaAbuso:
@@ -57,7 +62,14 @@ class LimitadorAbuso:
                 agora = self.relogio(db)
                 # Ordem uniforme global -> identidade evita ciclos entre consumidores.
                 global_ = repo.incrementar(
-                    db, politica.operacao, chave_global, politica.janela_global_segundos, agora
+                    db,
+                    politica.operacao,
+                    chave_global,
+                    politica.janela_global_segundos,
+                    agora,
+                    expira_em=fim_janela_utc(agora, politica.janela_global_segundos)
+                    if politica.alinhar_janela_utc
+                    else None,
                 )
                 motivo, espera = MotivoLimite.PERMITIDO, 0
                 if global_.quantidade > politica.quantidade_global:
@@ -71,6 +83,9 @@ class LimitadorAbuso:
                         politica.janela_segundos,
                         agora,
                         politica.modo == ModoLimite.ENFORCE,
+                        fim_janela_utc(agora, politica.janela_segundos)
+                        if politica.alinhar_janela_utc
+                        else None,
                     )
                     if estado.quantidade > politica.quantidade:
                         motivo = MotivoLimite.IDENTIDADE

@@ -1,5 +1,19 @@
 # specs.md — Especificação de implementação
 
+## Autenticação e abuso — #266, Bloco 2
+
+Derivada da restrição transversal de autenticação em `docs/requisitos.md`, fonte:
+pedido `EXECUTAR: BLOCO 2` do PO. Núcleo do Bloco 1 será usado em todos os POST de
+autenticação, exceto logout. Conta/papel não libera login, cadastro ou tokens.
+429/503 usam Retry-After e respostas sem detalhes internos. Erros do provedor nos
+fluxos de envio recebem 202 neutro, sem expor se houve envio/conta existente.
+Novo POST `/api/auth/reenviar-confirmacao`: `{email, return_to?}`, mesmos validadores
+de cadastro/retorno, 202 neutro para conta pendente, confirmada ou inexistente.
+Sob restrição, nenhum desses endpoints pode criar usuário, sessão, token, trocar
+senha ou enviar e-mail. Confirmação/redefinição preservam prazo e uso único.
+O orçamento diário de e-mail é compartilhado e alinhado à meia-noite UTC, incluindo
+reservas sem envio; não é uma janela fixa ancorada na primeira solicitação.
+
 ## Proteção de origens — #266
 
 Derivada da restrição transversal aprovada em `docs/requisitos.md` em 16/11/2026.

@@ -1,5 +1,30 @@
 # 📋 Engenharia de Requisitos — G7
 
+## Restrição transversal de autenticação — #266, Bloco 2
+
+Fonte: decisões A e pedido `EXECUTAR: BLOCO 2` do PO nesta conversa. Estado de
+entrega: **planejado** até a integração registrada na PR #280.
+
+Cadastro, login, confirmação, reenvio de confirmação e recuperação/redefinição
+devem limitar tentativas antes de efeitos. Restrições temporárias retornam 429
+com Retry-After; indisponibilidade do limitador suspende esses fluxos com 503.
+Cadastro, recuperação e reenvio não distinguem existência da conta nas respostas
+e não enviam e-mail durante a restrição. Falha do provedor mantém resposta neutra.
+Login tem atraso progressivo limitado e orçamento de até 100 tentativas entre
+sucesso ou término da janela provisória, sem desativar permanentemente a conta;
+sucesso reinicia o orçamento individual, preservando o global.
+Confirmação/redefinição combinam orçamento do token com orçamento global contra
+troca de tokens. Nenhum desses fluxos usa IP como chave ou bypass por papel.
+
+Cadastro, reenvio e recuperação compartilham intervalo mínimo por destino e
+orçamento diário de e-mail inferior à cota configurada do provedor. Reservas são
+feitas também para destinos sem conta para não revelar existência; isso pode
+consumir orçamento sem envio. Números são PROVISÓRIOS, pendentes de validação
+(item 4). Logout e sessão válida mantêm o contrato, sem passar pelo limitador.
+Reenvio solicita apenas e-mail institucional e retorno interno opcional; contas
+confirmadas/inexistentes recebem a mesma resposta. Links anteriores não são
+revogados por simples reenvio. RF02/RF24 e seus prazos vigentes são preservados.
+
 ## Restrição transversal de origens — #266
 
 **Validada pelo solicitante em 16/11/2026 nesta conversa**, após apresentação da proposta
