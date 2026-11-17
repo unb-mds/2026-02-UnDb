@@ -1,5 +1,51 @@
 # 🏛️ Arquitetura e Decisões Técnicas — G7
 
+## Registro complementar #266 — decisões aprovadas pelo PO
+
+**Estado: aprovado**, fonte decisões A–F e execuções dos Blocos 1–8 nesta sessão.
+Este registro atualiza os fluxos afetados e não promove ADRs não relacionados.
+FastAPI, SQLAlchemy síncrono, psycopg2, Alembic e PostgreSQL (ADR 01) permanecem.
+
+**Contexto e decisão.** Sessões e origens preservam a #279 integrada. Limitador
+genérico usa PostgreSQL UNLOGGED, incremento atômico, HMAC, capacidade global e
+políticas por operação/papel. Autenticação fecha na falha; avaliação segue com
+alerta; denúncia usa contenção local por processo; fila não tem bypass e ações
+urgentes preservam autorização. Sem IP nas chaves. Limites são **PROVISÓRIOS,
+pendentes de validação (item 4)**. Instâncias no mesmo escritor compartilham
+contadores; UNLOGGED pode perdê-los em crash/failover. Observe não garante cota.
+
+**Dados e descarte.** Migrações 20261117_01–03 são aditivas ao histórico. Conta
+excluída mantém ID/e-mail/datas e estado derivado, sem nome, senha, sessões/tokens
+ou papéis ativos; e-mail reservado impede reativação por recadastro. Avaliações
+excluídas deixam agregados e comentários públicos imediatamente e são purgadas
+após janela padrão configurável de sete dias. Comentários removidos/retirados
+seguem janela; rejeição de comentário pendente apaga texto e mantém metadados,
+sem rejeitar os critérios da avaliação. Denúncias encerradas ficam fora da fila
+ativa e permanecem até purga do conteúdo. Cascatas são explícitas na transação,
+protegidas por FKs. Essa decisão substitui, neste escopo, a exclusão imediata de
+denúncias e o descarte que apenas esvaziava texto em versões antigas.
+
+**Registros e jobs.** Tabela privada de acesso, sem interface/endpoint, registra
+mutações, UTC, operação, ID interno quando resolvido, peer ASGI, encaminhamento
+bruto NÃO confiável, resultado e UUID de requisição. Sem corpo/query/cookie/token,
+senha, nome ou e-mail. Seis meses corridos configuráveis e purga pelo processo
+existente `descarte-moderacao`, que também limpa credenciais e contadores vencidos.
+Console não registra links sensíveis nem em DEBUG. Escrita de acesso é separada;
+falha gera evento mínimo e pode deixar lacuna operacional.
+
+**Consequências e pendências.** Rollback não recupera dados apagados e exige parar
+API/job; guarda de IDs/datas de conta durante reaplicação não é backup. No Compose,
+`--no-proxy-headers` preserva peer; topologia efetiva, HTTPS/cookies, banco e
+execução contínua dos jobs na hospedagem estão **pendentes de validação**.
+Base/prazo da conta mínima, metadados, premissa do Marco Civil e incidentes também
+permanecem **pendentes de validação**. Canal segue DESATIVADO. Backup automático
+diário e arquivo semestral estão planejados; ensaio sintético não comprova produção.
+
+**Referências.** [Pendências](seguranca/validacoes-pendentes-266.md),
+[manutenção](operacao/manutencao.md), [retenção](seguranca/retencao-bloco-5.md),
+[registros](seguranca/acessos-bloco-6.md) e evidências por bloco na PR #280,
+continuação autorizada da #279. A #266 não é declarada concluída.
+
 ## Canal de solicitações — RF25
 
 Modelo aditivo aprovado por Nicolas em 15/11/2026: solicitações e histórico separados das
@@ -361,7 +407,7 @@ não conseguem concluir o cadastro na Release 1.
 
 **Decisão complementar aprovada em 19/09/2026.** Resend é o provedor de produção, isolado
 por uma interface interna de envio. O desenvolvimento usa um adaptador `console`, que
-registra o link no terminal sem depender de domínio externo. O link expira em 24 horas,
+simula envio sem imprimir destinatário ou link. O link expira em 24 horas,
 usa token opaco aleatório de uso único e somente seu hash é persistido. Senhas usam
 Argon2id. Cadastro repetido recebe a mesma resposta genérica `202`, sem revelar a
 existência da conta. A confirmação é acionada por `POST` depois que a página do frontend

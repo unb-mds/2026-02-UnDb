@@ -226,3 +226,14 @@ operação contínua segue em #169/#171; não se declara atendida pela API no Re
 Responsabilidades de acompanhamento: Nicolas nas #164/#169/#170/#171; time na
 revisão e definição da continuidade; aceite e fechamento de issues permanecem
 manuais com o PO. O registro não cria novo serviço pago, requisito ou SLA.
+
+
+## Operacao atual - #266, Bloco 8
+
+O processo de descarte inclui conteudo excluido, credenciais expiradas e
+registros privados de acesso. Janela padrao configuravel: sete dias para conteudo,
+seis meses corridos para acesso. Conta minima e metadados de rejeicao nao recebem
+prazo inventado. Ciclo/lote e purga estao em backend/.env.example.
+Ver [manutencao](operacao/manutencao.md) e
+[pendencias](seguranca/validacoes-pendentes-266.md). Codigo/Compose nao comprovam
+execucao continua na hospedagem, que permanece pendente de validacao.

@@ -140,3 +140,14 @@ A estratégia implementada para revisão na [Issue #36](https://github.com/unb-m
 Next.js, sem exportação estática. A justificativa, as alternativas e as consequências
 estão no [ADR 08](arquitetura.md).
 
+
+
+## Operacao atual - #266, Bloco 8
+
+O processo de descarte inclui conteudo excluido, credenciais expiradas e
+registros privados de acesso. Janela padrao configuravel: sete dias para conteudo,
+seis meses corridos para acesso. Conta minima e metadados de rejeicao nao recebem
+prazo inventado. Ciclo/lote e purga estao em backend/.env.example.
+Ver [manutencao](operacao/manutencao.md) e
+[pendencias](seguranca/validacoes-pendentes-266.md). Codigo/Compose nao comprovam
+execucao continua na hospedagem, que permanece pendente de validacao.
