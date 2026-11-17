@@ -41,6 +41,7 @@ nav:
   - Produto:
       - Visão: visao.md
       - Requisitos: requisitos.md
+      - Transparência, Privacidade e Termos: transparencia.md
       - Board no Figma: figma.md
       - Apoio à moderação com IA: moderacao-ia.md
   - Arquitetura:
@@ -71,6 +72,7 @@ nav:
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
   - Estudos:
+      - Transparência e ciência dos Termos — Issue 269: estudos/transparencia-issue-269.md
       - Integridade das notas — Issue 270 (decisões pendentes): estudos/integridade-notas-issue-270.md
       - Moderação — avaliação da Issue 252:
           - Ampliação com substituições numéricas: estudos/implementacao-substituicoes-issue-252.md

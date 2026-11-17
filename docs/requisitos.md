@@ -1,5 +1,39 @@
 # 📋 Engenharia de Requisitos — G7
 
+## RF26 — Transparência, Termos e ciência no cadastro (#269)
+
+**Validado pelo PO:** escopo consolidado da #269 em 16/11/2026 e solicitação
+explícita nesta sessão em 17/11/2026 para executar toda a issue e informar o
+caráter sem fins lucrativos. Esta autorização não redefine retenção ou moderação.
+
+- **[RF26]** Disponibilizar `/privacidade` e `/termos-de-uso` publicamente, com
+  versão/data, links no rodapé e no cadastro e linguagem acessível em celular/teclado.
+- Declarar projeto acadêmico estudantil independente e sem fins lucrativos, sem
+  vínculo oficial ou endosso institucional comprovado da UnB. Não converter isso em
+  alegação de pessoa jurídica, certificação ou dispensa de proteção de dados.
+- Consolidar inventário factual: dados, finalidade, origem, acesso, fornecedores e
+  descarte vigente. Reaproveitar T01–T18 da PR #277 e correções da #279; registrar
+  desconhecidos e atualizar votos #278 quando entregues.
+- Explicar autoria não divulgada publicamente, vínculo interno com a conta, acesso
+  restrito e identificação possível por texto/contexto; não prometer anonimato absoluto.
+  Descrever serviços reais, envio condicional à IA, atendimento manual e limites de
+  descarte/backups, sem inventar prazos, regiões, contratos ou práticas.
+- Permitir crítica acadêmica negativa legítima; proibir ameaça, discriminação, ataque
+  pessoal, exposição privada e contribuição deliberadamente falsa. Discordância docente
+  não dá veto; votos não alteram notas ou moderação. Preservar RF20–RF22/RF25.
+- Novo cadastro exige caixa inicialmente desmarcada de ciência dos Termos com link,
+  versão vigente e confirmação explícita. Servidor rejeita ausência, falso ou versão
+  inválida e registra versão e instante UTC junto à conta, sem aceitar data do cliente.
+  Ciência não é consentimento genérico para tratamento de dados.
+- Contas preexistentes permanecem com ciência desconhecida, sem preenchimento retroativo,
+  bloqueio de login ou exigência de reaceite. Atualizações futuras não impõem reaceite nesta etapa.
+
+Critérios: páginas acessíveis sem sessão; coerência com Home/Sobre; cadastro sem ciência
+ou com versão inválida não cria conta/envia e-mail; cadastro válido persiste versão/data;
+repetição não altera registro preexistente; login antigo preservado; links, teclado e
+layout verificados em 320/768/1280 px. Inventário e limites em
+[Transparência da R2](transparencia.md). Estado: **validado para R2; implementação e verificação locais concluídas; publicação pendente**.
+
 ## Restrição transversal de origens — #266
 
 **Validada pelo solicitante em 16/11/2026 nesta conversa**, após apresentação da proposta
