@@ -188,6 +188,16 @@ registrados pelo operador.
 
 ## Backup e restauração — roteiro ainda não executado
 
+**Atualização #267, 17/11/2026:** a descrição abaixo preserva o roteiro original
+da #170. O Bloco 7 da #266 comprovou dump/restore e contagens sintéticas;
+a extensão #267 valida schema, vínculos, reaplicação de exclusões e jornada no
+destino, com resultados no [registro do ensaio](seguranca/evidencias/issue-267/README.md).
+Isso não comprova recuperação da hospedagem. Nicolas informou nesta sessão que
+faz backups manuais no Docker quando necessário; cobertura, histórico, local e
+outros acessos ainda precisam ser detalhados. Não foi inspecionada cópia real.
+O [roteiro curto](operacao/incidentes-recuperacao.md) concentra fatos, limites e
+pendências operacionais, sem criar outro procedimento de backup de produção.
+
 A #170 exige verificação de recuperação. Não foi obtida evidência de dump,
 restauração ou política periódica instalada nesta sessão. Limites/janela de
 restauração do plano Neon devem ser conferidos no projeto, sem pressupor retenção

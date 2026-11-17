@@ -1,5 +1,17 @@
 # specs.md — Especificação de implementação
 
+## Recuperação isolada — #267
+
+Derivado de `docs/requisitos.md`, escopo autorizado da #267 em 17/11/2026.
+O runner `scripts/recovery_drill.py` cria apenas cluster/bancos sintéticos novos,
+em rede Docker interna sem portas publicadas, restaura em destino distinto e
+executa `tests.recovery_scenario` com o banco real. Schema/revisão/constraints,
+dados/vínculos, jornada, sessão/autorização e retenção são verificados, inclusive
+reaplicação de exclusões/retirada/revogações sintéticas antes do encerramento do
+ensaio. Não instala mecanismo de produção. Canal, backup real e diário operacional
+dependem dos fatos registrados em `docs/operacao/incidentes-recuperacao.md`.
+Preserva o Bloco 7 da #266 e não altera contratos, schema ou política de guarda.
+
 ## Retenção — #266, Bloco 5
 
 Derivado de docs/requisitos.md, decisão B do PO. DELETE /api/auth/conta exclui

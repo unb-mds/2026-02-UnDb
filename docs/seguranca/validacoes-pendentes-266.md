@@ -8,6 +8,12 @@ não declara nenhuma pendência concluída e não comprova configuração em pro
 
 ## Matriz única de acompanhamento
 
+Complemento #267 de 17/11/2026: [roteiro e insumos específicos](../operacao/incidentes-recuperacao.md)
+e [ensaio ampliado](evidencias/issue-267/README.md). Nicolas relata backups manuais
+no Docker; cobertura/histórico/acessos ainda sem evidência. Canal privado e
+registro protegido de exclusões/revogações continuam pendentes. A extensão do
+ensaio não resolve infraestrutura, guarda ou operação de backups da matriz.
+
 | Item / tema | Estado atual | Falta validar / quem valida | Risco enquanto pendente | Critério de conclusão / referência |
 | --- | --- | --- | --- | --- |
 | 4 — números do limitador | Implementado, PROVISÓRIOS, pendentes de validação | PO e operação: cota reservada real de e-mail, custo de hash, carga, falsos positivos, limites por papel e observação | Negação coletiva para anônimos, esgotamento sem envio, carga excessiva ou bloqueio de uso legítimo | Medições sintéticas e operacionais sanitizadas, cota comprovada e configuração aprovada; `backend/app/core/config.py`, `services/auth_abuso_service.py`, `core/protecao_fluxos.py` |

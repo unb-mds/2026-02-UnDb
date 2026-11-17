@@ -1,5 +1,13 @@
 # Continuidade operacional e responsáveis
 
+> **Complemento #267 — 17/11/2026:** não reabre o aceite documental da #260.
+> Nicolas informou de memória Gabriel/Vinicius como recebedores de incidentes;
+> canal privado e forma de acompanhamento continuam sem confirmação. Informou
+> backups manuais no Docker, sem detalhar cobertura/histórico/outros acessos, e
+> não confirmou registro protegido de exclusões/revogações. Ver o
+> [roteiro e encaminhamentos](operacao/incidentes-recuperacao.md), mantendo os
+> aceites e os limites históricos abaixo. Nenhum novo acesso foi concedido.
+
 > **Estado: proposta parcial para validação humana.** Este documento registra indicações
 > e aceites reportados por Nicolas nesta conversa, além de procedimentos para revisão.
 > Não determina qualificação jurídica, não confirma acessos reais e não altera contas,

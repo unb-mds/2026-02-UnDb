@@ -1,0 +1,210 @@
+[
+  {
+    "data_inicio_utc": "2026-11-17T14:21:08.469070+00:00",
+    "data_fim_utc": "2026-11-17T14:21:39.266520+00:00",
+    "resultado": "falha",
+    "fontes_sha256": {
+      "scripts/recovery_drill.py": "569740b7dec16c550020580811540193936eeecc3d4c9c3b5ed52df534e31f74",
+      "backend/tests/recovery_scenario.py": "dbf3bad38141a429f8b1e7217d66430d5fc7da830a0730bc84913ed9eb05f2b9"
+    },
+    "descarte": [
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "network",
+        "removido": true
+      }
+    ],
+    "dump_diario_conexoes_removidos": true,
+    "tentativa": "ensaio267-01",
+    "falha": {
+      "etapa": "verify",
+      "tipo": "RuntimeError",
+      "detalhe": "comando retornou 1; AssertionError: schema/revisão/valores diferentes da origem do backup"
+    },
+    "classificacao": "falha do ensaio (comparação), sem defeito de produto comprovado"
+  },
+  {
+    "data_inicio_utc": "2026-11-17T15:14:27.712689+00:00",
+    "data_fim_utc": "2026-11-17T15:15:45.073112+00:00",
+    "resultado": "falha",
+    "fontes_sha256": {
+      "scripts/recovery_drill.py": "a3f76c4dcc2830183e3dfba151a03603b013fdb681b31b3d531b25ef41db60f6",
+      "backend/tests/recovery_scenario.py": "afdd0df5b659f35d56c36111c6163531b8eae0bbb68a2b609d80746e852dfa9c"
+    },
+    "descarte": [
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "network",
+        "removido": true
+      }
+    ],
+    "dump_diario_conexoes_removidos": true,
+    "tentativa": "ensaio267-02",
+    "falha": {
+      "etapa": "verify",
+      "tipo": "RuntimeError",
+      "detalhe": "comando retornou 1; AssertionError: schema/revisão/valores diferentes: schema:agradecimentos:checks,schema:denuncias:checks,schema:eventos_solicitacoes:checks,schema:pendencias_identidade:checks,schema:solicitacoes_titulares:checks,schema:votos_comentario:checks"
+    },
+    "classificacao": "falha do ensaio (comparação), sem defeito de produto comprovado"
+  },
+  {
+    "data_inicio_utc": "2026-11-17T15:16:53.427569+00:00",
+    "data_fim_utc": "2026-11-17T15:17:29.561649+00:00",
+    "resultado": "falha",
+    "fontes_sha256": {
+      "scripts/recovery_drill.py": "a3f76c4dcc2830183e3dfba151a03603b013fdb681b31b3d531b25ef41db60f6",
+      "backend/tests/recovery_scenario.py": "4e6e0767a9826124a328c542ebd436b74fab41fd14b52bec02d43eb0f0344fc9"
+    },
+    "descarte": [
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "network",
+        "removido": true
+      }
+    ],
+    "dump_diario_conexoes_removidos": true,
+    "tentativa": "ensaio267-03",
+    "falha": {
+      "etapa": "verify",
+      "tipo": "RuntimeError",
+      "detalhe": "comando retornou 1; AssertionError: schema/revisão/valores diferentes: schema:agradecimentos:checks,schema:denuncias:checks,schema:eventos_solicitacoes:checks,schema:pendencias_identidade:checks,schema:solicitacoes_titulares:checks,schema:votos_comentario:checks"
+    },
+    "classificacao": "falha do ensaio (comparação), sem defeito de produto comprovado"
+  },
+  {
+    "data_inicio_utc": "2026-11-17T15:17:33.319483+00:00",
+    "data_fim_utc": "2026-11-17T15:18:08.584681+00:00",
+    "resultado": "falha",
+    "fontes_sha256": {
+      "scripts/recovery_drill.py": "04e94f0f788eeea5f47f756a8d9ecdc80c2eadf058b2b6d944a9fdb2815de5a9",
+      "backend/tests/recovery_scenario.py": "4e6e0767a9826124a328c542ebd436b74fab41fd14b52bec02d43eb0f0344fc9"
+    },
+    "descarte": [
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "network",
+        "removido": true
+      }
+    ],
+    "dump_diario_conexoes_removidos": true,
+    "tentativa": "ensaio267-04",
+    "falha": {
+      "etapa": "verify",
+      "tipo": "RuntimeError",
+      "detalhe": "comando retornou 1; AssertionError: schema/revisão/valores diferentes: schema:agradecimentos:checks,schema:denuncias:checks,schema:eventos_solicitacoes:checks,schema:pendencias_identidade:checks,schema:solicitacoes_titulares:checks,schema:votos_comentario:checks"
+    },
+    "classificacao": "falha do ensaio (comparação), sem defeito de produto comprovado"
+  },
+  {
+    "data_inicio_utc": "2026-11-17T15:18:53.939978+00:00",
+    "data_fim_utc": "2026-11-17T15:19:40.146526+00:00",
+    "resultado": "falha",
+    "fontes_sha256": {
+      "scripts/recovery_drill.py": "48a26779a6c4698f05d93472c2f11afea06b78818c7ec758e2d85d4d3ba646e2",
+      "backend/tests/recovery_scenario.py": "5f2f80f0ed733953de599d7a4ca89914ad1c62b7c5335022c0e5e141ace8ae0a"
+    },
+    "descarte": [
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "network",
+        "removido": true
+      }
+    ],
+    "dump_diario_conexoes_removidos": true,
+    "tentativa": "ensaio267-05",
+    "falha": {
+      "etapa": "replay",
+      "tipo": "RuntimeError",
+      "detalhe": "comando retornou 1; AssertionError: reaplicação divergente/não idempotente"
+    },
+    "classificacao": "falha do ensaio (comparação), sem defeito de produto comprovado"
+  },
+  {
+    "data_inicio_utc": "2026-11-17T15:20:47.711001+00:00",
+    "data_fim_utc": "2026-11-17T15:21:51.035817+00:00",
+    "resultado": "aprovado",
+    "fontes_sha256": {
+      "scripts/recovery_drill.py": "621f41df56d077178254542d3737f434b2731517003f6f2d655c796a22b7de02",
+      "backend/tests/recovery_scenario.py": "784a845a78c5231bac01e20bdcd3554aa968de633c8a163d9f9f43193363a9a0"
+    },
+    "descarte": [
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "network",
+        "removido": true
+      }
+    ],
+    "dump_diario_conexoes_removidos": true,
+    "tentativa": "ensaio267-06",
+    "falha": null,
+    "classificacao": "aprovado"
+  },
+  {
+    "data_inicio_utc": "2026-11-17T15:24:31.607316+00:00",
+    "data_fim_utc": "2026-11-17T15:26:24.745493+00:00",
+    "resultado": "aprovado",
+    "fontes_sha256": {
+      "scripts/recovery_drill.py": "4fb8bc9a75fdb9acfa07ee25e31dfe3a458e393ac5fcc2aeaf38b01e162bac09",
+      "backend/tests/recovery_scenario.py": "784a845a78c5231bac01e20bdcd3554aa968de633c8a163d9f9f43193363a9a0"
+    },
+    "descarte": [
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "container",
+        "removido": true
+      },
+      {
+        "tipo": "network",
+        "removido": true
+      }
+    ],
+    "dump_diario_conexoes_removidos": true,
+    "tentativa": "conferencia-protecoes-locais",
+    "classificacao": "aprovado; antes de reposicionar a recusa remota para preceder docker version"
+  }
+]
