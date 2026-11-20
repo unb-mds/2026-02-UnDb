@@ -68,6 +68,7 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
           setTentativa((valor) => valor + 1);
         }}>Tentar novamente</button>
       )}
+      {estado === "erro" && <Link href={retorno ? `/reenviar-confirmacao?returnTo=${encodeURIComponent(retorno)}` : "/reenviar-confirmacao"} className="button">Solicitar novo link de confirmação</Link>}
       {estado !== "carregando" && (
         <div className="flex flex-col gap-3">
           {estado === "sucesso" && (

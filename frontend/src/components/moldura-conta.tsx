@@ -5,7 +5,8 @@ import FundoLiquido from "./fundo-liquido";
 import Icone from "./icone";
 
 /** Moldura compartilhada de login/cadastro (#211): cartão translúcido sobre o fundo decorativo. */
-export default function MolduraConta({ titulo, descricao, retorno, contexto, opcoes, rotulo, children }: {
+export default function MolduraConta({ titulo, descricao, retorno, contexto, opcoes, rotulo, ampla = false, children }: {
+  ampla?: boolean;
   titulo: string;
   descricao: string;
   retorno: string | null;
@@ -17,7 +18,7 @@ export default function MolduraConta({ titulo, descricao, retorno, contexto, opc
   return (
     <main className="auth-page flex flex-1 items-start justify-center px-4 py-10 sm:items-center sm:py-16">
       <FundoLiquido />
-      <section className="auth-card flex min-w-0 flex-col gap-5" aria-label={rotulo}>
+      <section className={`auth-card flex min-w-0 flex-col gap-5 ${ampla ? "w-full! max-w-5xl" : ""}`} aria-label={rotulo}>
         <Link href="/" aria-label="UnDb — início" className="mb-1 inline-flex min-h-11 w-fit items-center">
           <Image src="/brand/undb-logo.png" alt="" width={600} height={201} className="h-auto w-28" loading="eager" />
         </Link>

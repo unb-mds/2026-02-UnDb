@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async headers() {
-    return ["/contato", "/atendimento", "/confirmar-email", "/redefinir-senha"].map(source => ({ source, headers: [
+    return ["/contato", "/atendimento", "/login", "/reenviar-confirmacao", "/confirmar-email", "/redefinir-senha"].map(source => ({ source, headers: [
       { key: "Cache-Control", value: "no-store" },
       { key: "Referrer-Policy", value: "no-referrer" },
     ] }));

@@ -119,3 +119,19 @@ AvaliacaoAgregadaResponse = (
 class ComparacaoProfessoresResponse(BaseModel):
     disciplina: DisciplinaInstitucionalResponse
     professores: list[AvaliacaoAgregadaResponse]
+
+
+class MinhaAvaliacaoResponse(AvaliacaoBase):
+    model_config = ConfigDict(extra="forbid", from_attributes=True)
+
+    id: UUID
+    updated_at: datetime
+    professor: ProfessorInstitucionalResponse
+    disciplina: DisciplinaInstitucionalResponse
+
+
+class MinhasAvaliacoesResponse(BaseModel):
+    itens: list[MinhaAvaliacaoResponse]
+    total: int
+    pagina: int
+    tamanho: int
