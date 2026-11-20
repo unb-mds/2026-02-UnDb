@@ -1,5 +1,253 @@
 # 📋 Engenharia de Requisitos — G7
 
+## Recuperação isolada e roteiro de incidentes — #267
+
+Fonte autorizada: escopo simplificado vigente da [#267](https://github.com/unb-mds/2026-02-UnDb/issues/267)
+e solicitação de implementação de 17/11/2026. Exige roteiro curto com aviso privado,
+acompanhamento de Nicolas, fatos mínimos e referência aos procedimentos existentes;
+descrição factual do backup disponível; ensaio sintético em origem/destino novos e
+distintos, com schema, revisão, vínculos e jornada pela aplicação restaurada.
+Verificar sessão, autorização e retenção, reaplicando exclusões/revogações posteriores
+ao backup antes de liberar a cópia. Registrar versão, resultados, limites e descarte.
+Reutilizar o Bloco 7 da #266 como evidência parcial, sem presumir backup de produção.
+Canal, acessos, janela real de backup e guarda do registro de exclusões precisam de
+fonte operacional; ausências permanecem pendentes. Não cria política de guarda,
+SLA, prazo legal, papel jurídico ou mecanismo de produção. Revisão jurídica formal
+e estrutura empresarial ficam fora desta R2. Derivados: [roteiro](operacao/incidentes-recuperacao.md),
+[manutenção](operacao/manutencao.md) e [transparência](transparencia.md).
+
+## Registros de acesso — #266, Bloco 6
+
+Fonte: decisão C do PO e EXECUTAR: BLOCO 6 e 7. Estado: implementado.
+Mutações de autenticação, avaliação/comentário, denúncia, moderação, exclusão e
+canal de titulares devem registrar UTC, operação, usuário autenticado quando
+resolvido, IP de conexão, encaminhamento bruto não confiável, resultado e ID de
+requisição. Sem corpo, senha, token ou texto de avaliação. Tabela privada, sem
+endpoint/interface, retenção configurável de seis meses corridos e purga automática.
+Premissa sobre Marco Civil e configurações externas permanecem pendentes de validação.
+
+## Retenção e exclusão — #266, Bloco 5
+
+Fonte: decisão B e EXECUTAR: BLOCO 5 do PO. Estado: implementado;
+guarda mínima e operação em hospedagem permanecem pendentes de validação.
+Exclusão de conta preserva identificador, e-mail, datas e estado de exclusão,
+remove nome, senha, papéis, sessões e tokens e impede autenticação. E-mail fica
+reservado: recadastro não reativa a conta e mantém resposta neutra. Base legal,
+prazo e revisão dessa guarda permanecem pendentes de validação.
+Avaliações e comentários excluídos são ocultados imediatamente e removidos
+definitivamente após sete dias configuráveis, inclusive em cascata da conta.
+Conteúdo rejeitado antes de publicar é apagado, mantendo metadados da decisão.
+Denúncias encerradas permanecem até a purga do conteúdo, fora da fila/contagem
+ativa. A purga automática também remove sessões/tokens/contadores expirados.
+Restauração de backup deve reaplicar exclusões mediante registro mínimo de IDs
+e datas; retenção e operação dos backups permanecem pendentes de validação.
+
+## Restrição transversal — #266, Blocos 3 e 4
+
+Fonte: decisão A e pedido EXECUTAR: BLOCO 3 e 4 do PO. Estado: implementado;
+calibração e validações humanas permanecem pendentes de validação.
+Avaliações e denúncias devem rejeitar excesso antes de escrita. Na falha do
+limitador, avaliações seguem com alerta; denúncias usam teto local por processo.
+Canal de titulares usa contadores compartilhados, continua desativado por padrão
+e suspende acesso público na falha. Sem IP nas chaves. Contas usam ID interno;
+anônimos compartilham capacidade global. Moderação/reconciliação usam limites por
+papel; fila não tem bypass. Remoção urgente, retirada própria e atendimento pela
+equipe mantêm autorização e registro de uso sem limitador. Operações administrativas
+ausentes não são criadas por este escopo. Valores são PROVISÓRIOS, pendentes de
+validação (item 4). O frontend apresenta 429/503 sem detalhes internos, informa
+espera de Retry-After quando disponível, preserva preenchimento e anuncia erro
+de forma acessível.
+
+## Restrição transversal de autenticação — #266, Bloco 2
+
+Fonte: decisões A e pedido `EXECUTAR: BLOCO 2` do PO nesta conversa. Estado de
+entrega: **implementado**, com evidências na PR #280 e em
+`docs/seguranca/limitador-auth-bloco-2.md`.
+
+Cadastro, login, confirmação, reenvio de confirmação e recuperação/redefinição
+devem limitar tentativas antes de efeitos. Restrições temporárias retornam 429
+com Retry-After; indisponibilidade do limitador suspende esses fluxos com 503.
+Cadastro, recuperação e reenvio não distinguem existência da conta nas respostas
+e não enviam e-mail durante a restrição. Falha do provedor mantém resposta neutra.
+Login tem atraso progressivo limitado e orçamento de até 100 tentativas entre
+sucesso ou término da janela provisória, sem desativar permanentemente a conta;
+sucesso reinicia o orçamento individual, preservando o global.
+Confirmação/redefinição combinam orçamento do token com orçamento global contra
+troca de tokens. Nenhum desses fluxos usa IP como chave ou bypass por papel.
+
+Cadastro, reenvio e recuperação compartilham intervalo mínimo por destino e
+orçamento diário de e-mail inferior à cota configurada do provedor. Reservas são
+feitas também para destinos sem conta para não revelar existência; isso pode
+consumir orçamento sem envio. Números são PROVISÓRIOS, pendentes de validação
+(item 4). Logout e sessão válida mantêm o contrato, sem passar pelo limitador.
+Reenvio solicita apenas e-mail institucional e retorno interno opcional; contas
+confirmadas/inexistentes recebem a mesma resposta. Links anteriores não são
+revogados por simples reenvio. RF02/RF24 e seus prazos vigentes são preservados.
+## RF26 — Transparência, Termos e ciência no cadastro (#269)
+
+**Validado pelo PO:** escopo consolidado da #269 em 16/11/2026 e solicitação
+explícita nesta sessão em 17/11/2026 para executar toda a issue e informar o
+caráter sem fins lucrativos. Esta autorização não redefine retenção ou moderação.
+
+- **[RF26]** Disponibilizar `/privacidade` e `/termos-de-uso` publicamente, com
+  versão/data, links no rodapé e no cadastro e linguagem acessível em celular/teclado.
+- Declarar projeto acadêmico estudantil independente e sem fins lucrativos, sem
+  vínculo oficial ou endosso institucional comprovado da UnB. Não converter isso em
+  alegação de pessoa jurídica, certificação ou dispensa de proteção de dados.
+- Consolidar inventário factual: dados, finalidade, origem, acesso, fornecedores e
+  descarte vigente. Reaproveitar T01–T18 da PR #277 e correções da #279; registrar
+  desconhecidos e atualizar votos #278 quando entregues.
+- Explicar autoria não divulgada publicamente, vínculo interno com a conta, acesso
+  restrito e identificação possível por texto/contexto; não prometer anonimato absoluto.
+  Descrever serviços reais, envio condicional à IA, atendimento manual e limites de
+  descarte/backups, sem inventar prazos, regiões, contratos ou práticas.
+- Permitir crítica acadêmica negativa legítima; proibir ameaça, discriminação, ataque
+  pessoal, exposição privada e contribuição deliberadamente falsa. Discordância docente
+  não dá veto; votos não alteram notas ou moderação. Preservar RF20–RF22/RF25.
+- Novo cadastro exige caixa inicialmente desmarcada de ciência dos Termos com link,
+  versão vigente e confirmação explícita. Servidor rejeita ausência, falso ou versão
+  inválida e registra versão e instante UTC junto à conta, sem aceitar data do cliente.
+  Ciência não é consentimento genérico para tratamento de dados.
+- Contas preexistentes permanecem com ciência desconhecida, sem preenchimento retroativo,
+  bloqueio de login ou exigência de reaceite. Atualizações futuras não impõem reaceite nesta etapa.
+
+Critérios: páginas acessíveis sem sessão; coerência com Home/Sobre; cadastro sem ciência
+ou com versão inválida não cria conta/envia e-mail; cadastro válido persiste versão/data;
+repetição não altera registro preexistente; login antigo preservado; links, teclado e
+layout verificados em 320/768/1280 px. Inventário e limites em
+[Transparência da R2](transparencia.md). Estado: **validado para R2; implementação e verificação locais concluídas; publicação pendente**.
+
+## Restrição transversal de origens — #266
+
+**Validada pelo solicitante em 16/11/2026 nesta conversa**, após apresentação da proposta
+de CSRF no relatório da #266 e resposta explícita “Aprovar a proposta de CSRF”.
+
+Operações mutáveis da API devem rejeitar origem explícita externa, nula ou inválida,
+antes de autenticar/renovar sessão ou produzir efeitos. Somente origens exatas da lista
+autorizada são aceitas. Sem origem explícita, conferir a origem da referência quando
+presente; sem ambas, rejeitar login e operações com cookie de sessão. Demais clientes
+sem cookie podem continuar usando as operações sem metadados de navegador, respeitando
+autenticação/autorização específicas. Não aceitar automaticamente subdomínios, curingas
+ou origens derivadas de cabeçalhos de proxy. Preservar o frontend autorizado e as consultas
+GET conforme seus contratos. Rejeição retorna HTTP 403 sem refletir os cabeçalhos.
+
+Esta decisão não define limites de abuso, nova duração de sessão, retenção ou permissão.
+Origem não autentica clientes HTTP e o controle não impede XSS. Critérios: origens exatas
+autorizadas passam ao fluxo normal; externas/null/malformadas/duplicadas são rejeitadas;
+ausência de metadados com cookie/login é rejeitada; clientes sem cookie nas demais
+operações e preflight legítimo permanecem compatíveis.
+
+## RF25 — Contato, solicitações de titulares e política de moderação (#263)
+
+**Validado pelo PO:** consolidação das issues #262, #263 e #264 autorizada por Nicolas
+em 17/11/2026 para execução integral na Release 2, com base no contrato inicial de 15/11/2026.
+Esta consolidação unifica canal de contato, atendimento aos titulares (LGPD) e política
+de moderação sem criar novos prazos ou automações excessivas.
+
+### 1. Canal de contato e atendimento (#263)
+- Formulário e consulta públicos em `/contato`, acessíveis sem login estudantil, com links
+  no rodapé e na página Sobre. Sete categorias válidas: `DADO_INCORRETO`, `COMENTARIO_ILICITO`,
+  `NOTA_SUSPEITA`, `FRAUDE_COORDENADA`, `EXPOSICAO_PESSOAL`, `DIREITO_LGPD`, `OUTRA`.
+- Protocolo aleatório em formato UUID e chave secreta alfanumérica de acompanhamento
+  (32 bytes urlsafe). O banco persiste unicamente o hash SHA-256 da chave.
+- O solicitante acompanha respostas da equipe e envia complementos ou pedidos de revisão
+  usando o protocolo e a chave secreta. Não há envio de chaves ou respostas por e-mail, nem
+  exibição pública de registros de outros solicitantes.
+- Atendimento restrito às contas autorizadas: `CANAL_TITULARES_ATENDENTES` (Vinicius Gavaldao
+  e Gabriel) registram triagem, providências e respostas; `CANAL_TITULARES_LEITORES` (Nicolas
+  Zanin e Tiago Vieira) têm permissão de visualização restrita.
+- Separação de visibilidade: eventos de triagem e providências são estritamente internos com
+  identificação do responsável; eventos de resposta são visíveis ao solicitante e omitem a
+  identidade do operador.
+- Proteção contra abuso pelo limitador compartilhado no PostgreSQL da #266: contas usam ID
+  interno e envios anônimos compartilham capacidade global, sem IP como chave. Na falha, o
+  canal público é suspenso; excesso responde 429/Retry-After. Atendimento autenticado não
+  passa pelo limitador. Ver configuração e limites em `docs/canal-titulares.md`.
+- Recebimento de novas solicitações permanece desativado por padrão (`CANAL_TITULARES_ATIVO=False`),
+  condicionado à retenção aprovada e à configuração explícita de operadores em produção.
+
+### 2. Atendimento a pedidos de titulares (#262)
+- Atendimento manual aos direitos dos titulares previstos na LGPD (confirmação, acesso,
+  correção e avaliação de eliminação), registrado pelo canal de contato na categoria `DIREITO_LGPD`.
+- Verificação proporcional de identidade: a equipe deve solicitar comprovação proporcional
+  ao risco antes de divulgar dados privados ou executar mutações, vedada a exigência
+  generalizada de documentos pessoais sensíveis ou cópias integrais de documentos.
+- Distinção conceitual e técnica obrigatória entre três operações:
+  1. **Retirada de comentário:** ação autenticada do próprio autor que oculta o texto
+     da visualização pública, encerra denúncias abertas como `CONTEUDO_RETIRADO` e agenda o descarte
+     do texto em 7 dias pela rotina vigente; as notas estruturadas dos 5 critérios permanecem
+     ativas nos agregados estatísticos;
+  2. **Desativação de acesso:** descrição operacional de bloqueio/revogação de credenciais;
+     não há uma operação independente de desativação de conta implementada nesta entrega;
+  3. **Exclusão de conta (#266, decisão B):** exclusão lógica transacional. Remove nome,
+     senha, papéis, sessões, tokens e agradecimentos; preserva ID, e-mail reservado, datas
+     de criação/exclusão e estado. Bloqueia login e não reativa por recadastro.
+- Efeitos efetivos da exclusão lógica e FKs: avaliações e comentários ficam ocultos de imediato,
+  deixam de compor agregados/consultas públicas e são purgados após sete dias configuráveis.
+  `avaliacoes.usuario_id` é obrigatório e sem `ON DELETE CASCADE`, portanto a conta mínima
+  preserva a referência durante a janela; não há desvinculação/anomização manual das notas.
+  Na purga, avaliações, versões, denúncias, agradecimentos, decisões vinculadas e votos da
+  versão são removidos transacionalmente; FKs são tratadas pela purga explícita (não por uma
+  exclusão física direta da conta). Sessões e tokens são removidos na exclusão lógica.
+  `votos_comentario.usuario_id` usa `ON DELETE CASCADE`, mas o serviço também remove votos
+  feitos pela conta; votos de outras contas só saem quando a versão é purgada. FKs para
+  `decisoes_moderacao.moderador_id` e `denuncias.denunciante_id` aceitam NULL;
+  `decisoes_identidade.usuario_id` é obrigatório e reforça a preservação da conta
+  mínima. `sessoes_usuario`, tokens e votos têm suas próprias FKs e remoção no ciclo descrito.
+- Atendimento registra e encaminha pedidos; a allowlist de atendentes não concede autoria,
+  moderação ou acesso administrativo ao banco. Retirada exige sessão do autor; remoção
+  por violação exige moderador elegível no fluxo existente. Operações manuais sobre
+  conta exigem verificação proporcional e executor técnico com acesso/autorização próprios,
+  sem solicitar senha, cookie ou token de sessão do titular.
+- Retirada de comentário permanece distinta: oculta o texto, encerra denúncias como
+  `CONTEUDO_RETIRADO` e mantém a avaliação estruturada. Desativação de acesso não equivale
+  à retirada nem à exclusão lógica, que oculta as avaliações/comentários da conta.
+- Limites reais de backups: não foi criado backup de produção nem validada restauração real.
+  A #266 ensaiou `pg_dump`/`pg_restore` com dados sintéticos em banco local; não comprovou
+  rotina, retenção nem deleção seletiva em cópias hospedadas. Restauração/reaplicação de
+  exclusões é procedimento operacional pendente de validação; não prometer apagamento
+  instantâneo em backups.
+
+### 3. Política de moderação e revisão de decisões (#264)
+- Critérios objetivos de conteúdo proibido em comentários textuais: ofensas pessoais,
+  xingamentos, palavrões, ameaças, discriminação de qualquer natureza, exposição de dados
+  pessoais de estudantes/terceiros, spam e manifestações comprovadamente falsas.
+- Exemplos claros distinguem crítica acadêmica legítima de infração:
+  - *Crítica permitida:* avaliações sobre metodologia, ritmo de aula, disponibilidade de material,
+    critérios de avaliação, clareza didática e exigência da disciplina (mesmo com tom severo
+    ou desfavorável);
+  - *Violação:* atribuição de adjetivos pejorativos à pessoa do docente, ataques à honra,
+    ameaças, assédio, menção a dados de contato particulares ou declarações discriminatórias.
+- Discordância do docente com a avaliação, notas desfavoráveis ou impopularidade de turmas
+  não justificam remoção de comentário nem conferem poder de veto ao professor ou departamento.
+- Fluxo real de moderação:
+  - Triagem automática (quando habilitada) executa filtro local (léxico, homoglifos e substituições
+    numéricas autorizadas) e API de moderação externa. Comentários sem nenhum sinal são
+    publicados automaticamente;
+  - Comentários com sinal, possível exposição de dados, falha de conexão, indisponibilidade ou
+    exaustão de cota permanecem no estado `pendente` para revisão humana; não há rejeição
+    automática pela IA;
+  - Uma única ocorrência fundamentada independe de volume de denúncias para ser analisada por
+    um moderador humano. O limiar de 50 contas autenticadas distintas com denúncia aberta é
+    apenas um gatilho de suspensão preventiva automática do texto público, e não um requisito
+    mínimo para análise manual.
+- Revisão manual de decisão: solicitantes ou autores que discordem de uma decisão de moderação
+  podem requerer revisão manual pelo canal de contato em `/contato`, enviando complemento com a
+  fundamentação do pedido. A revisão é realizada por moderador elegível diferente do que tomou a
+  decisão original, observados os impedimentos de autoria e denúncia. A revisão não
+  recupera texto apagado nem cria transições: somente uma versão SUSPENSA pode usar
+  RESTAURAR; REMOVIDO/REJEITADO não são restauráveis pelo fluxo existente. A resposta
+  deve explicar a providência possível ou o limite encontrado, sem prometer reversão.
+- Na retenção vigente, REJEITAR apaga o texto imediatamente e preserva metadados da
+  decisão sem novo prazo geral definido. REMOVER/RETIRAR agendam purga da versão e
+  dependentes após sete dias configuráveis. Outras decisões vencidas são descartadas
+  pela rotina de moderação; não prometer eliminação de toda decisão em sete dias.
+- Independência das avaliações e votos: a moderação de texto não altera as notas ou critérios
+  estruturados da avaliação (RF14/RF15). Votos de utilidade de comentários (#278), já integrados
+  em develop, destinam-se à relevância; não constituem denúncia, não acionam moderação e não
+  interferem no cômputo das notas. Seguem o ciclo de descarte aprovado da versão, sem retenção
+  adicional.
+
 Especificação de requisitos do sistema de **Avaliação de Professores e Disciplinas da UnB**,
 desenvolvido para a disciplina de Métodos de Desenvolvimento de Software (MDS) 2026/2.
 
@@ -192,6 +440,32 @@ A P2 é quem torna o produto viável: sem ela a base nasce vazia e a P1 não é 
 10. O autor acompanha na aplicação o estado do próprio comentário, incluindo a distinção
     entre versão pública e substituto em revisão. Isso não dá acesso a identidades de
     denunciantes ou aos registros privados de moderação.
+
+### RF20 — Utilidade do comentário (#278, R2 de 16/11/2026)
+
+**Estado:** escopo autorizado pelo PO na #278 e na solicitação de implementação.
+
+- Conta estudantil com e-mail confirmado pode marcar útil ou não útil na versão publicada
+  de comentário de outra conta. Uma conta tem no máximo um voto por versão; repetir,
+  trocar e retirar são operações idempotentes, com identidade validada no servidor.
+- Visitantes e contas não confirmadas podem consultar contagens. Somente a própria conta
+  recebe seu estado de voto; não há lista pública ou interna nova de votantes.
+- Versão indisponível não aceita votos nem divulga contagens/estado. Substituto começa
+  sem votos herdados. Suspensão conserva os votos junto da versão; restauração da mesma
+  versão preserva-os. Rejeição/substituição descarta votos com o texto; retirada/remoção
+  segue os sete dias existentes, apagando votos no descarte. Exclusão física da versão
+  ou da conta elimina os respectivos votos. Não há arquivo ou histórico de votos.
+- Essa aplicação do ciclo da versão aos votos não amplia retenção. Não foi localizada
+  regra anterior específica de votos: registrar no PR como ponto a confirmar na #263.
+- Votos não alteram ordenação, notas/agregados, denúncias, publicação ou moderação.
+  Crítica impopular permanece sujeita às mesmas regras de qualquer comentário.
+- Controles têm rótulos, foco visível preservado após o envio, teclado e estados de
+  carregamento e erro, em desktop e celular. Falha não apresenta sucesso ou contagem inventada.
+
+Critérios verificáveis: autorização (visitante/não confirmado/próprio autor), identidade
+não fornecida pelo cliente, unicidade inclusive concorrente, repetição/troca/retirada,
+privacidade por sessão, versões sem herança, indisponibilidade, descarte e isolamento de
+notas/denúncias/estado/ordenação. Sem ranking, fraude ou serviço/dependência novos.
 
 ### RF21 — Regras de denúncia
 
@@ -746,6 +1020,52 @@ versão anterior durante pendência; falha/limite sem perda dos critérios; bloq
 local de dados; retirada concorrente sem republicação; não contornar casos
 suspensos/denunciados; auditoria com ator sistema. [Guia](moderacao-ia.md).
 
+### Evolução de RF20 — etapa inicial da #252, autorizada em 15/11/2026
+
+Fonte: após consultar a [PR #258](https://github.com/unb-mds/2026-02-UnDb/pull/258) e o
+[parecer de Gabriel](https://github.com/unb-mds/2026-02-UnDb/pull/258#pullrequestreview-5912949613),
+o solicitante esclareceu nesta sessão que Gabriel tem a mesma autoridade de decisão de
+Nicolas e lhe delegou os pontos sem decisão explícita. Em resposta às perguntas de escopo,
+aprovou explicitamente a primeira etapa e seus critérios e autorizou implementar/validar
+localmente com rótulos exploratórios, mantendo homologação e ativação pendentes.
+A aprovação da PR anterior era exclusivamente documental; não é a fonte desta autorização funcional.
+
+- Complementar a identificação de possíveis ofensas disfarçadas sem perder nenhum sinal
+  ou categoria do filtro vigente. A detecção adicional é opcional e desativada por padrão;
+  desativá-la deve restaurar o comportamento lexical anterior sem desligar filtro, IA ou triagem.
+- Escopo aprovado: representações Unicode de compatibilidade, conjunto limitado de
+  invisíveis/homoglifos da proposta e separadores/repetições dentro de termos conhecidos,
+  com fronteiras de palavras, até três separadores e quatro repetições por posição.
+- Substituições de letras por números, incluindo `m3rda`/`m4rda`, não pertencem a esta etapa.
+  Não mudar lista, provedor/modelo nem enviar texto normalizado no payload externo.
+- Trabalhar em cópia derivada para análise; preservar texto original, privacidade, permissões,
+  retenção, substituições e critérios estruturados. Sinais/falhas mantêm revisão humana, sem
+  rejeição automática; publicação sem sinais continua conforme a #239.
+- Aceite local: preservar as detecções e categorias anteriores, incluindo U+FE0F/U+034F;
+  detectar os casos das técnicas delimitadas e não acrescentar sinais nos controles negativos
+  atuais. A meta de 90% do estudo não foi adotada como critério desta etapa incremental.
+- Homologação humana dos rótulos, avaliação adicional e ativação em produção continuam pendentes.
+  Esta autorização não permite habilitar a melhoria em produção ou usar comentários reais nos ensaios.
+
+### Ampliação de RF20 — substituições numéricas da #252 (15/11/2026)
+
+Fonte: solicitação explícita posterior do mesmo solicitante nesta sessão:
+“inclua o tratamento para m3rda, p0rra e entre outros”. Essa autorização amplia a
+primeira etapa; a exclusão de números acima descreve o escopo anterior.
+
+- Detectar substituições numéricas por posição de termos conhecidos, incluindo `m3rda`
+  e `p0rra`, sem transformar globalmente os números do comentário nem ampliar a lista.
+- Usar correspondência delimitada por palavras/expressões, somando aos sinais já existentes.
+  Resultado aproximado é sinal para revisão humana; não rejeitar automaticamente.
+- A ampliação numérica tem habilitação própria, desligada por padrão e dependente do
+  complemento já existente. Desligá-la restaura a primeira etapa sem desligar o filtro anterior.
+- Números acadêmicos e identificadores maiores devem manter suas fronteiras. Limitação técnica
+  a medir: um identificador isolado igual à grafia disfarçada pode ser sinalizado. Registrar os
+  falsos positivos exploratórios, sem criar exceções semânticas ou declarar adequação definitiva.
+  Isso não estabelece tolerância de falsos positivos homologada.
+- Permanecem pendentes homologação dos rótulos e autorização de ativação em produção.
+  Não foi autorizada a exceção `4→e` para `m4rda`, nem novo modelo/provedor ou envio de dados reais.
+
 ### RF24 — Recuperação de senha
 
 **Estado:** validado pelo solicitante nesta conversa em 15/11/2026, ao aprovar
@@ -763,3 +1083,34 @@ invalida os demais links de recuperação e encerra as sessões anteriores. Uma 
 no envio não altera a senha nem invalida os links anteriores. Não há login automático.
 O adaptador local continua mostrando o link nos logs; envio externo segue a configuração
 operacional já existente, sem ativação de provedor nesta mudança.
+
+### Revisão final — autorização do solicitante em 18/11/2026
+
+Fonte: pedido nesta conversa para implementar reenvio de confirmação, revisar a home
+(especialmente os destaques), melhorar a apresentação do catálogo de professores e
+disciplinas e permitir consultar as próprias avaliações em “Minha conta”. Trabalho
+na `develop`; PR e integração final aguardam a PR da Yasmin.
+
+- **[RF27] Consulta das próprias avaliações — validado pelo pedido explícito:** a pessoa
+  autenticada pode ver na própria conta as avaliações que enviou. As respostas individuais
+  continuam privadas; essa consulta não libera acesso às avaliações individuais alheias.
+- Reenvio mantém o contrato e as proteções já definidos na restrição de autenticação.
+- A revisão visual mantém o catálogo, busca e critérios existentes. Os destaques atuais
+  são por quantidade de avaliações; não há autorização para inventar contagens de visitas.
+
+| Escopo | Origem | Estado nesta revisão |
+|---|---|---|
+| RF27 | Solicitação explícita de 18/11/2026 | Implementação e validação local; integração pendente |
+| Reenvio de confirmação | Restrição de autenticação e pedido de 18/11/2026 | Exposição do fluxo existente na interface |
+| Home e catálogo | Pedido de 18/11/2026 | Revisão de apresentação; comportamento público preservado |
+
+### Conferência de privacidade #265 — 20/11/2026
+
+Fonte: escopo vigente da #265 e autorização explícita de Nicolas nesta conversa
+para executar o trabalho pendente dentro da revisão geral. Preservar RF22, RF25,
+RF26, RF27, mínimo de três e retenção vigente. Revalidar permissão de atendimento
+ao retornar à aba e limpar dados privados após perda de sessão/permissão, sem
+reexibi-los por uma resposta anterior. Isso aplica a autorização já existente,
+sem criar novo papel, campo público ou prazo de guarda. Conferência hospedada
+e aceite final continuam para #168. Matriz/evidências em
+[privacidade das APIs](estudos/privacidade-apis-265-revisao-final.md).

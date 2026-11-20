@@ -49,7 +49,11 @@ def main():
         assert any(v.estado.value == "RETIRADO" for v in versoes)
         assert all(v.texto is None for v in versoes if v.estado.value == "SUBSTITUIDO")
         assert (
-            db.scalar(select(func.count(Denuncia.id)).where(Denuncia.comentario_versao_id.in_(ids)))
+            db.scalar(
+                select(func.count(Denuncia.id)).where(
+                    Denuncia.comentario_versao_id.in_(ids), Denuncia.encerrada_em.is_(None)
+                )
+            )
             == 0
         )
         assert (

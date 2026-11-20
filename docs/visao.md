@@ -29,6 +29,27 @@ avaliações que sustenta cada resultado e integra dados institucionais público
 O objetivo é permitir uma decisão de matrícula mais fundamentada,
 **independentemente de quantas pessoas o estudante conheça no curso**.
 
+### Leitura dos resultados e limites
+
+A motivação acadêmica é ampliar o acesso às experiências sem depender de contatos pessoais
+(requisitos §§1–2). O UnDb é um projeto estudantil independente e complementar aos processos
+oficiais; esta apresentação não afirma autorização ou endosso institucional.
+
+Conforme RF08–RF13, RNF02 e decisões da seção 11 dos requisitos, os indicadores são por
+professor–disciplina, sem nota geral; o mínimo de três protege apenas a exibição dos
+indicadores. Contagem e insuficiência permanecem visíveis abaixo dele. Volume de respostas
+não indica qualidade. A metodologia detalhada está nas seções 4–6 de `specs.md` e em `/sobre`.
+
+Opiniões subjetivas, amostras pequenas e mudanças ao longo do tempo limitam a leitura:
+não há garantia de veracidade ou representatividade. A confirmação do e-mail institucional
+não comprova matrícula nem experiência na disciplina (RF01/RF14 e seção 11). A autoria da
+conta não é divulgada publicamente, mas existe associação interna; texto livre e o mínimo
+de três não garantem anonimato (RF20.3/RNF02).
+
+O [registro de revisão da metodologia](estudos/revisao-pr277.md) acompanha os insumos
+pendentes de moderação, privacidade, Política e Termos para retomada pelas entregas
+responsáveis; não substitui a aprovação humana da comunicação.
+
 ## 4. Público e partes interessadas
 
 | Público | Necessidade | Papel no produto |
@@ -72,7 +93,9 @@ O objetivo é permitir uma decisão de matrícula mais fundamentada,
 
 - atualização periódica dos dados importados do SIGAA;
 - comentário opcional da avaliação estudante/professor/disciplina, com leitura pública
-  sem autoria identificável e aprovação humana prévia nesta etapa;
+  sem divulgação pública da identidade da conta autora. Com a triagem #239 habilitada,
+  publicação automática somente sem sinais locais/IA; demais casos aguardam revisão humana.
+  Sem habilitação, aprovação humana prévia;
 - denúncia de comentário por usuários autenticados ou visitantes, com origens separadas
   e suspensão após 50 contas distintas com denúncia aberta da mesma versão;
 - fila para aprovação, denúncias e suspensões, com moderadores designados pelo PO,
@@ -161,9 +184,9 @@ fatores decisivos de escolha nem medição do peso relativo entre fatores.
 - acompanhar a execução e publicação pública conforme o [registro de hospedagem](hospedagem.md),
   incluindo recuperação, tarefas contínuas e promoção das entregas de `develop`;
 - validar os requisitos não-funcionais ainda propostos, exceto o RNF02 já validado.
-- definir a lista do filtro de termos; enquanto isso, manter aprovação humana prévia;
-- avaliar futuramente a moderação por IA sem aprovação humana prévia, sem considerar
-  essa intenção condicional como substituição já aprovada do fluxo inicial.
+- revisar a lista do filtro e os limites da triagem vigente (#239); sinais, falhas, limites
+  e configuração incompleta preservam pendência humana, sem rejeição automática. A ausência
+  de sinais não garante adequação (RF20.4 e evolução da moderação nos requisitos).
 
 ## 10. Releases
 
@@ -186,3 +209,22 @@ verificação técnica integradas não representam aceite geral da Release 2.
 - [Arquitetura](arquitetura.md) — decisões e estrutura técnica;
 - [Board de desenvolvimento](https://github.com/orgs/unb-mds/projects/60) — acompanhamento
   das entregas.
+
+## Transparência da R2 — RF26
+
+Fonte: [RF26 em requisitos](requisitos.md#rf26-transparencia-termos-e-ciencia-no-cadastro-269).
+O UnDb é um projeto acadêmico estudantil independente e sem fins lucrativos, sem vínculo
+oficial/endosso comprovado da UnB. Termos e Política públicos explicam participação,
+privacidade e limites reais. Novas contas registram ciência dos Termos com versão/data;
+contas anteriores mantêm acesso sem ciência retroativa inventada. Ciência não equivale
+a consentimento genérico. [Inventário e limites](transparencia.md).
+
+
+### Utilidade dos comentários — Release 2 (#278)
+
+Fonte: `docs/requisitos.md`, RF20 — Utilidade do comentário, escopo aprovado em
+16/11/2026. Conta estudantil confirmada vota útil/não útil em comentário publicado de
+outra conta, podendo trocar/retirar. Visitantes veem contagens; somente a própria conta
+recebe seu voto. Votos pertencem à versão, não passam a substitutos e seguem seu descarte,
+sem retenção ampliada. Não alteram ordem, notas, denúncias ou moderação. A disponibilidade
+da entrega depende das verificações registradas no PR, sem alegação de publicação.

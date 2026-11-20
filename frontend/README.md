@@ -368,3 +368,49 @@ usa a arte aprovada em `public/undb-preview.png`, com Open Graph e Twitter Card.
 `node tests/preview-compartilhamento-browser.mjs` verifica o PNG e o HTML inicial de
 produção local e integra `test:browser`. Publicação HTTPS e teste real no WhatsApp
 continuam pendentes; veja a [auditoria da PR](../docs/estudos/auditoria-pr248.md).
+
+## Transparência e ciência dos Termos — #269
+
+`/privacidade` e `/termos-de-uso` são páginas públicas com versão/data, sumário e links
+no rodapé, Sobre e cadastro. A ciência no novo cadastro é inicialmente desmarcada e
+exige versão vigente; o backend registra a data. Contas anteriores mantêm acesso.
+Fontes: [RF26](../docs/requisitos.md) e [inventário e limites](../docs/transparencia.md).
+
+Após o build, `npm run test:termos` usa a infraestrutura CDP existente, API controlada
+e `BROWSER_PATH` para verificar 320/768/1280 px, teclado, links e cadastro.
+`PREVIEW_DIR` salva capturas; teste HTTP/persistência real está em `backend/tests/test_termos.py`.
+O tema do produto permanece escuro nas duas preferências do sistema.
+
+## Revisão final local — 18/11/2026
+
+A base desta revisão é `develop`. A home mostra disciplinas por quantidade de
+avaliações e consulta somente `/api/disciplinas/destaques`; a comparação completa
+continua no detalhe da disciplina. O catálogo público paginado usa cartões com
+código, nome e unidade acadêmica, preservando os links HTML para descoberta.
+
+Em `/login`, a conta autenticada apresenta “Minhas avaliações”, com os critérios
+individuais privados e paginação. A lista é consultada com a sessão do navegador,
+sem cache compartilhado, e é descartada ao sair ou revalidar a sessão. Comentários
+continuam nos fluxos já existentes; não são incluídos nessa lista.
+
+`/reenviar-confirmacao` oferece o reenvio existente na API. Os atalhos de login,
+cadastro e confirmação inválida preservam apenas um `returnTo` interno validado.
+As respostas continuam neutras e respeitam os limites de autenticação.
+
+`npm run test:revisao-final` verifica os novos fluxos com HTTP sintético, além das
+larguras 320/768/1280 e temas claro/escuro. Use `BROWSER_PATH` para Brave/Chromium/Edge
+e `PREVIEW_DIR` para as capturas, conforme os runners existentes. Esse teste também
+integra `npm run test:browser`; autoria e persistência têm verificações no backend.
+
+Next.js e eslint-config-next foram atualizados juntos para 16.4.6. O lockfile foi
+conferido no Node 24 Linux do Docker. Resultados, limitações e avisos restantes estão
+em [revisão final](../docs/estudos/revisao-final-local-2026-11-18.md).
+
+Na revisão mobile, o catálogo passou a 12 registros por página. Listas longas de
+disciplinas no perfil podem ser expandidas por “Ver mais disciplinas”; os links
+continuam disponíveis no HTML. A frase de abertura da home foi restaurada a pedido
+do solicitante.
+
+A continuidade de 20/11 incorpora a revisão de privacidade #265 e revalida acesso
+ao atendimento ao retornar à aba, descartando respostas antigas após perda de
+permissão. Ver [revisão geral de implementação](../docs/estudos/revisao-geral-implementacao-2026-11-20.md).

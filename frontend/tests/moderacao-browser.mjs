@@ -35,6 +35,8 @@ const consultas = [];
 const fixture = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3100");
   res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Expose-Headers", "Retry-After");
+  res.setHeader("Retry-After", "37");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Content-Type", "application/json");
@@ -147,7 +149,7 @@ try {
   if (!real) {
     atrasoFila = 600;
     await navegar(); await esperarTexto("Carregando fila de moderação"); await esperarTexto("Selecione um comentário para analisar");
-    for (const [status, esperado] of [[401, "Entre na sua conta"], [403, "Acesso não permitido"], [503, "Não foi possível carregar"]]) {
+    for (const [status, esperado] of [[401, "Entre na sua conta"], [403, "Acesso não permitido"], [503, "Aguarde 37 segundos"]]) {
       acesso = status; await clicar("Atualizar fila"); await esperarTexto(esperado);
       assert.ok(!(await texto()).includes("Autor de teste"));
       assert.equal(await avaliar("document.querySelectorAll('[aria-label=\"Comentários na fila\"] button').length"), 0);
@@ -201,11 +203,15 @@ try {
       assert.equal(envios.at(-1).acao, acao); assert.ok(envios.at(-1).motivo.trim()); assert.ok(envios.at(-1).cookie?.includes("undb_session"));
       assert.ok(!(await texto()).includes("Autor de teste"), "painel antigo removido após ação");
     }
-    for (const [status, esperado] of [[403, "outro moderador"], [409, "estado do conteúdo mudou"], [503, "Não foi possível confirmar"], [422, "Revise a ação"]]) {
+    for (const [status, esperado] of [[403, "outro moderador"], [409, "estado do conteúdo mudou"], [429, "Aguarde 37 segundos"], [503, "Aguarde 37 segundos"], [422, "Revise a ação"]]) {
       reiniciar(); statusAcao = status; mudarNoConflito = status === 409;
       await navegar(); await esperarTexto("Selecione um comentário"); await selecionar(uuid(1));
       await preencher("APROVAR"); await clicar("Confirmar decisão"); await esperarTexto(esperado);
       assert.ok(!(await texto()).includes("Decisão registrada")); assert.ok(!(await texto()).includes("Rejeição privada"));
+      if ([429,503].includes(status)) {
+        assert.equal(await avaliar('document.querySelector("#acao-moderacao").value'), "APROVAR");
+        assert.equal(await avaliar('document.querySelector("textarea").value'), "Decisão humana de teste");
+      }
       if (status === 403) {
         await esperarTexto("Selecione um comentário");
         await avaliar("document.querySelector('[aria-label=\"Comentários na fila\"] button').click()");
@@ -223,7 +229,7 @@ try {
     reiniciar(); falharAtualizacao = true;
     await clicar("Atualizar fila"); await esperarTexto("Selecione um comentário"); await selecionar(uuid(1));
     await preencher("APROVAR"); await clicar("Confirmar decisão");
-    await esperarTexto("Decisão registrada"); await esperarTexto("Não foi possível carregar");
+    await esperarTexto("Decisão registrada"); await esperarTexto("Aguarde 37 segundos");
     assert.equal(await avaliar("document.querySelectorAll('[aria-label=\"Comentários na fila\"] button').length"), 0, "não mantém fila obsoleta quando a atualização falha");
     assert.equal(await avaliar("localStorage.length + sessionStorage.length"), 0);
     console.log("Fila controlada: acesso, três estados, filtros, seis ações, motivo, 403/409/422/503, concorrência de consultas, teclado e 24 combinações de estado/largura/tema aprovados.");

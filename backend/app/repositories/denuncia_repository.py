@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session
 
 from app.models.denuncia import Agradecimento, Denuncia
@@ -18,7 +18,9 @@ def existe_da_conta(db: Session, versao_id: UUID, usuario_id: UUID) -> bool:
         db.scalar(
             select(Denuncia.id)
             .where(
-                Denuncia.comentario_versao_id == versao_id, Denuncia.denunciante_id == usuario_id
+                Denuncia.encerrada_em.is_(None),
+                Denuncia.comentario_versao_id == versao_id,
+                Denuncia.denunciante_id == usuario_id,
             )
             .limit(1)
         )
@@ -41,7 +43,7 @@ def listar(db: Session, versao_id: UUID) -> list[Denuncia]:
     return list(
         db.scalars(
             select(Denuncia)
-            .where(Denuncia.comentario_versao_id == versao_id)
+            .where(Denuncia.encerrada_em.is_(None), Denuncia.comentario_versao_id == versao_id)
             .order_by(Denuncia.created_at, Denuncia.id)
         )
     )
@@ -51,7 +53,7 @@ def contar_contas(db: Session, versao_id: UUID) -> int:
     return (
         db.scalar(
             select(func.count(func.distinct(Denuncia.denunciante_id))).where(
-                Denuncia.comentario_versao_id == versao_id
+                Denuncia.encerrada_em.is_(None), Denuncia.comentario_versao_id == versao_id
             )
         )
         or 0
@@ -67,13 +69,18 @@ def encerrar(db: Session, versao_id: UUID, motivo: MotivoEncerramento) -> None:
         "VERSAO_SUBSTITUIDA",
     ):
         raise ValueError("motivo de encerramento invalido")
-    db.execute(delete(Denuncia).where(Denuncia.comentario_versao_id == versao_id))
+    db.execute(
+        update(Denuncia)
+        .where(Denuncia.encerrada_em.is_(None), Denuncia.comentario_versao_id == versao_id)
+        .values(encerrada_em=func.now())
+    )
 
 
 def agradecer(db: Session, versao_id: UUID, evento: str, agora: datetime) -> None:
     contas = db.scalars(
         select(Denuncia.denunciante_id)
         .where(
+            Denuncia.encerrada_em.is_(None),
             Denuncia.comentario_versao_id == versao_id,
             Denuncia.denunciante_id.is_not(None),
         )

@@ -2,10 +2,13 @@
 
 from uuid import UUID
 
+from app.repositories import voto_comentario_repository
+
 from sqlalchemy.orm import Session
 
 from app.core import config
-from app.domain.triagem_comentario import VERSAO_LISTA, categorias_lexicais, contem_dados_sensiveis
+from app.domain.triagem_comentario import VERSAO_LISTA, contem_dados_sensiveis
+from app.domain.filtro_moderacao import categorias_para_triagem, versao_filtro
 from app.models.enums import EstadoComentario
 from app.repositories import comentario_repository, denuncia_repository, moderacao_repository
 from app.services import openai_triagem
@@ -23,6 +26,8 @@ def processar(db: Session, versao_id: UUID) -> EstadoComentario | None:
         and config.OPENAI_API_KEY
     ):
         return EstadoComentario.PENDENTE
+    disfarces_ativos = config.MODERACAO_DISFARCES_ATIVO
+    substituicoes_ativas = config.MODERACAO_SUBSTITUICOES_ATIVAS
     try:
         versao = comentario_repository.obter_por_id(db, versao_id)
         if versao is None or versao.estado != EstadoComentario.PENDENTE:
@@ -32,7 +37,9 @@ def processar(db: Session, versao_id: UUID) -> EstadoComentario | None:
         if (
             not texto
             or len(texto) > 500
-            or categorias_lexicais(texto)
+            or categorias_para_triagem(
+                texto, disfarces_ativos=disfarces_ativos, substituicoes_ativas=substituicoes_ativas
+            )
             or contem_dados_sensiveis(texto, (autor.nome, autor.email))
         ):
             return EstadoComentario.PENDENTE
@@ -64,6 +71,7 @@ def processar(db: Session, versao_id: UUID) -> EstadoComentario | None:
         if atual is not None:
             atual.estado = EstadoComentario.SUBSTITUIDO
             atual.texto = None
+            voto_comentario_repository.apagar_da_versao(db, atual.id)
             atual.descartar_em = None
             atual.updated_at = agora
         versao.estado = EstadoComentario.PUBLICADO
@@ -73,7 +81,7 @@ def processar(db: Session, versao_id: UUID) -> EstadoComentario | None:
             comentario_versao_id=versao.id,
             moderador_id=None,
             acao="APROVAR",
-            motivo=f"Publicação automática sem sinais. {openai_triagem.VERSAO_INTEGRACAO}; lista {VERSAO_LISTA}; modelo {resultado.modelo}",
+            motivo=f"Publicação automática sem sinais. {openai_triagem.VERSAO_INTEGRACAO}; lista {VERSAO_LISTA}; filtro {versao_filtro(disfarces_ativos, substituicoes_ativas)}; modelo {resultado.modelo}",
             estado_anterior=EstadoComentario.PENDENTE.value,
             estado_posterior=EstadoComentario.PUBLICADO.value,
             created_at=agora,

@@ -33,7 +33,7 @@ def main():
         request = Request(
             "http://127.0.0.1:8127" + path,
             data=None if body is None else json.dumps(body).encode(),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Origin": "http://localhost:3000"},
         )
         with cliente.open(request, timeout=5) as response:
             return json.load(response)

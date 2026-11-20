@@ -1,5 +1,97 @@
 # specs.md — Especificação de implementação
 
+## Recuperação isolada — #267
+
+Derivado de `docs/requisitos.md`, escopo autorizado da #267 em 17/11/2026.
+O runner `scripts/recovery_drill.py` cria apenas cluster/bancos sintéticos novos,
+em rede Docker interna sem portas publicadas, restaura em destino distinto e
+executa `tests.recovery_scenario` com o banco real. Schema/revisão/constraints,
+dados/vínculos, jornada, sessão/autorização e retenção são verificados, inclusive
+reaplicação de exclusões/retirada/revogações sintéticas antes do encerramento do
+ensaio. Não instala mecanismo de produção. Canal, backup real e diário operacional
+dependem dos fatos registrados em `docs/operacao/incidentes-recuperacao.md`.
+Preserva o Bloco 7 da #266 e não altera contratos, schema ou política de guarda.
+
+## Retenção — #266, Bloco 5
+
+Derivado de docs/requisitos.md, decisão B do PO. DELETE /api/auth/conta exclui
+logicamente a própria conta autenticada, revoga credenciais e oculta conteúdo.
+DELETE /api/avaliacoes/{id} exclui avaliação própria; DELETE
+/api/moderacao/avaliacoes/{id} permite remoção urgente por moderador confirmado.
+Essas ações não passam pelo limitador e preservam CSRF/autorização. Conteúdo
+oculto não participa das consultas públicas e não pode ser reativado por upsert
+antes da purga. Estado/migração e job seguem docs/seguranca/retencao-bloco-5.md.
+
+## Abuso e respostas temporárias — #266, Blocos 3 e 4
+
+Derivado da restrição transversal em docs/requisitos.md, fonte PO. Avaliações,
+denúncias, canal público e operações de moderação/reconciliação recebem adaptadores
+do núcleo existente; nenhuma alteração de esquema. 429 e 503 incluem Retry-After.
+O cliente HTTP interpreta segundos ou data HTTP sem mostrar detalhes internos,
+preserva formulários e mantém alertas acessíveis. Matriz e parâmetros documentados
+em docs/seguranca/limitador-fluxos-blocos-3-4.md.
+
+## Autenticação e abuso — #266, Bloco 2
+
+Derivada da restrição transversal de autenticação em `docs/requisitos.md`, fonte:
+pedido `EXECUTAR: BLOCO 2` do PO. Núcleo do Bloco 1 será usado em todos os POST de
+autenticação, exceto logout. Conta/papel não libera login, cadastro ou tokens.
+429/503 usam Retry-After e respostas sem detalhes internos. Erros do provedor nos
+fluxos de envio recebem 202 neutro, sem expor se houve envio/conta existente.
+Novo POST `/api/auth/reenviar-confirmacao`: `{email, return_to?}`, mesmos validadores
+de cadastro/retorno, 202 neutro para conta pendente, confirmada ou inexistente.
+Sob restrição, nenhum desses endpoints pode criar usuário, sessão, token, trocar
+senha ou enviar e-mail. Confirmação/redefinição preservam prazo e uso único.
+O orçamento diário de e-mail é compartilhado e alinhado à meia-noite UTC, incluindo
+reservas sem envio; não é uma janela fixa ancorada na primeira solicitação.
+
+## Proteção de origens — #266
+
+Derivada da restrição transversal aprovada em `docs/requisitos.md` em 16/11/2026.
+Antes dos efeitos de POST/PUT/PATCH/DELETE em `/api`, conferir Origin exato na lista
+`CORS_ORIGINS`. Externo, `null`, inválido ou duplicado retorna 403 genérico. Sem Origin,
+validar origem de Referer se presente; sem ambos, negar login e operações com cookie
+`undb_session`. Outras operações sem cookie seguem seu contrato. Não inferir origem
+de Host ou cabeçalhos encaminhados; preflight e GET mantêm comportamento existente.
+Frontend usa fetch JSON com credenciais. Esse controle não autentica clientes HTTP,
+não define rate limit e não modifica os atributos/prazos da sessão.
+
+## Canal de contato, solicitações de titulares e política de moderação — RF25
+
+Derivado de `docs/requisitos.md`, RF25 (consolidação das issues #262, #263 e #264 em 17/11/2026).
+POST `/api/solicitacoes` recebe categoria, alvo, descrição e evidência textual;
+devolve protocolo UUID aleatório, chave secreta e data. Consultar e complementar usam
+POST com protocolo/chave no corpo, nunca URL. Apenas SHA-256 da chave fica persistido.
+GET `/api/atendimento` e detalhe usam sessão confirmada e UUID em allowlist própria;
+POST de eventos exige allowlist de atendentes. Leitores não podem registrar eventos.
+Campos internos de triagem, providências e identidade do atendente não são retornados ao
+solicitante. Não vincular solicitante a uma avaliação nem copiar dados de avaliadores.
+Schema independente: `solicitacoes_titulares` 1:N `eventos_solicitacoes`; autor interno
+referencia `usuarios`, sem mudar privilégios de moderadores/reconciliadores.
+Recebimento exige flags de ativação/retenção e lista de atendentes configurada.
+
+Pedidos de titulares: atendimento manual por `/contato`; a equipe verifica identidade
+proporcionalmente antes de divulgar dados privados ou executar mutações. Distinção entre:
+(a) retirada de comentário (somente autor autenticado retira texto, denúncias viram CONTEUDO_RETIRADO, versão purgada
+em 7 dias pela rotina; critérios estruturados permanecem); (b) desativação de conta (revogação de
+sessões e tokens, sem operação independente de desativação nesta entrega); e (c) exclusão lógica
+da conta conforme a decisão B/#266: credenciais e sessões removidas, conta mínima preservada,
+avaliações e comentários ocultos imediatamente e purgados após sete dias configuráveis. Não há
+desvinculação das notas; avaliações permanecem vinculadas à conta mínima até a purga. A restauração
+de cópias e reaplicação de exclusões não foram validadas em produção.
+
+Política de moderação: crítica acadêmica legítima é permitida; ofensas, ameaças, discriminação
+e exposição de dados são proibidas. Discordância docente não causa remoção. Triagem não rejeita
+automaticamente; casos com sinal aguardam revisão humana. Gatilho de 50 contas suspende exibição,
+mas uma única ocorrência fundamentada pode ser atendida manualmente. Revisão de decisão de
+moderação é solicitada por nova solicitação ou protocolo/complemento existente. Atendimento
+não concede autoria/moderação nem acesso administrativo ao banco; execução manual segue
+`docs/canal-titulares.md`, com identidade conferida e executor autorizado. Somente SUSPENSO
+admite RESTAURAR; REMOVIDO/REJEITADO não são restauráveis. REJEITAR descarta texto
+imediatamente e preserva metadados sem prazo geral novo; REMOVER/RETIRAR agendam purga
+da versão e dependentes em sete dias configuráveis. Moderação de texto não altera notas; votos de
+utilidade (#278) não são denúncias e não acionam moderação; seguem o ciclo de descarte aprovado das versões.
+
 Documento **derivado**. Fontes de verdade: [`docs/requisitos.md`](docs/requisitos.md) e
 [`docs/arquitetura.md`](docs/arquitetura.md).
 
@@ -89,6 +181,8 @@ referenciado na seção 12. As tabelas deste recorte não representam todo o mod
 | `nome` | VARCHAR(100) | obrigatório |
 | `email` | VARCHAR(150) | UNIQUE, obrigatório, domínio `@aluno.unb.br` |
 | `password_hash` | VARCHAR(255) | hash forte |
+| `termos_versao` | VARCHAR(32), nullable | RF26: versão da ciência no novo cadastro; NULL nas contas anteriores |
+| `termos_ciencia_em` | TIMESTAMPTZ, nullable | RF26: instante gerado pelo servidor; CHECK exige o par completo ou ambos NULL |
 | `email_confirmado` | BOOLEAN | default `false` |
 | `created_at` | TIMESTAMPTZ | default now |
 
@@ -200,7 +294,11 @@ Saída: objeto agregado. Devem ser testáveis unitariamente.
 As regras de agregação, empate e arredondamento foram aprovadas pelo PO e estão registradas
 na seção 11 dos requisitos, incluindo Material por maioria + moda.
 
-`total_avaliacoes` acompanha sempre o agregado (RF09).
+`total_avaliacoes` acompanha sempre o agregado (RF09). Chamada significa controle de
+presença. Dificuldade e Chamada têm apresentação neutra. O desempate de Dificuldade
+é Difícil > Médio > Fácil; o de qualidade do material é Bom > Médio > Ruim.
+Não há nota geral; destaques por quantidade não representam qualidade (restrições de
+produto e decisões da seção 11 de `docs/requisitos.md`).
 
 Se `disponibiliza_material` agregar para `false` ou `CONFLITANTE`,
 `qualidade_material` retorna `null`.
@@ -225,6 +323,13 @@ avaliações, a exibição pode permitir inferir respostas individuais (RNF02).
 **Sem nenhuma avaliação:** o professor continua aparecendo normalmente na busca e na
 comparação, com `total_avaliacoes: 0`. Ausência de avaliação nunca é apresentada como
 avaliação negativa (RF10).
+
+O mínimo aplica-se somente aos indicadores agregados por professor–disciplina, não
+aos comentários, que seguem RF20. A confirmação do e-mail institucional não comprova
+matrícula ou experiência (RF01/RF14); opiniões subjetivas, amostras pequenas e mudanças
+no tempo limitam a interpretação, sem garantia de veracidade ou representatividade.
+A associação interna da conta permanece; ocultação pública e mínimo de três não
+garantem anonimato (RF20.3/RNF02).
 
 O valor `3` é decisão de produto sem origem empírica e pode ser revisto pelo time.
 Manter como constante configurável, nunca espalhado no código.
@@ -279,9 +384,9 @@ dados suficientes. Não atribuir percentual artificial aos resultados insuficien
    seu hash é persistido.
 10. Cadastro repetido retorna a mesma resposta genérica `202`, não altera a conta existente
     e não informa se o endereço já está cadastrado.
-11. Na Release 1, `EMAIL_BACKEND=console` escreve o link no terminal e é o único modo
-    previsto. A ativação de `EMAIL_BACKEND=resend`, com chave e remetente configurados
-    externamente, fica planejada para a Release 2.
+11. `EMAIL_BACKEND=console` simula envio somente em DEBUG, sem registrar link ou
+    destinatário. O transporte Resend exige chave e remetente externos; sua configuração
+    operacional permanece pendente de validação. Ensaios usam transporte sintético privado.
 12. O cookie de sessão chama-se `undb_session`. O servidor persiste somente o hash do token
     aleatório e renova tanto `expires_at` quanto o `Max-Age` do cookie quando uma rota passa
     pela dependência de autenticação. Rotas públicas não renovam sessão.
@@ -619,6 +724,44 @@ comentario_estado: PUBLICADO/PENDENTE/null. DecisaoResponse.moderador_id é nulo
 somente para decisão do sistema. Nenhuma restauração ou rejeição automática.
 A flag MODERACAO_AUTOMATICA_ATIVA é False por padrão. Guia: docs/moderacao-ia.md.
 
+### Detecção complementar de disfarces — etapa inicial #252 (15/11/2026)
+
+Fonte: docs/requisitos.md, “Evolução de RF20 — etapa inicial da #252”. Escopo e critérios
+aprovados pelo solicitante após a delegação de decisão esclarecida nesta sessão.
+
+`MODERACAO_DISFARCES_ATIVO=False` controla somente o complemento. O filtro vigente
+continua independente e seus sinais/categorias são unidos aos novos. U+FE0F e U+034F
+devem continuar detectados. Em `filtro_moderacao.py`, NFKD/casefold/remoção de marcas
+com classe combinante não zero são aplicados a uma cópia, sem compactar espaços.
+Remover explicitamente U+200B/U+200C/U+200D/U+FEFF/U+2060 e mapear somente
+`а→a`, `е→e`, `о→o`, `і→i`, `с→c` (caracteres de origem cirílicos).
+
+Padrões são pré-compilados da lista existente, com fronteiras Unicode de palavra;
+até três espaços/pontos/hífens/sublinhados/asteriscos entre letras e até quatro
+repetições contíguas por posição. Entre palavras da expressão, exigir um a três
+separadores. Limites novos não retiram detecções já cobertas pelo filtro anterior.
+Não substituir números. Não mudar o texto armazenado ou o texto enviado à IA.
+
+O fluxo automático e o apoio privado usam a união; falhas mantêm revisão e no apoio
+retornam `INDISPONIVEL`, sem expor o erro bruto. Publicação automática registra a versão
+`252-disfarces-v1` (ou `239-lexical-v1` com complemento desligado) no motivo privado
+da auditoria existente. Não há alteração de schema/contrato ou retenção.
+Desligar somente a flag nova restaura o filtro anterior. Homologação dos rótulos e
+ativação em produção permanecem pendentes; não há autorização de deploy/ativação.
+
+### Ampliação numérica da #252
+
+Fonte: docs/requisitos.md, “Ampliação de RF20 — substituições numéricas da #252”.
+`MODERACAO_SUBSTITUICOES_ATIVAS=False`, dependente de `MODERACAO_DISFARCES_ATIVO`,
+adiciona padrões pré-compilados por posição: `a4`, `e3`, `i1`, `o0`, `s5`, `t7`.
+Não aplica substituições globais, substring ou similaridade. Mantém fronteiras e limites
+da primeira etapa e soma todas as categorias anteriores. Versão efetiva, com ambas as flags:
+`252-disfarces-leet-v2`; desligar só números retorna a `252-disfarces-v1`.
+Texto original e payload externo são preservados. `m4rda` não recebe exceção `4→e`.
+Identificadores isolados iguais a um termo disfarçado também podem gerar sinal; não criar
+exceção automática por contexto técnico, nem tratar sinal como decisão de rejeição.
+Homologação/ativação em produção permanecem pendentes.
+
 ### Persistência da recuperação de senha — RF24
 
 `password_reset_tokens`: `id` UUID PK, `usuario_id` UUID FK obrigatória para
@@ -627,3 +770,66 @@ obrigatório, `used_at` TIMESTAMPTZ opcional e `created_at` TIMESTAMPTZ obrigat�
 Índice em `usuario_id` para invalidar os links da conta. Não armazena token aberto,
 senha ou cópia do e-mail; mantém o padrão de tokens de confirmação sem permitir
 uso cruzado entre as duas finalidades.
+
+## Transparência e ciência dos Termos — RF26 / #269
+
+Derivado de `docs/requisitos.md`, RF26, autorizado pelo PO em 16–17/11/2026.
+
+- `POST /api/auth/cadastro` exige `ciencia_termos: true` (booleano estrito) e
+  `termos_versao: "2026-11-17"`. Ausência/falso/tipo indevido/versão diferente retorna
+  422 antes dos efeitos. Não aceita data enviada pelo cliente. Resposta neutra 202 preservada.
+- `usuarios.termos_versao VARCHAR(32) NULL` e `termos_ciencia_em TIMESTAMPTZ NULL`:
+  par ausente nas contas antigas ou completo nas novas, garantido por CHECK. Sem default
+  ou backfill; serviço registra instante UTC na mesma transação da criação. Não são
+  adicionados a respostas públicas. Nenhum índice novo: não há consulta por esses campos.
+- Páginas públicas `/privacidade` e `/termos-de-uso` com versão/data e links no rodapé,
+  cadastro e Sobre; ciência inicialmente desmarcada, sem novo bloqueio de contas antigas.
+- Natureza acadêmica estudantil independente e sem fins lucrativos; sem endosso oficial
+  comprovado. Inventário factual e limites em `docs/transparencia.md`.
+
+
+### Votos de utilidade — #278
+
+Fonte: `docs/requisitos.md`, RF20 — Utilidade do comentário (R2, 16/11/2026).
+
+- `GET /api/comentarios/{id}/utilidade`: sessão opcional; 200 com
+  `{uteis: integer >= 0, nao_uteis: integer >= 0, meu_voto: "UTIL" | "NAO_UTIL" | null}`.
+  O voto é sempre da sessão atual, nunca de um identificador recebido. Sem sessão, null.
+- `POST /api/comentarios/{id}/voto`: sessão confirmada; corpo exclusivo
+  `{voto: "UTIL" | "NAO_UTIL" | null}`. null retira. Retorna o mesmo resumo (200).
+  Repetir/trocar/retirar é idempotente. 401 sem sessão; 403 e-mail não confirmado ou
+  voto no próprio comentário; 404 alvo inexistente/não publicado/sem texto, com mensagem
+  única; 422 corpo/UUID inválido. Respostas no-store/no-referrer, inclusive erros.
+- Tabela `votos_comentario`: PK composta `(comentario_versao_id, usuario_id)`, FKs com
+  ON DELETE CASCADE para versão/conta e CHECK de voto. Sem timestamp ou auditoria nova.
+  Escrita usa lock da avaliação/versão existente e upsert; não atualiza a versão.
+- Contagens são calculadas no banco somente para a versão publicada solicitada;
+  ordenação da lista pública e seu contrato atual são preservados. Nenhuma identidade
+  de votante integra respostas. Aplicar o ciclo de descarte da versão, sem retenção nova.
+
+## Revisão final local — 18/11/2026
+
+Derivado de `docs/requisitos.md`, seção “Revisão final” e RF27, autorizado pelo
+solicitante nesta conversa. Base: `develop`. Em 20/11/2026, Nicolas autorizou incorporar o escopo pendente da #265 à revisão; a espera pela PR da Yasmin foi substituída por essa execução local.
+
+- `GET /api/avaliacoes/minhas?pagina=1`: sessão obrigatória. Retorna `{itens, total,
+  pagina, tamanho}`; dez avaliações por página, mais recentes primeiro, desempate por ID.
+  Cada item contém os cinco critérios, ID da avaliação, professor/disciplina institucionais
+  e atualização. O usuário vem exclusivamente da sessão; avaliações excluídas são omitidas.
+  Não expõe autor, e-mail, comentários ou informações de moderação. `Cache-Control: no-store`.
+- “Minha conta”, em `/login`, consulta essa lista no navegador com a sessão existente.
+- `/reenviar-confirmacao` usa o POST existente e mantém somente o retorno interno
+  validado. Disponível no login, cadastro e erro de confirmação; respostas e limites
+  continuam os da #266.
+- A home consulta somente os seis destaques por quantidade de avaliações. Os cartões
+  levam à comparação, onde os agregados de professores continuam disponíveis.
+- O catálogo mantém a paginação e os links HTML públicos; apresentação em cartões
+  com nome, código quando aplicável e unidade acadêmica.
+
+## Revalidação do atendimento — revisão #265 em 20/11/2026
+
+Derivado de `docs/requisitos.md`, conferência #265: a fila de atendimento limpa
+dados abertos ao revalidar/ocultar a aba, reconsulta permissão em foco/pageshow/
+visibilidade/evento de sessão e invalida respostas anteriores de leitura/escrita.
+A API mantém autorização por ator/objeto e no-store/no-referrer. Sem mudança de
+papéis, contratos de publicação ou retenção.

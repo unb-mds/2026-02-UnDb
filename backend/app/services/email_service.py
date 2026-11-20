@@ -3,6 +3,7 @@ from typing import Protocol
 
 import resend
 
+from app.core import config
 from app.core.config import EMAIL_BACKEND, EMAIL_FROM, RESEND_API_KEY
 
 
@@ -20,17 +21,17 @@ class EmailSender(Protocol):
 
 
 class ConsoleEmailSender:
+    def _validar_ambiente(self) -> None:
+        if not config.DEBUG:
+            raise EmailDeliveryError("adaptador console disponível apenas em desenvolvimento")
+
     def enviar_confirmacao(self, destinatario: str, link: str) -> None:
-        logger.warning(
-            "EMAIL_BACKEND=console: confirmacao para %s: %s",
-            destinatario,
-            link,
-        )
+        self._validar_ambiente()
+        logger.warning("auth.confirmacao.simulado")
 
     def enviar_recuperacao_senha(self, destinatario: str, link: str) -> None:
-        logger.warning(
-            "EMAIL_BACKEND=console: recuperacao de senha para %s: %s", destinatario, link
-        )
+        self._validar_ambiente()
+        logger.warning("auth.recuperacao.simulado")
 
 
 class ResendEmailSender:
@@ -52,7 +53,7 @@ class ResendEmailSender:
                         "<p>Confirme seu e-mail institucional para poder avaliar "
                         "professores e disciplinas no UnDb.</p>"
                         f'<p><a href="{link}">Confirmar e-mail</a></p>'
-                        "<p>Este link expira em 24 horas.</p>"
+                        f"<p>Este link expira em {config.AUTH_CONFIRMACAO_TTL_HORAS} horas.</p>"
                     ),
                 }
             )
@@ -70,7 +71,8 @@ class ResendEmailSender:
                     "html": (
                         "<p>Recebemos uma solicitação para redefinir sua senha no UnDb.</p>"
                         f'<p><a href="{link}">Redefinir senha</a></p>'
-                        "<p>Este link expira em uma hora e só pode ser usado uma vez.</p>"
+                        f"<p>Este link expira em {config.AUTH_RECUPERACAO_TTL_MINUTOS} minutos "
+                        "e só pode ser usado uma vez.</p>"
                         "<p>Se você não fez esta solicitação, ignore este e-mail.</p>"
                     ),
                 }

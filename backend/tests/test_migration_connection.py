@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 
@@ -14,8 +15,9 @@ class MigrationConnectionTest(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
         self.runtime = Path(self.directory.name) / "runtime.db"
-        # O caractere % também verifica o escape de interpolação do Alembic.
-        self.migration = Path(self.directory.name) / "migration%170.db"
+        # Verifica o escape de interpolação do Alembic sem uma sequência %HH,
+        # que o SQLAlchemy 2.1 decodifica como parte da URL do SQLite.
+        self.migration = Path(self.directory.name) / "migration%literal.db"
         self.environment = {
             **os.environ,
             "SECRET_KEY": "migration-test-only",
@@ -34,7 +36,7 @@ class MigrationConnectionTest(unittest.TestCase):
 
     def assert_migrated(self, path):
         self.assertTrue(path.exists())
-        with sqlite3.connect(path) as connection:
+        with closing(sqlite3.connect(path)) as connection:
             self.assertEqual(
                 connection.execute("SELECT version_num FROM alembic_version").fetchone(),
                 ("20260911_01",),
@@ -47,7 +49,7 @@ class MigrationConnectionTest(unittest.TestCase):
 
     def test_explicit_migration_connection_does_not_migrate_runtime_database(self):
         self.environment["MIGRATION_DATABASE_URL"] = (
-            f"sqlite+pysqlite:///{self.migration.as_posix().replace('%', '%25')}"
+            f"sqlite+pysqlite:///{self.migration.as_posix()}"
         )
         result = self.migrate()
         self.assertEqual(result.returncode, 0, result.stderr)

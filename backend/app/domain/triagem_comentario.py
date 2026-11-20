@@ -5,7 +5,9 @@ import re
 import unicodedata
 from pathlib import Path
 
-LISTA = json.loads((Path(__file__).resolve().parents[1] / "data/termos_moderacao.json").read_text())
+LISTA = json.loads(
+    (Path(__file__).resolve().parents[1] / "data/termos_moderacao.json").read_text(encoding="utf-8")
+)
 VERSAO_LISTA = LISTA["versao"]
 
 

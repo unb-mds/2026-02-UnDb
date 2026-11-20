@@ -42,7 +42,7 @@ export default async function DetalheDisciplinaPage({
   return (
     <main className="relative isolate flex flex-1 flex-col overflow-hidden">
       <FundoLiquido />
-      <div className="container flex flex-col gap-8 py-8 sm:py-12">
+      <div className="container flex flex-col gap-5 py-5 sm:gap-8 sm:py-12">
         <Caminho
           itens={[
             { nome: "Início", href: "/" },

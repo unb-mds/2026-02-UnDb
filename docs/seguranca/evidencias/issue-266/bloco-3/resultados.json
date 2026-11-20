@@ -1,0 +1,64 @@
+{
+  "estado": "implementado",
+  "ambiente": "Windows local Python 3.12.16 PostgreSQL 16.16 descartavel, API sem DDL",
+  "selecionados": {
+    "total": 69,
+    "falhas": 0,
+    "skips": 0
+  },
+  "suite_completa": {
+    "total": 406,
+    "falhas": 0,
+    "skips": 2,
+    "motivo_skips": "Identidades/reconciliacao exigem banco separado undb_207_test"
+  },
+  "etapas": [
+    {
+      "etapa": "upgrade",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-bloco1",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-repetido",
+      "exit_code": 0
+    },
+    {
+      "etapa": "downgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "upgrade-base",
+      "exit_code": 0
+    },
+    {
+      "etapa": "testes-bloco3",
+      "exit_code": 0
+    },
+    {
+      "etapa": "suite-completa",
+      "exit_code": 0
+    },
+    {
+      "etapa": "limpeza-cli",
+      "exit_code": 0
+    },
+    {
+      "etapa": "check-final",
+      "exit_code": 0
+    }
+  ],
+  "analise_estatica": "ruff check/format, compileall e git diff --check passaram",
+  "producao": "Sem acesso ou validacao",
+  "pendencias": [
+    "Calibracao de limites item 4",
+    "Topologia item 8",
+    "Demais blocos e validacoes humanas"
+  ]
+}

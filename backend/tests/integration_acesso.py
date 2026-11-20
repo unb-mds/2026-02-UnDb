@@ -7,6 +7,7 @@ usar a mesma verificação com API externa em container, sem endpoint de testes.
 
 import json
 import os
+import secrets
 import socket
 import subprocess
 import sys
@@ -172,6 +173,7 @@ def main():
     try:
         with TemporaryDirectory(prefix="undb-acesso-") as temporario:
             log_path = Path(temporario) / "api.log"
+            correio_path = Path(temporario) / "mensagens.fixture"
             env = {
                 **os.environ,
                 "DEBUG": "True",
@@ -180,13 +182,17 @@ def main():
                 "EMAIL_BACKEND": "console",
                 "E2E_ACESSO_FIXTURE": json.dumps(fixture),
                 "E2E_PYTHON": sys.executable,
-                "E2E_EMAIL_LOG_FILE": str(log_path),
+                "ABUSO_HMAC_SECRET": os.environ.get("ABUSO_HMAC_SECRET")
+                or secrets.token_urlsafe(32),
+                "E2E_EMAIL_FIXTURE_FILE": str(correio_path),
+                # Nome legado consumido pelo navegador; o arquivo não é log da API.
+                "E2E_EMAIL_LOG_FILE": str(correio_path),
             }
-            # O link/token é lido do adaptador console real, sem gerar ou confirmar
-            # tokens por fora da API. O log temporário não é evidência versionada.
+            # A API gera/confirma os tokens; só o transporte externo é substituído.
+            # Mensagens sintéticas ficam no diretório privado, sem valores nos logs.
             with log_path.open("w", encoding="utf8") as log:
                 api = subprocess.Popen(
-                    [sys.executable, "-m", "uvicorn", "app.main:app", "--port", "8000"],
+                    [sys.executable, "-m", "tests.acesso_servidor"],
                     env=env,
                     stdout=log,
                     stderr=subprocess.STDOUT,
@@ -210,7 +216,16 @@ def main():
                         cwd=Path(__file__).resolve().parents[2] / "frontend",
                     )
                 finally:
-                    api.terminate()
+                    if sys.platform == "win32" and api.poll() is None:
+                        subprocess.run(
+                            ["taskkill", "/PID", str(api.pid), "/T", "/F"],
+                            check=True,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                            creationflags=subprocess.CREATE_NO_WINDOW,
+                        )
+                    elif api.poll() is None:
+                        api.terminate()
                     api.wait(timeout=15)
     finally:
         limpar(fixture)

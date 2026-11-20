@@ -115,15 +115,15 @@ for (const [status, detalhe, orientacao] of [
   [404, "Professor não encontrado.", /localizar o destino/],
   [405, "Method Not Allowed", /ainda não está disponível/],
   [409, "Conflito ao registrar avaliação.", /rejeitada/],
-  [429, "Tente novamente depois.", /Aguarde/],
-  [503, "Serviço temporariamente indisponível.", /não conseguiu confirmar/],
+  [429, "Tente novamente depois.", /Tente novamente em instantes/],
+  [503, "Serviço temporariamente indisponível.", /temporariamente indisponível/],
 ]) {
   test(`preserva detalhe HTTP ${status} e fornece orientação`, async (t) => {
     t.mock.method(globalThis, "fetch", async () => Response.json({ detail: detalhe }, { status }));
     await assert.rejects(enviarAvaliacao(criarEntradaAvaliacao(formulario(), "p", "d")), (erro) => {
       assert.equal(erro.status, status);
       assert.match(mensagemErroAvaliacao(erro), orientacao);
-      assert.ok(mensagemErroAvaliacao(erro).includes(detalhe));
+      if (![429, 503].includes(status)) assert.ok(mensagemErroAvaliacao(erro).includes(detalhe));
       return true;
     });
   });

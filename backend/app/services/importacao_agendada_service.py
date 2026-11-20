@@ -8,6 +8,7 @@ from app.services.sigaa_import_service import (
     DepartamentoImportacao,
     ResultadoImportacao,
     executar_importacao,
+    _mensagem_erro,
 )
 
 
@@ -83,7 +84,7 @@ def executar_importacao_agendada(
 
         registro.status = "falha"
         registro.finalizada_em = datetime.now(UTC)
-        registro.erro = f"{type(erro).__name__}: {erro}"
+        registro.erro = _mensagem_erro(erro)
         registro.resultado_json = {
             "origem_unidades": origem_unidades,
             "sucesso": False,

@@ -50,8 +50,8 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
         assert.equal(c.titulo, disciplinas[i].nome);
         assert.ok(c.texto.includes(disciplinas[i].codigo));
         assert.ok(c.texto.includes(`${disciplinas[i].total_avaliacoes} ${i === 5 ? "avaliação" : "avaliações"}`));
-        assert.equal(c.texto.includes("4,2/5 didática · 80% recomendam"), i !== 5);
-        assert.ok(c.texto.includes("Dados insuficientes"));
+        assert.equal(c.texto.includes("didática"), false);
+        assert.ok(c.texto.includes("TESTE"));
         assert.equal(c.href, `/disciplinas/${disciplinas[i].id}`);
       });
       const medidas = await avaliar(`(() => { const ul = document.querySelector('${seletor}'); return { pagina: document.documentElement.scrollWidth, viewport: innerWidth, colunas: getComputedStyle(ul).gridTemplateColumns.split(' ').length, titulos: Array.from(ul.querySelectorAll('h3')).every(h => h.scrollHeight <= h.clientHeight + 1 && h.scrollWidth <= h.clientWidth + 1 && getComputedStyle(h).webkitLineClamp === 'none'), cartoes: Array.from(ul.querySelectorAll('li > a')).every(a => a.scrollWidth <= a.clientWidth + 1), altura: ul.getBoundingClientRect().height }; })()`);
@@ -85,6 +85,6 @@ await comNavegador({ fixture, executar: async ({ cdp, avaliar, aguardar }) => {
     assert.equal(await avaliar(`document.querySelector('${seletor}') === null`), true);
   }
   assert.ok(consultas.includes("/api/disciplinas/destaques"));
-  assert.ok(disciplinas.every(d => consultas.includes(`/api/disciplinas/${d.id}/professores`)));
+  assert.ok(!consultas.some(path => /\/professores$/.test(path)), "destaques não disparam seis comparações adicionais");
   console.log(JSON.stringify({ resultados, dados: "HTTP controlado, sintético, exclusivo do teste", teclado: "Tab, foco e Enter", estados: "sucesso, vazio, erro" }));
 } });

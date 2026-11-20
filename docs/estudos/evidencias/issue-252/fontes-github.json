@@ -1,0 +1,150 @@
+{
+  "consulta_utc": "2026-11-15 18:36:32 UTC",
+  "issues": [
+    {
+      "issue": {
+        "url": "https://github.com/unb-mds/2026-02-UnDb/issues/239",
+        "title": "[MODERAÇÃO] Configurar apoio de IA e preparar lista de termos proibidos",
+        "issue_number": 239,
+        "body": "## Descrição e escopo vigente\n\nImplementar filtro local de termos e integração com a OpenAI Moderation API para triagem de comentários do UnDb, reutilizando os fluxos existentes de avaliações, denúncias e moderação.\n\n**Decisão do PO nesta implementação:** a direção inicial exclusivamente assistiva foi substituída, por autorização explícita, por publicação automática de comentários sem sinais. Termos detectados, possíveis dados pessoais, sinais da IA, limites, falhas ou indisponibilidade encaminham o comentário para revisão humana. Não há rejeição automática. Críticas acadêmicas negativas legítimas continuam permitidas.\n\nResponsável: @nicolaszanin06.\n\n## Checklist de entrega\n\n- [x] Preparar lista inicial versionada e revisável de palavras/expressões, com categorias e exemplos sintéticos, apresentada ao PO no desenvolvimento.\n- [x] Implementar correspondência por palavras/expressões completas, ignorando maiúsculas e acentos, evitando substring.\n- [x] Documentar limites de contexto, citações e disfarces; termo encontrado encaminha para revisão humana.\n- [x] Integrar a OpenAI Moderation API com `omni-moderation-latest`, conforme escolha explícita do PO, sem fallback para API generativa paga.\n- [x] Manter configuração desativada por padrão e credenciais somente no servidor.\n- [x] Limitar tamanho da entrada/saída, tempo, tentativas e volume de chamadas.\n- [x] Enviar somente o texto necessário, sem metadados de autoria, histórico ou denúncias; aplicar barreira local para dados pessoais reconhecíveis.\n- [x] Tratar comentário como dado não confiável e validar a resposta estruturada da API.\n- [x] Disponibilizar apoio manual ao moderador com categorias e resultado do filtro, sem decidir por esse botão.\n- [x] Impedir revisão assistida do próprio comentário e preservar permissões existentes.\n- [x] Aplicar triagem automática a comentários novos e substituições; publicar somente quando todas as verificações permitirem.\n- [x] Manter pendência humana diante de sinais, falha ou indisponibilidade, sem rejeição automática.\n- [x] Preservar o texto publicado anterior enquanto uma substituição aguarda análise; impedir publicação de versão retirada ou substituída durante a chamada.\n- [x] Registrar publicação automática na auditoria como ação do sistema, respeitando retenção.\n- [x] Preservar critérios estruturados, autoria e regras de agregação.\n- [x] Atualizar a fonte de requisitos e documentos derivados para a direção autorizada.\n- [x] Documentar configuração, operação, desligamento, versões e limitações.\n- [x] Executar testes de backend/frontend e verificações de integração/migração descritos na PR #245.\n- [x] Executar avaliação sintética com a API real e registrar resultados e limitações.\n- [x] Integrar a entrega e disponibilizá-la em produção.\n- [x] Configurar chave e flags no Render e validar apoio manual com resposta real da OpenAI em produção.\n- [x] Ativar `MODERACAO_AUTOMATICA_ATIVA=True` com redeploy.\n- [x] Validar novo envio em produção: mensagem “Seu comentário foi publicado após a triagem automática” e estado “Publicado”, confirmado pelo PO em 14/11/2026.\n\n## Evidências e validação\n\n- Implementação: [PR #245](https://github.com/unb-mds/2026-02-UnDb/pull/245).\n- Release integrada à main: [PR #250](https://github.com/unb-mds/2026-02-UnDb/pull/250).\n- Em 14/11/2026, o PO apresentou capturas de deploy bem-sucedido no Render, análise assistiva concluída com filtro habilitado e publicação automática de comentário novo contendo crítica acadêmica negativa.\n- Avaliação sintética apresentada nesta conversa: 11 casos analisados, 4 sinalizados, 0 falsos negativos e 2 categorias adicionais classificadas como falsos positivos pelo comparador; 1 caso não enviado por privacidade/limite. Esses números são de amostra pequena e não equivalem a certificação de precisão.\n\n## Limites e acompanhamento\n\n- A barreira de privacidade não garante anonimização completa de texto livre.\n- A API não cobre sozinha spam, todos os palavrões ou dados pessoais; filtro local e revisão humana permanecem necessários.\n- A lista continua passível de revisão pelo PO; não se presume aprovação individual de cada termo.\n- Não houve comprovação de estudo formal comparativo entre provedores, conjunto integralmente rotulado por humanos ou metas quantitativas de precisão aprovadas. A escolha da OpenAI e a ativação foram autorizadas diretamente pelo PO; não marcar esses estudos como realizados.\n- Comentários antigos já pendentes não são reprocessados automaticamente.\n- O bloqueio de revisão do próprio comentário funciona, mas a mensagem de erro genérica pode ser melhorada em acompanhamento separado.\n\n## Referências\n\n- [Guia de moderação com IA](https://github.com/unb-mds/2026-02-UnDb/blob/main/docs/moderacao-ia.md).\n- [Requisitos e decisões](https://github.com/unb-mds/2026-02-UnDb/blob/main/docs/requisitos.md).\n- Fluxos anteriores: #145, #154, #156, #159, #160, #161, #162 e #193.\n\n**Situação:** implementação e ativação validadas pelo PO em produção. Issue mantida aberta para fechamento manual pelo responsável.\n",
+        "state": "closed",
+        "user": {
+          "login": "nicolaszanin06",
+          "name": "nicolaszanin06",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/213249676?v=4",
+          "id": 213249676
+        },
+        "assignees": [
+          {
+            "login": "nicolaszanin06",
+            "name": "nicolaszanin06",
+            "email": null,
+            "avatar_url": "https://avatars.githubusercontent.com/u/213249676?v=4",
+            "id": 213249676
+          }
+        ],
+        "labels": null,
+        "milestone": 13,
+        "state_reason": "completed",
+        "comments": 0,
+        "created_at": "2026-11-14T01:36:29Z",
+        "updated_at": "2026-11-15T01:13:46Z",
+        "closed_at": "2026-11-15T01:13:46Z",
+        "display_url": "https://github.com/unb-mds/2026-02-UnDb/issues/239",
+        "display_title": "[MODERAÇÃO] Configurar apoio de IA e preparar lista de termos proibidos"
+      },
+      "comments": []
+    },
+    {
+      "issue": {
+        "url": "https://github.com/unb-mds/2026-02-UnDb/issues/251",
+        "title": "[BUSCA] Avaliar autocompletar e tolerância a erros e implementar se autorizado",
+        "issue_number": 251,
+        "body": "## Descrição e objetivo\nAvaliar a proposta de Vinicius, encaminhada por Nicolas: encontrar professores e disciplinas mesmo com erros de digitação, sugerir itens durante a digitação e oferecer “Você quis dizer…”. Implementar somente após autorização explícita do escopo e da solução.\n\n## Avaliação de viabilidade\n- [ ] Conferir a base remota atual, requisitos e decisões vigentes; o checkout inicialmente examinado estava desatualizado.\n- [ ] Avaliar PostgreSQL com pg_trgm como candidato: disponibilidade no ambiente hospedado, permissões, índices, migração, integração com SQLAlchemy/Alembic, armazenamento e desempenho. Não pressupor custo operacional zero.\n- [ ] Comparar a busca atual com uma prova de conceito usando nomes parciais, erros, acentos, nomes compostos, homônimos, disciplinas por nome/código, termos curtos e ausência de correspondência.\n- [ ] Propor ordenação de correspondências exatas, parciais e aproximadas, limiares e metas mensuráveis para validação humana; registrar resultados e limitações reproduzíveis.\n- [ ] Detalhar as três funcionalidades separadamente. Avaliar até 8 sugestões com departamento, pausa na digitação, teclado, foco, estados vazio/erro/carregamento e tratamento de respostas antigas como propostas.\n- [ ] Definir contrato e atualização das sugestões após importações; verificar se basta consultar o catálogo, sem presumir dicionário separado.\n- [ ] Registrar compatibilidade com RF05–RF07 e ADR 01, esforço, riscos, custos e reversão. Avaliar serviço adicional apenas se limites medidos justificarem; não adotar Meilisearch automaticamente.\n\n## Implementação condicionada\n- [ ] Registrar autorização explícita do PO, incluindo comportamento, critérios e solução escolhida, antes de implementar ou ativar alterações.\n- [ ] Atualizar primeiro os requisitos aplicáveis e depois contratos e documentos derivados.\n- [ ] Implementar backend, índices/migração e frontend conforme autorização.\n- [ ] Validar busca existente e nova, teclado/acessibilidade, respostas concorrentes, atualização do catálogo e desempenho; executar checks pertinentes.\n- [ ] Documentar operação, reversão e evidências; distinguir código implementado, integrado e publicado.\n\n## Critérios de aceite\n- [ ] Relatório de viabilidade com casos, medições, limites e recomendação rastreável.\n- [ ] Decisão registrada: implementar, ajustar, adiar ou não implementar.\n- [ ] Quando autorizado, implementação comprovada contra critérios aprovados; caso contrário, motivo registrado e implementação explicitamente não executada.\n\n## Referências\nOrigem: solicitação de Nicolas nesta conversa e proposta encaminhada de Vinicius. RF05–RF07 em docs/requisitos.md; ADR 01 em docs/arquitetura.md; governança em skills/governance/project-governance/SKILL.md. Documentação: https://www.postgresql.org/docs/current/pgtrgm.html.\n\nResponsável: @ViniGvdo. Prioridade e sprint: a definir pelo PO.",
+        "state": "open",
+        "user": {
+          "login": "nicolaszanin06",
+          "name": "nicolaszanin06",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/213249676?v=4",
+          "id": 213249676
+        },
+        "assignees": [
+          {
+            "login": "ViniGvdo",
+            "name": "ViniGvdo",
+            "email": null,
+            "avatar_url": "https://avatars.githubusercontent.com/u/198657137?v=4",
+            "id": 198657137
+          }
+        ],
+        "labels": null,
+        "milestone": 13,
+        "state_reason": null,
+        "comments": 0,
+        "created_at": "2026-11-15T02:07:01Z",
+        "updated_at": "2026-11-15T18:24:50Z",
+        "closed_at": null,
+        "display_url": "https://github.com/unb-mds/2026-02-UnDb/issues/251",
+        "display_title": "[BUSCA] Avaliar autocompletar e tolerância a erros e implementar se autorizado"
+      },
+      "comments": []
+    },
+    {
+      "issue": {
+        "url": "https://github.com/unb-mds/2026-02-UnDb/issues/252",
+        "title": "[MODERAÇÃO] Avaliar detecção de ofensas disfarçadas e implementar melhorias se autorizado",
+        "issue_number": 252,
+        "body": "## Descrição e objetivo\nInvestigar se a triagem atual detecta palavrões disfarçados, como “m4rda”, e propor melhorias mensuráveis sem bloquear críticas acadêmicas legítimas. Origem: ideia de Vinicius encaminhada por Nicolas, que solicitou avaliação e implementação caso autorizada.\n\n## Contexto e limites\nA issue #239 registra integração com OpenAI Moderation API e autorização de publicação automática para comentários sem sinais, com revisão humana diante de sinais ou falhas e sem rejeição automática. Partir da implementação remota vigente e das decisões vinculadas, não do checkout local desatualizado. Esta issue complementa a #239; não reabre nem substitui sua entrega e não declara defeito comprovado antes dos testes.\n\n## Avaliação de viabilidade\n- [ ] Conferir código, configuração, modelo, lista de termos, documentação e decisões atuais vinculadas à #239 e PR #245.\n- [ ] Preparar conjunto sintético rotulado e revisado por humanos: palavrões explícitos, m4rda/m3rda, pontuação intercalada, espaços, repetições, caracteres invisíveis e visualmente semelhantes.\n- [ ] Incluir controles negativos: críticas acadêmicas legítimas, palavras com trechos semelhantes, números em contexto acadêmico, citações e casos ambíguos.\n- [ ] Medir separadamente filtro local, IA e triagem combinada; registrar versão do modelo, configuração, data, amostra, falsos negativos e falsos positivos. Não presumir que a API de moderação detecte todo palavrão.\n- [ ] Executar eventual avaliação real apenas em ambiente de teste autorizado, com dados sintéticos, limites de chamadas e sem publicar avaliações fictícias de docentes reais.\n- [ ] Comparar normalização Unicode, tratamento de separadores/repetições e substituições contextuais de letras/números. Avaliar aumento de falsos positivos antes de propor regras gerais.\n- [ ] Propor metas de qualidade, limites aceitáveis, esforço, custos e recomendação para aprovação do PO, distinguindo evidência de hipótese e sem prometer detecção integral.\n\n## Implementação condicionada\n- [ ] Registrar autorização explícita do PO para a melhoria e seus critérios. Não alterar automaticamente política de publicação, lista aprovada, modelo/provedor ou parâmetros de produção.\n- [ ] Atualizar primeiro requisitos quando houver mudança autorizada e sincronizar documentos derivados.\n- [ ] Implementar apenas melhorias autorizadas e incluir testes de regressão dos casos positivos e negativos.\n- [ ] Preservar permissões, privacidade, retenção, critérios estruturados, tratamento de substituições e revisão humana para sinais/falhas conforme regras vigentes; sem rejeição automática.\n- [ ] Reexecutar o conjunto e comparar resultados antes/depois; documentar limitações, configuração e reversão antes de qualquer ativação autorizada.\n\n## Critérios de aceite\n- [ ] Relatório reproduzível informa quais disfarces passam ou são sinalizados, controles negativos, resultados por camada e limitações da amostra.\n- [ ] Decisão explícita registrada: implementar, ajustar, adiar ou não implementar.\n- [ ] Se autorizado, melhorias e regressões validadas contra critérios aprovados; caso contrário, implementação explicitamente não executada e motivo registrado.\n\n## Referências\n#239; PR #245; docs/moderacao-ia.md e docs/requisitos.md na base remota atual; skills/governance/project-governance/SKILL.md.\n\nResponsável: @ViniGvdo. Prioridade e sprint: a definir pelo PO.",
+        "state": "open",
+        "user": {
+          "login": "nicolaszanin06",
+          "name": "nicolaszanin06",
+          "email": null,
+          "avatar_url": "https://avatars.githubusercontent.com/u/213249676?v=4",
+          "id": 213249676
+        },
+        "assignees": [
+          {
+            "login": "ViniGvdo",
+            "name": "ViniGvdo",
+            "email": null,
+            "avatar_url": "https://avatars.githubusercontent.com/u/198657137?v=4",
+            "id": 198657137
+          }
+        ],
+        "labels": null,
+        "milestone": 13,
+        "state_reason": null,
+        "comments": 0,
+        "created_at": "2026-11-15T02:07:10Z",
+        "updated_at": "2026-11-15T18:24:57Z",
+        "closed_at": null,
+        "display_url": "https://github.com/unb-mds/2026-02-UnDb/issues/252",
+        "display_title": "[MODERAÇÃO] Avaliar detecção de ofensas disfarçadas e implementar melhorias se autorizado"
+      },
+      "comments": []
+    }
+  ],
+  "pr245": {
+    "url": "https://github.com/unb-mds/2026-02-UnDb/pull/245",
+    "number": 245,
+    "state": "closed",
+    "merged": true,
+    "mergeable": false,
+    "draft": false,
+    "body": "## Objetivo\n\nAo enviar ou editar um comentário, aplicar filtro local e a Moderation API gratuita da OpenAI antes da publicação. Textos sem sinais podem ser publicados automaticamente; sinalização, dados sensíveis, limite, indisponibilidade ou configuração incompleta mantêm o texto pendente para revisão humana. Não há rejeição automática.\n\nEsta é a **nova direção de produto explicitamente autorizada pelo PO em 14/11/2026**, substituindo a proposta inicial da #239 de IA apenas assistiva. Requisitos e derivados registram a mudança.\n\nCloses #239\n\n## Tipo de mudança\n\n- [x] Feature\n- [x] Documentação\n- [x] Chore/infra\n\n## Comportamento e migração\n\n- Os critérios e a versão pendente são confirmados antes da consulta externa. A publicação ocorre em outra transação, após bloquear e conferir novamente a versão; falha da IA não desfaz a avaliação.\n- Filtro por expressões completas, sem distinção de caixa/acentos; lista versionada e revisável. Citações sinalizadas seguem para humanos. Suspensão, remoção e denúncias anteriores não são contornadas por edição.\n- Cliente REST limitado a `/v1/moderations`, modelo padrão `omni-moderation-latest`, sem fallback pago. Chave somente no backend, limites de chamadas, bloqueio local conservador de dados e falha para pendência.\n- Migração `20261114_01`: `decisoes_moderacao.moderador_id` pode ser nulo para identificar **sistema**, sem conta humana fictícia. Auditoria mantém a retenção vigente de sete dias. Downgrade recusa perda de registros automáticos ainda existentes.\n- Resposta do envio informa `comentario_estado`; interface distingue publicado/pendente e mostra ator sistema no histórico privado. Apoio sob demanda continua disponível ao moderador.\n- Flags documentadas, desativadas por padrão no código/exemplo e repassadas pelo Compose. Aplicar migração antes de habilitar no ambiente desejado. Não há deploy neste PR.\n\n## Limites importantes para a revisão\n\nA Moderation API não fornece um “não sei” nem categorias de spam, dados pessoais e palavrões em geral. Ausência de sinais não garante adequação; lista e barreira local não detectam todo contexto/disfarce. Não foram inventados limiares de confiança nem mapeadas categorias nativas como novos motivos de denúncia. A revisão humana, denúncia e retirada permanecem disponíveis.\n\nNenhuma identidade, denúncia ou ID é enviado como metadado à OpenAI, mas o texto pode conter informações não reconhecidas pela barreira local. Rever comunicação de privacidade e condições externas de retenção antes da ativação pública; não confundir descarte local com descarte no provedor. Guia: [docs/moderacao-ia.md](https://github.com/unb-mds/2026-02-UnDb/blob/feature/239-triagem-automatica-openai/docs/moderacao-ia.md).\n\n## Validação\n\n- Base atualizada com `develop` incluindo #238: **275 testes backend**, dois opcionais ignorados; **79 testes frontend**, todos aprovados.\n- Dez cenários do fluxo automático aprovados também em PostgreSQL 16 descartável com schema migrado pelo Alembic: publicação/auditoria, sinais/falhas, flags, limite, edição, suspensão, retirada concorrente e falha de auditoria sem perder critérios.\n- Upgrade, `alembic check`, downgrade protegido, descarte de fixtures vencidas e novo downgrade/upgrade/check aprovados no banco descartável.\n- Lint dos arquivos alterados, TypeScript, build Next.js, MkDocs estrito, Compose e imagem backend aprovados. Imagem sem `.env`.\n- Navegador com API controlada: estados da triagem, decisões humanas, envio pendente/publicado, substituição/retirada e responsividade.\n- Teste local com API/OpenAI reais e dados sintéticos: texto sem sinais publicado, citação sinalizada pendente e versão publicada preservada. Fixtures removidas. Não foram usados comentários reais de estudantes ou docentes.\n- A base do PR foi atualizada sem conflitos; testes backend/frontend e documentação repetidos após a integração.\n\n## Checklist\n\n- [x] Branch `feature/239-triagem-automatica-openai` para `develop`, conforme CONTRIBUTING.md.\n- [x] Escopo limitado à #239 e sua evolução autorizada.\n- [x] Documentação atualizada.\n- [x] Nenhum segredo, credencial real ou arquivo `.env` incluído; verificação do diff realizada.\n- [x] Verificações locais aplicáveis executadas.\n- [x] Mudança de produto autorizada explicitamente pelo PO; promoção de skills e merge não fazem parte deste PR.\n\nRevisão solicitada a @TiagoVieira-596. Merge e ativação pública permanecem manuais.\n",
+    "title": "[R2] Implementar triagem automática de comentários com OpenAI (#239)",
+    "base": "develop",
+    "base_sha": "d59e48b0d5f293f5a332e51a0e422f60380327e9",
+    "head": "feature/239-triagem-automatica-openai",
+    "head_sha": "63cea22810619d3410833f60261459c3ff825beb",
+    "head_repo_id": 1338351549,
+    "head_repo_full_name": "unb-mds/2026-02-UnDb",
+    "merge_commit_sha": "18c04c445bed813948a6ed64f0fbcdc8a33c4bb7",
+    "user": {
+      "login": "nicolaszanin06",
+      "name": "nicolaszanin06",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/213249676?v=4",
+      "id": 213249676
+    },
+    "requested_reviewers": null,
+    "requested_team_reviewers": null,
+    "diff": null,
+    "comments": null,
+    "created_at": "2026-11-14T05:15:55Z",
+    "updated_at": "2026-11-15T01:18:21Z",
+    "closed_at": "2026-11-14T05:34:02Z",
+    "merged_at": "2026-11-14T05:34:02Z",
+    "commits": 3,
+    "changed_files": 35,
+    "additions": 1702,
+    "deletions": 35,
+    "display_url": "https://github.com/unb-mds/2026-02-UnDb/pull/245",
+    "display_title": "[R2] Implementar triagem automática de comentários com OpenAI (#239)"
+  },
+  "limite": "Retratos de leitura; ausência de autorização nas fontes consultadas não prova ausência em conversas externas.",
+  "revisao_humana_corpus": "Solicitante confirmou nesta sessão que não há revisão registrada; deixar homologação pendente."
+}

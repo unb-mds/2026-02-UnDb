@@ -4,8 +4,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlalchemy.orm import Session
 
-from app.core.auth import obter_usuario_confirmado
+from app.core.auth import obter_sessao_opcional, obter_usuario_confirmado
 from app.core.database import get_db
+from app.core.protecao_fluxos import registrar_bypass
+from app.models.sessao_usuario import SessaoUsuario
+from app.schemas.comentario import VotoComentarioRequest, UtilidadeComentarioResponse
+from app.services import voto_comentario_service
 from app.models.usuario import Usuario
 from app.schemas.comentario import ComentarioDoAutorResponse
 from app.services import comentario_service
@@ -38,6 +42,7 @@ def retirar_comentario(
     session: Annotated[Session, Depends(get_db)],
 ) -> ComentarioDoAutorResponse:
     """Retira um comentario pelo autor (PUBLICADO, PENDENTE ou SUSPENSO)."""
+    registrar_bypass()
     try:
         return comentario_service.retirar(session, comentario_id, usuario)
     except comentario_service.RecursoNaoEncontradoError as erro:
@@ -50,3 +55,30 @@ def retirar_comentario(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=str(erro),
         ) from erro
+
+
+@router.get("/{comentario_id}/utilidade", response_model=UtilidadeComentarioResponse)
+def consultar_utilidade(
+    comentario_id: UUID,
+    session: Annotated[Session, Depends(get_db)],
+    sessao: Annotated[SessaoUsuario | None, Depends(obter_sessao_opcional)],
+):
+    try:
+        return voto_comentario_service.consultar(
+            session, comentario_id, sessao.usuario if sessao else None
+        )
+    except voto_comentario_service.VotoComentarioError as erro:
+        raise HTTPException(status_code=erro.status_code, detail=str(erro)) from erro
+
+
+@router.post("/{comentario_id}/voto", response_model=UtilidadeComentarioResponse)
+def definir_voto(
+    comentario_id: UUID,
+    dados: VotoComentarioRequest,
+    usuario: Annotated[Usuario, Depends(obter_usuario_confirmado)],
+    session: Annotated[Session, Depends(get_db)],
+):
+    try:
+        return voto_comentario_service.definir(session, comentario_id, usuario, dados.voto)
+    except voto_comentario_service.VotoComentarioError as erro:
+        raise HTTPException(status_code=erro.status_code, detail=str(erro)) from erro

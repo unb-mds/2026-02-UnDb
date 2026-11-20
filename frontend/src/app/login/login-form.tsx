@@ -1,5 +1,6 @@
 "use client";
 
+import MinhasAvaliacoesPainel from "@/components/minhas-avaliacoes";
 import CampoSenha from "@/components/campo-senha";
 import MolduraConta from "@/components/moldura-conta";
 import OpcoesAcesso from "@/components/opcoes-acesso";
@@ -8,7 +9,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { consultarSessao, entrar, sair, EVENTO_SESSAO_ALTERADA } from "@/lib/services/auth";
-import { ApiError } from "@/lib/services/http-error";
+import { ApiError, mensagemErroTemporario } from "@/lib/services/http-error";
 
 export default function LoginForm({ retorno, contexto }: { retorno: string | null; contexto?: ReactNode }) {
   const router = useRouter();
@@ -79,9 +80,9 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
     } catch (falha) {
       setSessao("visitante");
       setErro(
-        falha instanceof ApiError && falha.status === 401
+        mensagemErroTemporario(falha) ?? (falha instanceof ApiError && falha.status === 401
           ? "E-mail ou senha inválidos."
-          : "Não foi possível entrar agora. Tente novamente em instantes.",
+          : "Não foi possível entrar agora. Tente novamente em instantes."),
       );
     } finally {
       enviandoRef.current = false;
@@ -107,7 +108,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
   }
 
   return (
-    <MolduraConta titulo={sessao === "visitante" ? "Entrar" : "Minha conta"} descricao={sessao === "autenticado" ? "Você já está conectado ao UnDb." : sessao === "visitante" ? "Use sua conta institucional para registrar avaliações. As consultas continuam públicas." : "Aguarde a verificação da sessão antes de continuar."} retorno={retorno} contexto={contexto} opcoes={sessao === "visitante" && <OpcoesAcesso atual="login" retorno={retorno} />} rotulo="Acesso à conta">
+    <MolduraConta ampla={sessao === "autenticado"} titulo={sessao === "visitante" ? "Entrar" : "Minha conta"} descricao={sessao === "autenticado" ? "Você já está conectado ao UnDb." : sessao === "visitante" ? "Use sua conta institucional para registrar avaliações. As consultas continuam públicas." : "Aguarde a verificação da sessão antes de continuar."} retorno={retorno} contexto={contexto} opcoes={sessao === "visitante" && <OpcoesAcesso atual="login" retorno={retorno} />} rotulo="Acesso à conta">
         {sessao === "carregando" ? (
           <p className="text-sm text-(--muted)" role="status">Verificando sessão…</p>
         ) : sessao === "erro" ? (
@@ -157,6 +158,8 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
           </div>
         )}
 
+        {sessao === "autenticado" && <MinhasAvaliacoesPainel />}
+
         {sessao === "visitante" && <p className="text-center text-sm leading-relaxed text-(--ink-soft)">
           Ainda não possui conta?{" "}
           <Link href={retorno ? `/cadastro?returnTo=${encodeURIComponent(retorno)}` : "/cadastro"} className="link font-medium">
@@ -170,6 +173,7 @@ export default function LoginForm({ retorno, contexto }: { retorno: string | nul
           )}
           {erro && <p className="status-box error">{erro}</p>}
         </div>
+    <Link href={retorno ? `/reenviar-confirmacao?returnTo=${encodeURIComponent(retorno)}` : "/reenviar-confirmacao"} className="link self-center text-center text-sm">Não recebeu a confirmação de e-mail?</Link>
     </MolduraConta>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { acoesParaEstado, rotulosAcao, rotulosEstado, rotulosMotivo, statusModeracao } from "@/lib/moderacao";
 import { consultarComentario, consultarDecisoes, consultarDenuncias } from "@/lib/services/moderacao";
+import { mensagemErroTemporario } from "@/lib/services/http-error";
 import type { AcaoModeracao, AcaoModeracaoInput, ComentarioModeracao, DecisaoModeracao, DenunciasDaVersao } from "@/lib/types/moderacao";
 
 import ApoioModeracao from "./apoio-moderacao";
@@ -26,6 +27,7 @@ export default function DetalheModeracao({ comentario, executando, impedido, aoD
   const [acao, setAcao] = useState<AcaoModeracao | "">("");
   const [motivo, setMotivo] = useState("");
   const [erroFormulario, setErroFormulario] = useState("");
+  const [erroTemporario, setErroTemporario] = useState<string | null>(null);
 
   useEffect(() => {
     const controlador = new AbortController();
@@ -33,7 +35,10 @@ export default function DetalheModeracao({ comentario, executando, impedido, aoD
       return (erro: unknown) => {
         if (controlador.signal.aborted) return;
         if ([401, 403].includes(statusModeracao(erro) ?? 0)) aoNegarAcesso(erro);
-        else atualizar({ tipo: "erro" });
+        else {
+          setErroTemporario(mensagemErroTemporario(erro));
+          atualizar({ tipo: "erro" });
+        }
       };
     }
     if (comentario.estado !== "PENDENTE") {
@@ -58,6 +63,7 @@ export default function DetalheModeracao({ comentario, executando, impedido, aoD
 
   return (
     <div className="space-y-5 [overflow-wrap:anywhere]">
+      {erroTemporario && <p role="alert">{erroTemporario}</p>}
       <div><p className="kicker">{comentario.estado === "PENDENTE" && comentario.substitui_id ? "Substituto em análise" : rotulosEstado[comentario.estado]}</p>
         <h2 className="mt-3 text-xl font-semibold">Analisar comentário</h2>
         <p className="mt-2 text-xs text-foreground/70">Versão <span className="font-mono">{comentario.id}</span></p>

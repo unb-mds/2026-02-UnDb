@@ -1,0 +1,45 @@
+{
+  "postgresql": "16.15",
+  "dados": "sintéticos",
+  "producao_acessada": false,
+  "upgrade_com_conta_antiga": "aprovado",
+  "alembic_check": "aprovado",
+  "http_cadastro_validacao_persistencia": "aprovado",
+  "login_legado": "aprovado",
+  "check_constraint": "aprovado",
+  "downgrade_reaplicacao": "aprovado",
+  "email": "adaptador sintético, nenhum envio externo",
+  "data": "2026-11-17",
+  "base": "62faab9308c8d66a7516e621a8cc522927efc553",
+  "backend": {
+    "total": 345,
+    "falhas": 0,
+    "skips_preexistentes": 2
+  },
+  "frontend": {
+    "total": 83,
+    "falhas": 0
+  },
+  "browser_termos": {
+    "combinacoes": 18,
+    "larguras": [
+      320,
+      768,
+      1280
+    ],
+    "preferencias_sistema": [
+      "light",
+      "dark"
+    ],
+    "tema_produto": "escuro",
+    "resultado": "aprovado"
+  },
+  "browser_jornada_247": "aprovado, HTTP controlado",
+  "browser_acesso": "aprovado, FastAPI/PostgreSQL reais, 54 combinações",
+  "ruff": "aprovado",
+  "eslint": "aprovado",
+  "build_next": "aprovado",
+  "mkdocs_strict": "aprovado",
+  "cluster_teste": "encerrado e removido",
+  "deploy_executado": false
+}

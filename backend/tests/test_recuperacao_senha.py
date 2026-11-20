@@ -18,8 +18,10 @@ from sqlalchemy.orm import Session
 from starlette.responses import Response
 
 from app.core.database import Base
+from app.core import config
 from app.core.security import gerar_hash_senha, gerar_hash_token, verificar_senha
 from app.main import app
+from tests.auth_abuso_fixtures import protecao_permitida
 from app.models.sessao_usuario import SessaoUsuario
 from app.models.token_recuperacao_senha import TokenRecuperacaoSenha
 from app.models.usuario import Usuario
@@ -75,9 +77,9 @@ class RecuperacaoSenhaTest(unittest.TestCase):
     def test_solicitacao_generica_e_normalizacao_sem_criar_conta(self):
         sender = Sender()
         dados = RecuperarSenhaRequest(email=" MARIA@ALUNO.UNB.BR ")
-        conhecida = router.recuperar_senha(dados, self.db, sender)
+        conhecida = router.recuperar_senha(dados, self.db, sender, protecao_permitida())
         desconhecida = router.recuperar_senha(
-            RecuperarSenhaRequest(email="outra@aluno.unb.br"), self.db, sender
+            RecuperarSenhaRequest(email="outra@aluno.unb.br"), self.db, sender, protecao_permitida()
         )
         self.assertEqual(conhecida, desconhecida)
         self.assertEqual(len(sender.envios), 1)
@@ -107,7 +109,10 @@ class RecuperacaoSenhaTest(unittest.TestCase):
             )
         resposta = Response()
         resultado = router.redefinir_senha(
-            RedefinirSenhaRequest(token=token, senha="nova senha segura"), resposta, self.db
+            RedefinirSenhaRequest(token=token, senha="nova senha segura"),
+            resposta,
+            self.db,
+            protecao_permitida(),
         )
         self.assertEqual(resultado.message, service.REDEFINICAO_MESSAGE)
         self.assertIn("Max-Age=0", resposta.headers["set-cookie"])
@@ -136,6 +141,7 @@ class RecuperacaoSenhaTest(unittest.TestCase):
                     RedefinirSenhaRequest(token=link, senha="nova senha segura"),
                     Response(),
                     self.db,
+                    protecao_permitida(),
                 )
             self.assertEqual(erro.exception.status_code, 400)
         self.assertEqual(self.usuario.password_hash, original)
@@ -145,7 +151,13 @@ class RecuperacaoSenhaTest(unittest.TestCase):
         sender = Sender()
         service.cadastrar(
             self.db,
-            CadastroRequest(nome="Outra", email="outra@aluno.unb.br", senha="senha de cadastro"),
+            CadastroRequest(
+                ciencia_termos=True,
+                termos_versao="2026-11-17",
+                nome="Outra",
+                email="outra@aluno.unb.br",
+                senha="senha de cadastro",
+            ),
             sender,
         )
         confirmacao = parse_qs(urlsplit(sender.envios[0][1]).query)["token"][0]
@@ -158,7 +170,10 @@ class RecuperacaoSenhaTest(unittest.TestCase):
         token = self.solicitar()
         with self.assertLogs("app.routers.auth", level="ERROR"):
             resposta = router.recuperar_senha(
-                RecuperarSenhaRequest(email=self.usuario.email), self.db, Sender(falhar=True)
+                RecuperarSenhaRequest(email=self.usuario.email),
+                self.db,
+                Sender(falhar=True),
+                protecao_permitida(),
             )
         self.assertEqual(resposta.message, service.RECUPERACAO_MESSAGE)
         self.assertEqual(len(self.db.scalars(select(TokenRecuperacaoSenha)).all()), 1)
@@ -193,18 +208,23 @@ class RecuperacaoSenhaTest(unittest.TestCase):
         self.assertIn("200", caminhos["/api/auth/redefinir-senha"]["post"]["responses"])
 
     def test_adaptadores_enviam_link_com_finalidade_correta(self):
-        with self.assertLogs("app.services.email_service", level="WARNING") as logs:
+        with (
+            patch("app.services.email_service.config.DEBUG", True),
+            self.assertLogs("app.services.email_service", level="WARNING") as logs,
+        ):
             ConsoleEmailSender().enviar_recuperacao_senha(
                 "teste@aluno.unb.br", "http://localhost/redefinir-senha?token=teste"
             )
-        self.assertIn("recuperacao de senha", logs.output[0])
+        self.assertIn("auth.recuperacao.simulado", logs.output[0])
+        self.assertNotIn("token=", logs.output[0])
+        self.assertNotIn("teste@", logs.output[0])
         with patch("app.services.email_service.resend.Emails.send") as enviar:
             ResendEmailSender("chave-de-teste", "teste@example.com").enviar_recuperacao_senha(
                 "teste@aluno.unb.br", "https://example.com/redefinir-senha?token=teste"
             )
             conteudo = enviar.call_args.args[0]
             self.assertIn("Redefina", conteudo["subject"])
-            self.assertIn("uma hora", conteudo["html"])
+            self.assertIn(f"{config.AUTH_RECUPERACAO_TTL_MINUTOS} minutos", conteudo["html"])
         with patch(
             "app.services.email_service.resend.Emails.send", side_effect=RuntimeError("falha")
         ):

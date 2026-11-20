@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-16",
+  "epic_table_updated_and_verified": true,
+  "records": [
+    {
+      "issue": 272,
+      "comment_id": 6930694269,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/272#issuecomment-6930694269",
+      "read_back": true
+    },
+    {
+      "issue": 266,
+      "comment_id": 6930716693,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/266#issuecomment-6930716693",
+      "read_back": true
+    },
+    {
+      "issue": 263,
+      "comment_id": 6930718232,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/263#issuecomment-6930718232",
+      "read_back": true
+    },
+    {
+      "issue": 265,
+      "comment_id": 6930719998,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/265#issuecomment-6930719998",
+      "read_back": true
+    },
+    {
+      "issue": 252,
+      "comment_id": 6930721909,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/252#issuecomment-6930721909",
+      "read_back": true
+    }
+  ],
+  "unmodified_destinations": [
+    261,
+    262,
+    267,
+    268,
+    269,
+    271
+  ],
+  "reason": "Checklists anteriores preservados; sem novo requisito ou alteração dessas entregas. Registro central e relatório vinculam os consumidores.",
+  "local_only": true
+}

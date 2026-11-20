@@ -7,7 +7,8 @@ import OpcoesAcesso from "@/components/opcoes-acesso";
 import Link from "next/link";
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import { cadastrarUsuario } from "@/lib/services/auth";
-import { ApiError } from "@/lib/services/http-error";
+import { ApiError, mensagemErroTemporario } from "@/lib/services/http-error";
+import { TERMOS_VERSAO } from "@/lib/termos";
 
 export default function CadastroForm({ retorno, contexto }: { retorno: string | null; contexto?: ReactNode }) {
   const [carregando, setCarregando] = useState(false);
@@ -32,10 +33,19 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
       return;
     }
 
+    if (formulario.get("ciencia_termos") !== "on") {
+      setErro("Confirme a ciência dos Termos de Uso para criar sua conta.");
+      setCarregando(false);
+      (elementoFormulario.elements.namedItem("ciencia_termos") as HTMLInputElement).focus();
+      return;
+    }
+
     enviandoRef.current = true;
     try {
       const resposta = await cadastrarUsuario({
         nome,
+        ciencia_termos: true,
+        termos_versao: TERMOS_VERSAO,
         email: String(formulario.get("email") ?? "").trim().toLowerCase(),
         senha: String(formulario.get("senha") ?? ""),
         ...(retorno ? { return_to: retorno } : {}),
@@ -43,9 +53,9 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
       setMensagem(resposta.message);
       elementoFormulario.reset();
     } catch (falha) {
-      setErro(falha instanceof ApiError && falha.status === 422
+      setErro(mensagemErroTemporario(falha) ?? (falha instanceof ApiError && falha.status === 422
         ? `Revise os dados do cadastro. ${falha.message}`
-        : "Não foi possível realizar o cadastro agora. Tente novamente em instantes.");
+        : "Não foi possível realizar o cadastro agora. Tente novamente em instantes."));
     } finally {
       enviandoRef.current = false;
       setCarregando(false);
@@ -89,6 +99,16 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
 
           <CampoSenha cadastro />
 
+          <div className="space-y-3 text-sm leading-relaxed text-(--ink-soft)">
+            <div className="flex items-start gap-3">
+              <input id="ciencia-termos" name="ciencia_termos" type="checkbox" required
+                aria-describedby="ciencia-termos-ajuda"
+                className="mt-1 size-5 shrink-0 accent-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent" />
+              <label htmlFor="ciencia-termos">Li e estou ciente dos <Link href="/termos-de-uso" target="_blank" rel="noopener noreferrer" className="link">Termos de Uso (abre em outra aba)</Link>, versão {TERMOS_VERSAO}.</label>
+            </div>
+            <p id="ciencia-termos-ajuda">Veja como seus dados são usados na <Link href="/privacidade" target="_blank" rel="noopener noreferrer" className="link">Política de Privacidade (abre em outra aba)</Link>. Esta ciência não é consentimento genérico para tratamento de dados.</p>
+          </div>
+
           <button
             type="submit"
             disabled={carregando}
@@ -112,6 +132,7 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
           {mensagem && <p className="status-box success">{mensagem} {retorno ? "O link de confirmação permitirá retomar esta avaliação." : "Depois de confirmar o e-mail, entre na conta para avaliar."}</p>}
           {erro && <p className="status-box error">{erro}</p>}
         </div>
+    <Link href={retorno ? `/reenviar-confirmacao?returnTo=${encodeURIComponent(retorno)}` : "/reenviar-confirmacao"} className="link self-center text-center text-sm">Não recebeu a confirmação de e-mail?</Link>
     </MolduraConta>
   );
 }

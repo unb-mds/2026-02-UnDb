@@ -34,7 +34,14 @@ await comNavegador({fixture,executar:async({avaliar,cdp,aguardar})=>{
  }
  for(const path of ['/login','/cadastro','/confirmar-email?token=ficticio','/moderacao','/prototipo','/professores?q=teste','/departamentos',`/professores/${pid}/disciplinas/${did}/avaliar`])assert.match((await parse(await(await request(path)).text())).robots,/noindex/,path);
  const lista=await parse(await(await request('/professores')).text());assert.ok(lista.links.some(link=>/^\/professores\/[a-f0-9-]{36}$/.test(link)));assert.ok(lista.links.includes('/catalogo/professores/1'));
- assert.equal((await request('/catalogo/professores/1')).status,200);assert.equal((await request('/catalogo/professores/2')).status,404);
+ assert.equal((await request('/catalogo/professores/1')).status,200);assert.equal((await request('/catalogo/professores/8')).status,200);assert.equal((await request('/catalogo/professores/9')).status,404);
+ const catalogados=[];
+ for(let pagina=0;pagina<9;pagina++){
+  const m=await parse(await(await request(pagina===0?'/professores':`/catalogo/professores/${pagina}`)).text());
+  const links=m.links.filter(link=>/^\/professores\/[a-f0-9-]{36}$/.test(link));
+  assert.equal(links.length,pagina===8?5:12,'lotes curtos sem perder o restante do catálogo');catalogados.push(...links);
+ }
+ assert.equal(new Set(catalogados).size,101,'paginação não duplica nem omite professores');
  assert.equal((await request('/professores/id-invalido')).status,404);assert.equal((await request('/professores/99999999-9999-4999-8999-999999999999')).status,404);
  const robots=await(await request('/robots.txt')).text();assert.match(robots,/Allow: \/\n/);assert.match(robots,/Sitemap: https:\/\/undb.app.br\/sitemap.xml/);assert.doesNotMatch(robots,/Disallow: \/login/);
  const index=await(await request('/sitemap.xml')).text();assert.match(index,/<sitemapindex/);assert.match(index,/sitemaps\/professores\/0.xml/);

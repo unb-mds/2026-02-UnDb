@@ -1,0 +1,288 @@
+{
+  "estado": "implementado",
+  "atualizacoes": {
+    "source-map-js": [
+      "1.2.1",
+      "1.2.2"
+    ],
+    "zod": [
+      "4.6.5",
+      "4.6.6"
+    ]
+  },
+  "manifest": "preservado; apenas dois pacotes do lockfile alterados; npm ci passou",
+  "advisories": {
+    "source-map-js": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+    "zod": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5"
+  },
+  "aplicabilidade": {
+    "source-map-js": "Presente em producao via Next/PostCSS e build Tailwind. PostCSS usa SourceMapConsumer; nao encontrado import direto pelo produto nem caminho HTTP controlado por usuario ate SourceNode.fromStringWithSourceMap. Presenca nao comprova explorabilidade; patch minimo aplicado.",
+    "zod": "Dev via eslint-plugin-react-hooks/zod-validation-error, ausente de npm audit omit=dev; regras usam zod/v4 e arrays durante lint de fonte. Sem import em src; patch minimo aplicado na linha 4."
+  },
+  "checks_frontend": {
+    "lint": 0,
+    "typecheck": 0,
+    "testes": 91,
+    "falhas": 0,
+    "build": 0,
+    "npm_ci_ignore_scripts": 0
+  },
+  "audit_antes": {
+    "total": 14,
+    "producao": 3
+  },
+  "audit_depois": {
+    "total": 12,
+    "producao": 2
+  },
+  "residuais_producao": {
+    "next": {
+      "severidade_reportada": "critical",
+      "avisos": [
+        {
+          "source": 1240609,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Remote Code Execution in next/og ImageResponse",
+          "url": "https://github.com/advisories/GHSA-vcvr-r3jv-pc5j",
+          "severity": "critical",
+          "cwe": [
+            "CWE-1395"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=16.2.0 <16.3.6"
+        },
+        {
+          "source": 1241489,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Pending `use cache` fill can leak Draft Mode content into regular responses and persisted pages",
+          "url": "https://github.com/advisories/GHSA-3w37-wq28-93x7",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-524"
+          ],
+          "cvss": {
+            "score": 4.2,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N"
+          },
+          "range": ">=16.3.0 <16.3.8"
+        },
+        {
+          "source": 1241490,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has cache poisoning of SSG and ISR pages in self-hosted applications",
+          "url": "https://github.com/advisories/GHSA-4jqv-mc3x-m676",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-524"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1241492,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has information disclosure in development server's Model Context Protocol endpoint",
+          "url": "https://github.com/advisories/GHSA-39w2-rjm5-chcv",
+          "severity": "low",
+          "cwe": [
+            "CWE-346"
+          ],
+          "cvss": {
+            "score": 5.4,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1241493,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has information disclosure in App Router metadata image routes via dynamicParams bypass",
+          "url": "https://github.com/advisories/GHSA-f87g-xv8r-7p7x",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-346"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1241495,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has cache poisoning in SSG/ISR rendering that leads to cross-user content substitution and persistent denial of service",
+          "url": "https://github.com/advisories/GHSA-mcj8-r9mp-w47p",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-524"
+          ],
+          "cvss": {
+            "score": 4.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:L"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1241496,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js has Server-Side Request Forgery in Image Optimization",
+          "url": "https://github.com/advisories/GHSA-cjq9-62q9-8jv4",
+          "severity": "high",
+          "cwe": [
+            "CWE-918"
+          ],
+          "cvss": {
+            "score": 6.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N"
+          },
+          "range": ">=16.0.0 <16.3.8"
+        },
+        {
+          "source": 1242816,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when SVG files are used",
+          "url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw",
+          "severity": "critical",
+          "cwe": [
+            "CWE-1395"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=16.0.0 <=16.4.0"
+        },
+        {
+          "source": 1242818,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Denial of Service in App Router using Server Actions",
+          "url": "https://github.com/advisories/GHSA-p3m5-59mp-jv5r",
+          "severity": "high",
+          "cwe": [
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=16.0.0 <=16.4.0"
+        },
+        {
+          "source": 1242825,
+          "name": "next",
+          "dependency": "next",
+          "title": "next.js cache leak across root param values in nested 'use cache' functions",
+          "url": "https://github.com/advisories/GHSA-h694-7cp9-m8p3",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-524"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=16.3.0 <16.3.8"
+        },
+        {
+          "source": 1242859,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Unauthenticated Remote Code Execution in `use cache` functions returning typed arrays",
+          "url": "https://github.com/advisories/GHSA-673q-mjm6-r5xr",
+          "severity": "critical",
+          "cwe": [
+            "CWE-502"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=16.0.0 <=16.4.0"
+        },
+        {
+          "source": 1247486,
+          "name": "next",
+          "dependency": "next",
+          "title": "Next.js: Information disclosure across root params when a 'use cache' function is called through unstable_cache()",
+          "url": "https://github.com/advisories/GHSA-mfr8-8qww-v76h",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-362"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=16.3.0 <=16.4.4"
+        }
+      ],
+      "estado": "pendente de investigacao completa de aplicabilidade; nao corrigido por este escopo E",
+      "observacao": "Nao encontrado ImageResponse/next/og/use cache/unstable_cache em src na busca estatica; isso limita apenas alguns avisos e nao comprova ausencia de todas as condicoes. Investigar separadamente antes de declarar risco resolvido."
+    },
+    "sharp": {
+      "severidade_reportada": "high",
+      "avisos": [
+        {
+          "source": 1241331,
+          "name": "sharp",
+          "dependency": "sharp",
+          "title": "sharp : Vulnerability in librsvg dependency CVE-2026-96889",
+          "url": "https://github.com/advisories/GHSA-wq5f-xc86-pv6w",
+          "severity": "high",
+          "cwe": [
+            "CWE-416",
+            "CWE-1395"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<0.35.5"
+        }
+      ],
+      "estado": "pendente de investigacao completa de aplicabilidade; nao corrigido por este escopo E"
+    }
+  },
+  "proposta_sem_aplicar": {
+    "glob": "13.0.6 -> 14.0.2 (major); https://github.com/advisories/GHSA-3g3m-2fjr-6pw4",
+    "minimatch": "10.2.6 -> 11.0.1 (major); https://github.com/advisories/GHSA-g3hv-75wg-m249; instancias 3.1.5 fora da faixa deste advisory nao devem receber override global",
+    "estado": "planejado, pendente de aprovacao item 9",
+    "responsavel": "Equipe de manutencao UnDb / PO para aprovar major",
+    "passos": [
+      "Verificar versoes compativeis dos pais c8/test-exclude e cadeia eslint-config-next/typescript-eslint",
+      "Confirmar engines Node 22/24, exports e semantica de padroes/cancelamento",
+      "Aplicar em passo isolado apos aprovacao; executar lint, typecheck, testes, cobertura e build; comparar arquivos incluidos/excluidos e lockfile",
+      "Reavaliar antes de aceitar padroes/diretorios nao confiaveis ou incluir em runtime; reavaliar se houver backport compativel"
+    ],
+    "impacto": "Mudanca de padroes, API e cancelamento pode alterar cobertura e lint. Risco residual de CPU/IO em ferramentas de desenvolvimento/CI; omit=dev nao lista estes pacotes. Sem afirmacao de risco zero."
+  },
+  "backup": {
+    "infra_versionada": "Compose possui volume postgres_data; referencias de backup sao pre-condicoes de scripts administrativos. Nao encontrado script/agenda de backup automatico.",
+    "ensaio": {
+      "etapa": "backup-restauracao-sintetica",
+      "exit_code": 0,
+      "tabelas_comparadas": 25,
+      "arquivo_temporario_removido": true
+    },
+    "metodo": "pg_dump -Fc --no-owner --no-privileges de undb_266_test sintetico; pg_restore --exit-on-error em undb_266_restore_test novo; contagem igual em todas as 25 tabelas; retorno zero. Senha por ambiente privado, sem argumento/log.",
+    "limites": "Contagens/restore conferidos; nao prova restaura??o byte a byte, RPO/RTO ou infraestrutura externa. UNLOGGED e efemero por desenho.",
+    "arquivo": "Temporario fora do repo, removido; bancos e papeis removidos. Nenhum dado real ou producao acessado.",
+    "plano": "Planejado: diarios a partir do primeiro dado real, copia de arquivo no inicio de semestre e testes periodicos. Retencao/local/acesso/responsavel e reaplicacao das exclusoes pendentes de validacao; sem servico contratado."
+  }
+}

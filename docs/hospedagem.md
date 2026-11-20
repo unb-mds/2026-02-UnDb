@@ -188,6 +188,16 @@ registrados pelo operador.
 
 ## Backup e restauração — roteiro ainda não executado
 
+**Atualização #267, 17/11/2026:** a descrição abaixo preserva o roteiro original
+da #170. O Bloco 7 da #266 comprovou dump/restore e contagens sintéticas;
+a extensão #267 valida schema, vínculos, reaplicação de exclusões e jornada no
+destino, com resultados no [registro do ensaio](seguranca/evidencias/issue-267/README.md).
+Isso não comprova recuperação da hospedagem. Nicolas informou nesta sessão que
+faz backups manuais no Docker quando necessário; cobertura, histórico, local e
+outros acessos ainda precisam ser detalhados. Não foi inspecionada cópia real.
+O [roteiro curto](operacao/incidentes-recuperacao.md) concentra fatos, limites e
+pendências operacionais, sem criar outro procedimento de backup de produção.
+
 A #170 exige verificação de recuperação. Não foi obtida evidência de dump,
 restauração ou política periódica instalada nesta sessão. Limites/janela de
 restauração do plano Neon devem ser conferidos no projeto, sem pressupor retenção
@@ -226,3 +236,14 @@ operação contínua segue em #169/#171; não se declara atendida pela API no Re
 Responsabilidades de acompanhamento: Nicolas nas #164/#169/#170/#171; time na
 revisão e definição da continuidade; aceite e fechamento de issues permanecem
 manuais com o PO. O registro não cria novo serviço pago, requisito ou SLA.
+
+
+## Operacao atual - #266, Bloco 8
+
+O processo de descarte inclui conteudo excluido, credenciais expiradas e
+registros privados de acesso. Janela padrao configuravel: sete dias para conteudo,
+seis meses corridos para acesso. Conta minima e metadados de rejeicao nao recebem
+prazo inventado. Ciclo/lote e purga estao em backend/.env.example.
+Ver [manutencao](operacao/manutencao.md) e
+[pendencias](seguranca/validacoes-pendentes-266.md). Codigo/Compose nao comprovam
+execucao continua na hospedagem, que permanece pendente de validacao.

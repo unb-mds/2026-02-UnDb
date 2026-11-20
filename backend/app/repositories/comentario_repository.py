@@ -1,3 +1,4 @@
+from app.repositories import voto_comentario_repository
 from uuid import UUID
 
 from sqlalchemy import and_, select
@@ -18,6 +19,7 @@ def bloquear_avaliacao(db: Session, avaliacao_id: UUID) -> None:
 
 
 def apagar(db: Session, comentario: ComentarioVersao) -> None:
+    voto_comentario_repository.apagar_da_versao(db, comentario.id)
     db.delete(comentario)
 
 
@@ -104,6 +106,7 @@ def listar_publicados(
             .join(ComentarioVersao.avaliacao)
             .where(
                 ComentarioVersao.estado == EstadoComentario.PUBLICADO,
+                Avaliacao.excluido_em.is_(None),
                 ComentarioVersao.avaliacao.has(
                     professor_id=professor_id, disciplina_id=disciplina_id
                 ),

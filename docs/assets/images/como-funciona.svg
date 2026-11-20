@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+<title id="title">Como funciona o UnDb</title>
+<desc id="desc">Busque um professor ou disciplina, compare cinco critérios com contexto e contribua com uma conta institucional confirmada.</desc>
+<rect width="1200" height="360" rx="24" fill="#0d1118"/>
+<text x="44" y="58" fill="#f4f7fb" font-family="Arial,sans-serif" font-size="28" font-weight="700">Da busca à experiência compartilhada</text>
+<g font-family="Arial,sans-serif">
+<rect x="44" y="92" width="336" height="222" rx="16" fill="#16233a" stroke="#46566e"/>
+<text x="68" y="134" fill="#7eb4ff" font-size="18" font-weight="700">01 · ENCONTRE</text>
+<text x="68" y="180" fill="#f4f7fb" font-size="24" font-weight="700">Professor ou disciplina</text>
+<text x="68" y="218" fill="#c5cedb" font-size="18">Pesquise nome ou código.</text>
+<text x="68" y="247" fill="#c5cedb" font-size="18">Confira unidade e contexto.</text>
+<text x="68" y="285" fill="#79d8b5" font-size="16">Consulta pública, sem cadastro.</text>
+<path d="M391 198h22m-8-8 8 8-8 8" stroke="#7eb4ff" stroke-width="3" fill="none"/>
+<rect x="432" y="92" width="336" height="222" rx="16" fill="#16233a" stroke="#46566e"/>
+<text x="456" y="134" fill="#7eb4ff" font-size="18" font-weight="700">02 · COMPARE</text>
+<text x="456" y="180" fill="#f4f7fb" font-size="24" font-weight="700">Cinco critérios separados</text>
+<text x="456" y="218" fill="#c5cedb" font-size="18">Leia também a quantidade.</text>
+<text x="456" y="247" fill="#c5cedb" font-size="18">Considere a mesma disciplina.</text>
+<text x="456" y="285" fill="#79d8b5" font-size="16">Sem nota geral; mínimo de 3.</text>
+<path d="M779 198h22m-8-8 8 8-8 8" stroke="#7eb4ff" stroke-width="3" fill="none"/>
+<rect x="820" y="92" width="336" height="222" rx="16" fill="#133229" stroke="#46566e"/>
+<text x="844" y="134" fill="#79d8b5" font-size="18" font-weight="700">03 · CONTRIBUA</text>
+<text x="844" y="180" fill="#f4f7fb" font-size="24" font-weight="700">Compartilhe sua experiência</text>
+<text x="844" y="218" fill="#c5cedb" font-size="18">Confirme o e-mail e avalie.</text>
+<text x="844" y="247" fill="#c5cedb" font-size="18">O comentário é opcional.</text>
+<text x="844" y="285" fill="#79d8b5" font-size="16">Conta @aluno.unb.br confirmada.</text>
+</g>
+</svg>

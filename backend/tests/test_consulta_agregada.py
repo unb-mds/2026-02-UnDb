@@ -1,3 +1,5 @@
+import asyncio
+import json
 import os
 import unittest
 from types import SimpleNamespace
@@ -11,6 +13,7 @@ os.environ.setdefault(
 os.environ.setdefault("SECRET_KEY", "teste-local")
 
 from app.main import app
+from app.core.database import get_db
 from app.repositories.avaliacao_repository import listar_por_professor_e_disciplina
 from app.repositories.turma_repository import existe_vinculo_professor_disciplina
 from app.models.enums import Dificuldade, QualidadeMaterial
@@ -191,6 +194,84 @@ class ConsultaAgregadaRepositoryTest(unittest.TestCase):
 
 
 class ConsultaAgregadaContratoTest(unittest.TestCase):
+    @patch("app.services.avaliacao_service.turma_repository")
+    @patch("app.services.avaliacao_service.avaliacao_repository")
+    def test_http_metodologia_com_zero_uma_duas_tres_e_quatro(
+        self, repository: Mock, turmas: Mock
+    ) -> None:
+        professor_id, disciplina_id = uuid4(), uuid4()
+        repository.obter_professor.return_value = professor(professor_id)
+        repository.obter_disciplina.return_value = disciplina(disciplina_id)
+        turmas.existe_vinculo_professor_disciplina.return_value = True
+
+        def banco_sintetico():
+            yield Mock()
+
+        async def consultar():
+            mensagens = []
+
+            async def receive():
+                return {"type": "http.request", "body": b"", "more_body": False}
+
+            async def send(mensagem):
+                mensagens.append(mensagem)
+
+            await app(
+                {
+                    "type": "http",
+                    "asgi": {"version": "3.0"},
+                    "http_version": "1.1",
+                    "method": "GET",
+                    "scheme": "http",
+                    "path": f"/api/professores/{professor_id}/disciplinas/{disciplina_id}",
+                    "query_string": b"",
+                    "headers": [],
+                    "server": ("teste", 80),
+                    "client": ("127.0.0.1", 1),
+                    "root_path": "",
+                },
+                receive,
+                send,
+            )
+            self.assertEqual(mensagens[0]["status"], 200)
+            return json.loads(b"".join(m.get("body", b"") for m in mensagens))
+
+        # Repositório sintético; router, serviço, fórmulas e serialização reais.
+        with patch.dict(app.dependency_overrides, {get_db: banco_sintetico}):
+            for total in (0, 1, 2, 3, 4):
+                with self.subTest(total=total):
+                    itens = [
+                        registro(chamada=i % 2 == 0, material=i % 2 == 0) for i in range(total)
+                    ]
+                    for i, item in enumerate(itens):
+                        item.didatica = i + 1
+                        item.recomenda = i % 2 == 0
+                    repository.listar_por_professor_e_disciplina.return_value = itens
+                    resposta = asyncio.run(consultar())
+                    self.assertEqual(resposta["total_avaliacoes"], total)
+                    self.assertEqual(resposta["dados_suficientes"], total >= 3)
+                    if total < 3:
+                        for criterio in (
+                            "didatica",
+                            "dificuldade",
+                            "chamada",
+                            "recomenda",
+                            "disponibiliza_material",
+                            "qualidade_material",
+                        ):
+                            self.assertNotIn(criterio, resposta)
+                    else:
+                        self.assertEqual(resposta["didatica"], 2.0 if total == 3 else 2.5)
+                        self.assertEqual(resposta["recomenda"], 67 if total == 3 else 50)
+                        self.assertEqual(resposta["chamada"], True if total == 3 else "CONFLITANTE")
+                        self.assertEqual(
+                            resposta["disponibiliza_material"],
+                            True if total == 3 else "CONFLITANTE",
+                        )
+                        self.assertEqual(
+                            resposta["qualidade_material"], "BOM" if total == 3 else None
+                        )
+
     def test_endpoint_publico_esta_registrado(self) -> None:
         operacoes = app.openapi()["paths"][
             "/api/professores/{professor_id}/disciplinas/{disciplina_id}"

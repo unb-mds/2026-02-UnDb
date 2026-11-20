@@ -57,6 +57,7 @@ def listar_turmas(db: Session, disciplina_id) -> list[Turma]:
 def listar_mais_avaliadas(db: Session, limite: int = 6) -> list[tuple[Disciplina, int]]:
     contagens = (
         select(Avaliacao.disciplina_id, func.count(Avaliacao.id).label("total"))
+        .where(Avaliacao.excluido_em.is_(None))
         .group_by(Avaliacao.disciplina_id)
         .subquery()
     )

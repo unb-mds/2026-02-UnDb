@@ -1,0 +1,6 @@
+{
+  "backend/requirements.txt": "a466dfcae4c59b38528e51e0db738834a5444bc64d5a874cbe3d84605144f623",
+  "backend/requirements-dev.txt": "806a3f374c31a3358c198d4738fc78b2bbd8174845c25406f66fd76b1bc8204b",
+  "frontend/package.json": "6da3f8be995a57fd8e107dd39baae27eb6c5227d34ac650601a1cfc0f27a0276",
+  "frontend/package-lock.json": "0cde0c8907bb4c504edddaf043245b106d65437f2d22bd5123dffa319df1e520"
+}

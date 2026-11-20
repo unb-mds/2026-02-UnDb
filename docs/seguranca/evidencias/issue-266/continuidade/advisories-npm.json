@@ -1,0 +1,378 @@
+[
+  {
+    "ghsa_id": "GHSA-2464-fhr4-w9xw",
+    "cve_id": null,
+    "html_url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw",
+    "summary": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when SVG files are used",
+    "severity": "critical",
+    "published_at": "2026-10-22T15:52:53Z",
+    "updated_at": "2026-10-22T15:52:56Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 10.0.0, <= 15.5.27",
+        "first_patched_version": "15.5.28",
+        "vulnerable_functions": []
+      },
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.0.0, <= 16.4.0",
+        "first_patched_version": "16.4.1",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-39w2-rjm5-chcv",
+    "cve_id": "CVE-2026-94486",
+    "html_url": "https://github.com/advisories/GHSA-39w2-rjm5-chcv",
+    "summary": "Next.js has information disclosure in development server's Model Context Protocol endpoint",
+    "severity": "low",
+    "published_at": "2026-10-07T20:31:51Z",
+    "updated_at": "2026-10-07T20:31:52Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.0.0, < 16.3.8",
+        "first_patched_version": "16.3.8",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-3g3m-2fjr-6pw4",
+    "cve_id": "CVE-2026-118773",
+    "html_url": "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4",
+    "summary": "Glob: AbortSignal cancellation bypass allows post-timeout filesystem traversal",
+    "severity": "medium",
+    "published_at": "2026-10-30T23:09:11Z",
+    "updated_at": "2026-10-30T23:09:15Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "glob"
+        },
+        "vulnerable_version_range": ">= 9.0.0, <= 14.0.1",
+        "first_patched_version": "14.0.2",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-3w37-wq28-93x7",
+    "cve_id": "CVE-2026-94544",
+    "html_url": "https://github.com/advisories/GHSA-3w37-wq28-93x7",
+    "summary": "Next.js: Pending `use cache` fill can leak Draft Mode content into regular responses and persisted pages",
+    "severity": "medium",
+    "published_at": "2026-10-07T20:32:13Z",
+    "updated_at": "2026-10-07T20:32:15Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.3.0, < 16.3.8",
+        "first_patched_version": "16.3.8",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-4jqv-mc3x-m676",
+    "cve_id": "CVE-2026-94543",
+    "html_url": "https://github.com/advisories/GHSA-4jqv-mc3x-m676",
+    "summary": "Next.js has cache poisoning of SSG and ISR pages in self-hosted applications",
+    "severity": "medium",
+    "published_at": "2026-10-07T20:32:06Z",
+    "updated_at": "2026-10-07T20:32:07Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 15.0.0, < 15.5.27",
+        "first_patched_version": "15.5.27",
+        "vulnerable_functions": []
+      },
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.0.0, < 16.3.8",
+        "first_patched_version": "16.3.8",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-673q-mjm6-r5xr",
+    "cve_id": null,
+    "html_url": "https://github.com/advisories/GHSA-673q-mjm6-r5xr",
+    "summary": "Next.js: Unauthenticated Remote Code Execution in `use cache` functions returning typed arrays",
+    "severity": "critical",
+    "published_at": "2026-10-22T16:42:31Z",
+    "updated_at": "2026-10-22T16:42:32Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.0.0, <= 16.4.0",
+        "first_patched_version": "16.4.1",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-68fv-2mgg-jv7q",
+    "cve_id": "CVE-2026-93749",
+    "html_url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+    "summary": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+    "severity": "high",
+    "published_at": "2026-09-18T18:31:44Z",
+    "updated_at": "2026-10-05T23:31:22Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "source-map-js"
+        },
+        "vulnerable_version_range": ">= 1.0.0, < 1.2.2",
+        "first_patched_version": "1.2.2",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-cjq9-62q9-8jv4",
+    "cve_id": "CVE-2026-94483",
+    "html_url": "https://github.com/advisories/GHSA-cjq9-62q9-8jv4",
+    "summary": "Next.js has Server-Side Request Forgery in Image Optimization",
+    "severity": "high",
+    "published_at": "2026-10-07T20:30:55Z",
+    "updated_at": "2026-10-07T20:30:56Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.0.0, < 16.3.8",
+        "first_patched_version": "16.3.8",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-f87g-xv8r-7p7x",
+    "cve_id": "CVE-2026-94485",
+    "html_url": "https://github.com/advisories/GHSA-f87g-xv8r-7p7x",
+    "summary": "Next.js has information disclosure in App Router metadata image routes via dynamicParams bypass",
+    "severity": "medium",
+    "published_at": "2026-10-07T20:31:33Z",
+    "updated_at": "2026-10-07T20:31:35Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.0.0, < 16.3.8",
+        "first_patched_version": "16.3.8",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-g3hv-75wg-m249",
+    "cve_id": "CVE-2026-118764",
+    "html_url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+    "summary": "minimatch has potential denial of service via globparts amplification",
+    "severity": "medium",
+    "published_at": "2026-10-30T23:09:55Z",
+    "updated_at": "2026-11-04T16:50:04Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "minimatch"
+        },
+        "vulnerable_version_range": ">= 7.0.0, < 11.0.1",
+        "first_patched_version": "11.0.1",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-h694-7cp9-m8p3",
+    "cve_id": "CVE-2026-103004",
+    "html_url": "https://github.com/advisories/GHSA-h694-7cp9-m8p3",
+    "summary": "next.js cache leak across root param values in nested 'use cache' functions",
+    "severity": "medium",
+    "published_at": "2026-10-22T16:08:40Z",
+    "updated_at": "2026-10-22T16:08:41Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.3.0, < 16.3.8",
+        "first_patched_version": "16.3.8",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-mcj8-r9mp-w47p",
+    "cve_id": "CVE-2026-94484",
+    "html_url": "https://github.com/advisories/GHSA-mcj8-r9mp-w47p",
+    "summary": "Next.js has cache poisoning in SSG/ISR rendering that leads to cross-user content substitution and persistent denial of service",
+    "severity": "medium",
+    "published_at": "2026-10-07T20:31:13Z",
+    "updated_at": "2026-10-07T20:31:15Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.0.0, < 16.3.8",
+        "first_patched_version": "16.3.8",
+        "vulnerable_functions": []
+      },
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 15.0.0, < 15.5.27",
+        "first_patched_version": "15.5.27",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-mfr8-8qww-v76h",
+    "cve_id": "CVE-2026-119790",
+    "html_url": "https://github.com/advisories/GHSA-mfr8-8qww-v76h",
+    "summary": "Next.js: Information disclosure across root params when a 'use cache' function is called through unstable_cache()",
+    "severity": "medium",
+    "published_at": "2026-11-16T18:51:22Z",
+    "updated_at": "2026-11-16T18:51:23Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.3.0, <= 16.4.4",
+        "first_patched_version": "16.4.5",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-mrhx-c7xc-m3w5",
+    "cve_id": "CVE-2023-54404",
+    "html_url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+    "summary": "Zod can exhaust memory while validating oversized constrained collections",
+    "severity": "high",
+    "published_at": "2026-10-01T18:32:46Z",
+    "updated_at": "2026-10-23T18:26:52Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "zod"
+        },
+        "vulnerable_version_range": "< 4.6.6",
+        "first_patched_version": "4.6.6",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-p3m5-59mp-jv5r",
+    "cve_id": "CVE-2026-94482",
+    "html_url": "https://github.com/advisories/GHSA-p3m5-59mp-jv5r",
+    "summary": "Next.js: Denial of Service in App Router using Server Actions",
+    "severity": "high",
+    "published_at": "2026-10-22T15:50:34Z",
+    "updated_at": "2026-10-22T15:50:35Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 13.0.0, <= 15.5.27",
+        "first_patched_version": "15.5.28",
+        "vulnerable_functions": []
+      },
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.0.0, <= 16.4.0",
+        "first_patched_version": "16.4.1",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-vcvr-r3jv-pc5j",
+    "cve_id": null,
+    "html_url": "https://github.com/advisories/GHSA-vcvr-r3jv-pc5j",
+    "summary": "Next.js: Remote Code Execution in next/og ImageResponse",
+    "severity": "critical",
+    "published_at": "2026-09-30T14:48:30Z",
+    "updated_at": "2026-09-30T14:48:31Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "next"
+        },
+        "vulnerable_version_range": ">= 16.2.0, < 16.3.6",
+        "first_patched_version": "16.3.6",
+        "vulnerable_functions": []
+      }
+    ]
+  },
+  {
+    "ghsa_id": "GHSA-wq5f-xc86-pv6w",
+    "cve_id": null,
+    "html_url": "https://github.com/advisories/GHSA-wq5f-xc86-pv6w",
+    "summary": "sharp : Vulnerability in librsvg dependency CVE-2026-96889",
+    "severity": "high",
+    "published_at": "2026-10-06T13:43:57Z",
+    "updated_at": "2026-10-06T13:43:58Z",
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "sharp"
+        },
+        "vulnerable_version_range": "< 0.35.5",
+        "first_patched_version": "0.35.5",
+        "vulnerable_functions": []
+      }
+    ]
+  }
+]

@@ -49,14 +49,14 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
   }, [termoBuscado, tentativa, tipo]);
 
   return (
-    <main className="container flex flex-1 flex-col gap-8 py-8 sm:py-12">
+    <section aria-label={`Busca de ${tipo}`} className="container flex flex-1 flex-col gap-4 py-5 sm:gap-8 sm:py-12">
       <Caminho itens={[{ nome: "Início", href: "/" }, { nome: professor ? "Professores" : "Disciplinas" }]} />
       <div className="flex w-full flex-col items-center gap-2">
-        <div className="hero-intro search-hero-intro">
+        <div className="hero-intro search-hero-intro gap-3! py-3! sm:gap-5! sm:py-6!">
           <MapaVento className="hero-wind" />
           <span className="eyebrow">Busca</span>
           <h1 className="hero-title hero-title-sm">{buscaValida ? `Resultados para “${termo}”` : `Buscar ${professor ? "professor" : "disciplina"}`}</h1>
-          <p className="hero-copy">
+          <p className="hero-copy text-sm! sm:text-[17px]!">
             {professor ? "Digite o nome, completo ou parcial — acentos e maiúsculas não importam." : "Digite o nome ou o código — ex.: algoritmos ou CIC0004."}
             {" "}A consulta é pública e abrange todas as unidades acadêmicas.
           </p>
@@ -75,7 +75,7 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
       </div>
 
       <section aria-label="Resultados da busca" className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-(--border) pb-4">
+        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-(--border) pb-4">
           <nav aria-label="Tipo de busca" className="flex flex-wrap gap-2 text-sm text-(--muted)">
             <Link href={urlBusca({ ...contexto, tipo: "professores" })} aria-current={professor ? "page" : undefined} className="border-b-2 border-transparent px-3 py-3 hover:text-foreground aria-[current=page]:border-accent aria-[current=page]:text-foreground">Professores</Link>
             <Link href={urlBusca({ ...contexto, tipo: "disciplinas" })} aria-current={!professor ? "page" : undefined} className="border-b-2 border-transparent px-3 py-3 hover:text-foreground aria-[current=page]:border-accent aria-[current=page]:text-foreground">Disciplinas</Link>
@@ -93,7 +93,7 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
           </select>
         </label>
         </div>
-        <p id="unidade-ajuda" className="text-sm text-(--muted)">
+        <p id="unidade-ajuda" className="sr-only sm:not-sr-only sm:text-sm sm:text-(--muted)">
           Unidade acadêmica pode ser departamento, instituto ou faculdade, conforme o cadastro institucional.
         </p>
         <div aria-live="polite" aria-atomic="true" aria-busy={carregando}>
@@ -123,6 +123,6 @@ export default function BuscaInstitucional({ tipo }: { tipo: TipoBusca }) {
           </>
         )}
       </section>
-    </main>
+    </section>
   );
 }

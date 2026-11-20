@@ -22,6 +22,8 @@ from app.core.auth import SESSION_COOKIE_NAME
 from app.core.database import get_db
 from app.core.security import gerar_hash_token
 from app.main import app
+from app.core.dependencia_limite_abuso import obter_limitador
+from tests.auth_abuso_fixtures import protecao_permitida
 from app.models.avaliacao import Avaliacao
 from app.models.comentario_versao import ComentarioVersao
 from app.models.disciplina import Disciplina
@@ -181,6 +183,8 @@ class AvaliacaoModelTest(unittest.TestCase):
                 "recomenda",
                 "created_at",
                 "updated_at",
+                "excluido_em",
+                "purgar_em",
             },
         )
 
@@ -526,9 +530,11 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
             with Session(self.engine) as session:
                 yield session
 
+        app.dependency_overrides[obter_limitador] = lambda: protecao_permitida().limitador
         app.dependency_overrides[get_db] = override_get_db
 
     def tearDown(self) -> None:
+        app.dependency_overrides.pop(obter_limitador, None)
         app.dependency_overrides.pop(get_db, None)
         self.db.close()
         self.engine.dispose()
@@ -540,6 +546,7 @@ class RegistroAvaliacaoHttpTest(unittest.TestCase):
     ) -> tuple[int, dict]:
         corpo = json.dumps(payload).encode("utf-8")
         headers = [
+            (b"origin", b"http://localhost:3000"),
             (b"content-type", b"application/json"),
             (b"content-length", str(len(corpo)).encode("ascii")),
         ]

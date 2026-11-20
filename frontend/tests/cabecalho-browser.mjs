@@ -18,6 +18,10 @@ const fixture = createServer(async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   if (req.method === "OPTIONS") { res.writeHead(204).end(); return; }
   if (req.url.startsWith("/api/moderacao/comentarios")) { res.writeHead(autenticado && moderador ? 200 : 403).end(autenticado && moderador ? "[]" : "{}"); return; }
+  if (req.url.startsWith("/api/avaliacoes/minhas")) {
+    res.writeHead(autenticado ? 200 : 401).end(JSON.stringify(autenticado ? { itens: [], total: 0, pagina: 1, tamanho: 10 } : {}));
+    return;
+  }
   if (req.url === "/api/auth/sessao") {
     const corpo = { autenticado };
     if (segurarProxima) {

@@ -8,8 +8,9 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core import config
-from app.domain.triagem_comentario import VERSAO_LISTA, categorias_lexicais, contem_dados_sensiveis
-from app.models.enums import EstadoComentario
+from app.domain.triagem_comentario import VERSAO_LISTA, contem_dados_sensiveis
+from app.domain.filtro_moderacao import FiltroIndisponivel, categorias_para_triagem
+from app.models.enums import EstadoComentario, MotivoDenuncia
 from app.models.usuario import Usuario
 from app.repositories import comentario_repository, denuncia_repository
 from app.schemas.triagem import TriagemResponse
@@ -73,9 +74,22 @@ def analisar(db: Session, usuario: Usuario, versao_id: UUID) -> TriagemResponse:
         status="DESATIVADA",
         filtro_ativo=config.MODERACAO_FILTRO_ATIVO,
         versao_lista=VERSAO_LISTA,
-        categorias_locais=categorias_lexicais(texto) if config.MODERACAO_FILTRO_ATIVO else [],
+        categorias_locais=[],
         versao_integracao=openai_triagem.VERSAO_INTEGRACAO,
     )
+    if config.MODERACAO_FILTRO_ATIVO:
+        try:
+            resposta.categorias_locais = [
+                MotivoDenuncia(categoria)
+                for categoria in categorias_para_triagem(
+                    texto,
+                    disfarces_ativos=config.MODERACAO_DISFARCES_ATIVO,
+                    substituicoes_ativas=config.MODERACAO_SUBSTITUICOES_ATIVAS,
+                )
+            ]
+        except FiltroIndisponivel:
+            resposta.status = "INDISPONIVEL"
+            return resposta
     if not config.MODERACAO_IA_ATIVA or not config.MODERACAO_IA_DADOS_APROVADOS:
         return resposta
     if len(texto) > 500 or sensivel:

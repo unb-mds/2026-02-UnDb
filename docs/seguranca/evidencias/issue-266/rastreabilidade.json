@@ -1,0 +1,77 @@
+{
+  "base": "d99916e93186864c2769ae95ea577bba477b4e17",
+  "implementation_commit": "5e5ab50bb8d2e1dca4852a962869a7e799f5ff9b",
+  "published_code": false,
+  "comments": [
+    {
+      "issue": 272,
+      "id": 6906902341,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/272#issuecomment-6906902341",
+      "verificado": true,
+      "checklists": 0
+    },
+    {
+      "issue": 266,
+      "id": 6906911556,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/266#issuecomment-6906911556",
+      "verificado": true,
+      "checklists": 9
+    },
+    {
+      "issue": 263,
+      "id": 6906912447,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/263#issuecomment-6906912447",
+      "verificado": true,
+      "checklists": 7
+    },
+    {
+      "issue": 261,
+      "id": 6906923249,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/261#issuecomment-6906923249",
+      "verificado": true,
+      "checklists": 3
+    },
+    {
+      "issue": 262,
+      "id": 6906924124,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/262#issuecomment-6906924124",
+      "verificado": true,
+      "checklists": 3
+    },
+    {
+      "issue": 265,
+      "id": 6906924932,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/265#issuecomment-6906924932",
+      "verificado": true,
+      "checklists": 3
+    },
+    {
+      "issue": 267,
+      "id": 6906925839,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/267#issuecomment-6906925839",
+      "verificado": true,
+      "checklists": 3
+    },
+    {
+      "issue": 268,
+      "id": 6906926619,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/268#issuecomment-6906926619",
+      "verificado": true,
+      "checklists": 3
+    },
+    {
+      "issue": 269,
+      "id": 6906927471,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/269#issuecomment-6906927471",
+      "verificado": true,
+      "checklists": 3
+    },
+    {
+      "issue": 271,
+      "id": 6906928253,
+      "url": "https://github.com/unb-mds/2026-02-UnDb/issues/271#issuecomment-6906928253",
+      "verificado": true,
+      "checklists": 3
+    }
+  ]
+}

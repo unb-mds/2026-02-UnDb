@@ -35,12 +35,23 @@ theme:
 
 nav:
   - Início: index.md
-  - Começar:
+  - Para usar:
+      - Tutorial passo a passo: tutorial-uso.md
+  - Para desenvolver:
+      - Por onde começar: para-desenvolvedores.md
       - Desenvolvimento local: desenvolvimento.md
+      - Como contribuir: https://github.com/unb-mds/2026-02-UnDb/blob/develop/CONTRIBUTING.md
       - Qualidade e verificações: qualidade.md
+      - Design system: design-system.md
+      - Implantação e operação: implantacao.md
+      - Incidentes e recuperação: operacao/incidentes-recuperacao.md
+      - Implementando com IA: implementando-com-ia.md
+      - Registro de uso de IA: uso-ia.md
   - Produto:
       - Visão: visao.md
       - Requisitos: requisitos.md
+      - Transparência, Privacidade e Termos: transparencia.md
+      - Política de Moderação: politica-moderacao.md
       - Board no Figma: figma.md
       - Apoio à moderação com IA: moderacao-ia.md
   - Arquitetura:
@@ -53,8 +64,12 @@ nav:
       - Identidades docentes: identidades-docentes.md
       - Operação do SIGAA: operacao-importacao-sigaa.md
       - Hospedagem e operação pública: hospedagem.md
+      - Continuidade operacional: continuidade-operacional.md
+      - Canal de solicitações: canal-titulares.md
       - Acesso PostgreSQL da API: acesso-postgresql-api.md
       - Inicialização no Render: inicializacao-render.md
+      - Sessões, abuso e logs — Issue 266: seguranca/revisao-sessoes-abuso-logs-issue-266.md
+      - Dependências — Issue 266: seguranca/dependencias-issue-266.md
   - Releases:
       - Release 1.0.0: releases/1.0.0.md
       - Release 1.1.0: releases/1.1.0.md
@@ -64,13 +79,33 @@ nav:
       - Release 1.4.0: releases/1.4.0.md
       - Release 1.5.0: releases/1.5.0.md
       - Release 1.7.0 — candidata: releases/1.7.0.md
+      - Release 2.0.0-rc.1 — candidata: releases/2.0.0-rc.1.md
       - Release 2.0.0 — planejamento: releases/2.0.0-planejamento.md
       - Release 2.0.0 — reconciliação documental: releases/2.0.0-reconciliacao.md
+      - "Release 2.0.0 — resumo da revisão #168": releases/2.0.0-resumo-revisao-168.md
   - Estudos:
+      - Atas e documentação — Issue 241: estudos/registro-issue-241.md
+      - Transparência e ciência dos Termos — Issue 269: estudos/transparencia-issue-269.md
+      - Integridade das notas — Issue 270 (decisões pendentes): estudos/integridade-notas-issue-270.md
+      - Moderação — avaliação da Issue 252:
+          - Ampliação com substituições numéricas: estudos/implementacao-substituicoes-issue-252.md
+          - Resultados das substituições: estudos/evidencias/issue-252/resultados-leet.md
+          - Implementação da primeira etapa: estudos/implementacao-ofensas-disfarcadas-issue-252.md
+          - Resultados da primeira etapa: estudos/evidencias/issue-252/resultados-etapa1.md
+          - Avaliação técnica: estudos/avaliacao-ofensas-disfarcadas-issue-252.md
+          - Casos e resultados: estudos/evidencias/issue-252/resultados.md
+          - Reprodução e validação: estudos/evidencias/issue-252/reproducao.md
       - Busca — avaliação da Issue 251:
           - Avaliação técnica: estudos/avaliacao-busca-autocomplete-issue-251.md
           - Casos e medições: estudos/evidencias/issue-251/resultados.md
           - Reprodução e validação: estudos/evidencias/issue-251/reproducao.md
+      - Comunicação e preparação jurídica — PR 277:
+          - Revisão e aceites: estudos/revisao-pr277.md
+          - Análise preliminar: estudos/revisao-juridica-preliminar-pr277.md
+          - Casos para validação: estudos/casos-juridicos-pr277.md
+          - Inventário técnico: estudos/inventario-tecnico-pr277.md
+          - Verificação das pendências: estudos/verificacao-pendencias-pr277.md
+          - Aceite editorial complementar: estudos/aceite-complementar-pr277.md
       - Auditoria e agenda SIGAA — Issue 164: estudos/verificacao-importacao-sigaa-issue-164.md
       - Acesso PostgreSQL — Issue 170: estudos/verificacao-acesso-postgresql-issue-170.md
       - Importação no Neon — 10/11/2026: estudos/importacao-neon-2026-11-10.md
@@ -100,10 +135,23 @@ nav:
       - Verificação formulario avaliacao: estudos/verificacao-formulario-avaliacao.md
       - Interface de comentários — Issue 159: estudos/interface-comentarios-issue-159.md
       - Validação integrada de comentários e moderação — Issue 163: estudos/validacao-integrada-issue-163.md
+  - Operacao e seguranca:
+      - Manutencao: operacao/manutencao.md
+      - Validacoes pendentes: seguranca/validacoes-pendentes-266.md
+      - Retencao: seguranca/retencao-bloco-5.md
+      - Acessos: seguranca/acessos-bloco-6.md
   - Processo:
       - Template de ata de reunião: atas/template-ata-reuniao.md
   - Atas:
-      - 2026-09-17: atas/2026-09-17.md
+      - Índice e cobertura das semanas: atas/README.md
+      - 14/09 — Sprint 03: atas/2026-09-14.md
+      - 17/09 — Sprint 4: atas/2026-09-17.md
+      - 05–11/10 — após R1: atas/2026-10-05-a-11.md
+      - 12–18/10 — Meet: atas/2026-10-12-a-18.md
+      - 26/10–01/11 — presencial: atas/2026-10-26-a-11-01.md
+      - 02–08/11 — frontend: atas/2026-11-02-a-08.md
+      - 16/11 — R2 e pendências jurídicas: atas/2026-11-16.md
+      - Orientações relatadas em 17/11: orientacoes-2026-11-17.md
   - Relatórios:
       - Relatório RF19: relatorio_rf19.md
 

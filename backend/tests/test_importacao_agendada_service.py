@@ -108,7 +108,8 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
                 select(ImportacaoExecucao).where(ImportacaoExecucao.id == registro_id)
             )
             self.assertEqual(persistido.status, "falha")
-            self.assertIn("RuntimeError: falha inesperada", persistido.erro)
+            self.assertIn("RuntimeError", persistido.erro)
+            self.assertNotIn("falha inesperada", persistido.erro)
             self.assertFalse(persistido.resultado_json["sucesso"])
 
     def test_registra_falha_ao_enumerar_unidades(self) -> None:
@@ -122,7 +123,8 @@ class ImportacaoAgendadaServiceTest(unittest.TestCase):
         with Session(self.engine) as db:
             persistido = db.get(ImportacaoExecucao, registro_id)
             self.assertEqual(persistido.status, "falha")
-            self.assertIn("formulário SIGAA indisponível", persistido.erro)
+            self.assertIn("RuntimeError", persistido.erro)
+            self.assertNotIn("formulário SIGAA indisponível", persistido.erro)
             self.assertEqual(persistido.departamentos, [])
 
     @patch("app.commands.importar_sigaa_agendado.listar_unidades_reais")

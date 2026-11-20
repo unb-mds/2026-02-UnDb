@@ -1,0 +1,105 @@
+{
+  "estado": "implementado",
+  "registrado_em": "2026-11-17T03:56:08.778094+00:00",
+  "fonte": "EXECUTAR: BLOCO 8 e decisoes A-F do PO",
+  "base": "c02396c",
+  "commit_teste": "2362f92",
+  "ambiente": "Windows local, Python 3.12.16, PostgreSQL 16.16 descartavel em loopback, API sem DDL",
+  "backend": {
+    "selecionados": 87,
+    "suite_total": 424,
+    "falhas_finais": 0,
+    "skips": 2,
+    "motivo_skips": "Identidades/reconciliacao exigem banco undb_207_test separado",
+    "etapas": [
+      {
+        "etapa": "upgrade",
+        "exit_code": 0
+      },
+      {
+        "etapa": "check",
+        "exit_code": 0
+      },
+      {
+        "etapa": "downgrade-bloco1",
+        "exit_code": 0
+      },
+      {
+        "etapa": "upgrade-repetido",
+        "exit_code": 0
+      },
+      {
+        "etapa": "downgrade-base",
+        "exit_code": 0
+      },
+      {
+        "etapa": "upgrade-base",
+        "exit_code": 0
+      },
+      {
+        "etapa": "testes-bloco6",
+        "exit_code": 0
+      },
+      {
+        "etapa": "suite-completa",
+        "exit_code": 0
+      },
+      {
+        "etapa": "moderacao-http",
+        "exit_code": 0
+      },
+      {
+        "etapa": "limpeza-cli",
+        "exit_code": 0
+      },
+      {
+        "etapa": "purga-cli",
+        "exit_code": 0
+      },
+      {
+        "etapa": "rollback-com-dados",
+        "exit_code": 0
+      },
+      {
+        "etapa": "check-final",
+        "exit_code": 0
+      }
+    ]
+  },
+  "frontend": {
+    "lint": 0,
+    "typecheck": 0,
+    "testes": 91,
+    "falhas": 0,
+    "build": 0,
+    "sobre_browser": "equipe-browser.mjs passou, 320/768/1280 sem overflow"
+  },
+  "checks": {
+    "ruff_check": 0,
+    "ruff_format": 0,
+    "compileall": 0,
+    "mkdocs_strict": 0,
+    "diff_check": 0
+  },
+  "ocorrencias": [
+    "Duas execucoes completas falharam no teste de 40 incrementos com lock timeout 200 ms, inclusive sem build concorrente; selecionados passavam",
+    "Conexao isolada apenas no teste de atomicidade passou a ter mais tempo; mesmas assercoes de 7 permissoes/40 incrementos preservadas. Produto e testes especificos de timeout inalterados",
+    "Suite final passou 424 com 2 skips; nao foram ocultadas execucoes anteriores"
+  ],
+  "documentos": [
+    "docs/seguranca/validacoes-pendentes-266.md",
+    "docs/operacao/manutencao.md",
+    "docs/arquitetura.md",
+    "docs/canal-titulares.md",
+    "docs/desenvolvimento.md",
+    "docs/hospedagem.md"
+  ],
+  "publico": {
+    "alteracao": "Somente paragrafo factual no Sobre; commit separado",
+    "home": "Revisada e preservada",
+    "politica_termos": "Nao encontrados no codigo atual; redacao/revisao humana pendentes"
+  },
+  "restricoes": "Sem producao, dump real, merge, fechamento ou comentarios em issues",
+  "ci": "SHA anterior c02396c sem execucao identificada. Ultimo push do Bloco 8 a conferir na PR; nao alegar aprovacao anterior para novo SHA",
+  "pendencias": "Matriz unica mantem itens 4/8/9-14, operacao, backups, vulnerabilidades residuais, textos e aceite humano pendentes de validacao"
+}

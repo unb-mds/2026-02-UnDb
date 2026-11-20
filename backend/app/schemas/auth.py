@@ -1,7 +1,10 @@
 import re
 from urllib.parse import parse_qsl
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from app.domain.email import normalizar_email
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, field_validator
+
+from app.domain.termos import TERMOS_VERSAO
 
 
 EMAIL_INSTITUCIONAL = re.compile(r"^[^@\s]+@aluno\.unb\.br$", re.IGNORECASE)
@@ -17,6 +20,23 @@ class CadastroRequest(BaseModel):
     nome: str
     email: str = Field(max_length=150)
     senha: str = Field(min_length=8, max_length=128)
+    ciencia_termos: StrictBool
+    termos_versao: str = Field(max_length=32)
+
+    @field_validator("ciencia_termos")
+    @classmethod
+    def validar_ciencia_termos(cls, valor: bool) -> bool:
+        if valor is not True:
+            raise ValueError("Confirme a ciência dos Termos de Uso para criar a conta.")
+        return valor
+
+    @field_validator("termos_versao")
+    @classmethod
+    def validar_versao_termos(cls, valor: str) -> str:
+        if valor != TERMOS_VERSAO:
+            raise ValueError("Reabra os Termos de Uso e confirme a versão vigente.")
+        return valor
+
     return_to: str | None = Field(default=None, max_length=2048)
 
     @field_validator("return_to")
@@ -59,7 +79,7 @@ class CadastroRequest(BaseModel):
     @field_validator("email")
     @classmethod
     def validar_email(cls, email: str) -> str:
-        email_normalizado = email.strip().casefold()
+        email_normalizado = normalizar_email(email)
         if not EMAIL_INSTITUCIONAL.fullmatch(email_normalizado):
             raise ValueError("email deve pertencer ao domínio @aluno.unb.br")
         return email_normalizado
@@ -80,7 +100,7 @@ class LoginRequest(BaseModel):
     @field_validator("email")
     @classmethod
     def normalizar_email(cls, email: str) -> str:
-        return email.strip().casefold()
+        return normalizar_email(email)
 
 
 class SessaoResponse(BaseModel):
@@ -104,3 +124,12 @@ class RecuperarSenhaRequest(BaseModel):
 
 class RedefinirSenhaRequest(ConfirmacaoEmailRequest):
     senha: str = Field(min_length=8, max_length=128)
+
+
+class ReenvioConfirmacaoRequest(RecuperarSenhaRequest):
+    return_to: str | None = Field(default=None, max_length=2048)
+
+    @field_validator("return_to")
+    @classmethod
+    def validar_retorno(cls, valor: str | None) -> str | None:
+        return CadastroRequest.validar_retorno(valor)

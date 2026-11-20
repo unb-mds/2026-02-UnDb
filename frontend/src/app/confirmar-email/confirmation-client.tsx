@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { confirmarEmail } from "@/lib/services/auth";
-import { ApiError } from "@/lib/services/http-error";
+import { ApiError, mensagemErroTemporario } from "@/lib/services/http-error";
 import Icone from "@/components/icone";
 import IconeResultado from "@/components/icone-resultado";
 
@@ -34,9 +34,9 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
           const linkInvalido = falha instanceof ApiError && [400, 422].includes(falha.status);
           setEstado("erro");
           setPodeTentar(!linkInvalido);
-          setMensagem(linkInvalido
+          setMensagem(mensagemErroTemporario(falha) ?? (linkInvalido
             ? "Este link é inválido ou expirou."
-            : "Não foi possível confirmar seu e-mail agora. Verifique sua conexão e tente novamente.");
+            : "Não foi possível confirmar seu e-mail agora. Verifique sua conexão e tente novamente."));
         }
       }), 0);
 
@@ -68,6 +68,7 @@ export function ConfirmationClient({ token, retorno }: { token?: string; retorno
           setTentativa((valor) => valor + 1);
         }}>Tentar novamente</button>
       )}
+      {estado === "erro" && <Link href={retorno ? `/reenviar-confirmacao?returnTo=${encodeURIComponent(retorno)}` : "/reenviar-confirmacao"} className="button">Solicitar novo link de confirmação</Link>}
       {estado !== "carregando" && (
         <div className="flex flex-col gap-3">
           {estado === "sucesso" && (

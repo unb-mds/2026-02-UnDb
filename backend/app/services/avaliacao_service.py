@@ -20,8 +20,10 @@ from app.repositories import (
     professor_repository,
     turma_repository,
 )
-from app.schemas.avaliacao import AvaliacaoCreate
+from app.schemas.avaliacao import AvaliacaoCreate, MinhaAvaliacaoResponse, MinhasAvaliacoesResponse
 from app.services import moderacao_automatica_service
+from app.repositories import retencao_repository
+from fastapi import HTTPException
 
 
 MIN_AVALIACOES_EXIBICAO = 3
@@ -86,11 +88,19 @@ def registrar_avaliacao(
     usuario: Usuario,
     dados: AvaliacaoCreate,
 ) -> Avaliacao:
+    conta = retencao_repository.bloquear_conta(db, usuario.id)
+    if conta is None or conta.excluido_em is not None:
+        raise HTTPException(401, "Sessao invalida.")
     professor = avaliacao_repository.obter_professor(db, dados.professor_id)
     if professor is None:
         raise RecursoNaoEncontradoError("professor nao encontrado")
     if professor.id != dados.professor_id:
         dados = dados.model_copy(update={"professor_id": professor.id})
+    anterior = avaliacao_repository.obter_por_avaliador_professor_disciplina(
+        db, usuario.id, dados.professor_id, dados.disciplina_id
+    )
+    if anterior is not None and anterior.excluido_em is not None:
+        raise HTTPException(409, "Avaliacao em descarte. Tente novamente apos a purga.")
     if avaliacao_repository.obter_disciplina(db, dados.disciplina_id) is None:
         raise RecursoNaoEncontradoError("disciplina nao encontrada")
     if not turma_repository.existe_vinculo_professor_disciplina(
@@ -261,4 +271,16 @@ def comparar_professores(
     return ComparacaoProfessores(
         disciplina=disciplina_institucional,
         professores=comparacao_ordenada,
+    )
+
+
+def listar_minhas_avaliacoes(
+    db: Session, usuario: Usuario, pagina: int
+) -> MinhasAvaliacoesResponse:
+    registros, total = avaliacao_repository.listar_do_usuario(db, usuario.id, pagina)
+    return MinhasAvaliacoesResponse(
+        itens=[MinhaAvaliacaoResponse.model_validate(item) for item in registros],
+        total=total,
+        pagina=pagina,
+        tamanho=10,
     )

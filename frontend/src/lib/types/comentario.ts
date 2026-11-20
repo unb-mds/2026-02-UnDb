@@ -24,3 +24,10 @@ export type ComentarioDoAutor = {
   avaliacao_id: string;
   substitui_id: string | null;
 };
+
+export type VotoComentario = "UTIL" | "NAO_UTIL";
+export type UtilidadeComentario = {
+  uteis: number;
+  nao_uteis: number;
+  meu_voto: VotoComentario | null;
+};

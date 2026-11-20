@@ -281,7 +281,8 @@ class FalhaPersistenciaTest(unittest.TestCase):
         )
         self.assertFalse(resultado.sucesso)
         self.assertEqual(resultado.departamentos[0].ofertas_processadas, 0)
-        self.assertIn("banco indisponivel", resultado.departamentos[0].erros[0])
+        self.assertIn("RuntimeError", resultado.departamentos[0].erros[0])
+        self.assertNotIn("banco indisponivel", resultado.departamentos[0].erros[0])
 
 
 if __name__ == "__main__":

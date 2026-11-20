@@ -12,6 +12,8 @@ export type CadastroInput = {
   nome: string;
   email: string;
   senha: string;
+  ciencia_termos: true;
+  termos_versao: string;
   return_to?: string;
 };
 
@@ -61,4 +63,11 @@ export async function redefinirSenha(token: string, senha: string): Promise<Mens
   const resposta = await apiClient.post<MensagemResponse, { token: string; senha: string }>("/api/auth/redefinir-senha", { token, senha });
   notificarSessao();
   return resposta;
+}
+
+
+export async function reenviarConfirmacao(email: string, retorno: string | null): Promise<MensagemResponse> {
+  return apiClient.post<MensagemResponse, { email: string; return_to?: string }>(
+    "/api/auth/reenviar-confirmacao", { email, ...(retorno ? { return_to: retorno } : {}) },
+  );
 }

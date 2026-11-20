@@ -51,10 +51,12 @@ def _validar_sessao(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(erro),
+            headers={"Set-Cookie": response.headers["set-cookie"]},
         ) from erro
 
     if renovar_cookie:
         definir_cookie_sessao(response, token)
+    request.scope["acesso_usuario_id"] = sessao.usuario_id
     return sessao
 
 

@@ -33,6 +33,7 @@ function executarTestes() {
       ...comando,
       "--test",
       "tests/avaliacao.test.mjs",
+      "tests/abuso.test.mjs",
       "tests/busca.test.mjs",
       "tests/comentarios.test.mjs",
       "tests/moderacao.test.mjs",
@@ -41,6 +42,7 @@ function executarTestes() {
       "tests/browser-navigation.test.mjs",
       "tests/paleta.test.mjs",
       "tests/seo.test.mjs",
+      "tests/revisao-final.test.mjs",
     ], { ...process.env, AVALIACAO_TEST_BUILD: join(fontesCompiladas, "lib") });
   } finally {
     rmSync(destino, { recursive: true, force: true });

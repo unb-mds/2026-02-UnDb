@@ -33,6 +33,7 @@ from app.routers import auth as auth_router
 from app.schemas.auth import CadastroRequest, LoginRequest
 from app.services import auth_service
 from app.services.email_service import EmailDeliveryError
+from tests.auth_abuso_fixtures import protecao_permitida
 
 
 class FakeEmailSender:
@@ -50,8 +51,15 @@ class AuthSchemaTest(unittest.TestCase):
     def test_retorno_opcional_aceita_somente_rota_interna_de_avaliacao(self) -> None:
         dados = dict(nome="Maria", email="maria@aluno.unb.br", senha="senha de teste")
         destino = "/professores/11111111-1111-4111-8111-111111111111/disciplinas/22222222-2222-4222-8222-222222222222/avaliar"
-        self.assertIsNone(CadastroRequest(**dados).return_to)
-        self.assertEqual(CadastroRequest(**dados, return_to=destino).return_to, destino)
+        self.assertIsNone(
+            CadastroRequest(ciencia_termos=True, termos_versao="2026-11-17", **dados).return_to
+        )
+        self.assertEqual(
+            CadastroRequest(
+                ciencia_termos=True, termos_versao="2026-11-17", **dados, return_to=destino
+            ).return_to,
+            destino,
+        )
         for valor in (
             "",
             "https://outro.example" + destino,
@@ -64,10 +72,14 @@ class AuthSchemaTest(unittest.TestCase):
             "javascript:alert(1)",
         ):
             with self.subTest(valor=valor), self.assertRaises(ValidationError):
-                CadastroRequest(**dados, return_to=valor)
+                CadastroRequest(
+                    ciencia_termos=True, termos_versao="2026-11-17", **dados, return_to=valor
+                )
 
     def test_normaliza_nome_e_email_institucional(self) -> None:
         dados = CadastroRequest(
+            ciencia_termos=True,
+            termos_versao="2026-11-17",
             nome="  Maria da Silva  ",
             email="  MARIA@ALUNO.UNB.BR ",
             senha="uma senha longa e segura",
@@ -80,6 +92,8 @@ class AuthSchemaTest(unittest.TestCase):
         for email in casos:
             with self.subTest(email=email), self.assertRaises(ValidationError):
                 CadastroRequest(
+                    ciencia_termos=True,
+                    termos_versao="2026-11-17",
                     nome="Maria",
                     email=email,
                     senha="uma senha longa e segura",
@@ -92,11 +106,15 @@ class AuthSchemaTest(unittest.TestCase):
                     "email": "maria@aluno.unb.br",
                     "senha": "uma senha longa e segura",
                     "matricula": "000000000",
+                    "ciencia_termos": True,
+                    "termos_versao": "2026-11-17",
                 }
             )
 
     def test_rejeita_senha_fora_do_intervalo_aprovado(self) -> None:
         CadastroRequest(
+            ciencia_termos=True,
+            termos_versao="2026-11-17",
             nome="Maria",
             email="maria@aluno.unb.br",
             senha="12345678",
@@ -105,6 +123,8 @@ class AuthSchemaTest(unittest.TestCase):
         for senha in ("1234567", "x" * 129):
             with self.subTest(tamanho=len(senha)), self.assertRaises(ValidationError):
                 CadastroRequest(
+                    ciencia_termos=True,
+                    termos_versao="2026-11-17",
                     nome="Maria",
                     email="maria@aluno.unb.br",
                     senha=senha,
@@ -121,6 +141,8 @@ class AuthServiceTest(unittest.TestCase):
         Base.metadata.create_all(self.engine)
         self.db = Session(self.engine)
         self.dados = CadastroRequest(
+            ciencia_termos=True,
+            termos_versao="2026-11-17",
             nome="Maria",
             email="maria@aluno.unb.br",
             senha="uma senha longa e segura",
@@ -154,6 +176,8 @@ class AuthServiceTest(unittest.TestCase):
 
         segundo_sender = FakeEmailSender()
         duplicado = CadastroRequest(
+            ciencia_termos=True,
+            termos_versao="2026-11-17",
             nome="Outro nome",
             email="MARIA@ALUNO.UNB.BR",
             senha="outra senha longa e segura",
@@ -286,6 +310,7 @@ class AuthServiceTest(unittest.TestCase):
             ),
             response,
             self.db,
+            protecao_permitida(),
         )
 
         self.assertEqual(resultado.message, auth_service.LOGIN_MESSAGE)
@@ -299,6 +324,7 @@ class AuthServiceTest(unittest.TestCase):
                 ),
                 Response(),
                 self.db,
+                protecao_permitida(),
             )
         self.assertEqual(contexto.exception.status_code, 401)
 

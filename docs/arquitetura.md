@@ -1,5 +1,67 @@
 # 🏛️ Arquitetura e Decisões Técnicas — G7
 
+## Registro complementar #266 — decisões aprovadas pelo PO
+
+**Estado: aprovado**, fonte decisões A–F e execuções dos Blocos 1–8 nesta sessão.
+Este registro atualiza os fluxos afetados e não promove ADRs não relacionados.
+FastAPI, SQLAlchemy síncrono, psycopg2, Alembic e PostgreSQL (ADR 01) permanecem.
+
+**Contexto e decisão.** Sessões e origens preservam a #279 integrada. Limitador
+genérico usa PostgreSQL UNLOGGED, incremento atômico, HMAC, capacidade global e
+políticas por operação/papel. Autenticação fecha na falha; avaliação segue com
+alerta; denúncia usa contenção local por processo; fila não tem bypass e ações
+urgentes preservam autorização. Sem IP nas chaves. Limites são **PROVISÓRIOS,
+pendentes de validação (item 4)**. Instâncias no mesmo escritor compartilham
+contadores; UNLOGGED pode perdê-los em crash/failover. Observe não garante cota.
+
+**Dados e descarte.** Migrações 20261117_01–03 são aditivas ao histórico. Conta
+excluída mantém ID/e-mail/datas e estado derivado, sem nome, senha, sessões/tokens
+ou papéis ativos; e-mail reservado impede reativação por recadastro. Avaliações
+excluídas deixam agregados e comentários públicos imediatamente e são purgadas
+após janela padrão configurável de sete dias. Comentários removidos/retirados
+seguem janela; rejeição de comentário pendente apaga texto e mantém metadados,
+sem rejeitar os critérios da avaliação. Denúncias encerradas ficam fora da fila
+ativa e permanecem até purga do conteúdo. Cascatas são explícitas na transação,
+protegidas por FKs. Essa decisão substitui, neste escopo, a exclusão imediata de
+denúncias e o descarte que apenas esvaziava texto em versões antigas.
+
+**Registros e jobs.** Tabela privada de acesso, sem interface/endpoint, registra
+mutações, UTC, operação, ID interno quando resolvido, peer ASGI, encaminhamento
+bruto NÃO confiável, resultado e UUID de requisição. Sem corpo/query/cookie/token,
+senha, nome ou e-mail. Seis meses corridos configuráveis e purga pelo processo
+existente `descarte-moderacao`, que também limpa credenciais e contadores vencidos.
+Console não registra links sensíveis nem em DEBUG. Escrita de acesso é separada;
+falha gera evento mínimo e pode deixar lacuna operacional.
+
+**Consequências e pendências.** Rollback não recupera dados apagados e exige parar
+API/job; guarda de IDs/datas de conta durante reaplicação não é backup. No Compose,
+`--no-proxy-headers` preserva peer; topologia efetiva, HTTPS/cookies, banco e
+execução contínua dos jobs na hospedagem estão **pendentes de validação**.
+Base/prazo da conta mínima, metadados, premissa do Marco Civil e incidentes também
+permanecem **pendentes de validação**. Canal segue DESATIVADO. Backup automático
+diário e arquivo semestral estão planejados; ensaio sintético não comprova produção.
+
+**Referências.** [Pendências](seguranca/validacoes-pendentes-266.md),
+[manutenção](operacao/manutencao.md), [retenção](seguranca/retencao-bloco-5.md),
+[registros](seguranca/acessos-bloco-6.md) e evidências por bloco na PR #280,
+continuação autorizada da #279. A #266 não é declarada concluída.
+
+## Canal de solicitações — RF25
+
+Modelo aditivo aprovado por Nicolas em 15/11/2026: solicitações e histórico separados das
+avaliações/moderação. `solicitacoes_titulares` tem UUID aleatório, hash da chave secreta,
+categoria, alvo, descrição, evidência textual e data. Cada solicitação possui N eventos em
+`eventos_solicitacoes`: UUID, FK de solicitação, tipo, texto, data e FK opcional do atendente
+em `usuarios`. Complementos públicos não vinculam conta estudantil. Nenhum cadastro,
+avaliação ou privilégio de moderação é alterado pelo canal.
+
+A FK de solicitação tem índice para leitura do histórico; PKs sustentam consulta direta.
+Fatos permanecem em sua entidade (sem copiar nome/e-mail de atendentes). Exclusão é
+restrita pelas FKs; política de descarte e coordenação com backups dependem da #262.
+API segue router/service/repository já existentes, com schemas públicos e internos
+distintos. Configuração de UUIDs separa leitores de atendentes. Operação detalhada em
+[canal de solicitações](canal-titulares.md).
+
 Sistema de avaliação de professores e disciplinas da UnB.
 Requisitos em [`requisitos.md`](requisitos.md).
 
@@ -107,6 +169,8 @@ as tabelas da R1 são preservadas como recorte histórico.
 | `nome` | VARCHAR(100) | |
 | `email` | VARCHAR(150), UNIQUE | Domínio institucional da UnB |
 | `password_hash` | VARCHAR(255) | Hash forte (RNF03) |
+| `termos_versao` | VARCHAR(32), nullable | RF26: versão da ciência no novo cadastro; NULL nas contas anteriores |
+| `termos_ciencia_em` | TIMESTAMPTZ, nullable | RF26: instante gerado pelo servidor; CHECK exige o par completo ou ambos NULL |
 | `email_confirmado` | BOOLEAN | Avaliação só é aceita se verdadeiro |
 | `created_at` | TIMESTAMPTZ | |
 
@@ -345,7 +409,7 @@ não conseguem concluir o cadastro na Release 1.
 
 **Decisão complementar aprovada em 19/09/2026.** Resend é o provedor de produção, isolado
 por uma interface interna de envio. O desenvolvimento usa um adaptador `console`, que
-registra o link no terminal sem depender de domínio externo. O link expira em 24 horas,
+simula envio sem imprimir destinatário ou link. O link expira em 24 horas,
 usa token opaco aleatório de uso único e somente seu hash é persistido. Senhas usam
 Argon2id. Cadastro repetido recebe a mesma resposta genérica `202`, sem revelar a
 existência da conta. A confirmação é acionada por `POST` depois que a página do frontend
@@ -588,3 +652,19 @@ a análise antiga. Falha da segunda etapa não desfaz os critérios já confirma
 Decisões automáticas usam moderador_id nulo como ator sistema, mantendo retenção
 vigente; não existe conta fictícia de moderador. Migração 20261114_01 permite essa
 nulabilidade. Downgrade recusa-se a apagar auditoria automática ainda existente.
+
+
+### Extensão local de comentários — #278
+
+Fonte de comportamento: `docs/requisitos.md`, RF20 — Utilidade do comentário.
+Mantidas as camadas e o ADR 01. `VotoComentario` representa a relação conta/versão
+(N:N, um valor atômico dependente da chave inteira; sem contadores duplicados).
+PK `(comentario_versao_id, usuario_id)` garante unicidade; CHECK restringe o voto;
+FKs eliminam votos na exclusão física de versão/conta. O índice da PK atende resumos
+por versão; índice de usuário atende sua exclusão sem varrer votos de todas as contas.
+Repository concentra SQL/upsert/agregação; service aplica disponibilidade/autoria e
+lock existente de avaliação → versão. Escrita não atualiza comentário/avaliação.
+Descarte de texto manual, automático ou programado remove votos na mesma transação.
+O endpoint de resumo tem sessão opcional e no-store: a lista pública permanece igual,
+evita personalizar cache compartilhado e a UI consulta utilidade por versão no cliente.
+Trade-off: uma consulta adicional por comentário exibido; sem tecnologia/dependência nova.

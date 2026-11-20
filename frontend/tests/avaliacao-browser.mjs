@@ -50,6 +50,8 @@ const envios = [];
 const fixture = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3100");
   res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Expose-Headers", "Retry-After");
+  res.setHeader("Retry-After", "37");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Content-Type", "application/json");
@@ -254,7 +256,8 @@ try {
       return window.fetchOriginal(url, init);
     }`);
     await enviar();
-    await aguardarErroEnvio("Revise os campos: Didática");
+    // O contrato sanitizado da #266 mantém a mensagem genérica, sem identificar campos.
+    await aguardarErroEnvio("Revise as opções da avaliação. Dados inválidos. Confira os campos informados.");
     await avaliar('window.fetch = window.fetchOriginal');
     assert.deepEqual(banco(), []);
     assert.deepEqual(await respostas(), preenchidas);
@@ -292,7 +295,7 @@ try {
     await aguardarErroEnvio("Entre na sua conta");
     assert.equal(envios.length, 0);
     autenticado = true;
-    for (const [status, mensagem] of [[401,"Entre na sua conta"], [403,"link recebido"], [422,"Revise as opções"], [503,"não conseguiu confirmar"]]) {
+    for (const [status, mensagem] of [[401,"Entre na sua conta"], [403,"link recebido"], [422,"Revise as opções"], [429,"Aguarde 37 segundos"], [503,"Aguarde 37 segundos"]]) {
       statusEnvio = status;
       await enviar();
       await aguardarErroEnvio(mensagem);
@@ -423,7 +426,7 @@ async function verificarCorrecoesInterface() {
   try {
     await cdp("Page.navigate", {url:"http://localhost:3100/cadastro"});
     await aguardar(async () => await avaliar('!!document.querySelector("[name=nome]")'), "cadastro");
-    await avaliar(`document.querySelector('[name=nome]').value='   '; document.querySelector('[name=email]').value='TESTE@ALUNO.UNB.BR'; document.querySelector('[name=senha]').value='senha-teste-local'`);
+    await avaliar(`document.querySelector('[name=ciencia_termos]').checked=true; document.querySelector('[name=nome]').value='   '; document.querySelector('[name=email]').value='TESTE@ALUNO.UNB.BR'; document.querySelector('[name=senha]').value='senha-teste-local'`);
     assert.equal(await avaliar('document.querySelector("main form").checkValidity()'), true);
     assert.ok(scriptsAtrasados.length > 0, "O cenário precisa atrasar scripts de hidratação");
     await avaliar('document.querySelector("main form").dispatchEvent(new Event("submit", {bubbles:true, cancelable:true}))');
@@ -448,11 +451,18 @@ async function verificarCorrecoesInterface() {
   await enviar();
   await aguardarTexto("Revise os dados do cadastro");
   assert.equal(await avaliar('document.querySelector("[name=email]").value'), "TESTE@ALUNO.UNB.BR");
+  for (const status of [429, 503]) {
+    statusCadastro = status;
+    await enviar();
+    await aguardarTexto("Aguarde 37 segundos");
+    assert.equal(await avaliar('document.querySelector("[name=email]").value'), "TESTE@ALUNO.UNB.BR");
+    assert.equal(await avaliar('document.querySelector("[name=nome]").value'), "Estudante");
+  }
   statusCadastro = 202;
   await aguardar(async () => !(await avaliar('document.querySelector("main button[type=submit]").disabled')), "cadastro liberado após rejeição");
   await enviar();
   await aguardarTexto("Se o endereço informado estiver disponível");
-  assert.equal(cadastrosRecebidos, 2, "Apenas as tentativas válidas de 422 e 202 chegam à API");
+  assert.equal(cadastrosRecebidos, 4, "Tentativas válidas de 422, 429, 503 e 202 chegam à API");
   await aguardar(async () => !(await avaliar('document.querySelector("main button[type=submit]").disabled')), "botão de cadastro habilitado");
   for (const tema of ["light", "dark"]) {
     await cdp("Emulation.setEmulatedMedia", {features:[{name:"prefers-color-scheme", value:tema}]});
@@ -465,7 +475,7 @@ async function verificarCorrecoesInterface() {
   }
   statusConfirmacao = 503;
   await cdp("Page.navigate", {url:"http://localhost:3100/confirmar-email?token=teste"});
-  await aguardarTexto("Verifique sua conexão");
+  await aguardarTexto("Aguarde 37 segundos");
   assert.ok(!(await texto()).includes("Este link é inválido"));
   statusConfirmacao = 200;
   await avaliar('document.querySelector("main button").click()');

@@ -11,7 +11,9 @@ recriação de serviços ou migração sobre um ambiente compartilhado sem coord
 
 O arquivo `backend/.env` deve definir `SECRET_KEY`, `DEBUG`, as credenciais locais do
 PostgreSQL (`POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_DB`) e a `DATABASE_URL` com
-o host `db`. O `.env` real nunca deve ser versionado.
+o host `db`. Defina também `ABUSO_HMAC_SECRET` com um segredo aleatório exclusivo;
+o Compose o repassa à API. Sem ele, os fluxos de autenticação retornam 503.
+O `.env` real nunca deve ser versionado.
 
 ```bash
 # clonar o repositório
@@ -67,6 +69,12 @@ nenhum `.env` entra na imagem do frontend.
 Por padrão, `EMAIL_BACKEND=console`: após um cadastro válido, o link de confirmação aparece
 nos logs do backend e pode ser aberto no navegador, sem domínio ou serviço externo. Para
 acompanhar o link:
+
+Esse adaptador exige `DEBUG=True` e uso exclusivamente local com dados sintéticos. A
+[revisão #266](seguranca/revisao-sessoes-abuso-logs-issue-266.md) mantém essa exceção local;
+fora de DEBUG o envio console falha sem registrar destinatário ou token. Não exportar
+esses logs para CI, provedores ou evidências compartilhadas. Login e mutações com cookie
+exigem Origin/Referer autorizado por `CORS_ORIGINS`; clientes de teste também devem enviá-lo.
 
 ```bash
 docker compose --env-file backend/.env logs -f backend
@@ -134,3 +142,14 @@ A estratégia implementada para revisão na [Issue #36](https://github.com/unb-m
 Next.js, sem exportação estática. A justificativa, as alternativas e as consequências
 estão no [ADR 08](arquitetura.md).
 
+
+
+## Operacao atual - #266, Bloco 8
+
+O processo de descarte inclui conteudo excluido, credenciais expiradas e
+registros privados de acesso. Janela padrao configuravel: sete dias para conteudo,
+seis meses corridos para acesso. Conta minima e metadados de rejeicao nao recebem
+prazo inventado. Ciclo/lote e purga estao em backend/.env.example.
+Ver [manutencao](operacao/manutencao.md) e
+[pendencias](seguranca/validacoes-pendentes-266.md). Codigo/Compose nao comprovam
+execucao continua na hospedagem, que permanece pendente de validacao.

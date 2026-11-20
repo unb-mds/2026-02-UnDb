@@ -1,0 +1,11 @@
+{
+  "backend/app/domain/termos.py": "4a9135a91e075b10312f99621020964a22cb42e49982afcd42211d998ecaadb2",
+  "backend/app/schemas/auth.py": "eac63a445d556f2a6944f2816f22e44409b960a952d429f0b000f7fa8123e2bd",
+  "backend/app/models/usuario.py": "084a74b85608d61bdfcef3b1878bad5349e931be0e50197d594c4cafc8c8e81f",
+  "backend/app/services/auth_service.py": "2477a54d20433f7487bb024accc53fbde33a4293a58abba043883bd376e34f4a",
+  "backend/alembic/versions/20261117_02_ciencia_termos.py": "e51268a50a82f924afb33b790f7abc9b0ff65367bdd48f9374354fb49b208338",
+  "frontend/src/lib/termos.ts": "042726dc3ab78d444608f876c5f373b3dc0947db0b267a1a85034d9593345d7b",
+  "frontend/src/app/cadastro/cadastro-form.tsx": "2c4cabf179d0f4ca0f35d172b0be2c36646d0778dcd772992eab973bd840269e",
+  "frontend/src/app/privacidade/page.tsx": "e8cba6139f537fc336dc8914f81ca3c43270507c97ab599cb9e7627547b9ba89",
+  "frontend/src/app/termos-de-uso/page.tsx": "b6d01252f15e09f8cdad847a23d069daa90c454593395b451eda5c2fea5a83e2"
+}

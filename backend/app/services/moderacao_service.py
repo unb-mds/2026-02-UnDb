@@ -3,6 +3,8 @@
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
+from app.repositories import voto_comentario_repository
+
 from sqlalchemy.orm import Session
 
 from app.models.enums import AcaoModeracao, EstadoComentario
@@ -16,7 +18,9 @@ from app.schemas.moderacao import (
     IdentidadeInterna,
 )
 
-RETENCAO = timedelta(days=7)
+from app.core import config
+
+RETENCAO = timedelta(days=config.RETENCAO_CONTEUDO_DIAS)
 
 
 class ModeracaoError(Exception):
@@ -117,12 +121,14 @@ def decidir(
                 denuncia_repository.encerrar(db, atual.id, "VERSAO_SUBSTITUIDA")
                 atual.estado = EstadoComentario.SUBSTITUIDO
                 atual.texto = None
-                atual.descartar_em = None
+                # A substituição não cancela o descarte de uma versão removida.
+                voto_comentario_repository.apagar_da_versao(db, atual.id)
                 atual.updated_at = agora
             versao.estado = EstadoComentario.PUBLICADO
         elif dados.acao == AcaoModeracao.REJEITAR:
             versao.estado = EstadoComentario.REJEITADO
             versao.texto = None
+            voto_comentario_repository.apagar_da_versao(db, versao.id)
         else:
             if dados.acao == AcaoModeracao.REMOVER:
                 if abertas:
