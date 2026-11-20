@@ -14,10 +14,10 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 export default async function BuscaDisciplinasPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const parametros = await searchParams;
   const filtrada = Object.values(parametros).some(valor => valor !== undefined && valor !== "");
-  return (<>
+  return (<main className="flex flex-1 flex-col">
     <Suspense fallback={<p role="status" className="p-4">Carregando busca…</p>}>
       <BuscaInstitucional tipo="disciplinas" />
     </Suspense>
     {!filtrada && <CatalogoLinks tipo="disciplinas" pagina={0} />}
-  </>);
+  </main>);
 }

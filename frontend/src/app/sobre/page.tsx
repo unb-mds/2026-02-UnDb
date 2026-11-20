@@ -28,7 +28,17 @@ export default function Sobre() {
       </div>
     </section>
     <div className="container flex flex-col gap-14 py-12 sm:gap-20 sm:py-16">
-      <section aria-label="Contato"><p className="mb-4 text-sm"><Link href="/privacidade" className="link">Política de Privacidade</Link> · <Link href="/termos-de-uso" className="link">Termos de Uso</Link></p><h2 className="section-title">Precisa falar com a equipe?</h2><p>Informe erros institucionais, conteste conteúdo ou solicite atendimento sobre dados pessoais.</p><Link href="/contato" className="button">Contato e solicitações</Link></section>
+      <section aria-label="Contato" className="flex flex-col items-start gap-6">
+        <nav aria-label="Privacidade e termos" className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+          <Link href="/privacidade" className="link inline-flex min-h-11 items-center">Política de Privacidade</Link>
+          <Link href="/termos-de-uso" className="link inline-flex min-h-11 items-center">Termos de Uso</Link>
+        </nav>
+        <div className="flex max-w-3xl flex-col gap-3">
+          <h2 className="section-title">Precisa falar com a equipe?</h2>
+          <p className="text-base leading-relaxed text-(--ink-soft)">Informe erros institucionais, conteste conteúdo ou solicite atendimento sobre dados pessoais.</p>
+        </div>
+        <Link href="/contato" className="button">Contato e solicitações</Link>
+      </section>
       <section id="proposta" aria-labelledby="proposta-titulo" className="grid scroll-mt-48 gap-8 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
         <div><span className="kicker">Por que existimos</span><h2 id="proposta-titulo" className="section-title mt-3">Experiências que ajudam<br />a próxima turma.</h2></div>
         <div className="space-y-4 text-base leading-relaxed text-(--ink-soft)"><p>Antes de montar o semestre, surgem perguntas que a oferta de disciplinas não responde: como são as explicações? Qual é o ritmo das aulas? Há material de apoio?</p><p>O UnDb reúne avaliações estruturadas para tornar essas experiências mais fáceis de consultar. Cada avaliação pertence a um professor em uma disciplina específica, preservando o contexto professor–disciplina.</p><p>O UnDb é um projeto acadêmico estudantil independente e sem fins lucrativos. Sua motivação é facilitar o acesso a experiências que circulam em contatos pessoais. É uma fonte complementar aos processos oficiais de avaliação e matrícula da UnB, sem representar autorização ou endosso institucional.</p><p>Nosso objetivo é apoiar escolhas informadas e contribuições respeitosas, sem reduzir o trabalho de um professor a uma nota geral.</p></div>
