@@ -20,7 +20,7 @@ from app.repositories import (
     professor_repository,
     turma_repository,
 )
-from app.schemas.avaliacao import AvaliacaoCreate
+from app.schemas.avaliacao import AvaliacaoCreate, MinhaAvaliacaoResponse, MinhasAvaliacoesResponse
 from app.services import moderacao_automatica_service
 from app.repositories import retencao_repository
 from fastapi import HTTPException
@@ -271,4 +271,16 @@ def comparar_professores(
     return ComparacaoProfessores(
         disciplina=disciplina_institucional,
         professores=comparacao_ordenada,
+    )
+
+
+def listar_minhas_avaliacoes(
+    db: Session, usuario: Usuario, pagina: int
+) -> MinhasAvaliacoesResponse:
+    registros, total = avaliacao_repository.listar_do_usuario(db, usuario.id, pagina)
+    return MinhasAvaliacoesResponse(
+        itens=[MinhaAvaliacaoResponse.model_validate(item) for item in registros],
+        total=total,
+        pagina=pagina,
+        tamanho=10,
     )

@@ -64,3 +64,10 @@ export async function redefinirSenha(token: string, senha: string): Promise<Mens
   notificarSessao();
   return resposta;
 }
+
+
+export async function reenviarConfirmacao(email: string, retorno: string | null): Promise<MensagemResponse> {
+  return apiClient.post<MensagemResponse, { email: string; return_to?: string }>(
+    "/api/auth/reenviar-confirmacao", { email, ...(retorno ? { return_to: retorno } : {}) },
+  );
+}

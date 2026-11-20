@@ -132,6 +132,7 @@ export default function CadastroForm({ retorno, contexto }: { retorno: string | 
           {mensagem && <p className="status-box success">{mensagem} {retorno ? "O link de confirmação permitirá retomar esta avaliação." : "Depois de confirmar o e-mail, entre na conta para avaliar."}</p>}
           {erro && <p className="status-box error">{erro}</p>}
         </div>
+    <Link href={retorno ? `/reenviar-confirmacao?returnTo=${encodeURIComponent(retorno)}` : "/reenviar-confirmacao"} className="link self-center text-center text-sm">Não recebeu a confirmação de e-mail?</Link>
     </MolduraConta>
   );
 }

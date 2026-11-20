@@ -1,10 +1,10 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.avaliacao import Avaliacao
 from app.models.disciplina import Disciplina
@@ -86,3 +86,19 @@ def listar_por_professor_e_disciplina(
         Avaliacao.excluido_em.is_(None),
     )
     return list(db.scalars(consulta).all())
+
+
+def listar_do_usuario(
+    db: Session, usuario_id: UUID, pagina: int, tamanho: int = 10
+) -> tuple[list[Avaliacao], int]:
+    filtros = (Avaliacao.usuario_id == usuario_id, Avaliacao.excluido_em.is_(None))
+    total = db.scalar(select(func.count(Avaliacao.id)).where(*filtros)) or 0
+    consulta = (
+        select(Avaliacao)
+        .where(*filtros)
+        .options(joinedload(Avaliacao.professor), joinedload(Avaliacao.disciplina))
+        .order_by(Avaliacao.updated_at.desc(), Avaliacao.id)
+        .offset((pagina - 1) * tamanho)
+        .limit(tamanho)
+    )
+    return list(db.scalars(consulta).all()), total

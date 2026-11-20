@@ -806,3 +806,30 @@ Fonte: `docs/requisitos.md`, RF20 — Utilidade do comentário (R2, 16/11/2026).
 - Contagens são calculadas no banco somente para a versão publicada solicitada;
   ordenação da lista pública e seu contrato atual são preservados. Nenhuma identidade
   de votante integra respostas. Aplicar o ciclo de descarte da versão, sem retenção nova.
+
+## Revisão final local — 18/11/2026
+
+Derivado de `docs/requisitos.md`, seção “Revisão final” e RF27, autorizado pelo
+solicitante nesta conversa. Base: `develop`. Em 20/11/2026, Nicolas autorizou incorporar o escopo pendente da #265 à revisão; a espera pela PR da Yasmin foi substituída por essa execução local.
+
+- `GET /api/avaliacoes/minhas?pagina=1`: sessão obrigatória. Retorna `{itens, total,
+  pagina, tamanho}`; dez avaliações por página, mais recentes primeiro, desempate por ID.
+  Cada item contém os cinco critérios, ID da avaliação, professor/disciplina institucionais
+  e atualização. O usuário vem exclusivamente da sessão; avaliações excluídas são omitidas.
+  Não expõe autor, e-mail, comentários ou informações de moderação. `Cache-Control: no-store`.
+- “Minha conta”, em `/login`, consulta essa lista no navegador com a sessão existente.
+- `/reenviar-confirmacao` usa o POST existente e mantém somente o retorno interno
+  validado. Disponível no login, cadastro e erro de confirmação; respostas e limites
+  continuam os da #266.
+- A home consulta somente os seis destaques por quantidade de avaliações. Os cartões
+  levam à comparação, onde os agregados de professores continuam disponíveis.
+- O catálogo mantém a paginação e os links HTML públicos; apresentação em cartões
+  com nome, código quando aplicável e unidade acadêmica.
+
+## Revalidação do atendimento — revisão #265 em 20/11/2026
+
+Derivado de `docs/requisitos.md`, conferência #265: a fila de atendimento limpa
+dados abertos ao revalidar/ocultar a aba, reconsulta permissão em foco/pageshow/
+visibilidade/evento de sessão e invalida respostas anteriores de leitura/escrita.
+A API mantém autorização por ator/objeto e no-store/no-referrer. Sem mudança de
+papéis, contratos de publicação ou retenção.

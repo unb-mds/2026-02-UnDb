@@ -1083,3 +1083,34 @@ invalida os demais links de recuperação e encerra as sessões anteriores. Uma 
 no envio não altera a senha nem invalida os links anteriores. Não há login automático.
 O adaptador local continua mostrando o link nos logs; envio externo segue a configuração
 operacional já existente, sem ativação de provedor nesta mudança.
+
+### Revisão final — autorização do solicitante em 18/11/2026
+
+Fonte: pedido nesta conversa para implementar reenvio de confirmação, revisar a home
+(especialmente os destaques), melhorar a apresentação do catálogo de professores e
+disciplinas e permitir consultar as próprias avaliações em “Minha conta”. Trabalho
+na `develop`; PR e integração final aguardam a PR da Yasmin.
+
+- **[RF27] Consulta das próprias avaliações — validado pelo pedido explícito:** a pessoa
+  autenticada pode ver na própria conta as avaliações que enviou. As respostas individuais
+  continuam privadas; essa consulta não libera acesso às avaliações individuais alheias.
+- Reenvio mantém o contrato e as proteções já definidos na restrição de autenticação.
+- A revisão visual mantém o catálogo, busca e critérios existentes. Os destaques atuais
+  são por quantidade de avaliações; não há autorização para inventar contagens de visitas.
+
+| Escopo | Origem | Estado nesta revisão |
+|---|---|---|
+| RF27 | Solicitação explícita de 18/11/2026 | Implementação e validação local; integração pendente |
+| Reenvio de confirmação | Restrição de autenticação e pedido de 18/11/2026 | Exposição do fluxo existente na interface |
+| Home e catálogo | Pedido de 18/11/2026 | Revisão de apresentação; comportamento público preservado |
+
+### Conferência de privacidade #265 — 20/11/2026
+
+Fonte: escopo vigente da #265 e autorização explícita de Nicolas nesta conversa
+para executar o trabalho pendente dentro da revisão geral. Preservar RF22, RF25,
+RF26, RF27, mínimo de três e retenção vigente. Revalidar permissão de atendimento
+ao retornar à aba e limpar dados privados após perda de sessão/permissão, sem
+reexibi-los por uma resposta anterior. Isso aplica a autorização já existente,
+sem criar novo papel, campo público ou prazo de guarda. Conferência hospedada
+e aceite final continuam para #168. Matriz/evidências em
+[privacidade das APIs](estudos/privacidade-apis-265-revisao-final.md).

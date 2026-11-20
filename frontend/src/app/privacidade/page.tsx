@@ -23,7 +23,7 @@ const secoes: SecaoDocumento[] = [
   </> },
   { id: "autoria", titulo: "3. O que fica público e quem tem acesso", conteudo: <>
     <p>O catálogo institucional, contagens, critérios agregados a partir de três avaliações e comentários publicados ficam disponíveis publicamente. A consulta pública não divulga nome, e-mail ou identificador da conta avaliadora, nem suas notas individuais. Comentários seguem fluxo próprio e podem aparecer mesmo abaixo do mínimo dos indicadores.</p>
-    <p>O vínculo entre conta e avaliação permanece internamente. Não prometemos anonimato absoluto: conteúdo, contexto ou fatos narrados podem permitir identificação. O mínimo de três avaliações também não garante anonimato.</p>
+    <p>Em Minha conta, a pessoa autenticada pode consultar suas próprias avaliações e os critérios individuais que enviou. Essa consulta usa a sessão e não libera acesso às respostas individuais de outras contas. O vínculo entre conta e avaliação permanece internamente. Não prometemos anonimato absoluto: conteúdo, contexto ou fatos narrados podem permitir identificação. O mínimo de três avaliações também não garante anonimato.</p>
     <p>O acesso privado exige autorização para a função e o registro. Moderadores autorizados acessam informações necessárias à análise, inclusive identidades previstas no fluxo; reconciliadores têm função distinta para o catálogo. A equipe de atendimento tem permissões separadas de leitura e resposta. Acesso à infraestrutura depende das permissões concedidas aos operadores.</p>
     <p>No contato, quem possui protocolo e chave pode consultar respostas e complementos. Triagem e providências internas não são expostas ao solicitante. Não compartilhe a chave publicamente.</p>
   </> },

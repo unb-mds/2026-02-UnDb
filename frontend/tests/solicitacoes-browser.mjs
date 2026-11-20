@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { comNavegador } from './browser-session.mjs';
-let ativo=true, escrita=false;
+let ativo=true, escrita=false, permissao=true, segurarDetalhe=false, detalheRetido=null;
 const protocolo='11111111-1111-4111-8111-111111111111', chave='x'.repeat(43), envios=[];
 const item={protocolo,categoria:'OUTRA',alvo:'Alvo fictício',descricao:'Pedido inteiramente sintético.',evidencia:'Contexto fictício.',recebido_em:'2026-11-15T12:00:00Z',historico:[]};
 const fixture=createServer(async(req,res)=>{
@@ -20,9 +20,9 @@ const fixture=createServer(async(req,res)=>{
   if(req.url==='/api/solicitacoes')return send({protocolo,chave,recebido_em:item.recebido_em});
   if(req.url==='/api/solicitacoes/consultar')return send(item);
   if(req.url==='/api/solicitacoes/complementos')return send({...item,historico:[{tipo:'COMPLEMENTO',texto:JSON.parse(body).texto,data:item.recebido_em}]});
-  if(req.url==='/api/atendimento/permissao')return send({responder:escrita});
+  if(req.url==='/api/atendimento/permissao'){if(!permissao){res.writeHead(403);return send({detail:'Acesso restrito ao atendimento.'});}return send({responder:escrita});}
   if(req.url?.startsWith('/api/atendimento?'))return send([item]);
-  if(req.url===`/api/atendimento/${protocolo}`)return send(item);
+  if(req.url===`/api/atendimento/${protocolo}`){if(segurarDetalhe){detalheRetido=()=>send(item);return;}return send(item);}
   if(req.url===`/api/atendimento/${protocolo}/eventos`)return send({...item,historico:[{tipo:'RESPOSTA',texto:JSON.parse(body).texto,data:item.recebido_em}]});
   res.writeHead(403).end('{"detail":"Acesso restrito"}');
 });
@@ -46,6 +46,14 @@ await comNavegador({fixture,executar:async({cdp,avaliar,aguardar})=>{
   await avaliar('document.querySelector("main button").click()');await esperar('Registrar');
   await fill({texto:'Resposta motivada sintética. Peça revisão por complemento.'});
   await avaliar('document.querySelector("main form").requestSubmit()');await esperar('Resposta motivada sintética.');
+  permissao=false;await avaliar('window.dispatchEvent(new Event("focus"))');await esperar('Acesso restrito ao atendimento.');
+  assert.equal(await avaliar('!!document.querySelector("main article")'),false,'perda de permissão limpa o pedido aberto');
+  assert.equal(await avaliar('!!document.querySelector("main form")'),false,'perda de permissão limpa controles internos');
+  permissao=true;await avaliar('window.dispatchEvent(new Event("pageshow"))');await esperar('Permissão de atendimento');
+  segurarDetalhe=true;await avaliar('document.querySelector("main button").click()');await aguardar(()=>Promise.resolve(!!detalheRetido),'detalhe retido');
+  permissao=false;await avaliar('window.dispatchEvent(new Event("undb:sessao-alterada"))');await esperar('Acesso restrito ao atendimento.');
+  detalheRetido();segurarDetalhe=false;await avaliar('new Promise(r=>setTimeout(r,150))');
+  assert.equal(await avaliar('!!document.querySelector("main article")'),false,'resposta anterior não reexibe pedido após perder acesso');
   ativo=false;await navegar('/contato');await esperar('recebimento ainda não está disponível');
   assert.equal(await avaliar('document.querySelectorAll("main form").length'),1,'acompanhar continua disponível');
   console.log('RF25 UI: criação, recibo, consulta, complemento, leitor, atendente e recebimento suspenso aprovados.');
