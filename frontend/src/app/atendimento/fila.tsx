@@ -17,31 +17,49 @@ export default function FilaAtendimento() {
   const geracao = useRef(0);
   useEffect(() => {
     let vivo = true;
-    const controller = new AbortController();
+    let controller: AbortController | null = null;
+    const invalidar = () => { ++geracao.current; controller?.abort(); };
     async function carregar() {
-      setItem(null); setFila([]); setAutorizado(false); setResponder(false);
+      controller?.abort();
+      controller = new AbortController();
+      const versao = ++geracao.current;
+      setItem(null); setFila([]); setAutorizado(false); setResponder(false); setOcupado(false); setErro("");
       try {
         const p = await apiClient.request<{responder:boolean}>("/api/atendimento/permissao", {}, {cache:"no-store", signal:controller.signal});
+        if (!vivo || versao !== geracao.current) return;
         const r = await apiClient.request<Resumo[]>("/api/atendimento", {offset:String(offset)}, {cache:"no-store", signal:controller.signal});
-        if (vivo) {setResponder(p.responder); setFila(r); setAutorizado(true); setErro("");}
-      } catch(e) {if(vivo) setErro(e instanceof Error ? e.message : "Falha ao carregar.");}
+        if (vivo && versao === geracao.current) {setResponder(p.responder); setFila(r); setAutorizado(true);}
+      } catch(e) {if(vivo && versao === geracao.current) setErro(e instanceof Error ? e.message : "Falha ao carregar.");}
     }
+    const limpar = () => { invalidar(); setItem(null); setFila([]); setAutorizado(false); setResponder(false); setOcupado(false); };
+    const visibilidade = () => {
+      if (document.visibilityState === "visible") void carregar();
+      else limpar();
+    };
     void carregar();
-    const limpar = () => {vivo=false; ++geracao.current; controller.abort(); setItem(null); setFila([]); setAutorizado(false); setResponder(false);};
-    window.addEventListener(EVENTO_SESSAO_ALTERADA,limpar);
-    return () => {limpar(); window.removeEventListener(EVENTO_SESSAO_ALTERADA,limpar);};
+    window.addEventListener(EVENTO_SESSAO_ALTERADA, carregar);
+    window.addEventListener("focus", carregar);
+    window.addEventListener("pageshow", carregar);
+    document.addEventListener("visibilitychange", visibilidade);
+    return () => {
+      vivo = false; invalidar();
+      window.removeEventListener(EVENTO_SESSAO_ALTERADA, carregar);
+      window.removeEventListener("focus", carregar);
+      window.removeEventListener("pageshow", carregar);
+      document.removeEventListener("visibilitychange", visibilidade);
+    };
   },[offset]);
   async function abrir(protocolo:string) {
     const versao=++geracao.current;
     setOcupado(true); setItem(null);
     try {const r=await apiClient.request<Solicitacao>(`/api/atendimento/${protocolo}`, {}, {cache:"no-store"}); if(versao===geracao.current) setItem(r);}
-    catch(e) {setErro(e instanceof Error ? e.message : "Falha ao consultar.");} finally {setOcupado(false);}
+    catch(e) {if(versao===geracao.current) setErro(e instanceof Error ? e.message : "Falha ao consultar.");} finally {if(versao===geracao.current) setOcupado(false);}
   }
   async function atender(e:React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); if(!item) return; setOcupado(true); const form=e.currentTarget;
     const versao=++geracao.current;
     try {const r=await apiClient.post<Solicitacao,object>(`/api/atendimento/${item.protocolo}/eventos`,Object.fromEntries(new FormData(form))); if(versao===geracao.current) {setItem(r); form.reset(); setErro("");}}
-    catch(e) {setErro(e instanceof Error ? e.message : "Falha ao responder.");} finally {setOcupado(false);}
+    catch(e) {if(versao===geracao.current) setErro(e instanceof Error ? e.message : "Falha ao responder.");} finally {if(versao===geracao.current) setOcupado(false);}
   }
   return <div className="space-y-5">
     {erro && <p role="alert">{erro} <Link href="/login">Acessar conta</Link></p>}
