@@ -84,6 +84,10 @@ await comNavegador({ fixture:real?null:fixture, executar:async ({cdp,avaliar,agu
     await clicar('Entrar'); await esperar('Sua sessão está ativa');
   }
   async function preencher(comentario=''){
+    await aguardar(
+      async () => await avaliar(`!!document.querySelector('textarea[name="comentario"]:enabled')`),
+      'formulário de avaliação pronto para preencher',
+    );
     await avaliar(`document.querySelector('input[name="didatica"][value="4"]').click();for(const [nome,valor] of Object.entries({dificuldade:'MEDIO',chamada:'true',material:'BOM',recomenda:'true'})){document.querySelector('input[name="'+nome+'"][value="'+valor+'"]').click();}const t=document.querySelector('textarea');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(t,${JSON.stringify(comentario)});t.dispatchEvent(new Event('input',{bubbles:true}));`);
   }
   await navegar(caminho+'/avaliar'); await esperar('Enviar avaliação');
