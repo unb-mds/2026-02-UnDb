@@ -11,6 +11,7 @@ from app.domain.avaliacoes import (
     QualidadeMaterial,
     ResultadoAgregado,
     agregar_avaliacoes,
+    agregar_contagens,
 )
 from app.models.avaliacao import Avaliacao
 from app.models.usuario import Usuario
@@ -263,10 +264,34 @@ def comparar_professores(
         departamento=disciplina.departamento,
         departamento_nome=disciplina.departamento_nome,
     )
-    comparacao = [
-        consultar_agregado(db, professor.id, disciplina_id)
-        for professor in professor_repository.listar_por_disciplina(db, disciplina_id)
-    ]
+    professores = professor_repository.listar_por_disciplina(db, disciplina_id)
+    contagens_por_professor = avaliacao_repository.contar_por_disciplina_e_professores(
+        db, disciplina_id, [professor.id for professor in professores]
+    )
+    comparacao = []
+    for professor in professores:
+        contagens = contagens_por_professor.get(professor.id)
+        total = contagens.total if contagens is not None else 0
+        criterios = None
+        if contagens is not None and total >= MIN_AVALIACOES_EXIBICAO:
+            criterios = agregar_contagens(contagens)
+
+        comparacao.append(
+            ConsultaAgregada(
+                professor_id=professor.id,
+                disciplina_id=disciplina_id,
+                professor=ProfessorInstitucional(
+                    id=professor.id,
+                    nome=professor.nome,
+                    departamento=professor.departamento,
+                    departamento_nome=professor.departamento_nome,
+                ),
+                disciplina=disciplina_institucional,
+                total_avaliacoes=total,
+                dados_suficientes=criterios is not None,
+                criterios=criterios,
+            )
+        )
     comparacao_ordenada = _ordenar_comparacao(comparacao, ordenar_por)
     return ComparacaoProfessores(
         disciplina=disciplina_institucional,

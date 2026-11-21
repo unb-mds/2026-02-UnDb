@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session, joinedload
 
+from app.domain.avaliacoes import ContagensAvaliacoes
 from app.models.avaliacao import Avaliacao
 from app.models.disciplina import Disciplina
 from app.models.enums import Dificuldade, QualidadeMaterial
@@ -102,3 +103,67 @@ def listar_do_usuario(
         .limit(tamanho)
     )
     return list(db.scalars(consulta).all()), total
+
+
+def contar_por_disciplina_e_professores(
+    db: Session,
+    disciplina_id: UUID,
+    professor_ids: list[UUID],
+) -> dict[UUID, ContagensAvaliacoes]:
+    if not professor_ids:
+        return {}
+
+    tem_material = Avaliacao.disponibiliza_material.is_(True)
+    consulta = (
+        select(
+            Avaliacao.professor_id,
+            func.count().label("total"),
+            func.sum(Avaliacao.didatica).label("soma_didatica"),
+            func.count().filter(Avaliacao.chamada.is_(True)).label("chamadas"),
+            func.count().filter(tem_material).label("materiais"),
+            func.count().filter(Avaliacao.recomenda.is_(True)).label("recomendacoes"),
+            *(
+                func.count().filter(Avaliacao.dificuldade == valor)
+                for valor in (Dificuldade.FACIL, Dificuldade.MEDIO, Dificuldade.DIFICIL)
+            ),
+            *(
+                func.count().filter(tem_material, Avaliacao.qualidade_material == valor)
+                for valor in (
+                    QualidadeMaterial.RUIM,
+                    QualidadeMaterial.MEDIO,
+                    QualidadeMaterial.BOM,
+                )
+            ),
+        )
+        .where(
+            Avaliacao.disciplina_id == disciplina_id,
+            Avaliacao.professor_id.in_(professor_ids),
+            Avaliacao.excluido_em.is_(None),
+        )
+        .group_by(Avaliacao.professor_id)
+    )
+    return {
+        professor_id: ContagensAvaliacoes(
+            total=total,
+            soma_didatica=soma_didatica,
+            dificuldades=(facil, medio, dificil),
+            chamadas=chamadas,
+            materiais=materiais,
+            qualidades=(ruim, regular, bom),
+            recomendacoes=recomendacoes,
+        )
+        for (
+            professor_id,
+            total,
+            soma_didatica,
+            chamadas,
+            materiais,
+            recomendacoes,
+            facil,
+            medio,
+            dificil,
+            ruim,
+            regular,
+            bom,
+        ) in db.execute(consulta)
+    }

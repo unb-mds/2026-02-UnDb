@@ -2,7 +2,6 @@ from collections import Counter
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
 from enum import Enum
-from typing import TypeVar
 
 
 class Dificuldade(str, Enum):
@@ -41,74 +40,80 @@ class ResultadoAgregado:
     recomenda: int
 
 
-EnumT = TypeVar("EnumT", bound=Enum)
+@dataclass(frozen=True)
+class ContagensAvaliacoes:
+    total: int
+    soma_didatica: int
+    dificuldades: tuple[int, int, int]
+    chamadas: int
+    materiais: int
+    qualidades: tuple[int, int, int]
+    recomendacoes: int
 
 
-def _maioria(valores: list[bool]) -> bool | ResultadoFactual:
-    positivos = sum(valores)
-    negativos = len(valores) - positivos
+def _maioria(positivos: int, total: int) -> bool | ResultadoFactual:
+    negativos = total - positivos
     if positivos == negativos:
         return ResultadoFactual.CONFLITANTE
     return positivos > negativos
 
 
-def _moda_com_desempate(
-    valores: list[EnumT],
-    ordem: dict[EnumT, int],
-) -> EnumT:
-    contagens = Counter(valores)
-    maior_contagem = max(contagens.values())
-    empatados = [valor for valor, contagem in contagens.items() if contagem == maior_contagem]
-    return max(empatados, key=ordem.__getitem__)
+def _indice_da_moda(contagens: tuple[int, int, int]) -> int:
+    return max(range(len(contagens)), key=lambda indice: (contagens[indice], indice))
 
 
-def agregar_avaliacoes(avaliacoes: list[AvaliacaoParaAgregacao]) -> ResultadoAgregado:
-    if not avaliacoes:
+def agregar_contagens(contagens: ContagensAvaliacoes) -> ResultadoAgregado:
+    total = contagens.total
+    if not total:
         raise ValueError("a agregacao exige ao menos uma avaliacao")
 
-    disponibiliza_material = _maioria(
-        [avaliacao.disponibiliza_material for avaliacao in avaliacoes]
-    )
-    qualidades = [
-        avaliacao.qualidade_material for avaliacao in avaliacoes if avaliacao.disponibiliza_material
-    ]
-    if any(qualidade is None for qualidade in qualidades):
+    disponibiliza_material = _maioria(contagens.materiais, total)
+    if sum(contagens.qualidades) != contagens.materiais:
         raise ValueError("avaliacao com material deve informar sua qualidade")
 
     qualidade_material = None
     if disponibiliza_material is True:
-        qualidade_material = _moda_com_desempate(
-            [qualidade for qualidade in qualidades if qualidade is not None],
-            {
-                QualidadeMaterial.RUIM: 1,
-                QualidadeMaterial.MEDIO: 2,
-                QualidadeMaterial.BOM: 3,
-            },
-        )
+        qualidade_material = tuple(QualidadeMaterial)[_indice_da_moda(contagens.qualidades)]
 
-    total = len(avaliacoes)
-    media_didatica = (
-        sum(avaliacao.didatica for avaliacao in avaliacoes) / Decimal(total)
-    ).quantize(
-        Decimal("0.1"),
-        rounding=ROUND_HALF_UP,
+    dificuldade = tuple(Dificuldade)[_indice_da_moda(contagens.dificuldades)]
+    media_didatica = (Decimal(contagens.soma_didatica) / total).quantize(
+        Decimal("0.1"), rounding=ROUND_HALF_UP
     )
-    percentual_recomendacao = (
-        Decimal(sum(avaliacao.recomenda for avaliacao in avaliacoes) * 100) / Decimal(total)
-    ).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    percentual_recomendacao = (Decimal(contagens.recomendacoes * 100) / total).quantize(
+        Decimal("1"), rounding=ROUND_HALF_UP
+    )
 
     return ResultadoAgregado(
         didatica=float(media_didatica),
-        dificuldade=_moda_com_desempate(
-            [avaliacao.dificuldade for avaliacao in avaliacoes],
-            {
-                Dificuldade.FACIL: 1,
-                Dificuldade.MEDIO: 2,
-                Dificuldade.DIFICIL: 3,
-            },
-        ),
-        chamada=_maioria([avaliacao.chamada for avaliacao in avaliacoes]),
+        dificuldade=dificuldade,
+        chamada=_maioria(contagens.chamadas, total),
         disponibiliza_material=disponibiliza_material,
         qualidade_material=qualidade_material,
         recomenda=int(percentual_recomendacao),
+    )
+
+
+def agregar_avaliacoes(avaliacoes: list[AvaliacaoParaAgregacao]) -> ResultadoAgregado:
+    dificuldades = Counter(avaliacao.dificuldade for avaliacao in avaliacoes)
+    qualidades = Counter(
+        avaliacao.qualidade_material for avaliacao in avaliacoes if avaliacao.disponibiliza_material
+    )
+    return agregar_contagens(
+        ContagensAvaliacoes(
+            total=len(avaliacoes),
+            soma_didatica=sum(avaliacao.didatica for avaliacao in avaliacoes),
+            dificuldades=(
+                dificuldades[Dificuldade.FACIL],
+                dificuldades[Dificuldade.MEDIO],
+                dificuldades[Dificuldade.DIFICIL],
+            ),
+            chamadas=sum(avaliacao.chamada for avaliacao in avaliacoes),
+            materiais=sum(avaliacao.disponibiliza_material for avaliacao in avaliacoes),
+            qualidades=(
+                qualidades[QualidadeMaterial.RUIM],
+                qualidades[QualidadeMaterial.MEDIO],
+                qualidades[QualidadeMaterial.BOM],
+            ),
+            recomendacoes=sum(avaliacao.recomenda for avaliacao in avaliacoes),
+        )
     )
