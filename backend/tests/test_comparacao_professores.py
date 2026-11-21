@@ -1,8 +1,12 @@
 import os
 import unittest
+from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 from uuid import uuid4
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
 os.environ.setdefault(
     "DATABASE_URL",
@@ -10,8 +14,18 @@ os.environ.setdefault(
 )
 os.environ.setdefault("SECRET_KEY", "teste-local")
 
+from app.core.database import Base
+from app.domain.avaliacoes import (
+    AvaliacaoParaAgregacao,
+    ContagensAvaliacoes,
+    Dificuldade,
+    QualidadeMaterial,
+    agregar_avaliacoes,
+    agregar_contagens,
+)
 from app.main import app
-from app.models.enums import Dificuldade, QualidadeMaterial
+from app.models.avaliacao import Avaliacao
+from app.repositories.avaliacao_repository import contar_por_disciplina_e_professores
 from app.repositories.professor_repository import listar_por_disciplina
 from app.services.avaliacao_service import (
     RecursoNaoEncontradoError,
@@ -31,17 +45,6 @@ def disciplina(disciplina_id):
 
 def professor(professor_id, nome):
     return SimpleNamespace(id=professor_id, nome=nome, departamento="CIC", departamento_nome=None)
-
-
-def avaliacao(recomenda: bool):
-    return SimpleNamespace(
-        didatica=4,
-        dificuldade=Dificuldade.MEDIO,
-        chamada=True,
-        disponibiliza_material=True,
-        qualidade_material=QualidadeMaterial.BOM,
-        recomenda=recomenda,
-    )
 
 
 class ComparacaoProfessoresServiceTest(unittest.TestCase):
@@ -68,21 +71,19 @@ class ComparacaoProfessoresServiceTest(unittest.TestCase):
             self.professor_bruno,
             self.professor_carol,
         ]
-        avaliacao_repository.obter_professor.side_effect = lambda _, professor_id: {
-            self.professor_alice.id: self.professor_alice,
-            self.professor_bruno.id: self.professor_bruno,
-            self.professor_carol.id: self.professor_carol,
-        }[professor_id]
-        avaliacao_repository.listar_por_professor_e_disciplina.side_effect = (
-            lambda _, professor_id, __: {
-                self.professor_alice.id: [avaliacao(True)] * 3,
-                self.professor_bruno.id: [avaliacao(True)] * 4,
-                self.professor_carol.id: [avaliacao(False)] * 2,
-            }[professor_id]
-        )
+        avaliacao_repository.contar_por_disciplina_e_professores.return_value = {
+            self.professor_alice.id: ContagensAvaliacoes(3, 12, (0, 3, 0), 3, 3, (0, 0, 3), 3),
+            self.professor_bruno.id: ContagensAvaliacoes(4, 16, (0, 4, 0), 4, 4, (0, 0, 4), 4),
+        }
 
         resultado = comparar_professores(self.session, self.disciplina_id)
 
+        avaliacao_repository.contar_por_disciplina_e_professores.assert_called_once_with(
+            self.session,
+            self.disciplina_id,
+            [self.professor_alice.id, self.professor_bruno.id, self.professor_carol.id],
+        )
+        self.turma_repository.existe_vinculo_professor_disciplina.assert_not_called()
         self.assertEqual(resultado.disciplina.id, self.disciplina_id)
         self.assertEqual(
             [consulta.professor.nome for consulta in resultado.professores],
@@ -90,6 +91,7 @@ class ComparacaoProfessoresServiceTest(unittest.TestCase):
         )
         self.assertEqual(resultado.professores[0].criterios.recomenda, 100)
         self.assertFalse(resultado.professores[-1].dados_suficientes)
+        self.assertEqual(resultado.professores[-1].total_avaliacoes, 0)
 
     @patch("app.services.avaliacao_service.avaliacao_repository")
     def test_rejeita_disciplina_inexistente(self, avaliacao_repository: Mock) -> None:
@@ -100,6 +102,56 @@ class ComparacaoProfessoresServiceTest(unittest.TestCase):
 
 
 class ComparacaoProfessoresRepositoryTest(unittest.TestCase):
+    def test_contagens_sql_equivalem_a_agregacao_das_avaliacoes(self) -> None:
+        engine = create_engine("sqlite+pysqlite:///:memory:")
+        self.addCleanup(engine.dispose)
+        Base.metadata.create_all(engine)
+        professor_id, outro_professor_id, disciplina_id = uuid4(), uuid4(), uuid4()
+        respostas = [
+            AvaliacaoParaAgregacao(1, Dificuldade.FACIL, True, True, QualidadeMaterial.RUIM, True),
+            AvaliacaoParaAgregacao(1, Dificuldade.MEDIO, True, True, QualidadeMaterial.MEDIO, True),
+            AvaliacaoParaAgregacao(
+                1, Dificuldade.DIFICIL, False, True, QualidadeMaterial.BOM, False
+            ),
+            AvaliacaoParaAgregacao(2, Dificuldade.FACIL, False, False, None, False),
+        ]
+
+        with Session(engine) as db:
+            for resposta in respostas:
+                db.add(
+                    Avaliacao(
+                        usuario_id=uuid4(),
+                        professor_id=professor_id,
+                        disciplina_id=disciplina_id,
+                        **vars(resposta),
+                    )
+                )
+            db.add(
+                Avaliacao(
+                    usuario_id=uuid4(),
+                    professor_id=professor_id,
+                    disciplina_id=uuid4(),
+                    **vars(respostas[0]),
+                )
+            )
+            db.add(
+                Avaliacao(
+                    usuario_id=uuid4(),
+                    professor_id=professor_id,
+                    disciplina_id=disciplina_id,
+                    excluido_em=datetime.now(timezone.utc),
+                    **vars(respostas[0]),
+                )
+            )
+            db.flush()
+            contagens = contar_por_disciplina_e_professores(
+                db, disciplina_id, [professor_id, outro_professor_id]
+            )
+
+        self.assertEqual(set(contagens), {professor_id})
+        self.assertEqual(contagens[professor_id].total, 4)
+        self.assertEqual(agregar_contagens(contagens[professor_id]), agregar_avaliacoes(respostas))
+
     def test_lista_professores_distintos_da_disciplina(self) -> None:
         db = Mock()
         db.scalars.return_value.all.return_value = []
