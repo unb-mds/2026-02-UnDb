@@ -22,7 +22,8 @@ cd 2026-02-UnDb
 
 # configurar variáveis de ambiente
 cp backend/.env.example backend/.env  # Windows: copy backend\.env.example backend\.env
-# edite backend/.env e troque os valores de exemplo, principalmente as senhas
+# Edite backend/.env e preencha os segredos antes de iniciar.
+# Ao trocar POSTGRES_PASSWORD, atualize a senha em DATABASE_URL.
 
 # construir as imagens, iniciar PostgreSQL, API e frontend, e aplicar as migrações
 # usando as variáveis configuradas em backend/.env
@@ -120,10 +121,11 @@ de resultado consumível pela rotina de atualização, está em
 ### Frontend com recarga automática, fora do Docker
 
 **Pré-requisitos:** Node.js 20.9 ou superior com npm (a imagem usa Node.js 24) e o backend
-acessível. Para usar apenas backend e banco no Compose, sem ocupar a porta 3000:
+acessível. Para manter o backend, o banco e a rotina de descarte no Compose e liberar
+a porta 3000 para o servidor de desenvolvimento:
 
 ```bash
-docker compose --env-file backend/.env up --build backend db
+docker compose --env-file backend/.env up --build backend db descarte-moderacao
 ```
 
 ```bash
@@ -136,7 +138,7 @@ npm run dev
 A aplicação sobe em `http://localhost:3000` e consome por padrão a API em
 `http://localhost:8000`. Ajuste `NEXT_PUBLIC_API_URL` em `.env.local` quando o backend estiver
 publicado em outro endereço. Os comandos disponíveis para lint, build de produção e execução
-do build estão documentados em [`frontend/README.md`](https://github.com/unb-mds/2026-02-UnDb/blob/release/1.4.0/frontend/README.md).
+do build estão documentados em [`frontend/README.md`](https://github.com/unb-mds/2026-02-UnDb/blob/develop/frontend/README.md).
 
 A estratégia implementada para revisão na [Issue #36](https://github.com/unb-mds/2026-02-UnDb/issues/36) usa servidor
 Next.js, sem exportação estática. A justificativa, as alternativas e as consequências

@@ -32,7 +32,7 @@ python -m unittest discover -s tests -v
 Configure `DATABASE_URL` e `SECRET_KEY` no ambiente de testes. Integrações PostgreSQL
 precisam de banco descartável migrado e `UNDB_INTEGRATION_TEST=1`; não aponte os runners
 para produção ou para o banco de uma importação em andamento. Procedimentos adicionais
-estão no [guia do frontend](https://github.com/unb-mds/2026-02-UnDb/blob/release/1.4.0/frontend/README.md) e nos módulos `tests.integration_*` do backend.
+estão no [guia do frontend](https://github.com/unb-mds/2026-02-UnDb/blob/develop/frontend/README.md) e nos módulos `tests.integration_*` do backend.
 
 ## Documentação
 

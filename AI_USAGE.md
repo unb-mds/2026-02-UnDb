@@ -27,6 +27,7 @@ com referência ao artefato e às alterações aceitas, ajustadas ou rejeitadas.
 | 16–17/11/2026, nesta sessão | Nicolas | Codex; modelo exato não registrado | Consulta das issues, análise da consolidação #263/#269 e correção das referências em #267/#278 | Nicolas solicitou as correções; somente referências foram atualizadas, sem novo aceite de entrega |
 | 17/11/2026 | Nicolas | Codex; modelo exato não registrado | Implementar #269: inventário, Privacidade, Termos, ciência no cadastro, inclusão de “sem fins lucrativos” e verificações | Ajustado para preservar contas antigas, separar ciência de consentimento genérico e explicitar limites operacionais. Nicolas autorizou publicação em um commit; PR #281 integrada em 17/11, conforme GitHub consultado nesta sessão; integração não comprova deploy |
 | 17/11/2026 | Nicolas | Codex; modelo exato não registrado | Preparar #241: atas retrospectivas, organização documental, README e registros de IA | Ajustado por Nicolas: corrigiu “entre R1 e R2”, forneceu semanas, ausências e exemplo de registro. Datas não lembradas ficaram como intervalos; issues foram usadas como contexto, sem inventar decisões. Revisão final da entrega segue pela PR |
+| 24/11/2026 | Nicolas | Codex | Revisar e corrigir os guias de instalação, uso e release na [#292](https://github.com/unb-mds/2026-02-UnDb/issues/292) | Revisão técnica do Tiago pendente. |
 
 ### Fontes das entradas
 
