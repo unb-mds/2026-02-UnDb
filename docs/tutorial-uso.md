@@ -66,7 +66,19 @@ Comentário é opcional e tem estado próprio de moderação; o registro dos cri
 depende da aprovação do texto. A consulta pública não mostra a conta autora, mas detalhes
 do texto ou do contexto podem identificar pessoas; não há promessa de anonimato absoluto.
 
-## 6. Informe problemas e peça revisão
+## 6. Consulte suas avaliações
+
+Abra **Minha conta** e vá até **Minhas avaliações** para conferir os critérios que
+você enviou por professor e disciplina. A lista é privada e fica disponível na sua conta.
+
+## 7. Vote na utilidade de um comentário
+
+Em um comentário publicado, você pode consultar as contagens de **Útil** e **Não útil**.
+Com seu e-mail institucional confirmado, selecione uma opção para votar em um comentário
+de outra pessoa. Para mudar de voto, selecione a outra opção. Para retirá-lo, selecione
+novamente a opção marcada.
+
+## 8. Informe problemas e peça revisão
 
 Use a ação de denúncia no comentário e selecione um motivo pertinente. Denúncia não é
 voto de discordância; crítica negativa legítima pode permanecer publicada.
@@ -85,8 +97,7 @@ Os formulários mostram mensagens para dados inválidos ou falha no envio.
 
 ## Sobre este tutorial
 
-Derivado dos [requisitos](requisitos.md), contratos e telas presentes na base `df854bf`,
-conferidos em 17/11/2026. A #269/PR #281 integrou Termos/Privacidade e ciência do cadastro
-à `develop` em 17/11/2026; a integração não confirma publicação em produção. A #278 prepara votos de utilidade, que ainda não
-são um passo deste tutorial. O texto não declara teste novo com participantes ou disponibilidade
-pública permanente.
+Este tutorial acompanha os [requisitos](requisitos.md) e as telas da
+[candidata 2.0.0-rc.1](releases/2.0.0-rc.1.md), incluindo a ciência dos Termos no
+cadastro (#269), votos de utilidade (#278) e a consulta das próprias avaliações (RF27).
+A disponibilidade no site público depende da versão implantada.

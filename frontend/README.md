@@ -228,7 +228,8 @@ O retorno recebido, a comparação com a #148 e as ideias para continuidade est�
 Na raiz do repositório, configure `backend/.env` conforme o [README principal](../README.md)
 e execute `docker compose --env-file backend/.env up --build`. O frontend fica em
 `http://localhost:3000`, junto da API e do PostgreSQL. Para trabalhar com recarga automática,
-inicie somente `backend db` no Compose e use `npm run dev` nesta pasta.
+siga o [guia de desenvolvimento local](../docs/desenvolvimento.md#frontend-com-recarga-automática-fora-do-docker)
+para iniciar o backend, o banco e a rotina de descarte. Depois, use `npm run dev` nesta pasta.
 
 A imagem usa Node.js 24 em Debian slim e build em múltiplas etapas. O Docker define
 `BUILD_STANDALONE=true` para gerar `.next/standalone`; o container executa `node server.js`

@@ -80,10 +80,12 @@ git clone https://github.com/unb-mds/2026-02-UnDb.git
 cd 2026-02-UnDb
 cp backend/.env.example backend/.env
 # Configure as credenciais locais e SECRET_KEY antes de iniciar.
+# Descomente ABUSO_HMAC_SECRET e preencha com um segredo aleatório exclusivo.
 docker compose --env-file backend/.env up --build
 ```
 
 Frontend: `http://localhost:3000` · API: `http://localhost:8000/docs`.
+Sem `ABUSO_HMAC_SECRET`, cadastro e login retornam HTTP 503.
 O catálogo depende da importação. O [guia completo](docs/desenvolvimento.md) explica
 variáveis, importação, e-mail local e execução com recarga automática. Não versione `.env`.
 
@@ -116,7 +118,7 @@ PR aberta e publicação em produção são marcos distintos.
 <td align="center"><a href="https://github.com/ailoiol"><img src="frontend/public/equipe/ailoiol.png" width="72" alt="Foto de Yasmin" /><br />Yasmin</a></td>
 <td align="center"><a href="https://github.com/ViniGvdo"><img src="frontend/public/equipe/ViniGvdo.png" width="72" alt="Foto de Vinicius" /><br />Vinicius</a></td>
 <td align="center"><a href="https://github.com/gabrielrdaraujo"><img src="frontend/public/equipe/gabrielrdaraujo.png" width="72" alt="Foto de Gabriel" /><br />Gabriel</a></td>
-<td align="center"><a href="https://github.com/TiagoVieira-596"><img src="frontend/public/equipe/TiagoVieira-596.png" width="72" alt="Foto de Tiago" /><br />Tiago</a></td>
+<td align="center"><a href="https://github.com/TiagoVieira-596"><img src="frontend/public/equipe/TiagoVieira-596.jpg" width="72" alt="Foto de Tiago" /><br />Tiago</a></td>
 <td align="center"><a href="https://github.com/warlleymedeiros"><img src="frontend/public/equipe/warlleymedeiros.png" width="72" alt="Foto de Warlley" /><br />Warlley</a></td>
 </tr></table>
 
