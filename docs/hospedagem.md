@@ -84,12 +84,16 @@ sequência `alembic ... && uvicorn ...` no campo: isso causou status 127 no depl
 | `DATABASE_URL` | Conexão direta Neon, `postgresql+psycopg2://`, com `sslmode=require`; valor secreto |
 | `MIGRATION_DATABASE_URL` | Após publicar o suporte da #170, conexão administrativa privada para Alembic; `DATABASE_URL` passa a usar o papel limitado `undb_api`, no mesmo banco/branch |
 | `SECRET_KEY` | Valor aleatório privado, mantido no painel |
+| `ABUSO_HMAC_SECRET` | Segredo aleatório exclusivo, mantido no painel. Exigido pelo limitador de autenticação desde a #266 |
 | `DEBUG` | `False` |
 | `CORS_ORIGINS` | Lista separada por vírgulas; origem principal `https://undb.app.br`. Incluir outras origens apenas quando usadas e verificadas |
 | `FRONTEND_URL` | `https://undb.app.br` |
 | `EMAIL_BACKEND` | `resend` |
 | `EMAIL_FROM` | `UnDb <no-reply@undb.app.br>` |
 | `RESEND_API_KEY` | Chave privada de envio, restrita ao domínio verificado |
+
+A ausência de `ABUSO_HMAC_SECRET` faz cadastro e login retornarem HTTP 503.
+Veja a [configuração do limitador de autenticação](seguranca/limitador-auth-bloco-2.md).
 
 Editar variáveis já existentes: o painel rejeita chaves duplicadas. A primeira
 configuração usava `EMAIL_BACKEND=console`, que só registra o link nos logs; ela
