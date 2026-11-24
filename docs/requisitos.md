@@ -685,6 +685,11 @@ Restrições que valem para todo o sistema e não pertencem a um RF isolado.
 
 ## 🗺️ 9. Matriz de rastreabilidade por release
 
+Registro histórico do planejamento da R1 e do início da R2, anterior às entregas
+reunidas na [reconciliação da R2](releases/2.0.0-reconciliacao.md). Consulte também
+as [notas da candidata 2.0.0-rc.1](releases/2.0.0-rc.1.md) para as entregas mais recentes
+e as validações pendentes daquela candidata.
+
 | Requisito | Descrição | Release | Estado |
 |---|---|---|---|
 | RF01–RF04 | Identificação, sessão, substituição sem duplicata, consulta anônima | R1 | Planejado — modelo de acesso validado; envio de e-mail ainda depende das decisões da seção 11 |
@@ -1098,11 +1103,14 @@ na `develop`; PR e integração final aguardam a PR da Yasmin.
 - A revisão visual mantém o catálogo, busca e critérios existentes. Os destaques atuais
   são por quantidade de avaliações; não há autorização para inventar contagens de visitas.
 
-| Escopo | Origem | Estado nesta revisão |
+| Escopo | Origem | Estado na revisão de 18/11/2026 |
 |---|---|---|
 | RF27 | Solicitação explícita de 18/11/2026 | Implementação e validação local; integração pendente |
 | Reenvio de confirmação | Restrição de autenticação e pedido de 18/11/2026 | Exposição do fluxo existente na interface |
 | Home e catálogo | Pedido de 18/11/2026 | Revisão de apresentação; comportamento público preservado |
+
+A implementação do RF27 foi integrada à `develop` pela [PR #286](https://github.com/unb-mds/2026-02-UnDb/pull/286)
+e consta na [candidata 2.0.0-rc.1](releases/2.0.0-rc.1.md).
 
 ### Conferência de privacidade #265 — 20/11/2026
 
